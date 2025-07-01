@@ -38,6 +38,7 @@ export class ModalManager {
   }
 
   show(modalId) {
+    console.log('ModalManager: Showing modal', modalId); // Debug log
     const modal = this.modals.get(modalId);
     if (modal) {
       modal.classList.add('active');
@@ -48,10 +49,15 @@ export class ModalManager {
       if (firstInput) {
         setTimeout(() => firstInput.focus(), 100);
       }
+      
+      console.log('ModalManager: Modal shown successfully'); // Debug log
+    } else {
+      console.error('ModalManager: Modal not found', modalId); // Debug log
     }
   }
 
   hide(modalId) {
+    console.log('ModalManager: Hiding modal', modalId); // Debug log
     const modal = this.modals.get(modalId);
     if (modal) {
       modal.classList.remove('active');

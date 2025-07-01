@@ -58,7 +58,10 @@ class FinznApp {
     
     // Income management
     document.getElementById('fixed-income-form').addEventListener('submit', (e) => this.handleFixedIncome(e));
-    document.getElementById('add-extra-income-btn').addEventListener('click', () => this.modals.show('extra-income-modal'));
+    document.getElementById('add-extra-income-btn').addEventListener('click', () => {
+      console.log('Extra income button clicked'); // Debug log
+      this.modals.show('extra-income-modal');
+    });
     document.getElementById('extra-income-form').addEventListener('submit', (e) => this.handleExtraIncome(e));
     
     // Goals management
@@ -236,6 +239,11 @@ class FinznApp {
       return;
     }
 
+    if (expense.amount <= 0) {
+      this.ui.showAlert('El monto debe ser mayor a 0', 'error');
+      return;
+    }
+
     try {
       await this.data.addExpense(expense);
       this.modals.hide('expense-modal');
@@ -270,20 +278,39 @@ class FinznApp {
 
   async handleExtraIncome(e) {
     e.preventDefault();
+    console.log('Extra income form submitted'); // Debug log
     
-    const extraIncome = {
-      description: document.getElementById('extra-income-description').value,
-      amount: parseFloat(document.getElementById('extra-income-amount').value),
-      category: document.getElementById('extra-income-category').value,
-      date: this.currentMonth
-    };
+    const description = document.getElementById('extra-income-description').value.trim();
+    const amount = parseFloat(document.getElementById('extra-income-amount').value);
+    const category = document.getElementById('extra-income-category').value;
+    
+    console.log('Form data:', { description, amount, category }); // Debug log
 
-    if (!extraIncome.description || !extraIncome.amount || !extraIncome.category) {
-      this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
+    // Validation
+    if (!description) {
+      this.ui.showAlert('Por favor ingresa una descripción', 'error');
       return;
     }
 
+    if (!amount || amount <= 0) {
+      this.ui.showAlert('Por favor ingresa un monto válido mayor a 0', 'error');
+      return;
+    }
+
+    if (!category) {
+      this.ui.showAlert('Por favor selecciona una categoría', 'error');
+      return;
+    }
+
+    const extraIncome = {
+      description,
+      amount,
+      category,
+      date: this.currentMonth
+    };
+
     try {
+      console.log('Adding extra income:', extraIncome); // Debug log
       await this.data.addExtraIncome(extraIncome, this.currentMonth);
       this.modals.hide('extra-income-modal');
       e.target.reset();

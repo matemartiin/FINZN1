@@ -32,6 +32,16 @@ export class DataManager {
       try {
         const parsed = JSON.parse(savedData);
         this.data = { ...this.data, ...parsed };
+        
+        // Ensure all required properties exist
+        if (!this.data.extraIncomes) this.data.extraIncomes = {};
+        if (!this.data.income) this.data.income = {};
+        if (!this.data.expenses) this.data.expenses = {};
+        if (!this.data.goals) this.data.goals = [];
+        if (!this.data.categories) this.data.categories = this.getDefaultCategories();
+        if (!this.data.achievements) this.data.achievements = [];
+        if (!this.data.recurringExpenses) this.data.recurringExpenses = [];
+        
       } catch (error) {
         console.error('Error loading user data:', error);
       }
@@ -44,6 +54,7 @@ export class DataManager {
 
     try {
       localStorage.setItem(`finzn-data-${user}`, JSON.stringify(this.data));
+      console.log('Data saved successfully'); // Debug log
     } catch (error) {
       console.error('Error saving user data:', error);
     }
@@ -105,7 +116,7 @@ export class DataManager {
     for (let month = 1; month <= 12; month++) {
       const monthKey = `${currentYear}-${month.toString().padStart(2, '0')}`;
       if (!this.data.income[monthKey]) {
-        this.data.income[monthKey] = {};
+        this.data.income[monthKey] = { fixed: 0, extra: 0 };
       }
       this.data.income[monthKey].fixed = amount;
     }
@@ -114,12 +125,16 @@ export class DataManager {
   }
 
   async addExtraIncome(extraIncome, month) {
+    console.log('DataManager: Adding extra income', extraIncome, month); // Debug log
+    
     const id = Date.now().toString();
     
+    // Initialize extraIncomes for the month if it doesn't exist
     if (!this.data.extraIncomes[month]) {
       this.data.extraIncomes[month] = [];
     }
     
+    // Add the extra income record
     this.data.extraIncomes[month].push({
       id,
       description: extraIncome.description,
@@ -129,15 +144,19 @@ export class DataManager {
       createdAt: new Date().toISOString()
     });
     
-    // Update total extra income for the month
+    // Initialize income for the month if it doesn't exist
     if (!this.data.income[month]) {
-      this.data.income[month] = {};
+      this.data.income[month] = { fixed: 0, extra: 0 };
     }
     
+    // Update total extra income for the month
     const currentExtra = this.data.income[month].extra || 0;
     this.data.income[month].extra = currentExtra + extraIncome.amount;
     
+    console.log('DataManager: Updated income data', this.data.income[month]); // Debug log
+    
     this.saveUserData();
+    this.checkAchievements();
   }
 
   async addGoal(goal) {
@@ -193,7 +212,9 @@ export class DataManager {
   }
 
   getIncome(month) {
-    return this.data.income[month] || { fixed: 0, extra: 0 };
+    const income = this.data.income[month] || { fixed: 0, extra: 0 };
+    console.log('DataManager: Getting income for', month, income); // Debug log
+    return income;
   }
 
   getExtraIncomes(month) {
