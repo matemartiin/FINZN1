@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FINZN - Gestión Financiera Personal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+</head>
+<body>
+  <!-- Alert System -->
+  <div id="alert-container" class="alert-container"></div>
+  
+  <!-- Login Container -->
+  <div id="login-container" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <div class="logo-icon">💰</div>
+          <h1 class="auth-title">FINZN</h1>
+        </div>
+        <p class="auth-subtitle">Gestiona tus finanzas de manera inteligente</p>
+      </div>
+      
+      <form id="login-form" class="auth-form">
+        <div class="input-group">
+          <input type="text" id="login-user" placeholder="Usuario" required autocomplete="username" />
+        </div>
+        <div class="input-group">
+          <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+          <span>🚀</span>
+          Iniciar Sesión
+        </button>
+        <div id="login-error" class="error-message"></div>
+      </form>
+      
+      <div class="auth-footer">
+        <p>¿No tienes cuenta? <button type="button" id="show-register" class="link-btn">Regístrate aquí</button></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Container -->
+  <div id="register-container" class="auth-container hidden">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 class="auth-title">Crear Cuenta</h1>
+        <p class="auth-subtitle">Únete a FINZN y toma control de tus finanzas</p>
+      </div>
+      
+      <form id="register-form" class="auth-form">
+        <div class="input-group">
+          <input type="text" id="register-user" placeholder="Usuario" required autocomplete="username" />
+        </div>
+        <div class="input-group">
+          <input type="password" id="register-pass" placeholder="Contraseña" required autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+          <span>🎯</span>
+          Crear Cuenta
+        </button>
+        <div id="register-error" class="error-message"></div>
+      </form>
+      
+      <div class="auth-footer">
+        <p>¿Ya tienes cuenta? <button type="button" id="show-login" class="link-btn">Inicia sesión</button></p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Application -->
+  <div id="app" class="app hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo-container">
+            <div class="logo-icon-small">💰</div>
+            <h1 class="logo">FINZN</h1>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="month-selector">
+            <label for="month-select">Mes:</label>
+            <select id="month-select"></select>
+          </div>
+          <div class="user-info">
+            <span id="user-name"></span>
+            <button id="logout-btn" class="btn btn-secondary btn-sm" title="Cerrar sesión">
+              <span>🚪</span>
+              Salir
+            </button>
+          </div>
+          <button id="theme-toggle" class="btn btn-icon" title="Cambiar tema">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <button id="logout-btn" class="btn btn-secondary logout-btn" title="Cerrar sesión">
+            <span>🚪</span>
+            <span class="logout-text">Salir</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard -->
+    <main class="dashboard">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Balance Card -->
+        <div class="card balance-card">
+          <div class="card-header">
+            <div class="card-icon">💰</div>
+            <h2>Balance Disponible</h2>
+          </div>
+          <div class="balance-amount" id="balance-amount">$0</div>
+          <div class="balance-details">
+            <div class="balance-item">
+              <span>Gastos del mes:</span>
+              <span id="monthly-expenses">$0</span>
+            </div>
+            <div class="balance-item">
+              <span>Cuotas activas:</span>
+              <span id="active-installments">0</span>
+            </div>
+          </div>
+          <button id="add-expense-btn" class="btn btn-primary btn-full">
+            <span>➕</span>
+            Nuevo Gasto
+          </button>
+        </div>
+
+        <!-- Income Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">💼</div>
+            <h2>Ingresos</h2>
+          </div>
+          <form id="fixed-income-form" class="income-form">
+            <div class="input-group">
+              <input type="number" id="fixed-income-input" placeholder="Ingreso fijo mensual" step="0.01" />
+              <button type="submit" class="btn btn-icon">💾</button>
+            </div>
+          </form>
+          <button id="add-extra-income-btn" class="btn btn-secondary btn-sm btn-full">
+            <span>💰</span>
+            Agregar Ingreso Extra
+          </button>
+          <div class="income-summary">
+            <div class="income-item">
+              <span>Fijo:</span>
+              <span id="fixed-income-amount">$0</span>
+            </div>
+            <div class="income-item">
+              <span>Extra:</span>
+              <span id="extra-income-amount">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goals Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">🎯</div>
+            <h2>Objetivos</h2>
+            <button id="add-goal-btn" class="btn btn-sm add-btn">
+              <span>➕</span>
+            </button>
+          </div>
+          <div id="goals-list" class="goals-list"></div>
+        </div>
+
+        <!-- Achievements Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">🏆</div>
+            <h2>Logros</h2>
+          </div>
+          <div id="achievements-list" class="achievements-list"></div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Gastos por Categoría</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="expenses-chart"></canvas>
+            </div>
+          </div>
+          
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Tendencia Mensual</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="trend-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expenses List -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">📋</div>
+            <h2>Gastos Recientes</h2>
+          </div>
+          <div class="search-bar">
+            <input type="text" id="expense-search" placeholder="🔍 Buscar gastos..." />
+          </div>
+          <div id="expenses-list" class="expenses-list"></div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <aside class="right-panel">
+        <!-- Quick Stats -->
+        <div class="card stats-card">
+          <div class="card-header">
+            <div class="card-icon">📊</div>
+            <h2>Resumen</h2>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-label">Total Ahorrado</div>
+              <div class="stat-value" id="total-savings">$0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Promedio Mensual</div>
+              <div class="stat-value" id="monthly-average">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">🏷️</div>
+            <h2>Categorías</h2>
+            <button id="add-category-btn" class="btn btn-sm add-btn">
+              <span>➕</span>
+            </button>
+          </div>
+          <div id="categories-list" class="categories-list"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card actions-card">
+          <div class="card-header">
+            <div class="card-icon">⚡</div>
+            <h2>Acciones</h2>
+          </div>
+          <div class="actions-grid">
+            <button id="generate-report-btn" class="btn btn-secondary">📊 Generar Informe</button>
+            <button id="export-csv-btn" class="btn btn-secondary">📥 Exportar CSV</button>
+            <label for="import-csv" class="btn btn-secondary">📤 Importar CSV</label>
+            <input type="file" id="import-csv" accept=".csv" class="hidden" />
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div id="expense-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nuevo Gasto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="expense-form" class="modal-form">
+        <div class="input-group">
+          <label for="expense-description">Descripción</label>
+          <input type="text" id="expense-description" required />
+        </div>
+        <div class="input-group">
+          <label for="expense-amount">Monto</label>
+          <input type="number" id="expense-amount" step="0.01" required />
+        </div>
+        <div class="input-group">
+          <label for="expense-category">Categoría</label>
+          <select id="expense-category" required></select>
+        </div>
+        <div class="input-group">
+          <label for="expense-installments">Cuotas (opcional)</label>
+          <input type="number" id="expense-installments" min="1" />
+        </div>
+        <div class="checkbox-group">
+          <label>
+            <input type="checkbox" id="expense-recurring" />
+            <span>Gasto recurrente</span>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Agregar Gasto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="extra-income-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nuevo Ingreso Extra</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="extra-income-form" class="modal-form">
+        <div class="input-group">
+          <label for="extra-income-description">Descripción</label>
+          <input type="text" id="extra-income-description" placeholder="Ej: Venta de producto, Regalo, Trabajo freelance" required />
+        </div>
+        <div class="input-group">
+          <label for="extra-income-amount">Monto</label>
+          <input type="number" id="extra-income-amount" step="0.01" required />
+        </div>
+        <div class="input-group">
+          <label for="extra-income-category">Categoría</label>
+          <select id="extra-income-category" required>
+            <option value="">Selecciona una categoría</option>
+            <option value="Venta">💰 Venta</option>
+            <option value="Regalo">🎁 Regalo</option>
+            <option value="Trabajo">💼 Trabajo</option>
+            <option value="Freelance">💻 Freelance</option>
+            <option value="Inversión">📈 Inversión</option>
+            <option value="Bono">🎯 Bono</option>
+            <option value="Otro">📦 Otro</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Agregar Ingreso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="goal-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nuevo Objetivo</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="goal-form" class="modal-form">
+        <div class="input-group">
+          <label for="goal-name">Nombre del objetivo</label>
+          <input type="text" id="goal-name" required />
+        </div>
+        <div class="input-group">
+          <label for="goal-target">Monto objetivo</label>
+          <input type="number" id="goal-target" step="0.01" required />
+        </div>
+        <div class="input-group">
+          <label for="goal-current">Monto actual</label>
+          <input type="number" id="goal-current" step="0.01" value="0" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Objetivo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="category-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nueva Categoría</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="category-form" class="modal-form">
+        <div class="input-group">
+          <label for="category-name">Nombre</label>
+          <input type="text" id="category-name" required />
+        </div>
+        <div class="input-group">
+          <label for="category-icon">Icono</label>
+          <input type="text" id="category-icon" maxlength="2" placeholder="🏷️" />
+        </div>
+        <div class="input-group">
+          <label for="category-color">Color</label>
+          <input type="color" id="category-color" value="#2563eb" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Categoría</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="report-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>Informe Financiero</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div id="report-content" class="report-content"></div>
+      <div class="modal-actions">
+        <button id="download-report-btn" class="btn btn-primary">📥 Descargar</button>
+        <button class="btn btn-secondary modal-cancel">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Chat Assistant -->
+  <div id="chat-assistant" class="chat-assistant">
+    <button id="chat-toggle" class="chat-toggle">
+      <img src="/mascota.png" alt="Asistente IA" />
+    </button>
+    <div id="chat-window" class="chat-window hidden">
+      <div class="chat-header">
+        <h3>Asistente Financiero</h3>
+        <button id="chat-close" class="chat-close">&times;</button>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <form id="chat-form" class="chat-form">
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Pregúntame sobre finanzas..." />
+          <button type="submit" class="btn btn-primary chat-send-btn">
+            <span>📤</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
