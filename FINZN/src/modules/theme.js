@@ -1,23 +1,18 @@
 export class ThemeManager {
   constructor() {
-    this.currentTheme = localStorage.getItem('theme') || 'light';
+    this.currentTheme = localStorage.getItem('finzn-theme') || 'light';
   }
 
   init() {
     this.applyTheme(this.currentTheme);
-    
-    const toggleBtn = document.getElementById('theme-toggle');
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => this.toggle());
-      this.updateToggleIcon();
-    }
+    this.updateToggleIcon();
   }
 
   toggle() {
     this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
     this.applyTheme(this.currentTheme);
     this.updateToggleIcon();
-    localStorage.setItem('theme', this.currentTheme);
+    localStorage.setItem('finzn-theme', this.currentTheme);
   }
 
   applyTheme(theme) {
@@ -35,10 +30,13 @@ export class ThemeManager {
     document.documentElement.setAttribute('data-theme', theme);
     
     // Update meta theme-color for mobile browsers
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff');
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement('meta');
+      metaThemeColor.name = 'theme-color';
+      document.head.appendChild(metaThemeColor);
     }
+    metaThemeColor.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff');
   }
 
   updateToggleIcon() {

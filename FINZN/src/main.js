@@ -86,9 +86,13 @@ class FinznApp {
 
   async handleLogin(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const username = formData.get('username') || document.getElementById('login-user').value;
-    const password = formData.get('password') || document.getElementById('login-pass').value;
+    const username = document.getElementById('login-user').value;
+    const password = document.getElementById('login-pass').value;
+
+    if (!username || !password) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
 
     try {
       const success = await this.auth.login(username, password);
@@ -107,9 +111,18 @@ class FinznApp {
 
   async handleRegister(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const username = formData.get('username') || document.getElementById('register-user').value;
-    const password = formData.get('password') || document.getElementById('register-pass').value;
+    const username = document.getElementById('register-user').value;
+    const password = document.getElementById('register-pass').value;
+
+    if (!username || !password) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+
+    if (password.length < 4) {
+      this.ui.showAlert('La contraseña debe tener al menos 4 caracteres', 'error');
+      return;
+    }
 
     try {
       const success = await this.auth.register(username, password);
@@ -117,7 +130,7 @@ class FinznApp {
         this.showLogin();
         this.ui.showAlert('Cuenta creada exitosamente. Ahora puedes iniciar sesión.', 'success');
       } else {
-        this.ui.showAlert('Error al crear la cuenta', 'error');
+        this.ui.showAlert('Error al crear la cuenta. El usuario ya existe.', 'error');
       }
     } catch (error) {
       console.error('Register error:', error);
@@ -159,11 +172,17 @@ class FinznApp {
   showLogin() {
     document.getElementById('register-container').classList.add('hidden');
     document.getElementById('login-container').classList.remove('hidden');
+    // Clear any error messages
+    document.getElementById('register-error').textContent = '';
+    document.getElementById('login-error').textContent = '';
   }
 
   showRegister() {
     document.getElementById('login-container').classList.add('hidden');
     document.getElementById('register-container').classList.remove('hidden');
+    // Clear any error messages
+    document.getElementById('register-error').textContent = '';
+    document.getElementById('login-error').textContent = '';
   }
 
   async loadUserData() {
@@ -202,14 +221,13 @@ class FinznApp {
 
   async handleAddExpense(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
     
     const expense = {
-      description: formData.get('description') || document.getElementById('expense-description').value,
-      amount: parseFloat(formData.get('amount') || document.getElementById('expense-amount').value),
-      category: formData.get('category') || document.getElementById('expense-category').value,
-      installments: parseInt(formData.get('installments') || document.getElementById('expense-installments').value) || 1,
-      recurring: formData.has('recurring') || document.getElementById('expense-recurring').checked,
+      description: document.getElementById('expense-description').value,
+      amount: parseFloat(document.getElementById('expense-amount').value),
+      category: document.getElementById('expense-category').value,
+      installments: parseInt(document.getElementById('expense-installments').value) || 1,
+      recurring: document.getElementById('expense-recurring').checked,
       date: this.currentMonth
     };
 
@@ -252,12 +270,11 @@ class FinznApp {
 
   async handleExtraIncome(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
     
     const extraIncome = {
-      description: formData.get('description') || document.getElementById('extra-income-description').value,
-      amount: parseFloat(formData.get('amount') || document.getElementById('extra-income-amount').value),
-      category: formData.get('category') || document.getElementById('extra-income-category').value,
+      description: document.getElementById('extra-income-description').value,
+      amount: parseFloat(document.getElementById('extra-income-amount').value),
+      category: document.getElementById('extra-income-category').value,
       date: this.currentMonth
     };
 
@@ -280,12 +297,11 @@ class FinznApp {
 
   async handleAddGoal(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
     
     const goal = {
-      name: formData.get('name') || document.getElementById('goal-name').value,
-      target: parseFloat(formData.get('target') || document.getElementById('goal-target').value),
-      current: parseFloat(formData.get('current') || document.getElementById('goal-current').value) || 0
+      name: document.getElementById('goal-name').value,
+      target: parseFloat(document.getElementById('goal-target').value),
+      current: parseFloat(document.getElementById('goal-current').value) || 0
     };
 
     if (!goal.name || !goal.target || goal.target <= 0) {
@@ -307,12 +323,11 @@ class FinznApp {
 
   async handleAddCategory(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
     
     const category = {
-      name: formData.get('name') || document.getElementById('category-name').value,
-      icon: formData.get('icon') || document.getElementById('category-icon').value || '🏷️',
-      color: formData.get('color') || document.getElementById('category-color').value
+      name: document.getElementById('category-name').value,
+      icon: document.getElementById('category-icon').value || '🏷️',
+      color: document.getElementById('category-color').value
     };
 
     if (!category.name) {
