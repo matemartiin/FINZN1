@@ -59,7 +59,7 @@ class FinznApp {
     // Income management
     document.getElementById('fixed-income-form').addEventListener('submit', (e) => this.handleFixedIncome(e));
     document.getElementById('add-extra-income-btn').addEventListener('click', () => {
-      console.log('Extra income button clicked'); // Debug log
+      console.log('🔥 Extra income button clicked'); // Debug log
       this.modals.show('extra-income-modal');
     });
     document.getElementById('extra-income-form').addEventListener('submit', (e) => this.handleExtraIncome(e));
@@ -278,26 +278,67 @@ class FinznApp {
 
   async handleExtraIncome(e) {
     e.preventDefault();
-    console.log('Extra income form submitted'); // Debug log
+    console.log('🔥 Extra income form submitted'); // Debug log
     
-    const description = document.getElementById('extra-income-description').value.trim();
-    const amount = parseFloat(document.getElementById('extra-income-amount').value);
-    const category = document.getElementById('extra-income-category').value;
+    // Get form values with detailed logging
+    const descriptionElement = document.getElementById('extra-income-description');
+    const amountElement = document.getElementById('extra-income-amount');
+    const categoryElement = document.getElementById('extra-income-category');
     
-    console.log('Form data:', { description, amount, category }); // Debug log
-
-    // Validation
+    console.log('🔍 Form elements found:', {
+      description: !!descriptionElement,
+      amount: !!amountElement,
+      category: !!categoryElement
+    });
+    
+    if (!descriptionElement || !amountElement || !categoryElement) {
+      console.error('❌ Missing form elements');
+      this.ui.showAlert('Error: No se pudieron encontrar los campos del formulario', 'error');
+      return;
+    }
+    
+    const description = descriptionElement.value.trim();
+    const amountValue = amountElement.value;
+    const category = categoryElement.value;
+    
+    console.log('📝 Raw form values:', {
+      description: `"${description}"`,
+      amountValue: `"${amountValue}"`,
+      category: `"${category}"`
+    });
+    
+    // Parse amount
+    const amount = parseFloat(amountValue);
+    
+    console.log('🔢 Parsed amount:', amount, 'isNaN:', isNaN(amount));
+    
+    // Enhanced validation with specific error messages
     if (!description) {
+      console.log('❌ Validation failed: Empty description');
       this.ui.showAlert('Por favor ingresa una descripción', 'error');
       return;
     }
 
-    if (!amount || amount <= 0) {
-      this.ui.showAlert('Por favor ingresa un monto válido mayor a 0', 'error');
+    if (!amountValue || amountValue.trim() === '') {
+      console.log('❌ Validation failed: Empty amount field');
+      this.ui.showAlert('Por favor ingresa un monto', 'error');
+      return;
+    }
+
+    if (isNaN(amount)) {
+      console.log('❌ Validation failed: Amount is not a number');
+      this.ui.showAlert('Por favor ingresa un monto válido (solo números)', 'error');
+      return;
+    }
+
+    if (amount <= 0) {
+      console.log('❌ Validation failed: Amount is not positive');
+      this.ui.showAlert('El monto debe ser mayor a 0', 'error');
       return;
     }
 
     if (!category) {
+      console.log('❌ Validation failed: No category selected');
       this.ui.showAlert('Por favor selecciona una categoría', 'error');
       return;
     }
@@ -309,15 +350,19 @@ class FinznApp {
       date: this.currentMonth
     };
 
+    console.log('✅ Final extraIncome object:', extraIncome);
+
     try {
-      console.log('Adding extra income:', extraIncome); // Debug log
+      console.log('💾 Attempting to save extra income...');
       await this.data.addExtraIncome(extraIncome, this.currentMonth);
+      console.log('✅ Extra income saved successfully');
+      
       this.modals.hide('extra-income-modal');
       e.target.reset();
       this.updateUI();
-      this.ui.showAlert('Ingreso extra agregado exitosamente', 'success');
+      this.ui.showAlert(`Ingreso extra de $${amount.toLocaleString()} agregado exitosamente`, 'success');
     } catch (error) {
-      console.error('Error adding extra income:', error);
+      console.error('❌ Error adding extra income:', error);
       this.ui.showAlert('Error al agregar el ingreso extra', 'error');
     }
   }
