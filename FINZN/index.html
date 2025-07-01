@@ -6,7 +6,7 @@
   <title>FINZN - Gestión Financiera Personal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 </head>
@@ -27,10 +27,10 @@
       
       <form id="login-form" class="auth-form">
         <div class="input-group">
-          <input type="text" id="login-user" placeholder="Usuario" required autocomplete="username" />
+          <input type="text" id="login-user" name="username" placeholder="Usuario" required autocomplete="username" />
         </div>
         <div class="input-group">
-          <input type="password" id="login-pass" placeholder="Contraseña" required autocomplete="current-password" />
+          <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
           <span>🚀</span>
@@ -55,10 +55,10 @@
       
       <form id="register-form" class="auth-form">
         <div class="input-group">
-          <input type="text" id="register-user" placeholder="Usuario" required autocomplete="username" />
+          <input type="text" id="register-user" name="username" placeholder="Usuario" required autocomplete="username" />
         </div>
         <div class="input-group">
-          <input type="password" id="register-pass" placeholder="Contraseña" required autocomplete="new-password" />
+          <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
           <span>🎯</span>
@@ -91,10 +91,6 @@
           </div>
           <div class="user-info">
             <span id="user-name"></span>
-            <button id="logout-btn" class="btn btn-secondary btn-sm" title="Cerrar sesión">
-              <span>🚪</span>
-              Salir
-            </button>
           </div>
           <button id="theme-toggle" class="btn btn-icon" title="Cambiar tema">
             <span class="theme-icon">🌙</span>
@@ -279,23 +275,23 @@
       <form id="expense-form" class="modal-form">
         <div class="input-group">
           <label for="expense-description">Descripción</label>
-          <input type="text" id="expense-description" required />
+          <input type="text" id="expense-description" name="description" required />
         </div>
         <div class="input-group">
           <label for="expense-amount">Monto</label>
-          <input type="number" id="expense-amount" step="0.01" required />
+          <input type="number" id="expense-amount" name="amount" step="0.01" required />
         </div>
         <div class="input-group">
           <label for="expense-category">Categoría</label>
-          <select id="expense-category" required></select>
+          <select id="expense-category" name="category" required></select>
         </div>
         <div class="input-group">
           <label for="expense-installments">Cuotas (opcional)</label>
-          <input type="number" id="expense-installments" min="1" />
+          <input type="number" id="expense-installments" name="installments" min="1" />
         </div>
         <div class="checkbox-group">
           <label>
-            <input type="checkbox" id="expense-recurring" />
+            <input type="checkbox" id="expense-recurring" name="recurring" />
             <span>Gasto recurrente</span>
           </label>
         </div>
@@ -316,15 +312,15 @@
       <form id="extra-income-form" class="modal-form">
         <div class="input-group">
           <label for="extra-income-description">Descripción</label>
-          <input type="text" id="extra-income-description" placeholder="Ej: Venta de producto, Regalo, Trabajo freelance" required />
+          <input type="text" id="extra-income-description" name="description" placeholder="Ej: Venta de producto, Regalo, Trabajo freelance" required />
         </div>
         <div class="input-group">
           <label for="extra-income-amount">Monto</label>
-          <input type="number" id="extra-income-amount" step="0.01" required />
+          <input type="number" id="extra-income-amount" name="amount" step="0.01" required />
         </div>
         <div class="input-group">
           <label for="extra-income-category">Categoría</label>
-          <select id="extra-income-category" required>
+          <select id="extra-income-category" name="category" required>
             <option value="">Selecciona una categoría</option>
             <option value="Venta">💰 Venta</option>
             <option value="Regalo">🎁 Regalo</option>
@@ -352,15 +348,15 @@
       <form id="goal-form" class="modal-form">
         <div class="input-group">
           <label for="goal-name">Nombre del objetivo</label>
-          <input type="text" id="goal-name" required />
+          <input type="text" id="goal-name" name="name" required />
         </div>
         <div class="input-group">
           <label for="goal-target">Monto objetivo</label>
-          <input type="number" id="goal-target" step="0.01" required />
+          <input type="number" id="goal-target" name="target" step="0.01" required />
         </div>
         <div class="input-group">
           <label for="goal-current">Monto actual</label>
-          <input type="number" id="goal-current" step="0.01" value="0" />
+          <input type="number" id="goal-current" name="current" step="0.01" value="0" />
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
@@ -379,15 +375,15 @@
       <form id="category-form" class="modal-form">
         <div class="input-group">
           <label for="category-name">Nombre</label>
-          <input type="text" id="category-name" required />
+          <input type="text" id="category-name" name="name" required />
         </div>
         <div class="input-group">
           <label for="category-icon">Icono</label>
-          <input type="text" id="category-icon" maxlength="2" placeholder="🏷️" />
+          <input type="text" id="category-icon" name="icon" maxlength="2" placeholder="🏷️" />
         </div>
         <div class="input-group">
           <label for="category-color">Color</label>
-          <input type="color" id="category-color" value="#2563eb" />
+          <input type="color" id="category-color" name="color" value="#2563eb" />
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
@@ -414,11 +410,20 @@
   <!-- AI Chat Assistant -->
   <div id="chat-assistant" class="chat-assistant">
     <button id="chat-toggle" class="chat-toggle">
-      <img src="/mascota.png" alt="Asistente IA" />
+      <div class="chat-avatar">
+        <div class="avatar-ring"></div>
+        <div class="avatar-icon">🤖</div>
+      </div>
     </button>
     <div id="chat-window" class="chat-window hidden">
       <div class="chat-header">
-        <h3>Asistente Financiero</h3>
+        <div class="chat-header-info">
+          <div class="chat-avatar-small">🤖</div>
+          <div class="chat-header-text">
+            <h3>Asistente Financiero</h3>
+            <div class="chat-status">En línea</div>
+          </div>
+        </div>
         <button id="chat-close" class="chat-close">&times;</button>
       </div>
       <div id="chat-messages" class="chat-messages"></div>

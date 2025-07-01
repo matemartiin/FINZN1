@@ -1,4 +1,4 @@
-/* CSS Variables - Paleta Profesional */
+/* CSS Variables - Professional Color Palette */
 :root {
   --primary-color: #2563eb;
   --primary-dark: #1d4ed8;
@@ -184,7 +184,7 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
   position: relative;
   overflow: hidden;
-  min-height: 44px; /* Accessibility: minimum touch target */
+  min-height: 44px;
 }
 
 .btn::before {
@@ -244,6 +244,10 @@ h1, h2, h3, h4, h5, h6 {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
+}
+
+.btn-full {
+  width: 100%;
 }
 
 .link-btn {
@@ -312,26 +316,6 @@ input:focus, select:focus, textarea:focus {
   margin: 0;
   font-weight: 500;
   cursor: pointer;
-}
-
-/* Search Input */
-.search-input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: var(--spacing-lg);
-  font-size: 1rem;
-  color: var(--text-muted);
-  z-index: 1;
-}
-
-.search-input-container input {
-  padding-left: 3rem;
-  width: 100%;
 }
 
 /* Cards */
@@ -557,22 +541,6 @@ input:focus, select:focus, textarea:focus {
   color: var(--text-secondary);
 }
 
-.user-avatar {
-  width: 2rem;
-  height: 2rem;
-  background: var(--primary-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.875rem;
-}
-
-.user-name {
-  white-space: nowrap;
-}
-
 .theme-toggle {
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
@@ -583,7 +551,7 @@ input:focus, select:focus, textarea:focus {
   font-size: 1.5rem;
 }
 
-/* Dashboard Layout - Mejorado */
+/* Dashboard Layout */
 .dashboard {
   flex: 1;
   max-width: 1400px;
@@ -650,36 +618,12 @@ input:focus, select:focus, textarea:focus {
   font-weight: 400;
 }
 
+/* Income Card */
 .income-form {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-}
-
-.balance-value {
-  font-family: var(--font-mono);
-  font-weight: 700;
-}
-
-/* Income Card */
-.income-form {
   margin-bottom: var(--spacing-lg);
-}
-
-.income-input-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.save-btn {
-  background: var(--success-color);
-  color: white;
-  border-radius: var(--border-radius);
-  width: 44px;
-  height: 44px;
-}
-
-.save-btn:hover {
-  background: #059669;
 }
 
 .income-summary {
@@ -693,18 +637,6 @@ input:focus, select:focus, textarea:focus {
   justify-content: space-between;
   font-size: 0.875rem;
   font-weight: 500;
-}
-
-.income-label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.income-value {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--success-color);
 }
 
 /* Goals */
@@ -953,15 +885,6 @@ input:focus, select:focus, textarea:focus {
   box-shadow: var(--shadow);
 }
 
-.stat-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.stat-content {
-  flex: 1;
-}
-
 .stat-label {
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -1021,25 +944,6 @@ input:focus, select:focus, textarea:focus {
   gap: var(--spacing-md);
 }
 
-.action-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg);
-  text-align: center;
-  min-height: 80px;
-}
-
-.action-btn span:first-child {
-  font-size: 1.5rem;
-}
-
-.action-btn span:last-child {
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
 /* Modals */
 .modal {
   position: fixed;
@@ -1090,24 +994,6 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--spacing-xl);
-}
-
-.modal-title-container {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.modal-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 .modal-header h2 {
@@ -1195,21 +1081,10 @@ input:focus, select:focus, textarea:focus {
   50% { transform: scale(1.1); opacity: 0.8; }
 }
 
-.chat-toggle img {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
+.avatar-icon {
+  font-size: 2rem;
   position: relative;
   z-index: 1;
-  width: 3.5rem;
-  height: 3.5rem;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .chat-toggle:hover {
@@ -1286,6 +1161,8 @@ input:focus, select:focus, textarea:focus {
   cursor: pointer;
   color: var(--text-secondary);
   transition: var(--transition-fast);
+  padding: 0.5rem;
+  border-radius: 50%;
 }
 
 .chat-close:hover {
@@ -1345,12 +1222,17 @@ input:focus, select:focus, textarea:focus {
   border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
 }
 
+.chat-input-container {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
 .chat-form input {
   flex: 1;
   margin: 0;
 }
 
-.chat-form button {
+.chat-send-btn {
   padding: 0.75rem 1.25rem;
 }
 
