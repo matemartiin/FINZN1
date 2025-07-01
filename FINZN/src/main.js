@@ -278,27 +278,62 @@ class FinznApp {
 
   async handleExtraIncome(e) {
     e.preventDefault();
-    console.log('🔥 Extra income form submitted'); // Debug log
+    console.log('🔥 Extra income form submitted - Starting debug process');
     
-    // Get form values with detailed logging
-    const descriptionElement = document.getElementById('extra-income-description');
-    const amountElement = document.getElementById('extra-income-amount');
-    const categoryElement = document.getElementById('extra-income-category');
+    // Wait a moment to ensure DOM is ready
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-    console.log('🔍 Form elements found:', {
-      description: !!descriptionElement,
-      amount: !!amountElement,
-      category: !!categoryElement
-    });
+    // Try multiple ways to get the form elements
+    console.log('🔍 Attempting to find form elements...');
     
-    if (!descriptionElement || !amountElement || !categoryElement) {
-      console.error('❌ Missing form elements');
-      this.ui.showAlert('Error: No se pudieron encontrar los campos del formulario', 'error');
+    // Method 1: Direct getElementById
+    let amountElement = document.getElementById('extra-income-amount');
+    console.log('Method 1 - getElementById result:', amountElement);
+    
+    // Method 2: Query from form
+    const form = e.target;
+    let amountElement2 = form.querySelector('#extra-income-amount');
+    console.log('Method 2 - form.querySelector result:', amountElement2);
+    
+    // Method 3: Query by name
+    let amountElement3 = form.querySelector('input[name="amount"]');
+    console.log('Method 3 - querySelector by name result:', amountElement3);
+    
+    // Method 4: Query all number inputs
+    const numberInputs = form.querySelectorAll('input[type="number"]');
+    console.log('Method 4 - All number inputs:', numberInputs);
+    
+    // Use the first available element
+    const finalAmountElement = amountElement || amountElement2 || amountElement3 || numberInputs[0];
+    
+    if (!finalAmountElement) {
+      console.error('❌ Could not find amount input element');
+      this.ui.showAlert('Error: No se pudo encontrar el campo de monto', 'error');
       return;
     }
     
+    console.log('✅ Found amount element:', finalAmountElement);
+    console.log('📝 Element properties:', {
+      id: finalAmountElement.id,
+      name: finalAmountElement.name,
+      type: finalAmountElement.type,
+      value: finalAmountElement.value,
+      placeholder: finalAmountElement.placeholder
+    });
+    
+    // Get other elements
+    const descriptionElement = document.getElementById('extra-income-description') || form.querySelector('input[name="description"]');
+    const categoryElement = document.getElementById('extra-income-category') || form.querySelector('select[name="category"]');
+    
+    if (!descriptionElement || !categoryElement) {
+      console.error('❌ Missing other form elements');
+      this.ui.showAlert('Error: Faltan campos del formulario', 'error');
+      return;
+    }
+    
+    // Get values
     const description = descriptionElement.value.trim();
-    const amountValue = amountElement.value;
+    const amountValue = finalAmountElement.value;
     const category = categoryElement.value;
     
     console.log('📝 Raw form values:', {
@@ -307,33 +342,43 @@ class FinznApp {
       category: `"${category}"`
     });
     
-    // Parse amount
-    const amount = parseFloat(amountValue);
-    
-    console.log('🔢 Parsed amount:', amount, 'isNaN:', isNaN(amount));
-    
-    // Enhanced validation with specific error messages
+    // Enhanced validation
     if (!description) {
       console.log('❌ Validation failed: Empty description');
       this.ui.showAlert('Por favor ingresa una descripción', 'error');
       return;
     }
 
-    if (!amountValue || amountValue.trim() === '') {
-      console.log('❌ Validation failed: Empty amount field');
-      this.ui.showAlert('Por favor ingresa un monto', 'error');
+    if (!amountValue || amountValue.trim() === '' || amountValue === '0') {
+      console.log('❌ Validation failed: Empty or zero amount field');
+      this.ui.showAlert('Por favor ingresa un monto mayor a 0', 'error');
+      // Focus the amount field to help user
+      finalAmountElement.focus();
       return;
     }
 
-    if (isNaN(amount)) {
-      console.log('❌ Validation failed: Amount is not a number');
+    // Parse amount with multiple methods
+    let amount;
+    try {
+      amount = parseFloat(amountValue.replace(',', '.'));
+      console.log('🔢 Parsed amount (method 1):', amount);
+    } catch (error) {
+      console.log('❌ Parse error with method 1, trying method 2');
+      amount = Number(amountValue);
+      console.log('🔢 Parsed amount (method 2):', amount);
+    }
+
+    if (isNaN(amount) || !isFinite(amount)) {
+      console.log('❌ Validation failed: Amount is not a valid number');
       this.ui.showAlert('Por favor ingresa un monto válido (solo números)', 'error');
+      finalAmountElement.focus();
       return;
     }
 
     if (amount <= 0) {
       console.log('❌ Validation failed: Amount is not positive');
       this.ui.showAlert('El monto debe ser mayor a 0', 'error');
+      finalAmountElement.focus();
       return;
     }
 
