@@ -7,6 +7,7 @@ import { ChatManager } from './modules/chat.js';
 import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
+import { MascotManager } from './modules/mascot.js';
 
 class FinznApp {
   constructor() {
@@ -19,6 +20,7 @@ class FinznApp {
     this.reports = new ReportManager();
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
+    this.mascot = new MascotManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.init();
@@ -30,6 +32,9 @@ class FinznApp {
     
     // Initialize navigation
     this.navigation.init();
+    
+    // Initialize mascot
+    this.mascot.init();
     
     // Check if user is already logged in
     const currentUser = this.auth.getCurrentUser();
@@ -267,6 +272,9 @@ class FinznApp {
       e.target.reset();
       this.updateUI();
       this.ui.showAlert('Gasto agregado exitosamente', 'success');
+      
+      // Trigger mascot feedback
+      this.mascot.onFinancialUpdate();
     } catch (error) {
       console.error('Error adding expense:', error);
       this.ui.showAlert('Error al agregar el gasto', 'error');
@@ -287,6 +295,9 @@ class FinznApp {
       document.getElementById('fixed-income-input').value = '';
       this.updateUI();
       this.ui.showAlert('Ingreso fijo actualizado', 'success');
+      
+      // Trigger mascot feedback
+      this.mascot.onFinancialUpdate();
     } catch (error) {
       console.error('Error setting fixed income:', error);
       this.ui.showAlert('Error al actualizar el ingreso', 'error');
@@ -369,6 +380,9 @@ class FinznApp {
       e.target.reset();
       this.updateUI();
       this.ui.showAlert(`✅ Ingreso extra de $${amount.toLocaleString()} agregado exitosamente`, 'success');
+      
+      // Trigger mascot feedback
+      this.mascot.onFinancialUpdate();
     } catch (error) {
       console.error('❌ ERROR SAVING:', error);
       this.ui.showAlert('Error al agregar el ingreso extra', 'error');
@@ -395,6 +409,9 @@ class FinznApp {
       e.target.reset();
       this.updateUI();
       this.ui.showAlert('Objetivo creado exitosamente', 'success');
+      
+      // Trigger mascot feedback
+      this.mascot.onFinancialUpdate();
     } catch (error) {
       console.error('Error adding goal:', error);
       this.ui.showAlert('Error al crear el objetivo', 'error');
@@ -421,6 +438,9 @@ class FinznApp {
       e.target.reset();
       this.updateUI();
       this.ui.showAlert('Categoría creada exitosamente', 'success');
+      
+      // Trigger mascot feedback
+      this.mascot.onFinancialUpdate();
     } catch (error) {
       console.error('Error adding category:', error);
       this.ui.showAlert('Error al crear la categoría', 'error');
