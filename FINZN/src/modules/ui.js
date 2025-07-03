@@ -190,6 +190,86 @@ export class UIManager {
     });
   }
 
+  showInstallmentsModal(installments) {
+    const container = document.getElementById('installments-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (installments.length === 0) {
+      container.innerHTML = `
+        <div class="installment-item">
+          <div class="installment-header">
+            <h3 class="installment-title">No hay cuotas activas</h3>
+          </div>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Cuando registres un gasto en cuotas, aparecerá aquí con todos los detalles.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    installments.forEach(installment => {
+      const item = document.createElement('div');
+      item.className = 'installment-item fade-in';
+      
+      const createdDate = new Date(installment.createdAt).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      item.innerHTML = `
+        <div class="installment-header">
+          <h3 class="installment-title">${installment.description}</h3>
+          <div class="installment-amount">${this.formatCurrency(installment.monthlyAmount)}</div>
+        </div>
+        
+        <div class="installment-details">
+          <div class="installment-detail">
+            <div class="installment-detail-label">Categoría</div>
+            <div class="installment-detail-value">${installment.category}</div>
+          </div>
+          
+          <div class="installment-detail">
+            <div class="installment-detail-label">Cuota Actual</div>
+            <div class="installment-detail-value">${installment.currentInstallment} de ${installment.totalInstallments}</div>
+          </div>
+          
+          <div class="installment-detail">
+            <div class="installment-detail-label">Monto Original</div>
+            <div class="installment-detail-value">${this.formatCurrency(installment.originalAmount)}</div>
+          </div>
+          
+          <div class="installment-detail">
+            <div class="installment-detail-label">Fecha de Creación</div>
+            <div class="installment-detail-value">${createdDate}</div>
+          </div>
+          
+          <div class="installment-detail">
+            <div class="installment-detail-label">Cuotas Restantes</div>
+            <div class="installment-detail-value">${installment.remainingInstallments}</div>
+          </div>
+          
+          <div class="installment-detail">
+            <div class="installment-detail-label">Monto Restante</div>
+            <div class="installment-detail-value">${this.formatCurrency(installment.remainingAmount)}</div>
+          </div>
+        </div>
+        
+        <div class="installment-progress">
+          <div class="installment-progress-label">Progreso: ${installment.progress}%</div>
+          <div class="installment-progress-bar">
+            <div class="installment-progress-fill" style="width: ${installment.progress}%"></div>
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
   filterExpenses(query) {
     const items = document.querySelectorAll('.expense-item');
     

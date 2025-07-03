@@ -852,6 +852,162 @@ input:focus, select:focus, textarea:focus {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Installments Info */
+.installments-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.installments-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  padding: 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.installments-button:hover {
+  color: white;
+  transform: translateX(2px);
+}
+
+.installments-button span {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* Installments Modal */
+.installments-content {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.installments-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-gradient-success);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-light);
+}
+
+.installments-description {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
+}
+
+.installments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.installment-item {
+  background: var(--glass-bg);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  border: 1px solid var(--border-light);
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.installment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
+}
+
+.installment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.installment-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.installment-amount {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.installment-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.installment-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.installment-detail-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.installment-detail-value {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.installment-progress {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.installment-progress-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.installment-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.installment-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
 /* Goals Section - LEFT COLUMN */
 .goals-section {
   grid-column: 1;
@@ -1973,6 +2129,10 @@ input:focus, select:focus, textarea:focus {
   .expense-amount {
     align-self: flex-end;
   }
+  
+  .installment-details {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2040,6 +2200,11 @@ input:focus, select:focus, textarea:focus {
   
   .nav-icon {
     font-size: 1.5rem;
+  }
+  
+  .installment-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -2128,7 +2293,8 @@ body.darkmode .btn-secondary:hover:not(:disabled) {
 body.darkmode .expense-item,
 body.darkmode .goal-item,
 body.darkmode .category-item,
-body.darkmode .achievement-item {
+body.darkmode .achievement-item,
+body.darkmode .installment-item {
   background: var(--glass-bg);
   border: 1px solid var(--border-light);
 }

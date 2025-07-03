@@ -91,7 +91,9 @@ export class DataManager {
         installment: i + 1,
         totalInstallments: expense.installments,
         recurring: expense.recurring && i === 0,
-        originalId: id
+        originalId: id,
+        originalAmount: expense.amount,
+        createdAt: new Date().toISOString()
       });
     }
 
@@ -203,12 +205,41 @@ export class DataManager {
     const totalIncome = (income.fixed || 0) + (income.extra || 0);
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     
+    // Count active installments for this month
+    const installments = expenses.filter(e => e.totalInstallments > 1).length;
+    
     return {
       available: totalIncome - totalExpenses,
       totalIncome,
       totalExpenses,
-      installments: expenses.filter(e => e.totalInstallments > 1).length
+      installments
     };
+  }
+
+  getActiveInstallments(month) {
+    const expenses = this.getExpenses(month);
+    const installments = expenses.filter(expense => expense.totalInstallments > 1);
+    
+    return installments.map(expense => {
+      const progress = (expense.installment / expense.totalInstallments) * 100;
+      const remainingInstallments = expense.totalInstallments - expense.installment;
+      const remainingAmount = expense.amount * remainingInstallments;
+      
+      return {
+        id: expense.id,
+        description: expense.description,
+        amount: expense.amount,
+        originalAmount: expense.originalAmount,
+        category: expense.category,
+        currentInstallment: expense.installment,
+        totalInstallments: expense.totalInstallments,
+        progress: Math.round(progress),
+        remainingInstallments,
+        remainingAmount,
+        createdAt: expense.createdAt || new Date().toISOString(),
+        monthlyAmount: expense.amount
+      };
+    });
   }
 
   getIncome(month) {
@@ -278,6 +309,7 @@ export class DataManager {
     const balance = this.getBalance(month);
     const byCategory = this.getExpensesByCategory(month);
     const extraIncomes = this.getExtraIncomes(month);
+    const installments = this.getActiveInstallments(month);
     
     const recommendations = [];
     const total = balance.totalExpenses;
@@ -300,13 +332,18 @@ export class DataManager {
       recommendations.push(`💰 Ingresos extra del mes: $${totalExtra.toLocaleString()}`);
     }
 
+    if (installments.length > 0) {
+      recommendations.push(`💳 Tienes ${installments.length} cuotas activas este mes`);
+    }
+
     return {
       month,
       balance,
       byCategory,
       recommendations,
       expenses,
-      extraIncomes
+      extraIncomes,
+      installments
     };
   }
 
@@ -398,6 +435,16 @@ export class DataManager {
         id: 'first-extra-income',
         title: '💰 Primer Ingreso Extra',
         description: 'Has registrado tu primer ingreso extra'
+      });
+    }
+    
+    // Installments achievement
+    const totalInstallments = Object.values(this.data.expenses).flat().filter(e => e.totalInstallments > 1).length;
+    if (totalInstallments >= 1 && !this.data.achievements.find(a => a.id === 'first-installment')) {
+      newAchievements.push({
+        id: 'first-installment',
+        title: '💳 Primera Cuota',
+        description: 'Has registrado tu primer gasto en cuotas'
       });
     }
     

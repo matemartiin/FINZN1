@@ -57,6 +57,9 @@ class FinznApp {
     document.getElementById('month-select').addEventListener('change', (e) => this.handleMonthChange(e));
     document.getElementById('theme-toggle').addEventListener('click', () => this.theme.toggle());
     
+    // Installments popup
+    document.getElementById('installments-btn').addEventListener('click', () => this.showInstallmentsPopup());
+    
     // Expense management
     document.getElementById('add-expense-btn').addEventListener('click', () => this.modals.show('expense-modal'));
     document.getElementById('expense-form').addEventListener('submit', (e) => this.handleAddExpense(e));
@@ -237,6 +240,12 @@ class FinznApp {
   handleMonthChange(e) {
     this.currentMonth = e.target.value;
     this.updateUI();
+  }
+
+  showInstallmentsPopup() {
+    const installments = this.data.getActiveInstallments(this.currentMonth);
+    this.ui.showInstallmentsModal(installments);
+    this.modals.show('installments-modal');
   }
 
   async handleAddExpense(e) {
@@ -478,6 +487,7 @@ class FinznApp {
     const monthlyExpensesSummary = document.getElementById('monthly-expenses-summary');
     const incomeSummary = document.getElementById('income-summary');
     const balanceAmountNew = document.getElementById('balance-amount-new');
+    const installmentsCount = document.getElementById('installments-count');
     
     if (monthlyExpensesSummary) {
       monthlyExpensesSummary.textContent = this.ui.formatCurrency(balance.totalExpenses);
@@ -487,6 +497,9 @@ class FinznApp {
     }
     if (balanceAmountNew) {
       balanceAmountNew.textContent = this.ui.formatCurrency(balance.available);
+    }
+    if (installmentsCount) {
+      installmentsCount.textContent = balance.installments;
     }
     
     // Update goals in new layout
