@@ -4,13 +4,25 @@ export class UIManager {
   }
 
   updateBalance(balance) {
-    document.getElementById('balance-amount').textContent = this.formatCurrency(balance.available);
-    document.getElementById('monthly-expenses').textContent = this.formatCurrency(balance.totalExpenses);
-    document.getElementById('active-installments').textContent = balance.installments;
+    const balanceAmount = document.getElementById('balance-amount');
+    const monthlyExpenses = document.getElementById('monthly-expenses');
+    const activeInstallments = document.getElementById('active-installments');
+    
+    if (balanceAmount) {
+      balanceAmount.textContent = this.formatCurrency(balance.available);
+    }
+    if (monthlyExpenses) {
+      monthlyExpenses.textContent = this.formatCurrency(balance.totalExpenses);
+    }
+    if (activeInstallments) {
+      activeInstallments.textContent = balance.installments;
+    }
   }
 
   updateExpensesList(expenses) {
     const container = document.getElementById('expenses-list');
+    if (!container) return;
+    
     container.innerHTML = '';
 
     if (expenses.length === 0) {
@@ -40,6 +52,8 @@ export class UIManager {
 
   updateGoalsList(goals) {
     const container = document.getElementById('goals-list');
+    if (!container) return;
+    
     container.innerHTML = '';
 
     if (goals.length === 0) {
@@ -67,8 +81,40 @@ export class UIManager {
     });
   }
 
+  updateGoalsListNew(goals) {
+    const container = document.getElementById('goals-list-new');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (goals.length === 0) {
+      container.innerHTML = '<p class="text-center text-muted">No hay objetivos creados</p>';
+      return;
+    }
+
+    goals.forEach(goal => {
+      const progress = Math.min((goal.current / goal.target) * 100, 100);
+      
+      const item = document.createElement('div');
+      item.className = 'goal-item-new fade-in';
+      item.innerHTML = `
+        <div class="goal-info">
+          <span class="goal-name">${goal.name}</span>
+          <span class="goal-percentage">${Math.round(progress)}%</span>
+        </div>
+        <div class="goal-progress-new">
+          <div class="goal-progress-bar-new" style="width: ${progress}%"></div>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
   updateCategoriesList(categories) {
     const container = document.getElementById('categories-list');
+    if (!container) return;
+    
     container.innerHTML = '';
 
     categories.forEach(category => {
@@ -86,6 +132,8 @@ export class UIManager {
 
   updateCategoryOptions(categories) {
     const select = document.getElementById('expense-category');
+    if (!select) return;
+    
     select.innerHTML = '<option value="">Selecciona una categoría</option>';
     
     categories.forEach(category => {
@@ -97,17 +145,33 @@ export class UIManager {
   }
 
   updateIncomeDisplay(income) {
-    document.getElementById('fixed-income-amount').textContent = this.formatCurrency(income.fixed || 0);
-    document.getElementById('extra-income-amount').textContent = this.formatCurrency(income.extra || 0);
+    const fixedIncomeAmount = document.getElementById('fixed-income-amount');
+    const extraIncomeAmount = document.getElementById('extra-income-amount');
+    
+    if (fixedIncomeAmount) {
+      fixedIncomeAmount.textContent = this.formatCurrency(income.fixed || 0);
+    }
+    if (extraIncomeAmount) {
+      extraIncomeAmount.textContent = this.formatCurrency(income.extra || 0);
+    }
   }
 
   updateStats(stats) {
-    document.getElementById('total-savings').textContent = this.formatCurrency(stats.totalSavings);
-    document.getElementById('monthly-average').textContent = this.formatCurrency(stats.monthlyAverage);
+    const totalSavings = document.getElementById('total-savings');
+    const monthlyAverage = document.getElementById('monthly-average');
+    
+    if (totalSavings) {
+      totalSavings.textContent = this.formatCurrency(stats.totalSavings);
+    }
+    if (monthlyAverage) {
+      monthlyAverage.textContent = this.formatCurrency(stats.monthlyAverage);
+    }
   }
 
   updateAchievements(achievements) {
     const container = document.getElementById('achievements-list');
+    if (!container) return;
+    
     container.innerHTML = '';
 
     if (achievements.length === 0) {
@@ -130,8 +194,8 @@ export class UIManager {
     const items = document.querySelectorAll('.expense-item');
     
     items.forEach(item => {
-      const description = item.querySelector('.expense-description').textContent.toLowerCase();
-      const category = item.querySelector('.expense-category').textContent.toLowerCase();
+      const description = item.querySelector('.expense-description')?.textContent.toLowerCase() || '';
+      const category = item.querySelector('.expense-category')?.textContent.toLowerCase() || '';
       
       if (description.includes(query) || category.includes(query)) {
         item.style.display = 'flex';

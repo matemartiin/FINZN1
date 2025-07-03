@@ -6,6 +6,7 @@ import { ModalManager } from './modules/modals.js';
 import { ChatManager } from './modules/chat.js';
 import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
+import { NavigationManager } from './modules/navigation.js';
 
 class FinznApp {
   constructor() {
@@ -17,6 +18,7 @@ class FinznApp {
     this.chat = new ChatManager();
     this.reports = new ReportManager();
     this.theme = new ThemeManager();
+    this.navigation = new NavigationManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.init();
@@ -25,6 +27,9 @@ class FinznApp {
   async init() {
     // Initialize theme first
     this.theme.init();
+    
+    // Initialize navigation
+    this.navigation.init();
     
     // Check if user is already logged in
     const currentUser = this.auth.getCurrentUser();
@@ -65,7 +70,16 @@ class FinznApp {
     document.getElementById('extra-income-form').addEventListener('submit', (e) => this.handleExtraIncome(e));
     
     // Goals management
-    document.getElementById('add-goal-btn').addEventListener('click', () => this.modals.show('goal-modal'));
+    const addGoalBtn = document.getElementById('add-goal-btn');
+    const addGoalBtnSection = document.getElementById('add-goal-btn-section');
+    
+    if (addGoalBtn) {
+      addGoalBtn.addEventListener('click', () => this.modals.show('goal-modal'));
+    }
+    if (addGoalBtnSection) {
+      addGoalBtnSection.addEventListener('click', () => this.modals.show('goal-modal'));
+    }
+    
     document.getElementById('goal-form').addEventListener('submit', (e) => this.handleAddGoal(e));
     
     // Categories management
@@ -78,7 +92,10 @@ class FinznApp {
     document.getElementById('import-csv').addEventListener('change', (e) => this.importCSV(e));
     
     // Search
-    document.getElementById('expense-search').addEventListener('input', (e) => this.handleSearch(e));
+    const expenseSearch = document.getElementById('expense-search');
+    if (expenseSearch) {
+      expenseSearch.addEventListener('input', (e) => this.handleSearch(e));
+    }
     
     // Chat
     this.chat.init();
@@ -453,11 +470,34 @@ class FinznApp {
   }
 
   updateUI() {
-    this.ui.updateBalance(this.data.getBalance(this.currentMonth));
+    // Update summary cards
+    const balance = this.data.getBalance(this.currentMonth);
+    const income = this.data.getIncome(this.currentMonth);
+    
+    // Update new dashboard elements
+    const monthlyExpensesSummary = document.getElementById('monthly-expenses-summary');
+    const incomeSummary = document.getElementById('income-summary');
+    const balanceAmountNew = document.getElementById('balance-amount-new');
+    
+    if (monthlyExpensesSummary) {
+      monthlyExpensesSummary.textContent = this.ui.formatCurrency(balance.totalExpenses);
+    }
+    if (incomeSummary) {
+      incomeSummary.textContent = this.ui.formatCurrency(income.fixed + income.extra);
+    }
+    if (balanceAmountNew) {
+      balanceAmountNew.textContent = this.ui.formatCurrency(balance.available);
+    }
+    
+    // Update goals in new layout
+    this.ui.updateGoalsListNew(this.data.getGoals());
+    
+    // Update traditional UI elements
+    this.ui.updateBalance(balance);
     this.ui.updateExpensesList(this.data.getExpenses(this.currentMonth));
     this.ui.updateGoalsList(this.data.getGoals());
     this.ui.updateCategoriesList(this.data.getCategories());
-    this.ui.updateIncomeDisplay(this.data.getIncome(this.currentMonth));
+    this.ui.updateIncomeDisplay(income);
     this.ui.updateStats(this.data.getStats());
     this.ui.updateAchievements(this.data.getAchievements());
     

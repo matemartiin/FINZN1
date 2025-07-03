@@ -134,175 +134,319 @@
       </div>
     </header>
 
-    <!-- Dashboard -->
-    <main class="dashboard">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <!-- Balance Card -->
-        <div class="card balance-card">
-          <div class="card-header">
-            <h2>Saldo</h2>
-            <div class="balance-mascot">
-              <div class="mini-mascot happy">
-                <div class="mini-face">
-                  <div class="mini-eyes">
-                    <div class="mini-eye"></div>
-                    <div class="mini-eye"></div>
+    <!-- Dashboard with New Layout -->
+    <main class="dashboard-new">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar-nav">
+        <nav class="nav-menu">
+          <div class="nav-item active" data-section="dashboard">
+            <div class="nav-icon">📊</div>
+            <span class="nav-label">Dashboard</span>
+          </div>
+          <div class="nav-item" data-section="expenses">
+            <div class="nav-icon">💳</div>
+            <span class="nav-label">Gastos</span>
+          </div>
+          <div class="nav-item" data-section="income">
+            <div class="nav-icon">💰</div>
+            <span class="nav-label">Ingresos</span>
+          </div>
+          <div class="nav-item" data-section="savings">
+            <div class="nav-icon">🎯</div>
+            <span class="nav-label">Ahorros</span>
+          </div>
+          <div class="nav-item" data-section="achievements">
+            <div class="nav-icon">🏆</div>
+            <span class="nav-label">Logros</span>
+          </div>
+          <div class="nav-item" data-section="settings">
+            <div class="nav-icon">⚙️</div>
+            <span class="nav-label">Configuración</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="main-dashboard">
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="dashboard-section active">
+          <div class="dashboard-grid">
+            <!-- Summary Cards Row -->
+            <div class="summary-cards">
+              <div class="summary-card expenses-card">
+                <div class="card-header-simple">
+                  <div class="card-icon-simple">💳</div>
+                  <span class="card-title">Este Mes</span>
+                </div>
+                <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
+              </div>
+
+              <div class="summary-card income-card">
+                <div class="card-header-simple">
+                  <div class="card-icon-simple">💰</div>
+                  <span class="card-title">Ingresos</span>
+                </div>
+                <div class="card-amount" id="income-summary">$3,500</div>
+              </div>
+
+              <div class="summary-card balance-card-new">
+                <div class="card-header-simple">
+                  <span class="card-title">Balance</span>
+                </div>
+                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
+              </div>
+            </div>
+
+            <!-- Goals Section -->
+            <div class="goals-section">
+              <div class="section-header">
+                <h2>Objetivos de Ahorro</h2>
+                <button id="add-goal-btn" class="btn btn-sm add-btn">
+                  <span>➕</span>
+                </button>
+              </div>
+              <div id="goals-list-new" class="goals-list-new">
+                <div class="goal-item-new">
+                  <div class="goal-info">
+                    <span class="goal-name">Vacaciones</span>
+                    <span class="goal-percentage">75%</span>
                   </div>
-                  <div class="mini-mouth"></div>
+                  <div class="goal-progress-new">
+                    <div class="goal-progress-bar-new" style="width: 75%"></div>
+                  </div>
+                </div>
+                <div class="goal-item-new">
+                  <div class="goal-info">
+                    <span class="goal-name">Nueva Laptop</span>
+                    <span class="goal-percentage">40%</span>
+                  </div>
+                  <div class="goal-progress-new">
+                    <div class="goal-progress-bar-new" style="width: 40%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-section">
+              <div class="chart-card-new">
+                <h3>Distribución de Gastos</h3>
+                <div class="chart-container-new">
+                  <canvas id="expenses-chart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Achievements Section -->
+            <div class="achievements-section">
+              <div class="section-header">
+                <h2>Logros</h2>
+              </div>
+              <div class="achievements-list-new">
+                <div class="achievement-item-new">
+                  <div class="achievement-icon">🏆</div>
+                  <span>¡Has alcanzado 3 objetivos!</span>
+                </div>
+                <div class="achievement-item-new">
+                  <div class="achievement-icon">💡</div>
+                  <span>Consejos para esta semana</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mascot Section -->
+            <div class="mascot-section">
+              <div class="dashboard-mascot">
+                <div class="mascot-body-large">
+                  <div class="mascot-face-large">
+                    <div class="mascot-eyes-large">
+                      <div class="eye-large left-eye"></div>
+                      <div class="eye-large right-eye"></div>
+                    </div>
+                    <div class="mascot-mouth-large"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="balance-amount" id="balance-amount">$0</div>
-          <div class="balance-details">
-            <div class="balance-item">
-              <span>Gastos este mes</span>
-              <span id="monthly-expenses">$0</span>
-            </div>
-            <div class="balance-item">
-              <span>Cuotas activas</span>
-              <span id="active-installments">0</span>
-            </div>
-          </div>
-          <button id="add-expense-btn" class="btn btn-primary btn-full">
-            <span>➕</span>
-            Nuevo Gasto
-          </button>
-        </div>
+        </section>
 
-        <!-- Income Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon">💰</div>
-            <h2>Ingresos</h2>
+        <!-- Expenses Section -->
+        <section id="expenses-section" class="dashboard-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Gestión de Gastos</h1>
+              <button id="add-expense-btn" class="btn btn-primary">
+                <span>➕</span>
+                Nuevo Gasto
+              </button>
+            </div>
+            
+            <div class="search-bar">
+              <input type="text" id="expense-search" placeholder="🔍 Buscar gastos..." />
+            </div>
+            
+            <div class="expenses-grid">
+              <div class="card">
+                <div class="card-header">
+                  <h3>Gastos Recientes</h3>
+                </div>
+                <div id="expenses-list" class="expenses-list"></div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <h3>Tendencia Mensual</h3>
+                </div>
+                <div class="chart-container">
+                  <canvas id="trend-chart"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
-          <form id="fixed-income-form" class="income-form">
-            <div class="input-group">
-              <input type="number" id="fixed-income-input" placeholder="Ingreso fijo mensual" step="0.01" />
-              <button type="submit" class="btn btn-icon">💾</button>
-            </div>
-          </form>
-          <button id="add-extra-income-btn" class="btn btn-secondary btn-sm btn-full">
-            <span>✨</span>
-            Agregar Ingreso Extra
-          </button>
-          <div class="income-summary">
-            <div class="income-item">
-              <span>Fijo:</span>
-              <span id="fixed-income-amount">$0</span>
-            </div>
-            <div class="income-item">
-              <span>Extra:</span>
-              <span id="extra-income-amount">$0</span>
-            </div>
-          </div>
-        </div>
+        </section>
 
-        <!-- Goals Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon">🎯</div>
-            <h2>Objetivos de Ahorro</h2>
-            <button id="add-goal-btn" class="btn btn-sm add-btn">
-              <span>➕</span>
-            </button>
-          </div>
-          <div id="goals-list" class="goals-list"></div>
-        </div>
+        <!-- Income Section -->
+        <section id="income-section" class="dashboard-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Gestión de Ingresos</h1>
+            </div>
+            
+            <div class="income-grid">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">💼</div>
+                  <h2>Ingreso Fijo</h2>
+                </div>
+                <form id="fixed-income-form" class="income-form">
+                  <div class="input-group">
+                    <input type="number" id="fixed-income-input" placeholder="Ingreso fijo mensual" step="0.01" />
+                    <button type="submit" class="btn btn-icon">💾</button>
+                  </div>
+                </form>
+                <div class="income-summary">
+                  <div class="income-item">
+                    <span>Fijo:</span>
+                    <span id="fixed-income-amount">$0</span>
+                  </div>
+                </div>
+              </div>
 
-        <!-- Achievements Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon">🏆</div>
-            <h2>Logros</h2>
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">✨</div>
+                  <h2>Ingresos Extra</h2>
+                </div>
+                <button id="add-extra-income-btn" class="btn btn-primary btn-full">
+                  <span>✨</span>
+                  Agregar Ingreso Extra
+                </button>
+                <div class="income-summary">
+                  <div class="income-item">
+                    <span>Extra:</span>
+                    <span id="extra-income-amount">$0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="achievements-list" class="achievements-list"></div>
-        </div>
-      </aside>
+        </section>
 
-      <!-- Main Content -->
-      <div class="main-content">
-        <!-- Charts Section -->
-        <div class="charts-grid">
-          <div class="card chart-card">
-            <div class="card-header">
-              <h3>Gastos por Categoría</h3>
+        <!-- Savings Section -->
+        <section id="savings-section" class="dashboard-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Objetivos de Ahorro</h1>
+              <button id="add-goal-btn-section" class="btn btn-primary">
+                <span>➕</span>
+                Nuevo Objetivo
+              </button>
             </div>
-            <div class="chart-container">
-              <canvas id="expenses-chart"></canvas>
+            
+            <div class="savings-grid">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">🎯</div>
+                  <h2>Mis Objetivos</h2>
+                </div>
+                <div id="goals-list" class="goals-list"></div>
+              </div>
+              
+              <div class="card stats-card">
+                <div class="card-header">
+                  <div class="card-icon">📊</div>
+                  <h2>Resumen de Ahorros</h2>
+                </div>
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-label">Total Ahorrado</div>
+                    <div class="stat-value" id="total-savings">$0</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">Promedio Mensual</div>
+                    <div class="stat-value" id="monthly-average">$0</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          
-          <div class="card chart-card">
-            <div class="card-header">
-              <h3>Tendencia Mensual</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="trend-chart"></canvas>
-            </div>
-          </div>
-        </div>
+        </section>
 
-        <!-- Expenses List -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon">📋</div>
-            <h2>Gastos Recientes</h2>
+        <!-- Achievements Section -->
+        <section id="achievements-section" class="dashboard-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Logros y Reconocimientos</h1>
+            </div>
+            
+            <div class="achievements-grid">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">🏆</div>
+                  <h2>Mis Logros</h2>
+                </div>
+                <div id="achievements-list" class="achievements-list"></div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">🏷️</div>
+                  <h2>Categorías</h2>
+                  <button id="add-category-btn" class="btn btn-sm add-btn">
+                    <span>➕</span>
+                  </button>
+                </div>
+                <div id="categories-list" class="categories-list"></div>
+              </div>
+            </div>
           </div>
-          <div class="search-bar">
-            <input type="text" id="expense-search" placeholder="🔍 Buscar gastos..." />
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings-section" class="dashboard-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Configuración</h1>
+            </div>
+            
+            <div class="settings-grid">
+              <div class="card actions-card">
+                <div class="card-header">
+                  <div class="card-icon">⚡</div>
+                  <h2>Acciones</h2>
+                </div>
+                <div class="actions-grid">
+                  <button id="generate-report-btn" class="btn btn-secondary">📊 Generar Informe</button>
+                  <button id="export-csv-btn" class="btn btn-secondary">📥 Exportar CSV</button>
+                  <label for="import-csv" class="btn btn-secondary">📤 Importar CSV</label>
+                  <input type="file" id="import-csv" accept=".csv" class="hidden" />
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="expenses-list" class="expenses-list"></div>
-        </div>
+        </section>
       </div>
-
-      <!-- Right Panel -->
-      <aside class="right-panel">
-        <!-- Quick Stats -->
-        <div class="card stats-card">
-          <div class="card-header">
-            <div class="card-icon">📊</div>
-            <h2>Resumen</h2>
-          </div>
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-label">Ahorros</div>
-              <div class="stat-value" id="total-savings">$0</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-label">Promedio Mensual</div>
-              <div class="stat-value" id="monthly-average">$0</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Categories -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon">🏷️</div>
-            <h2>Categorías</h2>
-            <button id="add-category-btn" class="btn btn-sm add-btn">
-              <span>➕</span>
-            </button>
-          </div>
-          <div id="categories-list" class="categories-list"></div>
-        </div>
-
-        <!-- Actions -->
-        <div class="card actions-card">
-          <div class="card-header">
-            <div class="card-icon">⚡</div>
-            <h2>Acciones</h2>
-          </div>
-          <div class="actions-grid">
-            <button id="generate-report-btn" class="btn btn-secondary">📊 Informe</button>
-            <button id="export-csv-btn" class="btn btn-secondary">📥 Exportar</button>
-            <label for="import-csv" class="btn btn-secondary">📤 Importar</label>
-            <input type="file" id="import-csv" accept=".csv" class="hidden" />
-          </div>
-        </div>
-      </aside>
     </main>
   </div>
 
