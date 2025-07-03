@@ -91,9 +91,7 @@ export class DataManager {
         installment: i + 1,
         totalInstallments: expense.installments,
         recurring: expense.recurring && i === 0,
-        originalId: id,
-        originalAmount: expense.amount,
-        originalDescription: expense.description
+        originalId: id
       });
     }
 
@@ -205,16 +203,11 @@ export class DataManager {
     const totalIncome = (income.fixed || 0) + (income.extra || 0);
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     
-    // Count active installments for this month
-    const activeInstallments = expenses.filter(expense => 
-      expense.totalInstallments > 1
-    ).length;
-    
     return {
       available: totalIncome - totalExpenses,
       totalIncome,
       totalExpenses,
-      installments: activeInstallments
+      installments: expenses.filter(e => e.totalInstallments > 1).length
     };
   }
 
@@ -234,36 +227,6 @@ export class DataManager {
 
   getCategories() {
     return this.data.categories;
-  }
-
-  // NEW METHOD: Get active installments for a specific month
-  getActiveInstallments(month) {
-    const expenses = this.getExpenses(month);
-    return expenses.filter(expense => expense.totalInstallments > 1);
-  }
-
-  // NEW METHOD: Get all installments across all months
-  getAllInstallments() {
-    const allInstallments = [];
-    
-    Object.entries(this.data.expenses).forEach(([month, expenses]) => {
-      expenses.forEach(expense => {
-        if (expense.totalInstallments > 1) {
-          allInstallments.push({
-            ...expense,
-            month: month
-          });
-        }
-      });
-    });
-    
-    // Sort by date and installment number
-    return allInstallments.sort((a, b) => {
-      if (a.date !== b.date) {
-        return a.date.localeCompare(b.date);
-      }
-      return a.installment - b.installment;
-    });
   }
 
   getStats() {

@@ -97,13 +97,6 @@ class FinznApp {
       expenseSearch.addEventListener('input', (e) => this.handleSearch(e));
     }
     
-    // Installments card click event
-    const installmentsCard = document.getElementById('installments-card');
-    if (installmentsCard) {
-      installmentsCard.addEventListener('click', () => this.showInstallmentsModal());
-      installmentsCard.style.cursor = 'pointer';
-    }
-    
     // Chat
     this.chat.init();
     
@@ -437,13 +430,6 @@ class FinznApp {
   handleSearch(e) {
     const query = e.target.value.toLowerCase();
     this.ui.filterExpenses(query);
-  }
-
-  // NEW METHOD: Show installments modal
-  showInstallmentsModal() {
-    const allInstallments = this.data.getAllInstallments();
-    this.ui.updateInstallmentsDisplay(allInstallments);
-    this.modals.show('installments-modal');
   }
 
   async generateReport() {
