@@ -388,6 +388,7 @@ export class DataManager {
     const byCategory = this.getExpensesByCategory(month);
     const extraIncomes = this.getExtraIncomes(month);
     const installments = this.getActiveInstallments(month);
+    const goals = this.getGoals();
     
     const recommendations = [];
     const total = balance.totalExpenses;
@@ -421,25 +422,82 @@ export class DataManager {
       recommendations,
       expenses,
       extraIncomes,
-      installments
+      installments,
+      goals
     };
   }
 
   async exportToCSV() {
-    const headers = ['Fecha', 'Descripción', 'Monto', 'Categoría', 'Cuota', 'Total Cuotas'];
+    const headers = [
+      'Fecha', 
+      'Descripción', 
+      'Monto', 
+      'Categoría', 
+      'Cuota', 
+      'Total Cuotas', 
+      'Monto Original', 
+      'Fecha de Registro',
+      'Tipo'
+    ];
     const rows = [headers];
     
+    // Add expenses
     Object.entries(this.data.expenses).forEach(([month, expenses]) => {
       expenses.forEach(expense => {
+        const createdDate = expense.createdAt 
+          ? new Date(expense.createdAt).toLocaleDateString('es-ES')
+          : 'No disponible';
+        
         rows.push([
           month,
           expense.description,
           expense.amount.toFixed(2),
           expense.category,
           expense.installment || 1,
-          expense.totalInstallments || 1
+          expense.totalInstallments || 1,
+          (expense.originalAmount || expense.amount).toFixed(2),
+          createdDate,
+          'Gasto'
         ]);
       });
+    });
+
+    // Add extra incomes
+    Object.entries(this.data.extraIncomes).forEach(([month, incomes]) => {
+      incomes.forEach(income => {
+        const createdDate = income.createdAt 
+          ? new Date(income.createdAt).toLocaleDateString('es-ES')
+          : 'No disponible';
+        
+        rows.push([
+          month,
+          income.description,
+          income.amount.toFixed(2),
+          income.category,
+          1,
+          1,
+          income.amount.toFixed(2),
+          createdDate,
+          'Ingreso Extra'
+        ]);
+      });
+    });
+
+    // Add fixed incomes
+    Object.entries(this.data.income).forEach(([month, income]) => {
+      if (income.fixed > 0) {
+        rows.push([
+          month,
+          'Ingreso Fijo Mensual',
+          income.fixed.toFixed(2),
+          'Ingreso',
+          1,
+          1,
+          income.fixed.toFixed(2),
+          'Automático',
+          'Ingreso Fijo'
+        ]);
+      }
     });
     
     return rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
@@ -465,7 +523,8 @@ export class DataManager {
           category,
           date: month,
           installment: 1,
-          totalInstallments: 1
+          totalInstallments: 1,
+          createdAt: new Date().toISOString()
         });
       }
     }
@@ -515,7 +574,7 @@ export class DataManager {
         description: 'Has registrado tu primer ingreso extra'
       });
     }
-    
+
     // Installments achievement
     const totalInstallments = Object.values(this.data.expenses).flat().filter(e => e.totalInstallments > 1).length;
     if (totalInstallments >= 1 && !this.data.achievements.find(a => a.id === 'first-installment')) {
