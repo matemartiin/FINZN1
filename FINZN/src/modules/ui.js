@@ -17,6 +17,12 @@ export class UIManager {
     if (activeInstallments) {
       activeInstallments.textContent = balance.installments;
     }
+
+    // Update new dashboard elements
+    const activeInstallmentsSummary = document.getElementById('active-installments-summary');
+    if (activeInstallmentsSummary) {
+      activeInstallmentsSummary.textContent = balance.installments;
+    }
   }
 
   updateExpensesList(expenses) {
@@ -36,10 +42,15 @@ export class UIManager {
       
       const category = this.getCategoryInfo(expense.category);
       
+      // Show installment info if applicable
+      const installmentInfo = expense.totalInstallments > 1 
+        ? ` (${expense.installment}/${expense.totalInstallments})`
+        : '';
+      
       item.innerHTML = `
         <div class="expense-icon">${category.icon}</div>
         <div class="expense-details">
-          <div class="expense-description">${expense.description}</div>
+          <div class="expense-description">${expense.description}${installmentInfo}</div>
           <div class="expense-category">${category.name}</div>
         </div>
         <div class="expense-amount">${this.formatCurrency(expense.amount)}</div>
@@ -187,6 +198,83 @@ export class UIManager {
       `;
       
       container.appendChild(item);
+    });
+  }
+
+  // NEW METHOD: Update installments display
+  updateInstallmentsDisplay(installments) {
+    const container = document.getElementById('installments-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (installments.length === 0) {
+      container.innerHTML = '<div class="no-installments">No hay cuotas activas</div>';
+      return;
+    }
+
+    // Group installments by original expense
+    const groupedInstallments = {};
+    installments.forEach(installment => {
+      const key = installment.originalId || installment.id.split('-')[0];
+      if (!groupedInstallments[key]) {
+        groupedInstallments[key] = [];
+      }
+      groupedInstallments[key].push(installment);
+    });
+
+    Object.entries(groupedInstallments).forEach(([originalId, installmentGroup]) => {
+      const firstInstallment = installmentGroup[0];
+      
+      const groupContainer = document.createElement('div');
+      groupContainer.className = 'installment-group';
+      
+      const header = document.createElement('div');
+      header.className = 'installment-group-header';
+      header.innerHTML = `
+        <div class="installment-expense-info">
+          <h4>${firstInstallment.originalDescription || firstInstallment.description}</h4>
+          <div class="installment-total">Total: ${this.formatCurrency(firstInstallment.originalAmount || (firstInstallment.amount * firstInstallment.totalInstallments))}</div>
+        </div>
+        <div class="installment-category">${firstInstallment.category}</div>
+      `;
+      
+      groupContainer.appendChild(header);
+      
+      const installmentsList = document.createElement('div');
+      installmentsList.className = 'installments-detail-list';
+      
+      // Sort installments by installment number
+      installmentGroup.sort((a, b) => a.installment - b.installment);
+      
+      installmentGroup.forEach(installment => {
+        const installmentItem = document.createElement('div');
+        installmentItem.className = 'installment-detail-item';
+        
+        // Format month for display
+        const monthDate = new Date(installment.month + '-01');
+        const monthName = monthDate.toLocaleDateString('es-ES', { 
+          month: 'long', 
+          year: 'numeric' 
+        });
+        
+        // Check if this installment is in the current month
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        const isCurrentMonth = installment.month === currentMonth;
+        
+        installmentItem.innerHTML = `
+          <div class="installment-number">
+            Cuota ${installment.installment}/${installment.totalInstallments}
+          </div>
+          <div class="installment-month ${isCurrentMonth ? 'current-month' : ''}">${monthName}</div>
+          <div class="installment-amount">${this.formatCurrency(installment.amount)}</div>
+        `;
+        
+        installmentsList.appendChild(installmentItem);
+      });
+      
+      groupContainer.appendChild(installmentsList);
+      container.appendChild(groupContainer);
     });
   }
 
