@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FINZN - Gestión Financiera Personal</title>
+  <title>FINZN - Tu Compañero Financiero Inteligente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/styles/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 </head>
@@ -19,10 +19,21 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-logo">
-          <div class="logo-icon">💰</div>
+          <div class="logo-mascot">
+            <div class="mascot-body">
+              <div class="mascot-face">
+                <div class="mascot-eyes">
+                  <div class="eye left-eye"></div>
+                  <div class="eye right-eye"></div>
+                </div>
+                <div class="mascot-mouth"></div>
+              </div>
+            </div>
+          </div>
           <h1 class="auth-title">FINZN</h1>
         </div>
-        <p class="auth-subtitle">Gestiona tus finanzas de manera inteligente</p>
+        <p class="auth-subtitle">Tu compañero financiero inteligente</p>
+        <p class="auth-description">Gestiona tus finanzas de manera simple y divertida</p>
       </div>
       
       <form id="login-form" class="auth-form">
@@ -33,7 +44,7 @@
           <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
-          <span>🚀</span>
+          <span>✨</span>
           Iniciar Sesión
         </button>
         <div id="login-error" class="error-message"></div>
@@ -49,8 +60,26 @@
   <div id="register-container" class="auth-container hidden">
     <div class="auth-card">
       <div class="auth-header">
-        <h1 class="auth-title">Crear Cuenta</h1>
-        <p class="auth-subtitle">Únete a FINZN y toma control de tus finanzas</p>
+        <div class="auth-logo">
+          <div class="logo-mascot">
+            <div class="mascot-body">
+              <div class="mascot-face">
+                <div class="mascot-eyes">
+                  <div class="eye left-eye"></div>
+                  <div class="eye right-eye"></div>
+                </div>
+                <div class="mascot-mouth happy"></div>
+              </div>
+              <div class="mascot-arms">
+                <div class="arm left-arm"></div>
+                <div class="arm right-arm"></div>
+              </div>
+            </div>
+          </div>
+          <h1 class="auth-title">¡Bienvenido!</h1>
+        </div>
+        <p class="auth-subtitle">Únete a FINZN</p>
+        <p class="auth-description">Comienza tu viaje hacia la libertad financiera</p>
       </div>
       
       <form id="register-form" class="auth-form">
@@ -61,7 +90,7 @@
           <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
-          <span>🎯</span>
+          <span>🚀</span>
           Crear Cuenta
         </button>
         <div id="register-error" class="error-message"></div>
@@ -80,7 +109,9 @@
       <div class="header-content">
         <div class="header-left">
           <div class="logo-container">
-            <div class="logo-icon-small">💰</div>
+            <div class="logo-icon-small">
+              <span class="logo-letter">F</span>
+            </div>
             <h1 class="logo">FINZN</h1>
           </div>
         </div>
@@ -96,7 +127,7 @@
             <span class="theme-icon">🌙</span>
           </button>
           <button id="logout-btn" class="btn btn-secondary logout-btn" title="Cerrar sesión">
-            <span>🚪</span>
+            <span>👋</span>
             <span class="logout-text">Salir</span>
           </button>
         </div>
@@ -110,17 +141,27 @@
         <!-- Balance Card -->
         <div class="card balance-card">
           <div class="card-header">
-            <div class="card-icon">💰</div>
-            <h2>Balance Disponible</h2>
+            <h2>Saldo</h2>
+            <div class="balance-mascot">
+              <div class="mini-mascot happy">
+                <div class="mini-face">
+                  <div class="mini-eyes">
+                    <div class="mini-eye"></div>
+                    <div class="mini-eye"></div>
+                  </div>
+                  <div class="mini-mouth"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="balance-amount" id="balance-amount">$0</div>
           <div class="balance-details">
             <div class="balance-item">
-              <span>Gastos del mes:</span>
+              <span>Gastos este mes</span>
               <span id="monthly-expenses">$0</span>
             </div>
             <div class="balance-item">
-              <span>Cuotas activas:</span>
+              <span>Cuotas activas</span>
               <span id="active-installments">0</span>
             </div>
           </div>
@@ -133,7 +174,7 @@
         <!-- Income Card -->
         <div class="card">
           <div class="card-header">
-            <div class="card-icon">💼</div>
+            <div class="card-icon">💰</div>
             <h2>Ingresos</h2>
           </div>
           <form id="fixed-income-form" class="income-form">
@@ -143,7 +184,7 @@
             </div>
           </form>
           <button id="add-extra-income-btn" class="btn btn-secondary btn-sm btn-full">
-            <span>💰</span>
+            <span>✨</span>
             Agregar Ingreso Extra
           </button>
           <div class="income-summary">
@@ -162,7 +203,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-icon">🎯</div>
-            <h2>Objetivos</h2>
+            <h2>Objetivos de Ahorro</h2>
             <button id="add-goal-btn" class="btn btn-sm add-btn">
               <span>➕</span>
             </button>
@@ -226,7 +267,7 @@
           </div>
           <div class="stats-grid">
             <div class="stat-item">
-              <div class="stat-label">Total Ahorrado</div>
+              <div class="stat-label">Ahorros</div>
               <div class="stat-value" id="total-savings">$0</div>
             </div>
             <div class="stat-item">
@@ -255,9 +296,9 @@
             <h2>Acciones</h2>
           </div>
           <div class="actions-grid">
-            <button id="generate-report-btn" class="btn btn-secondary">📊 Generar Informe</button>
-            <button id="export-csv-btn" class="btn btn-secondary">📥 Exportar CSV</button>
-            <label for="import-csv" class="btn btn-secondary">📤 Importar CSV</label>
+            <button id="generate-report-btn" class="btn btn-secondary">📊 Informe</button>
+            <button id="export-csv-btn" class="btn btn-secondary">📥 Exportar</button>
+            <label for="import-csv" class="btn btn-secondary">📤 Importar</label>
             <input type="file" id="import-csv" accept=".csv" class="hidden" />
           </div>
         </div>
@@ -392,7 +433,7 @@
         </div>
         <div class="input-group">
           <label for="category-color">Color</label>
-          <input type="color" id="category-color" name="color" value="#2563eb" />
+          <input type="color" id="category-color" name="color" value="#8B7CF6" />
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
@@ -419,15 +460,32 @@
   <!-- AI Chat Assistant -->
   <div id="chat-assistant" class="chat-assistant">
     <button id="chat-toggle" class="chat-toggle">
-      <div class="chat-avatar">
-        <div class="avatar-ring"></div>
-        <div class="avatar-icon">🤖</div>
+      <div class="chat-mascot">
+        <div class="chat-mascot-body">
+          <div class="chat-mascot-face">
+            <div class="chat-mascot-eyes">
+              <div class="chat-eye"></div>
+              <div class="chat-eye"></div>
+            </div>
+            <div class="chat-mascot-mouth"></div>
+          </div>
+        </div>
       </div>
     </button>
     <div id="chat-window" class="chat-window hidden">
       <div class="chat-header">
         <div class="chat-header-info">
-          <div class="chat-avatar-small">🤖</div>
+          <div class="chat-avatar-small">
+            <div class="chat-mini-mascot">
+              <div class="chat-mini-face">
+                <div class="chat-mini-eyes">
+                  <div class="chat-mini-eye"></div>
+                  <div class="chat-mini-eye"></div>
+                </div>
+                <div class="chat-mini-mouth"></div>
+              </div>
+            </div>
+          </div>
           <div class="chat-header-text">
             <h3>Asistente Financiero</h3>
             <div class="chat-status">En línea</div>
