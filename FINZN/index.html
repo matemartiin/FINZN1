@@ -19,17 +19,47 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-logo">
-          <div class="logo-finzn">
-            <div class="logo-bubble">
-              <span class="logo-f">F</span>
-              <div class="logo-smile">
-                <div class="smile-eyes">
-                  <div class="smile-eye"></div>
-                  <div class="smile-eye"></div>
-                </div>
-                <div class="smile-mouth"></div>
-              </div>
-            </div>
+          <div class="finzn-logo-main">
+            <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- Outer bubble/speech bubble shape -->
+              <defs>
+                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#B7A6FF;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#BDE2FF;stop-opacity:1" />
+                </linearGradient>
+                <filter id="logoShadow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(183, 166, 255, 0.3)"/>
+                </filter>
+              </defs>
+              
+              <!-- Main bubble shape -->
+              <path d="M20 40 Q20 20 40 20 L80 20 Q100 20 100 40 L100 60 Q100 80 80 80 L50 80 L35 95 L40 80 L40 80 Q20 80 20 60 Z" 
+                    fill="url(#logoGradient)" 
+                    filter="url(#logoShadow)"
+                    stroke="rgba(255,255,255,0.3)" 
+                    stroke-width="2"/>
+              
+              <!-- Letter F -->
+              <text x="60" y="65" 
+                    font-family="DM Sans, sans-serif" 
+                    font-size="36" 
+                    font-weight="900" 
+                    fill="white" 
+                    text-anchor="middle" 
+                    dominant-baseline="middle">F</text>
+              
+              <!-- Smile face -->
+              <g transform="translate(75, 65)">
+                <!-- Eyes -->
+                <circle cx="-3" cy="-2" r="2" fill="white" opacity="0.9"/>
+                <circle cx="3" cy="-2" r="2" fill="white" opacity="0.9"/>
+                <!-- Mouth -->
+                <path d="M-4 2 Q0 6 4 2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.9"/>
+              </g>
+              
+              <!-- Highlight/shine effect -->
+              <ellipse cx="45" cy="35" rx="8" ry="6" fill="rgba(255,255,255,0.4)" opacity="0.6"/>
+            </svg>
           </div>
           <h1 class="auth-title">FINZN</h1>
         </div>
@@ -62,17 +92,47 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-logo">
-          <div class="logo-finzn">
-            <div class="logo-bubble">
-              <span class="logo-f">F</span>
-              <div class="logo-smile">
-                <div class="smile-eyes">
-                  <div class="smile-eye"></div>
-                  <div class="smile-eye"></div>
-                </div>
-                <div class="smile-mouth happy"></div>
-              </div>
-            </div>
+          <div class="finzn-logo-main">
+            <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- Outer bubble/speech bubble shape -->
+              <defs>
+                <linearGradient id="logoGradientRegister" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#B7A6FF;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#BDE2FF;stop-opacity:1" />
+                </linearGradient>
+                <filter id="logoShadowRegister" x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(183, 166, 255, 0.3)"/>
+                </filter>
+              </defs>
+              
+              <!-- Main bubble shape -->
+              <path d="M20 40 Q20 20 40 20 L80 20 Q100 20 100 40 L100 60 Q100 80 80 80 L50 80 L35 95 L40 80 L40 80 Q20 80 20 60 Z" 
+                    fill="url(#logoGradientRegister)" 
+                    filter="url(#logoShadowRegister)"
+                    stroke="rgba(255,255,255,0.3)" 
+                    stroke-width="2"/>
+              
+              <!-- Letter F -->
+              <text x="60" y="65" 
+                    font-family="DM Sans, sans-serif" 
+                    font-size="36" 
+                    font-weight="900" 
+                    fill="white" 
+                    text-anchor="middle" 
+                    dominant-baseline="middle">F</text>
+              
+              <!-- Happy smile face -->
+              <g transform="translate(75, 65)">
+                <!-- Eyes -->
+                <circle cx="-3" cy="-2" r="2" fill="white" opacity="0.9"/>
+                <circle cx="3" cy="-2" r="2" fill="white" opacity="0.9"/>
+                <!-- Happy mouth -->
+                <path d="M-5 1 Q0 7 5 1" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.9"/>
+              </g>
+              
+              <!-- Highlight/shine effect -->
+              <ellipse cx="45" cy="35" rx="8" ry="6" fill="rgba(255,255,255,0.4)" opacity="0.6"/>
+            </svg>
           </div>
           <h1 class="auth-title">¡Bienvenido!</h1>
         </div>
@@ -107,10 +167,40 @@
       <div class="header-content">
         <div class="header-left">
           <div class="logo-container">
-            <div class="logo-icon-small">
-              <div class="header-logo-bubble">
-                <span class="header-logo-f">F</span>
-              </div>
+            <div class="finzn-logo-header">
+              <svg width="48" height="48" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="headerLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#B7A6FF;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#BDE2FF;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                
+                <!-- Main bubble shape -->
+                <path d="M20 40 Q20 20 40 20 L80 20 Q100 20 100 40 L100 60 Q100 80 80 80 L50 80 L35 95 L40 80 L40 80 Q20 80 20 60 Z" 
+                      fill="url(#headerLogoGradient)" 
+                      stroke="rgba(255,255,255,0.3)" 
+                      stroke-width="2"/>
+                
+                <!-- Letter F -->
+                <text x="60" y="65" 
+                      font-family="DM Sans, sans-serif" 
+                      font-size="36" 
+                      font-weight="900" 
+                      fill="white" 
+                      text-anchor="middle" 
+                      dominant-baseline="middle">F</text>
+                
+                <!-- Smile face -->
+                <g transform="translate(75, 65)">
+                  <circle cx="-3" cy="-2" r="2" fill="white" opacity="0.9"/>
+                  <circle cx="3" cy="-2" r="2" fill="white" opacity="0.9"/>
+                  <path d="M-4 2 Q0 6 4 2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.9"/>
+                </g>
+                
+                <!-- Highlight -->
+                <ellipse cx="45" cy="35" rx="8" ry="6" fill="rgba(255,255,255,0.4)" opacity="0.6"/>
+              </svg>
             </div>
             <h1 class="logo">FINZN</h1>
           </div>
@@ -257,15 +347,37 @@
             <!-- Mascot Section -->
             <div class="mascot-section">
               <div class="dashboard-mascot">
-                <div class="mascot-sphere">
-                  <div class="mascot-face-dashboard">
-                    <div class="mascot-eyes-dashboard">
-                      <div class="mascot-eye-dashboard"></div>
-                      <div class="mascot-eye-dashboard"></div>
-                    </div>
-                    <div class="mascot-mouth-dashboard"></div>
-                  </div>
-                  <div class="mascot-shine"></div>
+                <div class="finzn-mascot-dashboard">
+                  <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="mascotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#B7A6FF;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#BDE2FF;stop-opacity:1" />
+                      </linearGradient>
+                      <filter id="mascotGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(183, 166, 255, 0.4)"/>
+                      </filter>
+                    </defs>
+                    
+                    <!-- Mascot sphere -->
+                    <circle cx="40" cy="40" r="35" 
+                            fill="url(#mascotGradient)" 
+                            filter="url(#mascotGlow)"
+                            stroke="rgba(255,255,255,0.3)" 
+                            stroke-width="2"/>
+                    
+                    <!-- Eyes -->
+                    <circle cx="30" cy="32" r="4" fill="white"/>
+                    <circle cx="50" cy="32" r="4" fill="white"/>
+                    <circle cx="30" cy="32" r="2" fill="#433882"/>
+                    <circle cx="50" cy="32" r="2" fill="#433882"/>
+                    
+                    <!-- Mouth -->
+                    <path d="M32 48 Q40 54 48 48" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    
+                    <!-- Shine -->
+                    <ellipse cx="30" cy="25" rx="6" ry="4" fill="rgba(255,255,255,0.5)" opacity="0.8"/>
+                  </svg>
                 </div>
               </div>
             </div>
@@ -605,33 +717,62 @@
   <!-- AI Chat Assistant -->
   <div id="chat-assistant" class="chat-assistant">
     <button id="chat-toggle" class="chat-toggle">
-      <div class="chat-mascot">
-        <div class="chat-mascot-sphere">
-          <div class="chat-mascot-face">
-            <div class="chat-mascot-eyes">
-              <div class="chat-mascot-eye"></div>
-              <div class="chat-mascot-eye"></div>
-            </div>
-            <div class="chat-mascot-mouth"></div>
-          </div>
-          <div class="chat-mascot-shine"></div>
-        </div>
+      <div class="finzn-chat-mascot">
+        <svg width="36" height="36" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="chatMascotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#B7A6FF;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#BDE2FF;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          
+          <!-- Mascot sphere -->
+          <circle cx="40" cy="40" r="35" 
+                  fill="url(#chatMascotGradient)" 
+                  stroke="rgba(255,255,255,0.4)" 
+                  stroke-width="2"/>
+          
+          <!-- Eyes -->
+          <circle cx="30" cy="32" r="3" fill="white"/>
+          <circle cx="50" cy="32" r="3" fill="white"/>
+          <circle cx="30" cy="32" r="1.5" fill="#433882"/>
+          <circle cx="50" cy="32" r="1.5" fill="#433882"/>
+          
+          <!-- Mouth -->
+          <path d="M32 48 Q40 54 48 48" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+          
+          <!-- Shine -->
+          <ellipse cx="30" cy="25" rx="5" ry="3" fill="rgba(255,255,255,0.6)" opacity="0.8"/>
+        </svg>
       </div>
     </button>
     <div id="chat-window" class="chat-window hidden">
       <div class="chat-header">
         <div class="chat-header-info">
           <div class="chat-avatar-small">
-            <div class="chat-mini-mascot">
-              <div class="chat-mini-sphere">
-                <div class="chat-mini-face">
-                  <div class="chat-mini-eyes">
-                    <div class="chat-mini-eye"></div>
-                    <div class="chat-mini-eye"></div>
-                  </div>
-                  <div class="chat-mini-mouth"></div>
-                </div>
-              </div>
+            <div class="finzn-chat-mini">
+              <svg width="28" height="28" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="chatMiniGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#B7A6FF;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#BDE2FF;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                
+                <circle cx="40" cy="40" r="35" 
+                        fill="url(#chatMiniGradient)" 
+                        stroke="rgba(255,255,255,0.4)" 
+                        stroke-width="2"/>
+                
+                <circle cx="30" cy="32" r="3" fill="white"/>
+                <circle cx="50" cy="32" r="3" fill="white"/>
+                <circle cx="30" cy="32" r="1.5" fill="#433882"/>
+                <circle cx="50" cy="32" r="1.5" fill="#433882"/>
+                
+                <path d="M32 48 Q40 54 48 48" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                
+                <ellipse cx="30" cy="25" rx="5" ry="3" fill="rgba(255,255,255,0.6)" opacity="0.8"/>
+              </svg>
             </div>
           </div>
           <div class="chat-header-text">
