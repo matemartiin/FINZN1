@@ -271,8 +271,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .mascot-body-large {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   border-radius: 50%;
   position: relative;
@@ -295,13 +295,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .mascot-eyes-large {
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .eye-large {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   background: white;
   border-radius: 50%;
   position: relative;
@@ -310,8 +310,8 @@ h1, h2, h3, h4, h5, h6 {
 .eye-large::after {
   content: '';
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: var(--text-primary);
   border-radius: 50%;
   top: 50%;
@@ -320,11 +320,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .mascot-mouth-large {
-  width: 20px;
-  height: 10px;
-  border: 3px solid white;
+  width: 16px;
+  height: 8px;
+  border: 2px solid white;
   border-top: none;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 16px 16px;
 }
 
 /* Buttons */
@@ -855,6 +855,7 @@ input:focus, select:focus, textarea:focus {
   padding: 2rem;
   overflow-y: auto;
   background: var(--bg-gradient-light);
+  max-height: calc(100vh - 80px);
 }
 
 .dashboard-section {
@@ -885,7 +886,14 @@ input:focus, select:focus, textarea:focus {
   color: var(--text-primary);
 }
 
-/* Dashboard Grid - FIXED LAYOUT */
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Dashboard Grid - FIXED COMPACT LAYOUT */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -893,7 +901,7 @@ input:focus, select:focus, textarea:focus {
   gap: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
-  min-height: 600px;
+  height: fit-content;
 }
 
 /* Summary Cards */
@@ -902,7 +910,7 @@ input:focus, select:focus, textarea:focus {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .summary-card {
@@ -980,7 +988,8 @@ input:focus, select:focus, textarea:focus {
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   backdrop-filter: blur(20px);
-  min-height: 300px;
+  height: fit-content;
+  min-height: 250px;
 }
 
 .goals-list-new {
@@ -1042,8 +1051,8 @@ input:focus, select:focus, textarea:focus {
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   backdrop-filter: blur(20px);
-  height: 100%;
-  min-height: 300px;
+  height: fit-content;
+  min-height: 250px;
 }
 
 .chart-card-new h3 {
@@ -1055,7 +1064,7 @@ input:focus, select:focus, textarea:focus {
 
 .chart-container-new {
   position: relative;
-  height: 240px;
+  height: 200px;
   width: 100%;
 }
 
@@ -1069,7 +1078,8 @@ input:focus, select:focus, textarea:focus {
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   backdrop-filter: blur(20px);
-  min-height: 200px;
+  height: fit-content;
+  min-height: 150px;
 }
 
 .achievements-list-new {
@@ -1094,7 +1104,7 @@ input:focus, select:focus, textarea:focus {
   font-size: 1.5rem;
 }
 
-/* Mascot Section - RIGHT COLUMN */
+/* Mascot Section - RIGHT COLUMN - COMPACT */
 .mascot-section {
   grid-column: 2;
   grid-row: 3;
@@ -1103,11 +1113,12 @@ input:focus, select:focus, textarea:focus {
   justify-content: center;
   background: var(--glass-bg);
   border-radius: var(--border-radius-lg);
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
   backdrop-filter: blur(20px);
-  min-height: 200px;
+  height: fit-content;
+  min-height: 150px;
 }
 
 /* Section Grids */
@@ -2068,7 +2079,11 @@ input:focus, select:focus, textarea:focus {
   }
   
   .chart-container-new {
-    height: 250px;
+    height: 180px;
+  }
+  
+  .main-dashboard {
+    max-height: none;
   }
 }
 
@@ -2129,7 +2144,7 @@ input:focus, select:focus, textarea:focus {
   
   .chart-container,
   .chart-container-new {
-    height: 200px;
+    height: 160px;
   }
   
   .chat-window {
@@ -2194,7 +2209,7 @@ input:focus, select:focus, textarea:focus {
   
   .chart-container,
   .chart-container-new {
-    height: 180px;
+    height: 140px;
   }
   
   .chat-window {
@@ -2435,9 +2450,9 @@ body.darkmode .chat-window {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
 }
 
-/* Prevent content from going behind fixed elements */
+/* Remove bottom padding that was causing blank space */
 body {
-  padding-bottom: 6rem;
+  padding-bottom: 0;
 }
 
 /* Ensure proper stacking context */
