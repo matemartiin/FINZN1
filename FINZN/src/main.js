@@ -21,6 +21,7 @@ class FinznApp {
     this.navigation = new NavigationManager();
     
     this.currentMonth = this.getCurrentMonth();
+    this.currentExpenseId = null; // For editing expenses
     this.init();
   }
 
@@ -61,8 +62,11 @@ class FinznApp {
     document.getElementById('installments-btn').addEventListener('click', () => this.showInstallmentsPopup());
     
     // Expense management
-    document.getElementById('add-expense-btn').addEventListener('click', () => this.modals.show('expense-modal'));
-    document.getElementById('expense-form').addEventListener('submit', (e) => this.handleAddExpense(e));
+    document.getElementById('add-expense-btn').addEventListener('click', () => this.showAddExpenseModal());
+    document.getElementById('expense-form').addEventListener('submit', (e) => this.handleExpenseSubmit(e));
+    
+    // Delete confirmation
+    document.getElementById('confirm-delete-btn').addEventListener('click', () => this.confirmDelete());
     
     // Income management
     document.getElementById('fixed-income-form').addEventListener('submit', (e) => this.handleFixedIncome(e));
@@ -248,6 +252,56 @@ class FinznApp {
     this.modals.show('installments-modal');
   }
 
+  showAddExpenseModal() {
+    this.currentExpenseId = null;
+    this.resetExpenseForm();
+    document.getElementById('expense-modal-title').textContent = 'Nuevo Gasto';
+    document.getElementById('expense-submit-btn').textContent = 'Agregar Gasto';
+    document.getElementById('expense-edit-mode').value = 'false';
+    this.modals.show('expense-modal');
+  }
+
+  showEditExpenseModal(expenseId) {
+    const expense = this.data.getExpenseById(expenseId, this.currentMonth);
+    if (!expense) {
+      this.ui.showAlert('Gasto no encontrado', 'error');
+      return;
+    }
+
+    this.currentExpenseId = expenseId;
+    this.populateExpenseForm(expense);
+    document.getElementById('expense-modal-title').textContent = 'Editar Gasto';
+    document.getElementById('expense-submit-btn').textContent = 'Guardar Cambios';
+    document.getElementById('expense-edit-mode').value = 'true';
+    this.modals.show('expense-modal');
+  }
+
+  resetExpenseForm() {
+    document.getElementById('expense-form').reset();
+    document.getElementById('expense-id').value = '';
+  }
+
+  populateExpenseForm(expense) {
+    document.getElementById('expense-id').value = expense.id;
+    document.getElementById('expense-description').value = expense.description;
+    document.getElementById('expense-amount').value = expense.originalAmount || expense.amount;
+    document.getElementById('expense-category').value = expense.category;
+    document.getElementById('expense-installments').value = expense.totalInstallments || 1;
+    document.getElementById('expense-recurring').checked = expense.recurring || false;
+  }
+
+  async handleExpenseSubmit(e) {
+    e.preventDefault();
+    
+    const isEditMode = document.getElementById('expense-edit-mode').value === 'true';
+    
+    if (isEditMode) {
+      await this.handleEditExpense(e);
+    } else {
+      await this.handleAddExpense(e);
+    }
+  }
+
   async handleAddExpense(e) {
     e.preventDefault();
     
@@ -279,6 +333,60 @@ class FinznApp {
     } catch (error) {
       console.error('Error adding expense:', error);
       this.ui.showAlert('Error al agregar el gasto', 'error');
+    }
+  }
+
+  async handleEditExpense(e) {
+    e.preventDefault();
+    
+    const expenseData = {
+      id: this.currentExpenseId,
+      description: document.getElementById('expense-description').value,
+      amount: parseFloat(document.getElementById('expense-amount').value),
+      category: document.getElementById('expense-category').value,
+      installments: parseInt(document.getElementById('expense-installments').value) || 1,
+      recurring: document.getElementById('expense-recurring').checked
+    };
+
+    if (!expenseData.description || !expenseData.amount || !expenseData.category) {
+      this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+
+    if (expenseData.amount <= 0) {
+      this.ui.showAlert('El monto debe ser mayor a 0', 'error');
+      return;
+    }
+
+    try {
+      await this.data.updateExpense(this.currentExpenseId, expenseData, this.currentMonth);
+      this.modals.hide('expense-modal');
+      this.updateUI();
+      this.ui.showAlert('Gasto actualizado exitosamente', 'success');
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      this.ui.showAlert('Error al actualizar el gasto', 'error');
+    }
+  }
+
+  showDeleteConfirmation(expenseId, expenseDescription) {
+    this.currentExpenseId = expenseId;
+    document.getElementById('delete-confirmation-message').textContent = 
+      `¿Estás seguro de que quieres eliminar el gasto "${expenseDescription}"?`;
+    this.modals.show('delete-confirmation-modal');
+  }
+
+  async confirmDelete() {
+    if (!this.currentExpenseId) return;
+
+    try {
+      await this.data.deleteExpense(this.currentExpenseId, this.currentMonth);
+      this.modals.hide('delete-confirmation-modal');
+      this.updateUI();
+      this.ui.showAlert('Gasto eliminado exitosamente', 'success');
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      this.ui.showAlert('Error al eliminar el gasto', 'error');
     }
   }
 
@@ -507,7 +615,7 @@ class FinznApp {
     
     // Update traditional UI elements
     this.ui.updateBalance(balance);
-    this.ui.updateExpensesList(this.data.getExpenses(this.currentMonth));
+    this.ui.updateExpensesList(this.data.getExpenses(this.currentMonth), this);
     this.ui.updateGoalsList(this.data.getGoals());
     this.ui.updateCategoriesList(this.data.getCategories());
     this.ui.updateIncomeDisplay(income);

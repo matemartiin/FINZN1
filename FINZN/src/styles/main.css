@@ -289,6 +289,19 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--primary-color);
 }
 
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger-color), #FF6B6B);
+  color: white;
+  border-color: var(--danger-color);
+  box-shadow: 0 4px 15px rgba(255, 138, 128, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FF6B6B, #FF5252);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(255, 138, 128, 0.4);
+}
+
 .btn-sm {
   padding: 0.75rem 1.5rem;
   font-size: 0.8rem;
@@ -1255,6 +1268,15 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.05em;
 }
 
+.expense-installment {
+  font-size: 0.7rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .expense-amount {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -1262,6 +1284,50 @@ input:focus, select:focus, textarea:focus {
   font-size: 1.125rem;
   flex-shrink: 0;
   word-break: break-all;
+}
+
+.expense-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.expense-item:hover .expense-actions {
+  opacity: 1;
+}
+
+.expense-action-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 0.875rem;
+  backdrop-filter: blur(10px);
+}
+
+.expense-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow);
+}
+
+.edit-btn:hover {
+  background: var(--info-color);
+  border-color: var(--primary-color);
+  color: var(--primary-dark);
+}
+
+.delete-btn:hover {
+  background: var(--danger-color);
+  border-color: var(--danger-color);
+  color: white;
 }
 
 /* Goals */
@@ -1622,6 +1688,29 @@ input:focus, select:focus, textarea:focus {
 .modal-cancel {
   background: var(--bg-secondary);
   color: var(--text-primary);
+}
+
+/* Delete Confirmation Modal */
+.delete-confirmation-content {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.delete-confirmation-content p {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.delete-warning {
+  background: rgba(255, 138, 128, 0.1);
+  border: 1px solid rgba(255, 138, 128, 0.3);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 /* Chat Assistant */
@@ -2130,6 +2219,11 @@ input:focus, select:focus, textarea:focus {
     align-self: flex-end;
   }
   
+  .expense-actions {
+    align-self: flex-end;
+    opacity: 1;
+  }
+  
   .installment-details {
     grid-template-columns: 1fr;
   }
@@ -2201,11 +2295,6 @@ input:focus, select:focus, textarea:focus {
   .nav-icon {
     font-size: 1.5rem;
   }
-  
-  .installment-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
 
 @media (max-width: 360px) {
@@ -2232,6 +2321,11 @@ input:focus, select:focus, textarea:focus {
   
   .card-amount {
     font-size: 1.5rem;
+  }
+  
+  .installment-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 

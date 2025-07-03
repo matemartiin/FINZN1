@@ -19,7 +19,7 @@ export class UIManager {
     }
   }
 
-  updateExpensesList(expenses) {
+  updateExpensesList(expenses, app) {
     const container = document.getElementById('expenses-list');
     if (!container) return;
     
@@ -41,8 +41,17 @@ export class UIManager {
         <div class="expense-details">
           <div class="expense-description">${expense.description}</div>
           <div class="expense-category">${category.name}</div>
+          ${expense.totalInstallments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.totalInstallments}</div>` : ''}
         </div>
         <div class="expense-amount">${this.formatCurrency(expense.amount)}</div>
+        <div class="expense-actions">
+          <button class="expense-action-btn edit-btn" onclick="window.app.showEditExpenseModal('${expense.id}')" title="Editar">
+            ✏️
+          </button>
+          <button class="expense-action-btn delete-btn" onclick="window.app.showDeleteConfirmation('${expense.id}', '${expense.description}')" title="Eliminar">
+            🗑️
+          </button>
+        </div>
       `;
       
       item.style.borderLeftColor = category.color;
@@ -105,85 +114,6 @@ export class UIManager {
         <div class="goal-progress-new">
           <div class="goal-progress-bar-new" style="width: ${progress}%"></div>
         </div>
-      `;
-      
-      container.appendChild(item);
-    });
-  }
-
-  updateCategoriesList(categories) {
-    const container = document.getElementById('categories-list');
-    if (!container) return;
-    
-    container.innerHTML = '';
-
-    categories.forEach(category => {
-      const item = document.createElement('div');
-      item.className = 'category-item fade-in';
-      item.innerHTML = `
-        <div class="category-icon">${category.icon}</div>
-        <div class="category-name">${category.name}</div>
-        <button class="category-delete" onclick="window.app?.data.deleteCategory('${category.id}'); window.app?.updateUI();">×</button>
-      `;
-      
-      container.appendChild(item);
-    });
-  }
-
-  updateCategoryOptions(categories) {
-    const select = document.getElementById('expense-category');
-    if (!select) return;
-    
-    select.innerHTML = '<option value="">Selecciona una categoría</option>';
-    
-    categories.forEach(category => {
-      const option = document.createElement('option');
-      option.value = category.name;
-      option.textContent = `${category.icon} ${category.name}`;
-      select.appendChild(option);
-    });
-  }
-
-  updateIncomeDisplay(income) {
-    const fixedIncomeAmount = document.getElementById('fixed-income-amount');
-    const extraIncomeAmount = document.getElementById('extra-income-amount');
-    
-    if (fixedIncomeAmount) {
-      fixedIncomeAmount.textContent = this.formatCurrency(income.fixed || 0);
-    }
-    if (extraIncomeAmount) {
-      extraIncomeAmount.textContent = this.formatCurrency(income.extra || 0);
-    }
-  }
-
-  updateStats(stats) {
-    const totalSavings = document.getElementById('total-savings');
-    const monthlyAverage = document.getElementById('monthly-average');
-    
-    if (totalSavings) {
-      totalSavings.textContent = this.formatCurrency(stats.totalSavings);
-    }
-    if (monthlyAverage) {
-      monthlyAverage.textContent = this.formatCurrency(stats.monthlyAverage);
-    }
-  }
-
-  updateAchievements(achievements) {
-    const container = document.getElementById('achievements-list');
-    if (!container) return;
-    
-    container.innerHTML = '';
-
-    if (achievements.length === 0) {
-      container.innerHTML = '<p class="text-center text-muted">No hay logros desbloqueados</p>';
-      return;
-    }
-
-    achievements.forEach(achievement => {
-      const item = document.createElement('div');
-      item.className = 'achievement-item fade-in';
-      item.innerHTML = `
-        <div>${achievement.title}</div>
       `;
       
       container.appendChild(item);
@@ -264,6 +194,85 @@ export class UIManager {
             <div class="installment-progress-fill" style="width: ${installment.progress}%"></div>
           </div>
         </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
+  updateCategoriesList(categories) {
+    const container = document.getElementById('categories-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    categories.forEach(category => {
+      const item = document.createElement('div');
+      item.className = 'category-item fade-in';
+      item.innerHTML = `
+        <div class="category-icon">${category.icon}</div>
+        <div class="category-name">${category.name}</div>
+        <button class="category-delete" onclick="window.app?.data.deleteCategory('${category.id}'); window.app?.updateUI();">×</button>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
+  updateCategoryOptions(categories) {
+    const select = document.getElementById('expense-category');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecciona una categoría</option>';
+    
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.name;
+      option.textContent = `${category.icon} ${category.name}`;
+      select.appendChild(option);
+    });
+  }
+
+  updateIncomeDisplay(income) {
+    const fixedIncomeAmount = document.getElementById('fixed-income-amount');
+    const extraIncomeAmount = document.getElementById('extra-income-amount');
+    
+    if (fixedIncomeAmount) {
+      fixedIncomeAmount.textContent = this.formatCurrency(income.fixed || 0);
+    }
+    if (extraIncomeAmount) {
+      extraIncomeAmount.textContent = this.formatCurrency(income.extra || 0);
+    }
+  }
+
+  updateStats(stats) {
+    const totalSavings = document.getElementById('total-savings');
+    const monthlyAverage = document.getElementById('monthly-average');
+    
+    if (totalSavings) {
+      totalSavings.textContent = this.formatCurrency(stats.totalSavings);
+    }
+    if (monthlyAverage) {
+      monthlyAverage.textContent = this.formatCurrency(stats.monthlyAverage);
+    }
+  }
+
+  updateAchievements(achievements) {
+    const container = document.getElementById('achievements-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (achievements.length === 0) {
+      container.innerHTML = '<p class="text-center text-muted">No hay logros desbloqueados</p>';
+      return;
+    }
+
+    achievements.forEach(achievement => {
+      const item = document.createElement('div');
+      item.className = 'achievement-item fade-in';
+      item.innerHTML = `
+        <div>${achievement.title}</div>
       `;
       
       container.appendChild(item);

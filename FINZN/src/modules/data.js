@@ -112,6 +112,84 @@ export class DataManager {
     this.checkAchievements();
   }
 
+  async updateExpense(expenseId, expenseData, month) {
+    const expenses = this.data.expenses[month] || [];
+    const expenseIndex = expenses.findIndex(exp => exp.id === expenseId);
+    
+    if (expenseIndex === -1) {
+      throw new Error('Gasto no encontrado');
+    }
+
+    const currentExpense = expenses[expenseIndex];
+    
+    // If it's part of installments, we need to update all related installments
+    if (currentExpense.totalInstallments > 1) {
+      const originalId = currentExpense.originalId;
+      
+      // Find all installments with the same originalId
+      Object.keys(this.data.expenses).forEach(monthKey => {
+        this.data.expenses[monthKey] = this.data.expenses[monthKey].map(exp => {
+          if (exp.originalId === originalId) {
+            const newInstallmentAmount = expenseData.amount / expenseData.installments;
+            return {
+              ...exp,
+              description: expenseData.description,
+              amount: newInstallmentAmount,
+              category: expenseData.category,
+              originalAmount: expenseData.amount,
+              totalInstallments: expenseData.installments,
+              recurring: expenseData.recurring
+            };
+          }
+          return exp;
+        });
+      });
+    } else {
+      // Single expense update
+      expenses[expenseIndex] = {
+        ...currentExpense,
+        description: expenseData.description,
+        amount: expenseData.amount,
+        category: expenseData.category,
+        recurring: expenseData.recurring,
+        originalAmount: expenseData.amount
+      };
+    }
+
+    this.saveUserData();
+  }
+
+  async deleteExpense(expenseId, month) {
+    const expenses = this.data.expenses[month] || [];
+    const expense = expenses.find(exp => exp.id === expenseId);
+    
+    if (!expense) {
+      throw new Error('Gasto no encontrado');
+    }
+
+    // If it's part of installments, delete all related installments
+    if (expense.totalInstallments > 1) {
+      const originalId = expense.originalId;
+      
+      // Remove all installments with the same originalId
+      Object.keys(this.data.expenses).forEach(monthKey => {
+        this.data.expenses[monthKey] = this.data.expenses[monthKey].filter(exp => 
+          exp.originalId !== originalId
+        );
+      });
+    } else {
+      // Single expense deletion
+      this.data.expenses[month] = expenses.filter(exp => exp.id !== expenseId);
+    }
+
+    this.saveUserData();
+  }
+
+  getExpenseById(expenseId, month) {
+    const expenses = this.data.expenses[month] || [];
+    return expenses.find(exp => exp.id === expenseId);
+  }
+
   async setFixedIncome(amount) {
     // Apply to all months
     const currentYear = new Date().getFullYear();

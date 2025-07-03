@@ -433,10 +433,12 @@
   <div id="expense-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Nuevo Gasto</h2>
+        <h2 id="expense-modal-title">Nuevo Gasto</h2>
         <button class="modal-close">&times;</button>
       </div>
       <form id="expense-form" class="modal-form">
+        <input type="hidden" id="expense-id" name="id" />
+        <input type="hidden" id="expense-edit-mode" name="editMode" value="false" />
         <div class="input-group">
           <label for="expense-description">Descripción</label>
           <input type="text" id="expense-description" name="description" required />
@@ -461,7 +463,7 @@
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Agregar Gasto</button>
+          <button type="submit" class="btn btn-primary" id="expense-submit-btn">Agregar Gasto</button>
         </div>
       </form>
     </div>
@@ -599,6 +601,26 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-secondary modal-cancel">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-confirmation-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚠️ Confirmar Eliminación</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="delete-confirmation-content">
+        <p id="delete-confirmation-message">¿Estás seguro de que quieres eliminar este gasto?</p>
+        <div class="delete-warning">
+          <strong>⚠️ Esta acción no se puede deshacer</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="button" id="confirm-delete-btn" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>
