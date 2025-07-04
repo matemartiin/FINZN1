@@ -3266,4 +3266,101 @@ body {
 .main-dashboard > * {
   position: relative;
   z-index: var(--z-base);
+}.chat-message.assistant {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.chat-text {
+  background: #f0f0f0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 70%;
+}
+
+.user-text {
+  background: #d3eaff;
+}
+.chat-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  z-index: 1000;
+  cursor: pointer;
+  animation: float 3s ease-in-out infinite;
+  box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+  transition: transform 0.2s ease-in-out;
+}
+
+.chat-toggle img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.chat-toggle:hover {
+  transform: scale(1.05);
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(183, 166, 255, 0.3);
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #4b3fbb; /* o el color principal de FINZN */
+  margin: 0;
+}
+.mascota-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.mascota-img {
+  width: 120px;
+  height: auto;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+/* Achicar las cards grandes (gráfico de gastos, mascota, etc.) */
+.dashboard-section-large {
+  min-height: 200px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -76,17 +76,26 @@ export class ChatManager {
     }
   }
 
-  addMessage(text, sender) {
-    const container = document.getElementById('chat-messages');
-    const message = document.createElement('div');
-    message.className = `chat-message ${sender}`;
-    message.textContent = text;
-    
-    container.appendChild(message);
-    container.scrollTop = container.scrollHeight;
-    
-    this.messages.push({ text, sender, timestamp: new Date() });
+addMessage(text, sender) {
+  const container = document.getElementById('chat-messages');
+  const message = document.createElement('div');
+  message.className = `chat-message ${sender}`;
+
+  if (sender === 'assistant') {
+    message.innerHTML = `
+      <img src="/robot-chat.png" alt="robot" class="chat-avatar" />
+      <div class="chat-text">${text}</div>
+    `;
+  } else {
+    message.innerHTML = `<div class="chat-text user-text">${text}</div>`;
   }
+
+  container.appendChild(message);
+  container.scrollTop = container.scrollHeight;
+
+  this.messages.push({ text, sender, timestamp: new Date() });
+}
+
 
   addTypingIndicator() {
     const container = document.getElementById('chat-messages');
