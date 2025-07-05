@@ -1188,34 +1188,6 @@ input:focus, select:focus, textarea:focus {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.installments-button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  padding: 0.5rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.installments-button:hover {
-  color: white;
-  transform: translateX(2px);
-}
-
-.installments-button span {
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
 /* Installments Modal */
 .installments-content {
   max-height: 65vh;
