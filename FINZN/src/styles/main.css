@@ -239,6 +239,39 @@ h1, h2, h3, h4, h5, h6 {
 
 .mascot-alert-warning {
   border-color: #f59e0b;
+.summary-card .card-action {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.add-limit-btn-dashboard {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.add-limit-btn-dashboard:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.add-limit-btn-dashboard span {
+  font-size: 1rem;
+}
+
   background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%);
 }
 

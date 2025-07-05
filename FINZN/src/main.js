@@ -94,7 +94,7 @@ class FinznApp {
     document.getElementById('category-form').addEventListener('submit', (e) => this.handleAddCategory(e));
     
     // Spending limits management
-    document.getElementById('add-limit-btn').addEventListener('click', () => this.showAddLimitModal());
+    document.getElementById('add-limit-btn-dashboard').addEventListener('click', () => this.showAddLimitModal());
     document.getElementById('limit-form').addEventListener('submit', (e) => this.handleAddLimit(e));
     
     // Reports and exports
