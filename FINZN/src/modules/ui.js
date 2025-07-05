@@ -294,6 +294,104 @@ export class UIManager {
     });
   }
 
+  updateSpendingLimitsGrid(limits, expensesByCategory) {
+    const container = document.getElementById('spending-limits-grid');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (limits.length === 0) {
+      container.innerHTML = `
+        <div class="spending-limits-empty">
+          <div class="spending-limits-empty-icon">🎯</div>
+          <div class="spending-limits-empty-title">No hay límites establecidos</div>
+          <div class="spending-limits-empty-description">
+            Establece límites de gasto para cada categoría y mantén el control de tus finanzas.
+            <br>Haz clic en "Nuevo Límite" para comenzar.
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    limits.forEach(limit => {
+      const spent = expensesByCategory[limit.category] || 0;
+      const percentage = limit.amount > 0 ? (spent / limit.amount) * 100 : 0;
+      const remaining = Math.max(0, limit.amount - spent);
+      
+      let statusClass = 'safe';
+      let statusIcon = '✅';
+      let statusText = 'Dentro del límite';
+      
+      if (percentage >= 100) {
+        statusClass = 'danger';
+        statusIcon = '🚨';
+        statusText = 'Límite superado';
+      } else if (percentage >= limit.warning) {
+        statusClass = 'warning';
+        statusIcon = '⚠️';
+        statusText = 'Cerca del límite';
+      }
+      
+      const categoryInfo = this.getCategoryInfo(limit.category);
+      
+      const card = document.createElement('div');
+      card.className = `spending-limit-card limit-${statusClass} fade-in`;
+      card.innerHTML = `
+        <div class="limit-card-header">
+          <div class="limit-category-info">
+            <div class="limit-category-icon">${categoryInfo.icon}</div>
+            <div class="limit-category-name">${limit.category}</div>
+          </div>
+          <button class="limit-delete-btn" onclick="window.app?.data.deleteSpendingLimit('${limit.id}'); window.app?.updateUI();" title="Eliminar límite">
+            ×
+          </button>
+        </div>
+        
+        <div class="limit-amounts-grid">
+          <div class="limit-amount-item">
+            <div class="limit-amount-label">Gastado</div>
+            <div class="limit-amount-value spent">${this.formatCurrency(spent)}</div>
+          </div>
+          <div class="limit-amount-item">
+            <div class="limit-amount-label">Límite</div>
+            <div class="limit-amount-value">${this.formatCurrency(limit.amount)}</div>
+          </div>
+        </div>
+        
+        <div class="limit-progress-container">
+          <div class="limit-progress-header">
+            <div class="limit-progress-label">Progreso</div>
+            <div class="limit-progress-percentage">${Math.round(percentage)}%</div>
+          </div>
+          <div class="limit-progress-bar-container">
+            <div class="limit-progress-bar-animated ${statusClass}" style="width: 0%" data-width="${Math.min(percentage, 100)}%"></div>
+          </div>
+        </div>
+        
+        <div class="limit-status-badge ${statusClass}">
+          <span>${statusIcon}</span>
+          <span>${statusText}</span>
+        </div>
+        
+        <div class="limit-warning-threshold">
+          Alerta configurada al ${limit.warning}%
+        </div>
+      `;
+      
+      container.appendChild(card);
+    });
+    
+    // Trigger animations after DOM insertion
+    setTimeout(() => {
+      const progressBars = container.querySelectorAll('.limit-progress-bar-animated');
+      progressBars.forEach(bar => {
+        const targetWidth = bar.getAttribute('data-width');
+        bar.style.width = targetWidth;
+      });
+    }, 100);
+  }
+
   updateLimitCategoryOptions(categories) {
     const select = document.getElementById('limit-category');
     if (!select) return;

@@ -536,6 +536,283 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Spending Limits Grid in Expenses Section */
+.spending-limits-section {
+  margin-bottom: 2rem;
+}
+
+.spending-limits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.spending-limit-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.spending-limit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.spending-limit-card.limit-warning {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, var(--bg-card) 100%);
+}
+
+.spending-limit-card.limit-danger {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--bg-card) 100%);
+}
+
+.spending-limit-card.limit-safe {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-card) 100%);
+}
+
+.limit-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.limit-category-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.limit-category-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  border-radius: 12px;
+  color: white;
+}
+
+.limit-category-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.limit-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.limit-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.limit-amounts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.limit-amount-item {
+  text-align: center;
+}
+
+.limit-amount-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.limit-amount-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.limit-amount-value.spent {
+  color: var(--primary-color);
+}
+
+.limit-amount-value.remaining {
+  color: #10b981;
+}
+
+.limit-amount-value.exceeded {
+  color: #ef4444;
+}
+
+.limit-progress-container {
+  margin-bottom: 1rem;
+}
+
+.limit-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.limit-progress-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.limit-progress-percentage {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.limit-progress-bar-container {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.limit-progress-bar-animated {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.limit-progress-bar-animated.safe {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.limit-progress-bar-animated.warning {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.limit-progress-bar-animated.danger {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.limit-progress-bar-animated::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.limit-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.limit-status-badge.safe {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.limit-status-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.limit-status-badge.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.limit-warning-threshold {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* Empty state for spending limits */
+.spending-limits-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.spending-limits-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.spending-limits-empty-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.spending-limits-empty-description {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .spending-limits-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .limit-amounts-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .spending-limit-card {
+    padding: 1rem;
+  }
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
