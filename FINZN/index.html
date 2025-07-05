@@ -173,6 +173,12 @@
                   <span class="card-title">Ingresos</span>
                 </div>
                 <div class="card-amount" id="income-summary">$3,500</div>
+                <div class="card-action">
+                  <button id="add-income-btn-dashboard" class="btn btn-primary">
+                    <span>➕</span>
+                    Agregar Ingreso
+                  </button>
+                </div>
               </div>
 
               <div class="summary-card balance-card-new">
@@ -491,6 +497,110 @@
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary" id="expense-submit-btn">Agregar Gasto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Enhanced Income Modal -->
+  <div id="income-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💰 Agregar Ingreso</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      
+      <div class="income-type-selector">
+        <div class="income-type-tabs">
+          <button type="button" class="income-type-tab active" data-type="fixed">
+            <div class="income-type-icon">💼</div>
+            <div class="income-type-label">Ingreso Fijo</div>
+            <div class="income-type-description">Salario mensual</div>
+          </button>
+          <button type="button" class="income-type-tab" data-type="extra">
+            <div class="income-type-icon">✨</div>
+            <div class="income-type-label">Ingreso Extra</div>
+            <div class="income-type-description">Ingresos adicionales</div>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Fixed Income Form -->
+      <form id="fixed-income-form-modal" class="modal-form income-form-section active">
+        <div class="income-form-header">
+          <h3>💼 Configurar Ingreso Fijo</h3>
+          <p>Este será tu ingreso mensual recurrente</p>
+        </div>
+        
+        <div class="input-group">
+          <label for="fixed-income-amount-modal">Monto Mensual</label>
+          <input 
+            type="number" 
+            id="fixed-income-amount-modal" 
+            name="amount" 
+            step="0.01" 
+            min="0.01"
+            placeholder="Ej: 50000" 
+            required 
+          />
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Guardar Ingreso Fijo</button>
+        </div>
+      </form>
+      
+      <!-- Extra Income Form -->
+      <form id="extra-income-form-modal" class="modal-form income-form-section">
+        <div class="income-form-header">
+          <h3>✨ Agregar Ingreso Extra</h3>
+          <p>Registra ingresos adicionales como ventas, trabajos freelance, etc.</p>
+        </div>
+        
+        <div class="input-group">
+          <label for="extra-income-description-modal">Descripción</label>
+          <input 
+            type="text" 
+            id="extra-income-description-modal" 
+            name="description" 
+            placeholder="Ej: Venta de producto, Trabajo freelance, Regalo" 
+            required 
+          />
+        </div>
+        
+        <div class="input-group">
+          <label for="extra-income-amount-modal">Monto</label>
+          <input 
+            type="number" 
+            id="extra-income-amount-modal" 
+            name="amount" 
+            step="0.01" 
+            min="0.01" 
+            placeholder="Ingresa el monto aquí..." 
+            required 
+          />
+        </div>
+        
+        <div class="input-group">
+          <label for="extra-income-category-modal">Categoría</label>
+          <select id="extra-income-category-modal" name="category" required>
+            <option value="">Selecciona una categoría</option>
+            <option value="Venta">💰 Venta</option>
+            <option value="Regalo">🎁 Regalo</option>
+            <option value="Trabajo">💼 Trabajo</option>
+            <option value="Freelance">💻 Freelance</option>
+            <option value="Inversión">📈 Inversión</option>
+            <option value="Bono">🎯 Bono</option>
+            <option value="Comisión">💸 Comisión</option>
+            <option value="Reembolso">🔄 Reembolso</option>
+            <option value="Otro">📦 Otro</option>
+          </select>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">✨ Agregar Ingreso Extra</button>
         </div>
       </form>
     </div>
