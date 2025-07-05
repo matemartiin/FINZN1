@@ -246,26 +246,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .add-limit-btn-dashboard {
-  width: 100%;
-  padding: 8px 12px;
-  background: transparent;
-  border: 1px solid var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
   border-radius: 8px;
-  color: var(--primary-color);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   gap: 6px;
 }
 
 .add-limit-btn-dashboard:hover {
-  background: var(--primary-color);
-  color: white;
+  background: var(--primary-hover);
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .add-limit-btn-dashboard span {
