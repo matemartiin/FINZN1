@@ -693,6 +693,7 @@ class FinznApp {
     this.ui.updateStats(this.data.getStats());
     this.ui.updateAchievements(this.data.getAchievements());
     this.ui.updateSpendingLimitsList(this.data.getSpendingLimits(), this.data.getExpensesByCategory(this.currentMonth));
+    this.ui.updateSpendingLimitsGrid(this.data.getSpendingLimits(), this.data.getExpensesByCategory(this.currentMonth));
     
     // Update charts
     this.charts.updateExpensesChart(this.data.getExpensesByCategory(this.currentMonth));
