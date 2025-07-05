@@ -70,6 +70,9 @@ class FinznApp {
     
     // Income management
     document.getElementById('fixed-income-form').addEventListener('submit', (e) => this.handleFixedIncome(e));
+    document.getElementById('add-income-btn-dashboard').addEventListener('click', () => this.showIncomeModal());
+    document.getElementById('fixed-income-form-modal').addEventListener('submit', (e) => this.handleFixedIncomeModal(e));
+    document.getElementById('extra-income-form-modal').addEventListener('submit', (e) => this.handleExtraIncomeModal(e));
     document.getElementById('add-extra-income-btn').addEventListener('click', () => {
       console.log('🔥 Extra income button clicked');
       this.modals.show('extra-income-modal');
@@ -114,6 +117,9 @@ class FinznApp {
     
     // Modal events
     this.modals.init();
+    
+    // Income modal tab switching
+    this.setupIncomeModalTabs();
   }
 
   async handleLogin(e) {
@@ -304,6 +310,113 @@ class FinznApp {
       await this.handleEditExpense(e);
     } else {
       await this.handleAddExpense(e);
+    }
+  }
+
+  setupIncomeModalTabs() {
+    const tabs = document.querySelectorAll('.income-type-tab');
+    const forms = document.querySelectorAll('.income-form-section');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const type = tab.getAttribute('data-type');
+        
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show corresponding form
+        forms.forEach(form => {
+          form.classList.remove('active');
+          if (form.id.includes(type)) {
+            form.classList.add('active');
+          }
+        });
+      });
+    });
+  }
+
+  showIncomeModal() {
+    // Reset to fixed income tab by default
+    const tabs = document.querySelectorAll('.income-type-tab');
+    const forms = document.querySelectorAll('.income-form-section');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    forms.forEach(form => form.classList.remove('active'));
+    
+    document.querySelector('[data-type="fixed"]').classList.add('active');
+    document.getElementById('fixed-income-form-modal').classList.add('active');
+    
+    this.modals.show('income-modal');
+  }
+
+  async handleFixedIncomeModal(e) {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById('fixed-income-amount-modal').value);
+    
+    if (!amount || amount <= 0) {
+      this.ui.showAlert('Por favor ingresa un monto válido', 'error');
+      return;
+    }
+
+    try {
+      await this.data.setFixedIncome(amount);
+      this.modals.hide('income-modal');
+      e.target.reset();
+      this.updateUI();
+      this.ui.showAlert(`💼 Ingreso fijo de ${this.ui.formatCurrency(amount)} configurado exitosamente`, 'success');
+    } catch (error) {
+      console.error('Error setting fixed income:', error);
+      this.ui.showAlert('Error al configurar el ingreso fijo', 'error');
+    }
+  }
+
+  async handleExtraIncomeModal(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const description = formData.get('description')?.trim() || '';
+    const amountString = formData.get('amount') || '';
+    const category = formData.get('category') || '';
+    
+    // Validation
+    if (!description) {
+      this.ui.showAlert('Por favor ingresa una descripción', 'error');
+      return;
+    }
+
+    if (!amountString || amountString.trim() === '') {
+      this.ui.showAlert('Por favor ingresa un monto', 'error');
+      return;
+    }
+
+    const amount = parseFloat(amountString);
+    if (isNaN(amount) || amount <= 0) {
+      this.ui.showAlert('Por favor ingresa un monto válido mayor a 0', 'error');
+      return;
+    }
+
+    if (!category) {
+      this.ui.showAlert('Por favor selecciona una categoría', 'error');
+      return;
+    }
+
+    const extraIncome = {
+      description,
+      amount,
+      category,
+      date: this.currentMonth
+    };
+
+    try {
+      await this.data.addExtraIncome(extraIncome, this.currentMonth);
+      this.modals.hide('income-modal');
+      e.target.reset();
+      this.updateUI();
+      this.ui.showAlert(`✨ Ingreso extra de ${this.ui.formatCurrency(amount)} agregado exitosamente`, 'success');
+    } catch (error) {
+      console.error('Error adding extra income:', error);
+      this.ui.showAlert('Error al agregar el ingreso extra', 'error');
     }
   }
 
