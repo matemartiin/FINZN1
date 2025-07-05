@@ -7,7 +7,8 @@ export class DataManager {
       goals: [],
       categories: this.getDefaultCategories(),
       achievements: [],
-      recurringExpenses: []
+      recurringExpenses: [],
+      spendingLimits: []
     };
   }
 
@@ -41,6 +42,7 @@ export class DataManager {
         if (!this.data.categories) this.data.categories = this.getDefaultCategories();
         if (!this.data.achievements) this.data.achievements = [];
         if (!this.data.recurringExpenses) this.data.recurringExpenses = [];
+        if (!this.data.spendingLimits) this.data.spendingLimits = [];
         
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -259,6 +261,43 @@ export class DataManager {
     });
     
     this.saveUserData();
+  }
+
+  async addSpendingLimit(limit) {
+    // Check if limit already exists for this category
+    const existingIndex = this.data.spendingLimits.findIndex(l => l.category === limit.category);
+    
+    if (existingIndex !== -1) {
+      // Update existing limit
+      this.data.spendingLimits[existingIndex] = {
+        ...this.data.spendingLimits[existingIndex],
+        ...limit,
+        updatedAt: new Date().toISOString()
+      };
+    } else {
+      // Add new limit
+      const id = Date.now().toString();
+      this.data.spendingLimits.push({
+        id,
+        ...limit,
+        createdAt: new Date().toISOString()
+      });
+    }
+    
+    this.saveUserData();
+  }
+
+  getSpendingLimits() {
+    return this.data.spendingLimits || [];
+  }
+
+  deleteSpendingLimit(id) {
+    this.data.spendingLimits = this.data.spendingLimits.filter(limit => limit.id !== id);
+    this.saveUserData();
+  }
+
+  getSpendingLimitForCategory(category) {
+    return this.data.spendingLimits.find(limit => limit.category === category);
   }
 
   getExpenses(month) {

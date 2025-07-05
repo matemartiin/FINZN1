@@ -93,6 +93,10 @@ class FinznApp {
     document.getElementById('add-category-btn').addEventListener('click', () => this.modals.show('category-modal'));
     document.getElementById('category-form').addEventListener('submit', (e) => this.handleAddCategory(e));
     
+    // Spending limits management
+    document.getElementById('add-limit-btn').addEventListener('click', () => this.showAddLimitModal());
+    document.getElementById('limit-form').addEventListener('submit', (e) => this.handleAddLimit(e));
+    
     // Reports and exports
     document.getElementById('generate-report-btn').addEventListener('click', () => this.generateReport());
     document.getElementById('export-csv-btn').addEventListener('click', () => this.exportCSV());
@@ -302,6 +306,43 @@ class FinznApp {
     }
   }
 
+  showAddLimitModal() {
+    // Update category options in limit modal
+    this.ui.updateLimitCategoryOptions(this.data.getCategories());
+    this.modals.show('limit-modal');
+  }
+
+  async handleAddLimit(e) {
+    e.preventDefault();
+    
+    const limit = {
+      category: document.getElementById('limit-category').value,
+      amount: parseFloat(document.getElementById('limit-amount').value),
+      warning: parseInt(document.getElementById('limit-warning').value) || 80
+    };
+
+    if (!limit.category || !limit.amount || limit.amount <= 0) {
+      this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+
+    if (limit.warning < 50 || limit.warning > 100) {
+      this.ui.showAlert('El porcentaje de alerta debe estar entre 50% y 100%', 'error');
+      return;
+    }
+
+    try {
+      await this.data.addSpendingLimit(limit);
+      this.modals.hide('limit-modal');
+      e.target.reset();
+      this.updateUI();
+      this.ui.showAlert('Límite de gasto establecido exitosamente', 'success');
+    } catch (error) {
+      console.error('Error adding spending limit:', error);
+      this.ui.showAlert('Error al establecer el límite', 'error');
+    }
+  }
+
   async handleAddExpense(e) {
     e.preventDefault();
     
@@ -329,6 +370,7 @@ class FinznApp {
       this.modals.hide('expense-modal');
       e.target.reset();
       this.updateUI();
+      this.checkSpendingLimits(); // Check limits after adding expense
       this.ui.showAlert('Gasto agregado exitosamente', 'success');
     } catch (error) {
       console.error('Error adding expense:', error);
@@ -362,6 +404,7 @@ class FinznApp {
       await this.data.updateExpense(this.currentExpenseId, expenseData, this.currentMonth);
       this.modals.hide('expense-modal');
       this.updateUI();
+      this.checkSpendingLimits(); // Check limits after updating expense
       this.ui.showAlert('Gasto actualizado exitosamente', 'success');
     } catch (error) {
       console.error('Error updating expense:', error);
@@ -383,11 +426,38 @@ class FinznApp {
       await this.data.deleteExpense(this.currentExpenseId, this.currentMonth);
       this.modals.hide('delete-confirmation-modal');
       this.updateUI();
+      this.checkSpendingLimits(); // Check limits after deleting expense
       this.ui.showAlert('Gasto eliminado exitosamente', 'success');
     } catch (error) {
       console.error('Error deleting expense:', error);
       this.ui.showAlert('Error al eliminar el gasto', 'error');
     }
+  }
+
+  checkSpendingLimits() {
+    const limits = this.data.getSpendingLimits();
+    const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
+    
+    limits.forEach(limit => {
+      const spent = expensesByCategory[limit.category] || 0;
+      const percentage = (spent / limit.amount) * 100;
+      
+      if (percentage >= limit.warning) {
+        let message = '';
+        let alertType = 'warning';
+        
+        if (percentage >= 100) {
+          message = `¡Has superado el límite de ${limit.category}! Gastaste ${this.ui.formatCurrency(spent)} de ${this.ui.formatCurrency(limit.amount)}`;
+          alertType = 'danger';
+        } else if (percentage >= limit.warning) {
+          message = `¡Cuidado! Estás cerca del límite en ${limit.category}. Has gastado ${Math.round(percentage)}% (${this.ui.formatCurrency(spent)} de ${this.ui.formatCurrency(limit.amount)})`;
+        }
+        
+        if (message) {
+          this.ui.showMascotAlert(message, alertType);
+        }
+      }
+    });
   }
 
   async handleFixedIncome(e) {
@@ -621,6 +691,7 @@ class FinznApp {
     this.ui.updateIncomeDisplay(income);
     this.ui.updateStats(this.data.getStats());
     this.ui.updateAchievements(this.data.getAchievements());
+    this.ui.updateSpendingLimitsList(this.data.getSpendingLimits(), this.data.getExpensesByCategory(this.currentMonth));
     
     // Update charts
     this.charts.updateExpensesChart(this.data.getExpensesByCategory(this.currentMonth));
