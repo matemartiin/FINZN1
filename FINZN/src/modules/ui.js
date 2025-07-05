@@ -1,6 +1,7 @@
 export class UIManager {
   constructor() {
     this.alertContainer = document.getElementById('alert-container');
+    this.mascotAlertTimeout = null;
   }
 
   updateBalance(balance) {
@@ -219,6 +220,94 @@ export class UIManager {
     });
   }
 
+  updateSpendingLimitsList(limits, expensesByCategory) {
+    const container = document.getElementById('limits-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (limits.length === 0) {
+      container.innerHTML = '<p class="text-center text-muted">No hay límites establecidos</p>';
+      return;
+    }
+
+    limits.forEach(limit => {
+      const spent = expensesByCategory[limit.category] || 0;
+      const percentage = limit.amount > 0 ? (spent / limit.amount) * 100 : 0;
+      const remaining = Math.max(0, limit.amount - spent);
+      
+      let statusClass = 'safe';
+      let statusIcon = '✅';
+      let statusText = 'Dentro del límite';
+      
+      if (percentage >= 100) {
+        statusClass = 'exceeded';
+        statusIcon = '🚨';
+        statusText = 'Límite superado';
+      } else if (percentage >= limit.warning) {
+        statusClass = 'warning';
+        statusIcon = '⚠️';
+        statusText = 'Cerca del límite';
+      }
+      
+      const item = document.createElement('div');
+      item.className = `limit-item fade-in limit-${statusClass}`;
+      item.innerHTML = `
+        <div class="limit-header">
+          <div class="limit-category">
+            <div class="limit-icon">${this.getCategoryInfo(limit.category).icon}</div>
+            <div class="limit-name">${limit.category}</div>
+          </div>
+          <button class="limit-delete" onclick="window.app?.data.deleteSpendingLimit('${limit.id}'); window.app?.updateUI();" title="Eliminar límite">×</button>
+        </div>
+        
+        <div class="limit-amounts">
+          <div class="limit-spent">
+            <span class="limit-label">Gastado:</span>
+            <span class="limit-value">${this.formatCurrency(spent)}</span>
+          </div>
+          <div class="limit-total">
+            <span class="limit-label">Límite:</span>
+            <span class="limit-value">${this.formatCurrency(limit.amount)}</span>
+          </div>
+          <div class="limit-remaining">
+            <span class="limit-label">Disponible:</span>
+            <span class="limit-value">${this.formatCurrency(remaining)}</span>
+          </div>
+        </div>
+        
+        <div class="limit-progress">
+          <div class="limit-progress-bar">
+            <div class="limit-progress-fill limit-progress-${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+          </div>
+          <div class="limit-percentage">${Math.round(percentage)}%</div>
+        </div>
+        
+        <div class="limit-status">
+          <span class="limit-status-icon">${statusIcon}</span>
+          <span class="limit-status-text">${statusText}</span>
+          <span class="limit-warning-threshold">Alerta: ${limit.warning}%</span>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
+  updateLimitCategoryOptions(categories) {
+    const select = document.getElementById('limit-category');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecciona una categoría</option>';
+    
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.name;
+      option.textContent = `${category.icon} ${category.name}`;
+      select.appendChild(option);
+    });
+  }
+
   updateCategoryOptions(categories) {
     const select = document.getElementById('expense-category');
     if (!select) return;
@@ -292,6 +381,35 @@ export class UIManager {
         item.style.display = 'none';
       }
     });
+  }
+
+  showMascotAlert(message, type = 'warning') {
+    const mascotAlert = document.getElementById('mascot-alert');
+    const mascotAlertText = document.getElementById('mascot-alert-text');
+    
+    if (!mascotAlert || !mascotAlertText) return;
+    
+    // Clear any existing timeout
+    if (this.mascotAlertTimeout) {
+      clearTimeout(this.mascotAlertTimeout);
+    }
+    
+    // Set the message and show the alert
+    mascotAlertText.textContent = message;
+    mascotAlert.className = `mascot-alert mascot-alert-${type}`;
+    
+    // Add bounce animation to mascot
+    const mascot = document.querySelector('.finzn-mascot-dashboard img');
+    if (mascot) {
+      mascot.classList.add('mascot-bounce');
+      setTimeout(() => mascot.classList.remove('mascot-bounce'), 1000);
+    }
+    
+    // Auto-hide after 8 seconds for warnings, 12 seconds for danger
+    const hideDelay = type === 'danger' ? 12000 : 8000;
+    this.mascotAlertTimeout = setTimeout(() => {
+      mascotAlert.classList.add('hidden');
+    }, hideDelay);
   }
 
   showAlert(message, type = 'info') {
