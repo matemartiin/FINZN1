@@ -69,7 +69,6 @@ class FinznApp {
     document.getElementById('confirm-delete-btn').addEventListener('click', () => this.confirmDelete());
     
     // Income management
-    document.getElementById('fixed-income-form').addEventListener('submit', (e) => this.handleFixedIncome(e));
     document.getElementById('add-income-btn-dashboard').addEventListener('click', () => this.showIncomeModal());
     document.getElementById('fixed-income-form-modal').addEventListener('submit', (e) => this.handleFixedIncomeModal(e));
     document.getElementById('extra-income-form-modal').addEventListener('submit', (e) => this.handleExtraIncomeModal(e));
