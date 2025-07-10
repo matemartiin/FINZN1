@@ -848,12 +848,12 @@ class FinznApp {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
-}
 
-showExtraIncomesModal() {
-  const extraIncomes = this.data.getAllExtraIncomes();
-  this.ui.showExtraIncomesModal(extraIncomes);
-  this.modals.show('extra-incomes-modal');
+  showExtraIncomesModal() {
+    const extraIncomes = this.data.getAllExtraIncomes();
+    this.ui.showExtraIncomesModal(extraIncomes);
+    this.modals.show('extra-incomes-modal');
+  }
 }
 
 // Make app globally accessible for debugging
