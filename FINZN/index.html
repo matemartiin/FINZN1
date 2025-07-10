@@ -127,10 +127,6 @@
             <div class="nav-icon">💳</div>
             <span class="nav-label">Gastos</span>
           </div>
-          <div class="nav-item" data-section="income">
-            <div class="nav-icon">💰</div>
-            <span class="nav-label">Ingresos</span>
-          </div>
           <div class="nav-item" data-section="savings">
             <div class="nav-icon">🎯</div>
             <span class="nav-label">Ahorros</span>
@@ -170,7 +166,12 @@
               <div class="summary-card income-card">
                 <div class="card-header-simple">
                   <div class="card-icon-simple">💰</div>
-                  <span class="card-title">Ingresos</span>
+                  <span class="card-title">
+                    Ingresos
+                    <button id="extra-incomes-indicator" class="extra-incomes-indicator hidden" title="Ver ingresos extras">
+                      <span class="indicator-count">0</span>
+                    </button>
+                  </span>
                 </div>
                 <div class="card-amount" id="income-summary">$3,500</div>
                 <div class="card-action">
@@ -312,53 +313,6 @@
                 </div>
                 <div class="chart-container">
                   <canvas id="trend-chart"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Income Section -->
-        <section id="income-section" class="dashboard-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Gestión de Ingresos</h1>
-            </div>
-            
-            <div class="income-grid">
-              <div class="card">
-                <div class="card-header">
-                  <div class="card-icon">💼</div>
-                  <h2>Ingreso Fijo</h2>
-                </div>
-                <form id="fixed-income-form" class="income-form">
-                  <div class="input-group">
-                    <input type="number" id="fixed-income-input" placeholder="Ingreso fijo mensual" step="0.01" />
-                    <button type="submit" class="btn btn-icon">💾</button>
-                  </div>
-                </form>
-                <div class="income-summary">
-                  <div class="income-item">
-                    <span>Fijo:</span>
-                    <span id="fixed-income-amount">$0</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="card-header">
-                  <div class="card-icon">✨</div>
-                  <h2>Ingresos Extra</h2>
-                </div>
-                <button id="add-extra-income-btn" class="btn btn-primary btn-full">
-                  <span>✨</span>
-                  Agregar Ingreso Extra
-                </button>
-                <div class="income-summary">
-                  <div class="income-item">
-                    <span>Extra:</span>
-                    <span id="extra-income-amount">$0</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -768,6 +722,43 @@
           <button type="submit" class="btn btn-primary">Establecer Límite</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Extra Incomes List Modal -->
+  <div id="extra-incomes-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>💰 Historial de Ingresos Extras</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div id="extra-incomes-content" class="extra-incomes-content">
+        <div class="extra-incomes-header">
+          <p class="extra-incomes-description">
+            Aquí puedes ver todos los ingresos extras que has registrado, organizados por mes.
+          </p>
+          <div class="extra-incomes-stats">
+            <div class="stat-item">
+              <div class="stat-label">Total de Ingresos Extras</div>
+              <div class="stat-value" id="total-extra-incomes">$0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Este Mes</div>
+              <div class="stat-value" id="current-month-extra-incomes">$0</div>
+            </div>
+          </div>
+        </div>
+        <div id="extra-incomes-list" class="extra-incomes-list">
+          <!-- Los ingresos extras se cargarán dinámicamente aquí -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="add-extra-income-from-modal" class="btn btn-primary">
+          <span>✨</span>
+          Agregar Nuevo Ingreso Extra
+        </button>
+        <button class="btn btn-secondary modal-cancel">Cerrar</button>
+      </div>
     </div>
   </div>
 
