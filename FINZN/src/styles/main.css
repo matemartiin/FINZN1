@@ -496,7 +496,11 @@ body {
 /* Dashboard Grid */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "summary summary"
+    "chart goals"
+    "mascot mascot";
   gap: 24px;
   max-width: 100%;
 }
@@ -641,7 +645,7 @@ body {
 
 /* Goals Section */
 .goals-section {
-  grid-column: span 12;
+  grid-area: goals;
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   padding: 24px;
@@ -722,7 +726,7 @@ body {
 
 /* Chart Section */
 .chart-section {
-  grid-column: span 8;
+  grid-area: chart;
 }
 
 .chart-card-new {
@@ -732,61 +736,104 @@ body {
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
   height: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.chart-card-new h3 {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 20px;
+.chart-card-new:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.chart-content-with-mascot {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 300px;
 }
 
 .chart-container-new {
+  flex: 1;
+  height: 280px;
   position: relative;
-  height: 300px;
 }
 
-/* Achievements Section */
-.achievements-section {
-  grid-column: span 4;
-}
-
-.achievements-list-new {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.achievement-item-new {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  transition: all var(--transition-fast);
-}
-
-.achievement-item-new:hover {
-  background: var(--bg-tertiary);
-  transform: translateX(4px);
-}
-
-.achievement-icon {
-  font-size: var(--text-xl);
-  width: 40px;
-  height: 40px;
+.chart-mascot {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border-radius: var(--radius-lg);
+}
+
+.chart-mascot-container {
+  position: relative;
+  display: inline-block;
+}
+
+.chart-mascot-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 12px rgba(183, 166, 255, 0.3));
+}
+
+.chart-mascot-img:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 6px 16px rgba(183, 166, 255, 0.5));
+}
+
+.chart-mascot-tooltip {
+  position: absolute;
+  bottom: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-color);
   color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chart-mascot-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--primary-color);
+}
+
+.chart-mascot-container:hover .chart-mascot-tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: -40px;
+}
+
+.chart-card-new h3 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+  font-weight: 700;
 }
 
 /* Mascot Section */
 .mascot-section {
-  grid-column: span 12;
+  grid-area: mascot;
   display: flex;
   justify-content: center;
   margin-top: 20px;
@@ -2545,6 +2592,17 @@ body {
   }
 }
 
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "chart"
+      "goals"
+      "mascot";
+  }
+}
+
 @media (max-width: 768px) {
   .header-content {
     padding: 12px 16px;
@@ -2583,6 +2641,36 @@ body {
   
   .key-metrics {
     grid-template-columns: 1fr;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "chart"
+      "goals"
+      "mascot";
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .goals-list-new,
+  .achievements-list-new {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .chart-content-with-mascot {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .chart-container-new {
+    height: 250px;
   }
 }
 
