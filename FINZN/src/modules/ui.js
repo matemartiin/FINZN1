@@ -201,6 +201,115 @@ export class UIManager {
     });
   }
 
+  showExtraIncomesModal(extraIncomes) {
+    const container = document.getElementById('extra-incomes-list');
+    const totalExtraIncomes = document.getElementById('total-extra-incomes');
+    const currentMonthExtraIncomes = document.getElementById('current-month-extra-incomes');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (extraIncomes.length === 0) {
+      container.innerHTML = `
+        <div class="extra-incomes-empty">
+          <div class="extra-incomes-empty-icon">✨</div>
+          <div class="extra-incomes-empty-title">No hay ingresos extras registrados</div>
+          <div class="extra-incomes-empty-description">
+            Cuando registres ingresos adicionales como ventas, trabajos freelance o regalos, aparecerán aquí.
+          </div>
+        </div>
+      `;
+      
+      if (totalExtraIncomes) totalExtraIncomes.textContent = '$0';
+      if (currentMonthExtraIncomes) currentMonthExtraIncomes.textContent = '$0';
+      return;
+    }
+
+    // Calculate totals
+    const currentMonth = this.getCurrentMonth();
+    const totalAmount = extraIncomes.reduce((sum, income) => sum + income.amount, 0);
+    const currentMonthAmount = extraIncomes
+      .filter(income => income.month === currentMonth)
+      .reduce((sum, income) => sum + income.amount, 0);
+    
+    if (totalExtraIncomes) totalExtraIncomes.textContent = this.formatCurrency(totalAmount);
+    if (currentMonthExtraIncomes) currentMonthExtraIncomes.textContent = this.formatCurrency(currentMonthAmount);
+
+    // Group by month
+    const groupedByMonth = {};
+    extraIncomes.forEach(income => {
+      if (!groupedByMonth[income.month]) {
+        groupedByMonth[income.month] = [];
+      }
+      groupedByMonth[income.month].push(income);
+    });
+
+    // Create month sections
+    Object.entries(groupedByMonth)
+      .sort(([a], [b]) => b.localeCompare(a)) // Sort months descending
+      .forEach(([month, incomes]) => {
+        const monthSection = document.createElement('div');
+        monthSection.className = 'extra-incomes-month-section';
+        
+        const monthTotal = incomes.reduce((sum, income) => sum + income.amount, 0);
+        const monthName = new Date(month + '-01').toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long' 
+        });
+        
+        monthSection.innerHTML = `
+          <div class="extra-incomes-month-header">
+            <h3 class="extra-incomes-month-title">${monthName}</h3>
+            <div class="extra-incomes-month-total">${this.formatCurrency(monthTotal)}</div>
+          </div>
+          <div class="extra-incomes-month-list">
+            ${incomes.map(income => {
+              const createdDate = new Date(income.createdAt).toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'short'
+              });
+              
+              return `
+                <div class="extra-income-item fade-in">
+                  <div class="extra-income-icon">${this.getCategoryIcon(income.category)}</div>
+                  <div class="extra-income-details">
+                    <div class="extra-income-description">${income.description}</div>
+                    <div class="extra-income-category">${income.category}</div>
+                    <div class="extra-income-date">${createdDate}</div>
+                  </div>
+                  <div class="extra-income-amount">${this.formatCurrency(income.amount)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+        
+        container.appendChild(monthSection);
+      });
+  }
+
+  getCategoryIcon(category) {
+    const categoryIcons = {
+      'Venta': '💰',
+      'Regalo': '🎁',
+      'Trabajo': '💼',
+      'Freelance': '💻',
+      'Inversión': '📈',
+      'Bono': '🎯',
+      'Comisión': '💸',
+      'Reembolso': '🔄',
+      'Otro': '📦'
+    };
+    
+    return categoryIcons[category] || '📦';
+  }
+
+  getCurrentMonth() {
+    const now = new Date();
+    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+  }
+
   updateCategoriesList(categories) {
     const container = document.getElementById('categories-list');
     if (!container) return;

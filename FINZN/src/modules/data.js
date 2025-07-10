@@ -369,6 +369,21 @@ export class DataManager {
     return this.data.extraIncomes[month] || [];
   }
 
+  getAllExtraIncomes() {
+    const allExtraIncomes = [];
+    Object.entries(this.data.extraIncomes).forEach(([month, incomes]) => {
+      incomes.forEach(income => {
+        allExtraIncomes.push({
+          ...income,
+          month: month
+        });
+      });
+    });
+    
+    // Sort by date (newest first)
+    return allExtraIncomes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
   getGoals() {
     return this.data.goals;
   }

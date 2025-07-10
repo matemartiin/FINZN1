@@ -73,11 +73,14 @@ class FinznApp {
     document.getElementById('add-income-btn-dashboard').addEventListener('click', () => this.showIncomeModal());
     document.getElementById('fixed-income-form-modal').addEventListener('submit', (e) => this.handleFixedIncomeModal(e));
     document.getElementById('extra-income-form-modal').addEventListener('submit', (e) => this.handleExtraIncomeModal(e));
-    document.getElementById('add-extra-income-btn').addEventListener('click', () => {
-      console.log('🔥 Extra income button clicked');
+    document.getElementById('extra-income-form').addEventListener('submit', (e) => this.handleExtraIncome(e));
+    
+    // Extra incomes indicator
+    document.getElementById('extra-incomes-indicator').addEventListener('click', () => this.showExtraIncomesModal());
+    document.getElementById('add-extra-income-from-modal').addEventListener('click', () => {
+      this.modals.hide('extra-incomes-modal');
       this.modals.show('extra-income-modal');
     });
-    document.getElementById('extra-income-form').addEventListener('submit', (e) => this.handleExtraIncome(e));
     
     // Goals management
     const addGoalBtn = document.getElementById('add-goal-btn');
@@ -774,12 +777,15 @@ class FinznApp {
     // Update summary cards
     const balance = this.data.getBalance(this.currentMonth);
     const income = this.data.getIncome(this.currentMonth);
+    const extraIncomes = this.data.getExtraIncomes(this.currentMonth);
     
     // Update new dashboard elements
     const monthlyExpensesSummary = document.getElementById('monthly-expenses-summary');
     const incomeSummary = document.getElementById('income-summary');
     const balanceAmountNew = document.getElementById('balance-amount-new');
     const installmentsCount = document.getElementById('installments-count');
+    const extraIncomesIndicator = document.getElementById('extra-incomes-indicator');
+    const extraIncomesCount = document.querySelector('#extra-incomes-indicator .indicator-count');
     
     if (monthlyExpensesSummary) {
       monthlyExpensesSummary.textContent = this.ui.formatCurrency(balance.totalExpenses);
@@ -792,6 +798,16 @@ class FinznApp {
     }
     if (installmentsCount) {
       installmentsCount.textContent = balance.installments;
+    }
+    
+    // Update extra incomes indicator
+    if (extraIncomesIndicator && extraIncomesCount) {
+      if (extraIncomes.length > 0) {
+        extraIncomesIndicator.classList.remove('hidden');
+        extraIncomesCount.textContent = extraIncomes.length;
+      } else {
+        extraIncomesIndicator.classList.add('hidden');
+      }
     }
     
     // Update goals in new layout
@@ -832,6 +848,12 @@ class FinznApp {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+}
+
+showExtraIncomesModal() {
+  const extraIncomes = this.data.getAllExtraIncomes();
+  this.ui.showExtraIncomesModal(extraIncomes);
+  this.modals.show('extra-incomes-modal');
 }
 
 // Make app globally accessible for debugging
