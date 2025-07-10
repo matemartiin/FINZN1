@@ -750,14 +750,14 @@ body {
 .chart-content-with-mascot {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 2rem;
   min-height: 300px;
 }
 
 .chart-container-new {
   flex: 1;
-  height: 280px;
   position: relative;
+  height: 300px;
 }
 
 .chart-mascot {
@@ -769,59 +769,60 @@ body {
 
 .chart-mascot-container {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chart-mascot-img {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
+  filter: drop-shadow(0 6px 12px rgba(183, 166, 255, 0.3));
   transition: all 0.3s ease;
-  cursor: pointer;
-  filter: drop-shadow(0 4px 12px rgba(183, 166, 255, 0.3));
+  object-fit: cover;
+  border: 3px solid rgba(183, 166, 255, 0.2);
 }
 
 .chart-mascot-img:hover {
   transform: scale(1.1);
-  filter: drop-shadow(0 6px 16px rgba(183, 166, 255, 0.5));
+  filter: drop-shadow(0 8px 16px rgba(183, 166, 255, 0.4));
 }
 
 .chart-mascot-tooltip {
   position: absolute;
-  bottom: -45px;
+  top: -50px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--primary-color);
+  background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 8px 12px;
+  padding: 10px 16px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.chart-mascot-tooltip::before {
+.chart-mascot-tooltip::after {
   content: '';
   position: absolute;
-  top: -6px;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 6px solid var(--primary-color);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.8);
 }
 
 .chart-mascot-container:hover .chart-mascot-tooltip {
   opacity: 1;
   visibility: visible;
-  bottom: -40px;
+  top: -55px;
 }
 
 .chart-card-new h3 {
@@ -829,6 +830,23 @@ body {
   color: var(--text-primary);
   font-size: var(--text-lg);
   font-weight: 700;
+}
+
+/* Responsive adjustments for chart with mascot */
+@media (max-width: 768px) {
+  .chart-content-with-mascot {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .chart-mascot-img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .chart-container-new {
+    height: 250px;
+  }
 }
 
 /* Mascot Section */
@@ -2666,7 +2684,12 @@ body {
   
   .chart-content-with-mascot {
     flex-direction: column;
-    gap: 16px;
+    gap: 1rem;
+  }
+  
+  .chart-mascot-img {
+    width: 100px;
+    height: 100px;
   }
   
   .chart-container-new {
