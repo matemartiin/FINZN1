@@ -2884,3 +2884,46 @@ textarea:focus-visible {
 .darkmode .achievement-item:hover {
   background: var(--bg-card);
 }
+.limit-traffic-light {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  width: 42px;
+  margin-top: 8px;
+}
+
+.light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  opacity: 0.2;
+  background-color: #cbd5e1;
+  transition: all 0.3s ease;
+}
+
+.light.on {
+  opacity: 1;
+}
+
+.light.red {
+  background-color: #ef4444;
+}
+
+.light.yellow {
+  background-color: #facc15;
+}
+
+.light.green {
+  background-color: #10b981;
+}
+
+.light-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-top: 2px;
+  color: #475569;
+}

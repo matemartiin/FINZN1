@@ -434,7 +434,22 @@ export class UIManager {
     limits.forEach(limit => {
       const spent = expensesByCategory[limit.category] || 0;
       const percentage = limit.amount > 0 ? (spent / limit.amount) * 100 : 0;
-      const remaining = Math.max(0, limit.amount - spent);
+      let trafficState = 'green';
+      if (percentage >= 100) {
+        trafficState = 'red';
+      } else if (percentage >= limit.warning) {
+        trafficState = 'yellow';
+      }
+      
+      const trafficLightHTML = `
+        <div class="limit-traffic-light">
+          <div class="light ${trafficState === 'red' ? 'on red' : 'off'}"></div>
+          <div class="light ${trafficState === 'yellow' ? 'on yellow' : 'off'}"></div>
+          <div class="light ${trafficState === 'green' ? 'on green' : 'off'}"></div>
+          <div class="light-label">${Math.round(percentage)}%</div>
+        </div>
+      `;
+        const remaining = Math.max(0, limit.amount - spent);
       
       let statusClass = 'safe';
       let statusIcon = '✅';
@@ -494,6 +509,7 @@ export class UIManager {
         <div class="limit-warning-threshold">
           Alerta configurada al ${limit.warning}%
         </div>
+        ${trafficLightHTML}
       `;
       
       container.appendChild(card);
