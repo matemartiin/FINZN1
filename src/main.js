@@ -6,6 +6,8 @@
 
  class FinznApp {
    constructor() {
+   }
+ }
 @@ .. @@
      this.theme = new ThemeManager();
      this.navigation = new NavigationManager();
@@ -17,6 +19,7 @@
      // Initialize theme first
      this.theme.init();
      
+   }
 +    // Initialize developer mode
 +    this.developer.init();
 +    
