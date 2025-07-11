@@ -82,12 +82,8 @@ class FinznApp {
     });
     
     // Goals management
-    const addGoalBtn = document.getElementById('add-goal-btn');
     const addGoalBtnSection = document.getElementById('add-goal-btn-section');
     
-    if (addGoalBtn) {
-      addGoalBtn.addEventListener('click', () => this.modals.show('goal-modal'));
-    }
     if (addGoalBtnSection) {
       addGoalBtnSection.addEventListener('click', () => this.modals.show('goal-modal'));
     }
