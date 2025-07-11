@@ -37,11 +37,19 @@ export class UIManager {
       
       const category = this.getCategoryInfo(expense.category);
       
+      // Format transaction date for display
+      const transactionDate = expense.transactionDate 
+        ? new Date(expense.transactionDate).toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short' 
+          })
+        : 'Sin fecha';
+      
       item.innerHTML = `
         <div class="expense-icon">${category.icon}</div>
         <div class="expense-details">
           <div class="expense-description">${expense.description}</div>
-          <div class="expense-category">${category.name}</div>
+          <div class="expense-category">${category.name} • ${transactionDate}</div>
           ${expense.totalInstallments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.totalInstallments}</div>` : ''}
         </div>
         <div class="expense-amount">${this.formatCurrency(expense.amount)}</div>
@@ -550,6 +558,11 @@ export class UIManager {
     }
     if (monthlyAverage) {
       monthlyAverage.textContent = this.formatCurrency(stats.monthlyAverage);
+    }
+    
+    // Show savings achievement if user has accumulated savings
+    if (stats.totalSavings > 0) {
+      console.log(`💰 Total de ahorros acumulados: ${this.formatCurrency(stats.totalSavings)}`);
     }
   }
 

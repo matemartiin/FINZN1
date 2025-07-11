@@ -8,7 +8,8 @@ export class DataManager {
       categories: this.getDefaultCategories(),
       achievements: [],
       recurringExpenses: [],
-      spendingLimits: []
+      spendingLimits: [],
+      monthlySavings: {}
     };
   }
 
@@ -43,6 +44,7 @@ export class DataManager {
         if (!this.data.achievements) this.data.achievements = [];
         if (!this.data.recurringExpenses) this.data.recurringExpenses = [];
         if (!this.data.spendingLimits) this.data.spendingLimits = [];
+        if (!this.data.monthlySavings) this.data.monthlySavings = {};
         
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -89,6 +91,7 @@ export class DataManager {
         description: expense.description,
         amount: installmentAmount,
         category: expense.category,
+        transactionDate: expense.transactionDate,
         date: installmentDate,
         installment: i + 1,
         totalInstallments: expense.installments,
@@ -138,6 +141,7 @@ export class DataManager {
               description: expenseData.description,
               amount: newInstallmentAmount,
               category: expenseData.category,
+              transactionDate: expenseData.transactionDate,
               originalAmount: expenseData.amount,
               totalInstallments: expenseData.installments,
               recurring: expenseData.recurring
@@ -153,6 +157,7 @@ export class DataManager {
         description: expenseData.description,
         amount: expenseData.amount,
         category: expenseData.category,
+        transactionDate: expenseData.transactionDate,
         recurring: expenseData.recurring,
         originalAmount: expenseData.amount
       };
@@ -287,6 +292,19 @@ export class DataManager {
     this.saveUserData();
   }
 
+  saveMonthlySavings(month, amount) {
+    this.data.monthlySavings[month] = amount;
+    this.saveUserData();
+  }
+
+  getMonthlySavings(month) {
+    return this.data.monthlySavings[month] || 0;
+  }
+
+  getAllMonthlySavings() {
+    return this.data.monthlySavings;
+  }
+
   getSpendingLimits() {
     return this.data.spendingLimits || [];
   }
@@ -393,15 +411,10 @@ export class DataManager {
   }
 
   getStats() {
-    const allExpenses = Object.values(this.data.expenses).flat();
-    const totalSavings = Object.values(this.data.income).reduce((sum, income) => {
-      const monthExpenses = Object.values(this.data.expenses).flat()
-        .filter(expense => expense.date === Object.keys(this.data.income).find(key => this.data.income[key] === income))
-        .reduce((expSum, expense) => expSum + expense.amount, 0);
-      const monthIncome = (income.fixed || 0) + (income.extra || 0);
-      return sum + Math.max(0, monthIncome - monthExpenses);
-    }, 0);
+    // Calculate total savings from saved monthly balances
+    const totalSavings = Object.values(this.data.monthlySavings).reduce((sum, savings) => sum + savings, 0);
 
+    const allExpenses = Object.values(this.data.expenses).flat();
     const monthlyAverage = allExpenses.length > 0 
       ? allExpenses.reduce((sum, expense) => sum + expense.amount, 0) / Object.keys(this.data.expenses).length
       : 0;
@@ -484,6 +497,7 @@ export class DataManager {
   async exportToCSV() {
     const headers = [
       'Fecha', 
+      'Fecha de Transacción',
       'Descripción', 
       'Monto', 
       'Categoría', 
@@ -502,8 +516,13 @@ export class DataManager {
           ? new Date(expense.createdAt).toLocaleDateString('es-ES')
           : 'No disponible';
         
+        const transactionDate = expense.transactionDate 
+          ? new Date(expense.transactionDate).toLocaleDateString('es-ES')
+          : 'No disponible';
+        
         rows.push([
           month,
+          transactionDate,
           expense.description,
           expense.amount.toFixed(2),
           expense.category,
@@ -525,6 +544,7 @@ export class DataManager {
         
         rows.push([
           month,
+          month + '-01', // Default to first day of month for incomes
           income.description,
           income.amount.toFixed(2),
           income.category,
@@ -542,6 +562,7 @@ export class DataManager {
       if (income.fixed > 0) {
         rows.push([
           month,
+          month + '-01', // Default to first day of month for fixed income
           'Ingreso Fijo Mensual',
           income.fixed.toFixed(2),
           'Ingreso',
@@ -563,7 +584,7 @@ export class DataManager {
     
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(cell => cell.replace(/"/g, ''));
-      const [month, description, amount, category] = values;
+      const [month, transactionDate, description, amount, category] = values;
       
       if (month && description && amount && category) {
         if (!this.data.expenses[month]) {
@@ -575,6 +596,7 @@ export class DataManager {
           description,
           amount: parseFloat(amount),
           category,
+          transactionDate: transactionDate || month + '-01',
           date: month,
           installment: 1,
           totalInstallments: 1,

@@ -255,8 +255,23 @@ class FinznApp {
   }
 
   handleMonthChange(e) {
+    const previousMonth = this.currentMonth;
     this.currentMonth = e.target.value;
+    
+    // Save previous month's balance as savings if it's a valid previous month
+    if (previousMonth && previousMonth !== this.currentMonth) {
+      this.savePreviousMonthBalance(previousMonth);
+    }
+    
     this.updateUI();
+  }
+
+  savePreviousMonthBalance(previousMonth) {
+    const balance = this.data.getBalance(previousMonth);
+    if (balance.available > 0) {
+      this.data.saveMonthlySavings(previousMonth, balance.available);
+      console.log(`Saved ${this.ui.formatCurrency(balance.available)} as savings for ${previousMonth}`);
+    }
   }
 
   showInstallmentsPopup() {
@@ -268,6 +283,8 @@ class FinznApp {
   showAddExpenseModal() {
     this.currentExpenseId = null;
     this.resetExpenseForm();
+    // Set default date to today
+    document.getElementById('expense-transaction-date').value = new Date().toISOString().split('T')[0];
     document.getElementById('expense-modal-title').textContent = 'Nuevo Gasto';
     document.getElementById('expense-submit-btn').textContent = 'Agregar Gasto';
     document.getElementById('expense-edit-mode').value = 'false';
@@ -299,6 +316,7 @@ class FinznApp {
     document.getElementById('expense-description').value = expense.description;
     document.getElementById('expense-amount').value = expense.originalAmount || expense.amount;
     document.getElementById('expense-category').value = expense.category;
+    document.getElementById('expense-transaction-date').value = expense.transactionDate || new Date().toISOString().split('T')[0];
     document.getElementById('expense-installments').value = expense.totalInstallments || 1;
     document.getElementById('expense-recurring').checked = expense.recurring || false;
   }
@@ -466,18 +484,27 @@ class FinznApp {
       description: document.getElementById('expense-description').value,
       amount: parseFloat(document.getElementById('expense-amount').value),
       category: document.getElementById('expense-category').value,
+      transactionDate: document.getElementById('expense-transaction-date').value,
       installments: parseInt(document.getElementById('expense-installments').value) || 1,
       recurring: document.getElementById('expense-recurring').checked,
       date: this.currentMonth
     };
 
-    if (!expense.description || !expense.amount || !expense.category) {
+    if (!expense.description || !expense.amount || !expense.category || !expense.transactionDate) {
       this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
       return;
     }
 
     if (expense.amount <= 0) {
       this.ui.showAlert('El monto debe ser mayor a 0', 'error');
+      return;
+    }
+
+    // Validate transaction date
+    const transactionDate = new Date(expense.transactionDate);
+    const today = new Date();
+    if (transactionDate > today) {
+      this.ui.showAlert('La fecha del gasto no puede ser futura', 'error');
       return;
     }
 
@@ -502,17 +529,26 @@ class FinznApp {
       description: document.getElementById('expense-description').value,
       amount: parseFloat(document.getElementById('expense-amount').value),
       category: document.getElementById('expense-category').value,
+      transactionDate: document.getElementById('expense-transaction-date').value,
       installments: parseInt(document.getElementById('expense-installments').value) || 1,
       recurring: document.getElementById('expense-recurring').checked
     };
 
-    if (!expenseData.description || !expenseData.amount || !expenseData.category) {
+    if (!expenseData.description || !expenseData.amount || !expenseData.category || !expenseData.transactionDate) {
       this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
       return;
     }
 
     if (expenseData.amount <= 0) {
       this.ui.showAlert('El monto debe ser mayor a 0', 'error');
+      return;
+    }
+
+    // Validate transaction date
+    const transactionDate = new Date(expenseData.transactionDate);
+    const today = new Date();
+    if (transactionDate > today) {
+      this.ui.showAlert('La fecha del gasto no puede ser futura', 'error');
       return;
     }
 
