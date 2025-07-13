@@ -7,12 +7,24 @@ export class AuthManager {
   }
 
   async initializeAuth() {
+    console.log('🔐 Initializing authentication...');
+    
     // Get initial session
-    const { data: { session } } = await supabase.auth.getSession();
-    this.currentUser = session?.user || null;
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error getting session:', error);
+      }
+      this.currentUser = session?.user || null;
+      console.log('Initial session:', session ? 'Found' : 'None');
+    } catch (error) {
+      console.error('Error in initializeAuth:', error);
+      this.currentUser = null;
+    }
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
       this.currentUser = session?.user || null;
       
       if (event === 'SIGNED_OUT') {

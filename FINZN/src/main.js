@@ -26,6 +26,8 @@ class FinznApp {
   }
 
   async init() {
+    console.log('🚀 Initializing FINZN App...');
+    
     // Initialize theme first
     this.theme.init();
     
@@ -33,15 +35,24 @@ class FinznApp {
     this.navigation.init();
     
     // Check if user is already logged in
-    const currentUser = this.auth.getCurrentUser();
-    if (currentUser) {
-      this.showApp();
-      await this.loadUserData();
-    } else {
+    try {
+      await this.auth.initializeAuth();
+      const currentUser = this.auth.getCurrentUser();
+      console.log('Current user:', currentUser);
+      
+      if (currentUser) {
+        this.showApp();
+        await this.loadUserData();
+      } else {
+        this.showAuth();
+      }
+    } catch (error) {
+      console.error('Error initializing auth:', error);
       this.showAuth();
     }
 
     this.setupEventListeners();
+    console.log('✅ FINZN App initialized successfully');
   }
 
   setupEventListeners() {
