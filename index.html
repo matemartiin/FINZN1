@@ -154,25 +154,24 @@
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="dashboard-section active">
           <div class="dashboard-grid">
-            <!-- Summary Cards Row -->
+            <!-- Primera fila: Balance, Ingresos, Gastos -->
             <div class="summary-cards">
-              <div class="summary-card expenses-card">
+              <div class="summary-card balance-card-new">
                 <div class="card-header-simple">
-                  <div class="card-icon-simple">💳</div>
-                  <span class="card-title">Este Mes</span>
+                  <div class="card-icon-simple">💰</div>
+                  <span class="card-title">Balance</span>
                 </div>
-                <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
-                <div class="card-action">
-                  <button id="add-expense-btn-dashboard" class="btn btn-primary">
-                    <span>➕</span>
-                    Agregar Gasto
+                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
+                <div class="installments-info">
+                  <button id="installments-btn" class="installments-button">
+                    <span id="installments-count">3</span> cuotas activas
                   </button>
                 </div>
               </div>
 
               <div class="summary-card income-card">
                 <div class="card-header-simple">
-                  <div class="card-icon-simple">💰</div>
+                  <div class="card-icon-simple">💵</div>
                   <span class="card-title">
                     Ingresos
                     <button id="extra-incomes-indicator" class="extra-incomes-indicator hidden" title="Ver ingresos extras">
@@ -189,23 +188,25 @@
                 </div>
               </div>
 
-              <div class="summary-card balance-card-new">
+              <div class="summary-card expenses-card">
                 <div class="card-header-simple">
-                  <span class="card-title">Balance</span>
+                  <div class="card-icon-simple">💳</div>
+                  <span class="card-title">Gastos del Mes</span>
                 </div>
-                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
-                <div class="installments-info">
-                  <button id="installments-btn" class="installments-button">
-                    <span id="installments-count">3</span> cuotas activas
+                <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
+                <div class="card-action">
+                  <button id="add-expense-btn-dashboard" class="btn btn-primary">
+                    <span>➕</span>
+                    Agregar Gasto
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Goals Section -->
+            <!-- Segunda fila: Gráfico ocupando toda la horizontal -->
             <div class="chart-section">
               <div class="chart-card-new">
-                <h3>Distribución de Gastos</h3>
+                <h3>📊 Distribución de Gastos del Mes</h3>
                 <div class="chart-content-with-mascot">
                   <div class="chart-container-new">
                     <canvas id="expenses-chart"></canvas>
@@ -213,7 +214,7 @@
                   <div class="chart-mascot">
                     <div class="chart-mascot-container">
                       <img src="/mascota-finzn.png" alt="FINZN Mascota" class="chart-mascot-img" />
-                      <div class="chart-mascot-tooltip">Esta es tu división de gastos</div>
+                      <div class="chart-mascot-tooltip">¡Aquí tienes tu análisis financiero!</div>
                     </div>
                   </div>
                 </div>
@@ -318,6 +319,48 @@
                   Exportar
                 </button>
               </div>
+              
+              <div class="settings-card">
+                <h3>Notificaciones</h3>
+                <p>Configura alertas y recordatorios</p>
+                <button id="manage-notifications-btn" class="btn btn-secondary">
+                  <span>🔔</span>
+                  Configurar
+                </button>
+              </div>
+              
+              <div class="settings-card">
+                <h3>Respaldo de Datos</h3>
+                <p>Respalda y restaura tu información</p>
+                <button id="backup-data-btn" class="btn btn-secondary">
+                  <span>☁️</span>
+                  Respaldar
+                </button>
+              </div>
+              
+              <div class="settings-card">
+                <h3>Tema y Apariencia</h3>
+                <p>Personaliza la interfaz de la app</p>
+                <button id="theme-settings-btn" class="btn btn-secondary">
+                  <span>🎨</span>
+                  Personalizar
+                </button>
+              </div>
+            </div>
+            
+            <!-- Sección de Límites de Gastos -->
+            <div class="spending-limits-section">
+              <div class="section-header">
+                <h2>Límites de Gastos por Categoría</h2>
+                <button id="add-spending-limit-btn" class="btn btn-primary">
+                  <span>➕</span>
+                  Agregar Límite
+                </button>
+              </div>
+              
+              <div id="spending-limits-list" class="spending-limits-list">
+                <!-- Los límites se cargarán aquí dinámicamente -->
+              </div>
             </div>
           </div>
         </section>
@@ -326,6 +369,37 @@
   </div>
 
   <!-- Modals -->
+  
+  <!-- Add Spending Limit Modal -->
+  <div id="add-spending-limit-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Límite de Gasto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-spending-limit-form" class="modal-form">
+        <div class="form-group">
+          <label for="limit-category">Categoría</label>
+          <select id="limit-category" name="category" required>
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="limit-amount">Límite Mensual</label>
+          <input type="number" id="limit-amount" name="amount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="limit-warning">Porcentaje de Alerta (%)</label>
+          <input type="number" id="limit-warning" name="warningPercentage" min="50" max="100" value="80" />
+          <small class="input-hint">Te alertaremos cuando alcances este porcentaje del límite</small>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Límite</button>
+        </div>
+      </form>
+    </div>
+  </div>
   
   <!-- Add Expense Modal -->
   <div id="add-expense-modal" class="modal">

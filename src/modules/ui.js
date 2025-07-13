@@ -144,6 +144,68 @@ export class UIManager {
     });
   }
 
+  updateSpendingLimitsList(limits, expenses) {
+    const container = document.getElementById('spending-limits-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (limits.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⚠️</div>
+          <h3>No tienes límites de gasto configurados</h3>
+          <p>Establece límites para controlar mejor tus gastos</p>
+          <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+            <span>➕</span>
+            Agregar Límite
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    limits.forEach(limit => {
+      // Calcular gasto actual en la categoría
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+      
+      let statusClass = 'safe';
+      if (percentage >= 100) {
+        statusClass = 'danger';
+      } else if (percentage >= limit.warning_percentage) {
+        statusClass = 'warning';
+      }
+      
+      const item = document.createElement('div');
+      item.className = 'spending-limit-item fade-in';
+      
+      item.innerHTML = `
+        <div class="spending-limit-info">
+          <div class="spending-limit-category">${limit.category}</div>
+          <div class="spending-limit-amount">Límite: ${this.formatCurrency(limit.amount)}</div>
+        </div>
+        <div class="spending-limit-progress">
+          <div class="spending-limit-bar">
+            <div class="spending-limit-fill ${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+          </div>
+          <div class="spending-limit-text">${this.formatCurrency(currentSpent)} / ${this.formatCurrency(limit.amount)} (${percentage.toFixed(1)}%)</div>
+        </div>
+        <div class="spending-limit-actions">
+          <button class="expense-action-btn edit-btn" onclick="window.app.editSpendingLimit('${limit.id}')" title="Editar">
+            ✏️
+          </button>
+          <button class="expense-action-btn delete-btn" onclick="window.app.deleteSpendingLimit('${limit.id}')" title="Eliminar">
+            🗑️
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
   updateCategoriesSelect(categories, selectId) {
     const select = document.getElementById(selectId);
     if (!select) return;

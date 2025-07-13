@@ -411,6 +411,94 @@ export class DataManager {
     return this.data.spendingLimits;
   }
 
+  async addSpendingLimit(limitData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const limit = {
+        user_id: userId,
+        category: limitData.category,
+        amount: parseFloat(limitData.amount),
+        warning_percentage: parseInt(limitData.warningPercentage) || 80
+      };
+
+      const { data, error } = await supabase
+        .from('spending_limits')
+        .insert([limit])
+        .select();
+
+      if (error) {
+        console.error('Error adding spending limit:', error);
+        return false;
+      }
+
+      this.data.spendingLimits.unshift(data[0]);
+      return true;
+    } catch (error) {
+      console.error('Error in addSpendingLimit:', error);
+      return false;
+    }
+  }
+
+  async updateSpendingLimit(limitId, limitData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('spending_limits')
+        .update({
+          category: limitData.category,
+          amount: parseFloat(limitData.amount),
+          warning_percentage: parseInt(limitData.warningPercentage) || 80
+        })
+        .eq('id', limitId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error updating spending limit:', error);
+        return false;
+      }
+
+      // Update local data
+      const index = this.data.spendingLimits.findIndex(limit => limit.id === limitId);
+      if (index !== -1) {
+        this.data.spendingLimits[index] = { ...this.data.spendingLimits[index], ...limitData };
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in updateSpendingLimit:', error);
+      return false;
+    }
+  }
+
+  async deleteSpendingLimit(limitId) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('spending_limits')
+        .delete()
+        .eq('id', limitId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error deleting spending limit:', error);
+        return false;
+      }
+
+      // Update local data
+      this.data.spendingLimits = this.data.spendingLimits.filter(limit => limit.id !== limitId);
+      return true;
+    } catch (error) {
+      console.error('Error in deleteSpendingLimit:', error);
+      return false;
+    }
+  }
+
   // Achievements
   async loadAchievements() {
     const userId = this.getCurrentUserId();
@@ -468,5 +556,35 @@ export class DataManager {
     });
     
     return categoryTotals;
+  }
+
+  // Check spending limits
+  checkSpendingLimits(month) {
+    const expenses = this.getExpenses(month);
+    const limits = this.getSpendingLimits();
+    const alerts = [];
+
+    limits.forEach(limit => {
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+
+      if (percentage >= 100) {
+        alerts.push({
+          type: 'danger',
+          category: limit.category,
+          message: `Has superado el límite de ${limit.category}`,
+          percentage: percentage.toFixed(1)
+        });
+      } else if (percentage >= limit.warning_percentage) {
+        alerts.push({
+          type: 'warning',
+          category: limit.category,
+          message: `Te acercas al límite de ${limit.category}`,
+          percentage: percentage.toFixed(1)
+        });
+      }
+    });
+    return alerts;
   }
 }

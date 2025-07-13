@@ -179,6 +179,18 @@ class FinznApp {
     if (addGoalBtn) {
       addGoalBtn.addEventListener('click', () => this.showAddGoalModal());
     }
+    
+    // Add spending limit button
+    const addSpendingLimitBtn = document.getElementById('add-spending-limit-btn');
+    if (addSpendingLimitBtn) {
+      addSpendingLimitBtn.addEventListener('click', () => this.showAddSpendingLimitModal());
+    }
+    
+    // Settings buttons
+    const manageLimitsBtn = document.getElementById('manage-limits-btn');
+    if (manageLimitsBtn) {
+      manageLimitsBtn.addEventListener('click', () => this.navigation.showSection('settings'));
+    }
   }
 
   setupModalEvents() {
@@ -198,6 +210,12 @@ class FinznApp {
     const addGoalForm = document.getElementById('add-goal-form');
     if (addGoalForm) {
       addGoalForm.addEventListener('submit', (e) => this.handleAddGoal(e));
+    }
+    
+    // Add spending limit form
+    const addSpendingLimitForm = document.getElementById('add-spending-limit-form');
+    if (addSpendingLimitForm) {
+      addSpendingLimitForm.addEventListener('submit', (e) => this.handleAddSpendingLimit(e));
     }
     
     // Installments checkbox
@@ -383,6 +401,7 @@ class FinznApp {
       const categories = this.data.getCategories();
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'category-filter');
+      this.ui.updateCategoriesSelect(categories, 'limit-category');
       
       console.log('✅ User data loaded successfully');
     } catch (error) {
@@ -408,6 +427,16 @@ class FinznApp {
       // Update goals
       const goals = this.data.getGoals();
       this.ui.updateGoalsList(goals);
+      
+      // Update spending limits
+      const spendingLimits = this.data.getSpendingLimits();
+      this.ui.updateSpendingLimitsList(spendingLimits, expenses);
+      
+      // Check spending limit alerts
+      const limitAlerts = this.data.checkSpendingLimits(this.currentMonth);
+      limitAlerts.forEach(alert => {
+        this.ui.showAlert(alert.message, alert.type);
+      });
       
       // Update charts
       const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
@@ -449,6 +478,10 @@ class FinznApp {
     this.modals.show('add-goal-modal');
   }
 
+  showAddSpendingLimitModal() {
+    console.log('⚠️ Show add spending limit modal');
+    this.modals.show('add-spending-limit-modal');
+  }
   showInstallmentsModal() {
     console.log('📊 Show installments modal');
     this.ui.showAlert('Función de cuotas próximamente', 'info');
@@ -580,6 +613,35 @@ class FinznApp {
     }
   }
 
+  async handleAddSpendingLimit(e) {
+    e.preventDefault();
+    console.log('⚠️ Adding spending limit...');
+    
+    const formData = this.ui.getFormData('add-spending-limit-form');
+    
+    if (!formData.category || !formData.amount) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    try {
+      const limitData = {
+        category: formData.category,
+        amount: parseFloat(formData.amount),
+        warningPercentage: parseInt(formData.warningPercentage) || 80
+      };
+      
+      await this.data.addSpendingLimit(limitData);
+      
+      this.modals.hide('add-spending-limit-modal');
+      this.ui.showAlert('Límite de gasto creado exitosamente', 'success');
+      this.updateDashboard();
+      
+    } catch (error) {
+      console.error('Error adding spending limit:', error);
+      this.ui.showAlert('Error al crear el límite de gasto', 'error');
+    }
+  }
   // Expense management methods
   showEditExpenseModal(expenseId) {
     console.log('✏️ Edit expense:', expenseId);
@@ -614,6 +676,24 @@ class FinznApp {
     this.ui.showAlert('Función de editar objetivo próximamente', 'info');
   }
 
+  // Spending limit management methods
+  editSpendingLimit(limitId) {
+    console.log('✏️ Edit spending limit:', limitId);
+    this.ui.showAlert('Función de editar límite próximamente', 'info');
+  }
+
+  async deleteSpendingLimit(limitId) {
+    if (confirm('¿Estás seguro de que quieres eliminar este límite de gasto?')) {
+      try {
+        await this.data.deleteSpendingLimit(limitId);
+        this.ui.showAlert('Límite eliminado exitosamente', 'success');
+        this.updateDashboard();
+      } catch (error) {
+        console.error('Error deleting spending limit:', error);
+        this.ui.showAlert('Error al eliminar el límite', 'error');
+      }
+    }
+  }
   getCurrentMonth() {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
