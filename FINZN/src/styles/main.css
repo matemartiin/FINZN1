@@ -560,7 +560,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Summary Cards */
 .summary-cards {
-  display: contents;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: 0;
 }
 
 .summary-card {
@@ -2569,6 +2573,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-new {
     flex-direction: column;
