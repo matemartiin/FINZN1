@@ -412,13 +412,12 @@ export class UIManager {
         countElement.textContent = totalIncomes;
       }
       
-      if (totalIncomes > 0) {
-        incomesIndicator.classList.remove('hidden');
-        incomesIndicator.style.display = 'flex';
-      } else {
-        incomesIndicator.classList.add('hidden');
-        incomesIndicator.style.display = 'none';
-      }
+      // SIEMPRE mostrar el indicador, incluso con 0 ingresos
+      incomesIndicator.classList.remove('hidden');
+      incomesIndicator.classList.add('visible');
+      incomesIndicator.style.display = 'flex';
+      incomesIndicator.style.visibility = 'visible';
+      incomesIndicator.style.opacity = '1';
       
       console.log('💰 Income indicator updated:', totalIncomes);
     }
