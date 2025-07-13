@@ -14,7 +14,7 @@ export default defineConfig({
     host: true
   },
   base: './',
-  publicDir: './FINZN/public',
+  publicDir: './public',
   resolve: {
     alias: {
       '@': '/src'

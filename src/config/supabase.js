@@ -7,16 +7,11 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 console.log('🔧 Supabase Config Check:', {
   url: supabaseUrl ? 'Present' : 'Missing',
-  key: supabaseAnonKey ? 'Present' : 'Missing',
-  urlValue: supabaseUrl,
-  keyValue: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 10)}...` : 'Missing'
+  key: supabaseAnonKey ? 'Present' : 'Missing'
 })
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Missing Supabase environment variables:', {
-    url: supabaseUrl ? 'Present' : 'Missing',
-    key: supabaseAnonKey ? 'Present' : 'Missing'
-  })
+  console.error('❌ Missing Supabase environment variables')
   
   // Create a mock client for development
   console.warn('⚠️ Creating mock Supabase client for development');
