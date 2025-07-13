@@ -41,6 +41,12 @@ class FinznApp {
       // Initialize navigation
       this.navigation.init();
       
+      // Initialize modals
+      this.modals.init();
+      
+      // Initialize chat
+      this.chat.init();
+      
       // Check if user is already logged in
       await this.auth.initializeAuth();
       const currentUser = this.auth.getCurrentUser();
