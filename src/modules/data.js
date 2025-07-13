@@ -13,6 +13,7 @@ export class DataManager {
       spendingLimits: [],
       monthlySavings: {}
     };
+    this.currentMonth = this.getCurrentMonth();
   }
 
   getDefaultCategories() {
@@ -32,44 +33,440 @@ export class DataManager {
     if (!userId) return;
 
     try {
+      console.log('📊 Loading user data for:', userId);
+      
       // Load all user data in parallel
       await Promise.all([
         this.loadCategories(),
         this.loadGoals(),
         this.loadSpendingLimits(),
-        this.loadAchievements()
+        this.loadAchievements(),
+        this.loadExpenses(this.currentMonth),
+        this.loadIncome(this.currentMonth)
       ]);
+      
+      console.log('✅ User data loaded successfully');
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error('❌ Error loading user data:', error);
     }
   }
 
   getCurrentUserId() {
-    const { data: { user } } = supabase.auth.getUser();
-    return user?.id || null;
+    // This will be set by the auth manager
+    return window.app?.auth?.getCurrentUserId() || null;
   }
 
+  getCurrentMonth() {
+    const now = new Date();
+    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+  }
+
+  // Categories
   getCategories() {
     return this.data.categories;
   }
 
   async loadCategories() {
-    // Basic implementation for now
-    this.data.categories = this.getDefaultCategories();
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error loading categories:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        this.data.categories = data.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          icon: cat.icon,
+          color: cat.color
+        }));
+      } else {
+        // Create default categories for new user
+        await this.createDefaultCategories();
+      }
+    } catch (error) {
+      console.error('Error in loadCategories:', error);
+    }
   }
 
+  async createDefaultCategories() {
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      const defaultCategories = this.getDefaultCategories().map(cat => ({
+        user_id: userId,
+        name: cat.name,
+        icon: cat.icon,
+        color: cat.color
+      }));
+
+      const { error } = await supabase
+        .from('categories')
+        .insert(defaultCategories);
+
+      if (error) {
+        console.error('Error creating default categories:', error);
+      } else {
+        console.log('✅ Default categories created');
+      }
+    } catch (error) {
+      console.error('Error in createDefaultCategories:', error);
+    }
+  }
+
+  // Expenses
+  async loadExpenses(month) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('month', month)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading expenses:', error);
+        return [];
+      }
+
+      const expenses = data || [];
+      this.data.expenses[month] = expenses;
+      return expenses;
+    } catch (error) {
+      console.error('Error in loadExpenses:', error);
+      return [];
+    }
+  }
+
+  async addExpense(expenseData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const expense = {
+        user_id: userId,
+        description: expenseData.description,
+        amount: parseFloat(expenseData.amount),
+        category: expenseData.category,
+        transaction_date: expenseData.transactionDate,
+        month: expenseData.month,
+        installment: expenseData.installment || 1,
+        total_installments: expenseData.totalInstallments || 1,
+        original_id: expenseData.originalId || null,
+        original_amount: expenseData.originalAmount || null,
+        recurring: expenseData.recurring || false
+      };
+
+      const { data, error } = await supabase
+        .from('expenses')
+        .insert([expense])
+        .select();
+
+      if (error) {
+        console.error('Error adding expense:', error);
+        return false;
+      }
+
+      // Update local data
+      if (!this.data.expenses[expense.month]) {
+        this.data.expenses[expense.month] = [];
+      }
+      this.data.expenses[expense.month].unshift(data[0]);
+
+      return true;
+    } catch (error) {
+      console.error('Error in addExpense:', error);
+      return false;
+    }
+  }
+
+  async updateExpense(expenseId, expenseData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('expenses')
+        .update({
+          description: expenseData.description,
+          amount: parseFloat(expenseData.amount),
+          category: expenseData.category,
+          transaction_date: expenseData.transactionDate
+        })
+        .eq('id', expenseId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error updating expense:', error);
+        return false;
+      }
+
+      // Update local data
+      const month = expenseData.month;
+      if (this.data.expenses[month]) {
+        const index = this.data.expenses[month].findIndex(exp => exp.id === expenseId);
+        if (index !== -1) {
+          this.data.expenses[month][index] = { ...this.data.expenses[month][index], ...expenseData };
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in updateExpense:', error);
+      return false;
+    }
+  }
+
+  async deleteExpense(expenseId) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', expenseId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error deleting expense:', error);
+        return false;
+      }
+
+      // Update local data
+      Object.keys(this.data.expenses).forEach(month => {
+        this.data.expenses[month] = this.data.expenses[month].filter(exp => exp.id !== expenseId);
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error in deleteExpense:', error);
+      return false;
+    }
+  }
+
+  getExpenses(month) {
+    return this.data.expenses[month] || [];
+  }
+
+  // Income
+  async loadIncome(month) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return { fixed: 0, extra: 0 };
+
+    try {
+      const { data, error } = await supabase
+        .from('incomes')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('month', month)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading income:', error);
+        return { fixed: 0, extra: 0 };
+      }
+
+      const income = data ? {
+        fixed: parseFloat(data.fixed_amount) || 0,
+        extra: parseFloat(data.extra_amount) || 0
+      } : { fixed: 0, extra: 0 };
+
+      this.data.income[month] = income;
+      return income;
+    } catch (error) {
+      console.error('Error in loadIncome:', error);
+      return { fixed: 0, extra: 0 };
+    }
+  }
+
+  async updateIncome(month, incomeData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('incomes')
+        .upsert({
+          user_id: userId,
+          month: month,
+          fixed_amount: parseFloat(incomeData.fixed) || 0,
+          extra_amount: parseFloat(incomeData.extra) || 0
+        });
+
+      if (error) {
+        console.error('Error updating income:', error);
+        return false;
+      }
+
+      // Update local data
+      this.data.income[month] = {
+        fixed: parseFloat(incomeData.fixed) || 0,
+        extra: parseFloat(incomeData.extra) || 0
+      };
+
+      return true;
+    } catch (error) {
+      console.error('Error in updateIncome:', error);
+      return false;
+    }
+  }
+
+  getIncome(month) {
+    return this.data.income[month] || { fixed: 0, extra: 0 };
+  }
+
+  // Goals
   async loadGoals() {
-    // Basic implementation for now
-    this.data.goals = [];
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('goals')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading goals:', error);
+        return;
+      }
+
+      this.data.goals = data || [];
+    } catch (error) {
+      console.error('Error in loadGoals:', error);
+    }
   }
 
+  async addGoal(goalData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const goal = {
+        user_id: userId,
+        name: goalData.name,
+        target_amount: parseFloat(goalData.targetAmount),
+        current_amount: parseFloat(goalData.currentAmount) || 0
+      };
+
+      const { data, error } = await supabase
+        .from('goals')
+        .insert([goal])
+        .select();
+
+      if (error) {
+        console.error('Error adding goal:', error);
+        return false;
+      }
+
+      this.data.goals.unshift(data[0]);
+      return true;
+    } catch (error) {
+      console.error('Error in addGoal:', error);
+      return false;
+    }
+  }
+
+  getGoals() {
+    return this.data.goals;
+  }
+
+  // Spending Limits
   async loadSpendingLimits() {
-    // Basic implementation for now
-    this.data.spendingLimits = [];
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('spending_limits')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error loading spending limits:', error);
+        return;
+      }
+
+      this.data.spendingLimits = data || [];
+    } catch (error) {
+      console.error('Error in loadSpendingLimits:', error);
+    }
   }
 
+  getSpendingLimits() {
+    return this.data.spendingLimits;
+  }
+
+  // Achievements
   async loadAchievements() {
-    // Basic implementation for now
-    this.data.achievements = [];
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('achievements')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading achievements:', error);
+        return;
+      }
+
+      this.data.achievements = data || [];
+    } catch (error) {
+      console.error('Error in loadAchievements:', error);
+    }
+  }
+
+  getAchievements() {
+    return this.data.achievements;
+  }
+
+  // Balance calculations
+  calculateBalance(month) {
+    const expenses = this.getExpenses(month);
+    const income = this.getIncome(month);
+    
+    const totalExpenses = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+    const totalIncome = income.fixed + income.extra;
+    const available = totalIncome - totalExpenses;
+    
+    const installments = expenses.filter(exp => exp.total_installments > 1).length;
+    
+    return {
+      totalIncome,
+      totalExpenses,
+      available,
+      installments
+    };
+  }
+
+  // Category analysis
+  getExpensesByCategory(month) {
+    const expenses = this.getExpenses(month);
+    const categoryTotals = {};
+    
+    expenses.forEach(expense => {
+      const category = expense.category;
+      categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(expense.amount);
+    });
+    
+    return categoryTotals;
   }
 }

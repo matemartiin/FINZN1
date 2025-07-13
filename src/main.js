@@ -8,12 +8,13 @@ import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 
-console.log('🔥 MAIN.JS LOADING - Starting FINZN App initialization');
+console.log('🔥 FINZN App - Starting initialization');
 
 class FinznApp {
   constructor() {
-    console.log('🏗️ CONSTRUCTING FINZN APP');
+    console.log('🏗️ Constructing FINZN App');
     
+    // Initialize all managers
     this.auth = new AuthManager();
     this.data = new DataManager();
     this.ui = new UIManager();
@@ -27,7 +28,7 @@ class FinznApp {
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
     
-    console.log('🔧 ALL MODULES INITIALIZED');
+    console.log('🔧 All modules initialized');
     this.init();
   }
 
@@ -47,7 +48,10 @@ class FinznApp {
       // Initialize chat
       this.chat.init();
       
-      // Check if user is already logged in
+      // Setup month selector
+      this.setupMonthSelector();
+      
+      // Check authentication
       await this.auth.initializeAuth();
       const currentUser = this.auth.getCurrentUser();
       console.log('Current user:', currentUser);
@@ -55,6 +59,7 @@ class FinznApp {
       if (currentUser) {
         this.showApp();
         await this.loadUserData();
+        this.updateDashboard();
       } else {
         this.showAuth();
       }
@@ -73,42 +78,107 @@ class FinznApp {
     
     try {
       // Auth events
-      const loginForm = document.getElementById('login-form');
-      const registerForm = document.getElementById('register-form');
-      const showRegister = document.getElementById('show-register');
-      const showLogin = document.getElementById('show-login');
+      this.setupAuthEvents();
       
-      if (loginForm) {
-        loginForm.addEventListener('submit', (e) => this.handleLogin(e));
-        console.log('✅ Login form listener added');
+      // Dashboard events
+      this.setupDashboardEvents();
+      
+      // Theme toggle
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          this.theme.toggle();
+        });
       }
       
-      if (registerForm) {
-        registerForm.addEventListener('submit', (e) => this.handleRegister(e));
-        console.log('✅ Register form listener added');
+      // Month selector
+      const monthSelect = document.getElementById('month-select');
+      if (monthSelect) {
+        monthSelect.addEventListener('change', (e) => {
+          this.currentMonth = e.target.value;
+          this.updateDashboard();
+        });
       }
       
-      if (showRegister) {
-        showRegister.addEventListener('click', () => this.showRegister());
-        console.log('✅ Show register button listener added');
-      }
-      
-      if (showLogin) {
-        showLogin.addEventListener('click', () => this.showLogin());
-        console.log('✅ Show login button listener added');
-      }
-      
-      // Logout event
-      const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => this.handleLogout());
-        console.log('✅ Logout button listener added');
-      }
-
       console.log('✅ All event listeners set up successfully');
     } catch (error) {
       console.error('❌ Error setting up event listeners:', error);
     }
+  }
+
+  setupAuthEvents() {
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const showRegister = document.getElementById('show-register');
+    const showLogin = document.getElementById('show-login');
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+    }
+    
+    if (registerForm) {
+      registerForm.addEventListener('submit', (e) => this.handleRegister(e));
+    }
+    
+    if (showRegister) {
+      showRegister.addEventListener('click', () => this.showRegister());
+    }
+    
+    if (showLogin) {
+      showLogin.addEventListener('click', () => this.showLogin());
+    }
+    
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => this.handleLogout());
+    }
+  }
+
+  setupDashboardEvents() {
+    // Add expense buttons
+    const addExpenseBtn = document.getElementById('add-expense-btn-dashboard');
+    if (addExpenseBtn) {
+      addExpenseBtn.addEventListener('click', () => this.showAddExpenseModal());
+    }
+    
+    // Add income button
+    const addIncomeBtn = document.getElementById('add-income-btn-dashboard');
+    if (addIncomeBtn) {
+      addIncomeBtn.addEventListener('click', () => this.showAddIncomeModal());
+    }
+    
+    // Installments button
+    const installmentsBtn = document.getElementById('installments-btn');
+    if (installmentsBtn) {
+      installmentsBtn.addEventListener('click', () => this.showInstallmentsModal());
+    }
+  }
+
+  setupMonthSelector() {
+    const monthSelect = document.getElementById('month-select');
+    if (!monthSelect) return;
+    
+    // Generate last 12 months
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      const monthName = date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      months.push({ key: monthKey, name: monthName });
+    }
+    
+    monthSelect.innerHTML = '';
+    months.forEach(month => {
+      const option = document.createElement('option');
+      option.value = month.key;
+      option.textContent = month.name;
+      if (month.key === this.currentMonth) {
+        option.selected = true;
+      }
+      monthSelect.appendChild(option);
+    });
   }
 
   async handleLogin(e) {
@@ -128,6 +198,7 @@ class FinznApp {
       if (success) {
         this.showApp();
         await this.loadUserData();
+        this.updateDashboard();
         this.ui.showAlert('¡Bienvenido de vuelta!', 'success');
       } else {
         this.ui.showAlert('Credenciales incorrectas', 'error');
@@ -155,7 +226,6 @@ class FinznApp {
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(username)) {
       this.ui.showAlert('Por favor ingresa un email válido', 'error');
@@ -219,13 +289,58 @@ class FinznApp {
 
   async loadUserData() {
     console.log('📊 Loading user data...');
-    await this.data.loadUserData();
-    this.updateUI();
+    try {
+      await this.data.loadUserData();
+      console.log('✅ User data loaded successfully');
+    } catch (error) {
+      console.error('❌ Error loading user data:', error);
+    }
   }
 
-  updateUI() {
-    console.log('🔄 Updating UI...');
-    // Basic UI update for now
+  async updateDashboard() {
+    console.log('🔄 Updating dashboard for month:', this.currentMonth);
+    
+    try {
+      // Load current month data
+      const expenses = await this.data.loadExpenses(this.currentMonth);
+      const income = await this.data.loadIncome(this.currentMonth);
+      
+      // Calculate balance
+      const balance = this.data.calculateBalance(this.currentMonth);
+      
+      // Update UI
+      this.ui.updateBalance(balance);
+      
+      // Update charts
+      const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
+      this.charts.updateExpensesChart(expensesByCategory);
+      
+      // Show mascot message based on balance
+      if (balance.available < 0) {
+        this.ui.showMascotAlert('¡Cuidado! Estás gastando más de lo que ingresas', 'warning');
+      } else if (balance.available > balance.totalIncome * 0.2) {
+        this.ui.showMascotAlert('¡Excelente! Tienes un buen balance este mes', 'success');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error updating dashboard:', error);
+    }
+  }
+
+  // Modal methods (placeholders for now)
+  showAddExpenseModal() {
+    console.log('💳 Show add expense modal');
+    this.ui.showAlert('Función de agregar gasto próximamente', 'info');
+  }
+
+  showAddIncomeModal() {
+    console.log('💰 Show add income modal');
+    this.ui.showAlert('Función de agregar ingreso próximamente', 'info');
+  }
+
+  showInstallmentsModal() {
+    console.log('📊 Show installments modal');
+    this.ui.showAlert('Función de cuotas próximamente', 'info');
   }
 
   getCurrentMonth() {

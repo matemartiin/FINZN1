@@ -5,18 +5,33 @@ export class UIManager {
   }
 
   updateBalance(balance) {
-    const balanceAmount = document.getElementById('balance-amount');
-    const monthlyExpenses = document.getElementById('monthly-expenses');
-    const activeInstallments = document.getElementById('active-installments');
+    const balanceAmount = document.getElementById('balance-amount-new');
+    const monthlyExpenses = document.getElementById('monthly-expenses-summary');
+    const incomeAmount = document.getElementById('income-summary');
+    const installmentsCount = document.getElementById('installments-count');
     
     if (balanceAmount) {
       balanceAmount.textContent = this.formatCurrency(balance.available);
+      // Change color based on balance
+      if (balance.available < 0) {
+        balanceAmount.style.color = '#ef4444';
+      } else if (balance.available < 1000) {
+        balanceAmount.style.color = '#f59e0b';
+      } else {
+        balanceAmount.style.color = '#B7A6FF';
+      }
     }
+    
     if (monthlyExpenses) {
       monthlyExpenses.textContent = this.formatCurrency(balance.totalExpenses);
     }
-    if (activeInstallments) {
-      activeInstallments.textContent = balance.installments;
+    
+    if (incomeAmount) {
+      incomeAmount.textContent = this.formatCurrency(balance.totalIncome);
+    }
+    
+    if (installmentsCount) {
+      installmentsCount.textContent = balance.installments;
     }
   }
 
@@ -27,7 +42,17 @@ export class UIManager {
     container.innerHTML = '';
 
     if (expenses.length === 0) {
-      container.innerHTML = '<p class="text-center text-muted">No hay gastos registrados este mes</p>';
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">💳</div>
+          <h3>No hay gastos registrados</h3>
+          <p>Comienza agregando tu primer gasto del mes</p>
+          <button class="btn btn-primary" onclick="window.app.showAddExpenseModal()">
+            <span>➕</span>
+            Agregar Gasto
+          </button>
+        </div>
+      `;
       return;
     }
 
@@ -38,8 +63,8 @@ export class UIManager {
       const category = this.getCategoryInfo(expense.category);
       
       // Format transaction date for display
-      const transactionDate = expense.transactionDate 
-        ? new Date(expense.transactionDate).toLocaleDateString('es-ES', { 
+      const transactionDate = expense.transaction_date 
+        ? new Date(expense.transaction_date).toLocaleDateString('es-ES', { 
             day: 'numeric', 
             month: 'short' 
           })
@@ -50,7 +75,7 @@ export class UIManager {
         <div class="expense-details">
           <div class="expense-description">${expense.description}</div>
           <div class="expense-category">${category.name} • ${transactionDate}</div>
-          ${expense.totalInstallments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.totalInstallments}</div>` : ''}
+          ${expense.total_installments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.total_installments}</div>` : ''}
         </div>
         <div class="expense-amount">${this.formatCurrency(expense.amount)}</div>
         <div class="expense-actions">
@@ -65,6 +90,71 @@ export class UIManager {
       
       item.style.borderLeftColor = category.color;
       container.appendChild(item);
+    });
+  }
+
+  updateGoalsList(goals) {
+    const container = document.getElementById('goals-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (goals.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <h3>No tienes objetivos de ahorro</h3>
+          <p>Establece metas para motivarte a ahorrar</p>
+          <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
+            <span>➕</span>
+            Crear Objetivo
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    goals.forEach(goal => {
+      const progress = (goal.current_amount / goal.target_amount) * 100;
+      const item = document.createElement('div');
+      item.className = 'goal-item fade-in';
+      
+      item.innerHTML = `
+        <div class="goal-header">
+          <div class="goal-name">${goal.name}</div>
+          <div class="goal-amount">${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}</div>
+        </div>
+        <div class="goal-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+          </div>
+          <div class="progress-text">${progress.toFixed(1)}%</div>
+        </div>
+        <div class="goal-actions">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
+            💰 Agregar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
+            ✏️ Editar
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
+  updateCategoriesSelect(categories, selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecciona una categoría</option>';
+    
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.name;
+      option.textContent = `${category.icon} ${category.name}`;
+      select.appendChild(option);
     });
   }
 
@@ -89,6 +179,32 @@ export class UIManager {
     }, 5000);
   }
 
+  showMascotAlert(message, type = 'info') {
+    // Clear existing mascot alert
+    if (this.mascotAlertTimeout) {
+      clearTimeout(this.mascotAlertTimeout);
+    }
+
+    const mascotContainer = document.querySelector('.chart-mascot-container');
+    if (!mascotContainer) return;
+
+    // Create or update tooltip
+    let tooltip = mascotContainer.querySelector('.mascot-alert');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'mascot-alert';
+      mascotContainer.appendChild(tooltip);
+    }
+
+    tooltip.textContent = message;
+    tooltip.className = `mascot-alert mascot-alert-${type} show`;
+
+    // Auto hide after 3 seconds
+    this.mascotAlertTimeout = setTimeout(() => {
+      tooltip.classList.remove('show');
+    }, 3000);
+  }
+
   formatCurrency(amount) {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -99,7 +215,20 @@ export class UIManager {
   }
 
   getCategoryInfo(categoryName) {
-    // Default category info - this should be enhanced to work with the data manager
+    // Get category info from data manager if available
+    if (window.app && window.app.data) {
+      const categories = window.app.data.getCategories();
+      const category = categories.find(cat => cat.name === categoryName);
+      if (category) {
+        return {
+          name: category.name,
+          icon: category.icon,
+          color: category.color
+        };
+      }
+    }
+    
+    // Fallback to default categories
     const defaultCategories = {
       'Comida': { icon: '🍔', color: '#ef4444' },
       'Transporte': { icon: '🚗', color: '#3b82f6' },
@@ -110,6 +239,61 @@ export class UIManager {
       'Otros': { icon: '📦', color: '#9ca3af' }
     };
     
-    return defaultCategories[categoryName] || defaultCategories['Otros'];
+    return defaultCategories[categoryName] || { 
+      name: categoryName, 
+      icon: '📦', 
+      color: '#9ca3af' 
+    };
+  }
+
+  // Utility methods for form handling
+  clearForm(formId) {
+    const form = document.getElementById(formId);
+    if (form) {
+      form.reset();
+    }
+  }
+
+  setFormData(formId, data) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    Object.keys(data).forEach(key => {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) {
+        input.value = data[key];
+      }
+    });
+  }
+
+  getFormData(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return {};
+
+    const formData = new FormData(form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+      data[key] = value;
+    }
+    
+    return data;
+  }
+
+  // Loading states
+  showLoading(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.classList.add('loading');
+      element.disabled = true;
+    }
+  }
+
+  hideLoading(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.classList.remove('loading');
+      element.disabled = false;
+    }
   }
 }
