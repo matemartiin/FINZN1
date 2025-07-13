@@ -155,6 +155,8 @@ export class DataManager {
     if (!userId) return false;
 
     try {
+      console.log('💳 Adding expense with installments:', expenseData);
+      
       const expense = {
         user_id: userId,
         description: expenseData.description,
@@ -169,6 +171,8 @@ export class DataManager {
         recurring: expenseData.recurring || false
       };
 
+      console.log('💳 Expense data prepared:', expense);
+      
       const { data, error } = await supabase
         .from('expenses')
         .insert([expense])
@@ -179,6 +183,8 @@ export class DataManager {
         return false;
       }
 
+      console.log('✅ Expense added successfully:', data[0]);
+      
       // Update local data
       if (!this.data.expenses[expense.month]) {
         this.data.expenses[expense.month] = [];
@@ -267,6 +273,8 @@ export class DataManager {
     if (!userId) return { fixed: 0, extra: 0 };
 
     try {
+      console.log('💰 Loading income for user:', userId, 'month:', month);
+      
       const { data, error } = await supabase
         .from('incomes')
         .select('*')
@@ -284,7 +292,12 @@ export class DataManager {
         extra: parseFloat(data.extra_amount) || 0
       } : { fixed: 0, extra: 0 };
 
+      console.log('💰 Income loaded:', income);
       this.data.income[month] = income;
+      
+      // Also load extra incomes for complete picture
+      await this.loadExtraIncomes(month);
+      
       return income;
     } catch (error) {
       console.error('Error in loadIncome:', error);

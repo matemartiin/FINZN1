@@ -10,28 +10,34 @@ export class UIManager {
     const incomeAmount = document.getElementById('income-summary');
     const installmentsCount = document.getElementById('installments-count');
     
+    console.log('🔄 Updating balance UI with:', balance);
+    
     if (balanceAmount) {
       balanceAmount.textContent = this.formatCurrency(balance.available);
+      console.log('💰 Balance amount updated:', balance.available);
       // Change color based on balance
       if (balance.available < 0) {
         balanceAmount.style.color = '#ef4444';
       } else if (balance.available < 1000) {
         balanceAmount.style.color = '#f59e0b';
       } else {
-        balanceAmount.style.color = '#B7A6FF';
+        balanceAmount.style.color = '#C8B6FF'; // Lavanda from your palette
       }
     }
     
     if (monthlyExpenses) {
       monthlyExpenses.textContent = this.formatCurrency(balance.totalExpenses);
+      console.log('💳 Monthly expenses updated:', balance.totalExpenses);
     }
     
     if (incomeAmount) {
       incomeAmount.textContent = this.formatCurrency(balance.totalIncome);
+      console.log('💵 Income amount updated:', balance.totalIncome);
     }
     
     if (installmentsCount) {
       installmentsCount.textContent = balance.installments;
+      console.log('📊 Installments count updated:', balance.installments);
     }
   }
 

@@ -433,12 +433,18 @@ class FinznApp {
     
     try {
       // Load current month data
+      console.log('📊 Loading expenses...');
       const expenses = await this.data.loadExpenses(this.currentMonth);
+      console.log('💰 Loading income...');
       const income = await this.data.loadIncome(this.currentMonth);
+      console.log('💵 Loading extra incomes...');
       const extraIncomes = await this.data.loadExtraIncomes(this.currentMonth);
+      
+      console.log('📊 Data loaded:', { expenses: expenses.length, income, extraIncomes: extraIncomes.length });
       
       // Calculate balance
       const balance = this.data.calculateBalance(this.currentMonth);
+      console.log('💰 Balance calculated:', balance);
       
       // Update UI
       this.ui.updateBalance(balance);
@@ -476,8 +482,11 @@ class FinznApp {
         this.ui.showMascotAlert('¡Excelente! Tienes un buen balance este mes', 'success');
       }
       
+      console.log('✅ Dashboard updated successfully');
+      
     } catch (error) {
       console.error('❌ Error updating dashboard:', error);
+      this.ui.showAlert('Error al cargar los datos. Intenta refrescar la página.', 'error');
     }
   }
 
@@ -552,7 +561,11 @@ class FinznApp {
       // Handle installments
       if (formData.hasInstallments && formData.installmentsCount) {
         const installmentsCount = parseInt(formData.installmentsCount);
+        console.log('📊 Creating installments:', installmentsCount);
         const monthlyAmount = expenseData.amount / installmentsCount;
+        
+        // Store original amount for reference
+        const originalAmount = expenseData.amount;
         
         // Create installments for future months
         for (let i = 0; i < installmentsCount; i++) {
@@ -567,17 +580,21 @@ class FinznApp {
             month: installmentMonth,
             installment: i + 1,
             totalInstallments: installmentsCount,
+            originalAmount: originalAmount,
             transactionDate: installmentDate.toISOString().split('T')[0]
           };
           
+          console.log(`📊 Adding installment ${i + 1}/${installmentsCount}:`, installmentData);
           await this.data.addExpense(installmentData);
         }
+        
+        this.ui.showAlert(`Gasto dividido en ${installmentsCount} cuotas exitosamente`, 'success');
       } else {
         await this.data.addExpense(expenseData);
+        this.ui.showAlert('Gasto agregado exitosamente', 'success');
       }
       
       this.modals.hide('add-expense-modal');
-      this.ui.showAlert('Gasto agregado exitosamente', 'success');
       this.updateDashboard();
       
     } catch (error) {

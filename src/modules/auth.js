@@ -14,9 +14,11 @@ export class AuthManager {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error('Error getting session:', error);
+        // Try to recover from auth errors
+        await this.handleAuthError(error);
       }
       this.currentUser = session?.user || null;
-      console.log('Initial session:', session ? 'Found' : 'None');
+      console.log('🔐 Initial session:', session ? `Found for ${session.user.email}` : 'None');
     } catch (error) {
       console.error('Error in initializeAuth:', error);
       this.currentUser = null;
@@ -24,7 +26,7 @@ export class AuthManager {
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email);
+      console.log('🔐 Auth state changed:', event, session?.user?.email);
       this.currentUser = session?.user || null;
       
       if (event === 'SIGNED_OUT') {
@@ -32,10 +34,23 @@ export class AuthManager {
         this.clearUserData();
         // Reload the page to reset application state
         window.location.reload();
+      } else if (event === 'SIGNED_IN') {
+        console.log('✅ User successfully signed in:', session.user.email);
       }
     });
   }
 
+  async handleAuthError(error) {
+    console.log('🔧 Handling auth error:', error.message);
+    
+    // Clear potentially corrupted session data
+    try {
+      await supabase.auth.signOut();
+      this.clearUserData();
+    } catch (signOutError) {
+      console.error('Error during auth recovery:', signOutError);
+    }
+  }
   async login(email, password) {
     try {
       console.log('🔐 Attempting login for:', email);
