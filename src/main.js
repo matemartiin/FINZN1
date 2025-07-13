@@ -624,6 +624,15 @@ class FinznApp {
       return;
     }
     
+    // Check if limit already exists for this category
+    const existingLimits = this.data.getSpendingLimits();
+    const existingLimit = existingLimits.find(limit => limit.category === formData.category);
+    
+    if (existingLimit) {
+      this.ui.showAlert('Ya existe un límite para esta categoría', 'warning');
+      return;
+    }
+    
     try {
       const limitData = {
         category: formData.category,
@@ -631,7 +640,12 @@ class FinznApp {
         warningPercentage: parseInt(formData.warningPercentage) || 80
       };
       
-      await this.data.addSpendingLimit(limitData);
+      const success = await this.data.addSpendingLimit(limitData);
+      
+      if (!success) {
+        this.ui.showAlert('Error al crear el límite de gasto', 'error');
+        return;
+      }
       
       this.modals.hide('add-spending-limit-modal');
       this.ui.showAlert('Límite de gasto creado exitosamente', 'success');
