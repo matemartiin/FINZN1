@@ -185,13 +185,15 @@ export class UIManager {
       const percentage = (currentSpent / limit.amount) * 100;
       
       let statusClass = 'safe';
-      let statusIcon = '🟢';
+      let semaphore = '🚦';
+      let semaphoreColor = '#4CAF50'; // Verde
+      
       if (percentage >= 100) {
         statusClass = 'danger';
-        statusIcon = '🔴';
+        semaphoreColor = '#F44336'; // Rojo
       } else if (percentage >= limit.warning_percentage) {
         statusClass = 'warning';
-        statusIcon = '🟡';
+        semaphoreColor = '#FF9800'; // Amarillo
       }
       
       // Add to main list
@@ -200,7 +202,7 @@ export class UIManager {
       
       item.innerHTML = `
         <div class="spending-limit-info">
-          <div class="spending-limit-category">${statusIcon} ${limit.category}</div>
+          <div class="spending-limit-category">${limit.category}</div>
           <div class="spending-limit-amount">Límite: ${this.formatCurrency(limit.amount)}</div>
         </div>
         <div class="spending-limit-progress">
@@ -227,8 +229,8 @@ export class UIManager {
         summaryItem.className = `spending-limit-summary-item ${statusClass}`;
         
         summaryItem.innerHTML = `
+          <div class="limit-semaphore" style="color: ${semaphoreColor}">${semaphore}</div>
           <div class="limit-category-info">
-            <span class="limit-status-icon">${statusIcon}</span>
             <span class="limit-category-name">${limit.category}</span>
           </div>
           <div class="limit-progress-info">
@@ -365,41 +367,68 @@ export class UIManager {
   }
 
   updateIncomeDetails(income, extraIncomes = []) {
-    const fixedIncomeDisplay = document.getElementById('fixed-income-display');
-    const extraIncomeDisplay = document.getElementById('extra-income-display');
-    const extraIncomesList = document.getElementById('extra-incomes-list');
+    const allIncomesList = document.getElementById('all-incomes-list');
+    const incomesIndicator = document.getElementById('incomes-indicator');
     
-    if (fixedIncomeDisplay) {
-      fixedIncomeDisplay.textContent = this.formatCurrency(income.fixed || 0);
-    }
+    // Update indicator count
+    let totalIncomes = 0;
+    if (income.fixed > 0) totalIncomes++;
+    if (extraIncomes.length > 0) totalIncomes += extraIncomes.length;
     
-    if (extraIncomeDisplay) {
-      extraIncomeDisplay.textContent = this.formatCurrency(income.extra || 0);
-    }
-    
-    if (extraIncomesList) {
-      extraIncomesList.innerHTML = '';
+    if (incomesIndicator) {
+      const countElement = incomesIndicator.querySelector('.indicator-count');
+      if (countElement) {
+        countElement.textContent = totalIncomes;
+      }
       
-      if (extraIncomes.length === 0) {
-        extraIncomesList.innerHTML = `
+      if (totalIncomes > 0) {
+        incomesIndicator.classList.remove('hidden');
+      } else {
+        incomesIndicator.classList.add('hidden');
+      }
+    }
+    
+    if (allIncomesList) {
+      allIncomesList.innerHTML = '';
+      
+      if (totalIncomes === 0) {
+        allIncomesList.innerHTML = `
           <div class="empty-state">
-            <p>No hay ingresos extras registrados</p>
+            <p>No hay ingresos registrados este mes</p>
           </div>
         `;
       } else {
-        extraIncomes.forEach(extraIncome => {
-          const item = document.createElement('div');
-          item.className = 'extra-income-item';
+        // Add fixed income if exists
+        if (income.fixed > 0) {
+          const fixedItem = document.createElement('div');
+          fixedItem.className = 'income-list-item fixed';
           
-          item.innerHTML = `
-            <div class="extra-income-details">
-              <div class="extra-income-description">${extraIncome.description}</div>
-              <div class="extra-income-category">${extraIncome.category}</div>
+          fixedItem.innerHTML = `
+            <div class="income-item-details">
+              <div class="income-item-type">💰 Ingreso Fijo</div>
+              <div class="income-item-description">Sueldo mensual</div>
             </div>
-            <div class="extra-income-amount">${this.formatCurrency(extraIncome.amount)}</div>
+            <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
           `;
           
-          extraIncomesList.appendChild(item);
+          allIncomesList.appendChild(fixedItem);
+        }
+        
+        // Add extra incomes
+        extraIncomes.forEach(extraIncome => {
+          const item = document.createElement('div');
+          item.className = 'income-list-item extra';
+          
+          item.innerHTML = `
+            <div class="income-item-details">
+              <div class="income-item-type">💵 ${extraIncome.category}</div>
+              <div class="income-item-description">${extraIncome.description}</div>
+              <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
+            </div>
+            <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
+          `;
+          
+          allIncomesList.appendChild(item);
         });
       }
     }

@@ -329,7 +329,54 @@ export class DataManager {
   }
 
   getExtraIncomes(month) {
-    return this.data.extraIncomes[month] || [];
+    // For now, return empty array since we need to implement extra incomes storage
+    // This will be populated when user adds extra incomes
+    return [];
+  }
+
+  async getTrendData() {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      // Get last 6 months of data
+      const months = [];
+      const now = new Date();
+      
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        months.push(monthKey);
+      }
+
+      const trendData = [];
+      
+      for (const month of months) {
+        const { data, error } = await supabase
+          .from('expenses')
+          .select('amount')
+          .eq('user_id', userId)
+          .eq('month', month);
+
+        if (error) {
+          console.error('Error loading trend data for month:', month, error);
+          continue;
+        }
+
+        const total = (data || []).reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+        const monthName = new Date(month + '-01').toLocaleDateString('es-ES', { month: 'short' });
+        
+        trendData.push({
+          month: monthName,
+          amount: total
+        });
+      }
+
+      return trendData;
+    } catch (error) {
+      console.error('Error in getTrendData:', error);
+      return [];
+    }
   }
 
   // Goals

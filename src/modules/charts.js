@@ -58,6 +58,65 @@ export class ChartManager {
     });
   }
 
+  updateTrendChart(data) {
+    const ctx = document.getElementById('trend-chart');
+    if (!ctx) return;
+
+    if (this.trendChart) {
+      this.trendChart.destroy();
+    }
+
+    const labels = data.map(item => item.month);
+    const values = data.map(item => item.amount);
+
+    this.trendChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Gastos Mensuales',
+          data: values,
+          borderColor: '#A7C7E7',
+          backgroundColor: 'rgba(167, 199, 231, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#C8B6FF',
+          pointBorderColor: '#A7C7E7',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                return `Gastos: $${context.raw.toLocaleString()}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   generateColors(count) {
     const colors = [
       '#ef4444', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981',

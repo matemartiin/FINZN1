@@ -169,9 +169,9 @@ class FinznApp {
     }
     
     // View incomes button
-    const viewIncomesBtn = document.getElementById('view-incomes-btn');
-    if (viewIncomesBtn) {
-      viewIncomesBtn.addEventListener('click', () => this.showViewIncomesModal());
+    const incomesIndicator = document.getElementById('incomes-indicator');
+    if (incomesIndicator) {
+      incomesIndicator.addEventListener('click', () => this.showViewIncomesModal());
     }
     
     // Installments button
@@ -210,13 +210,6 @@ class FinznApp {
     }
     
     // Add income from modal
-    const addIncomeFromModal = document.getElementById('add-income-from-modal');
-    if (addIncomeFromModal) {
-      addIncomeFromModal.addEventListener('click', () => {
-        this.modals.hide('view-incomes-modal');
-        this.showAddIncomeModal();
-      });
-    }
   }
 
   setupModalEvents() {
@@ -467,6 +460,10 @@ class FinznApp {
       // Update charts
       const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
       this.charts.updateExpensesChart(expensesByCategory);
+      
+      // Update trend chart
+      const trendData = await this.data.getTrendData();
+      this.charts.updateTrendChart(trendData);
       
       // Show mascot message based on balance
       if (balance.available < 0) {
