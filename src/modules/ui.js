@@ -172,10 +172,13 @@ export class UIManager {
       const percentage = (currentSpent / limit.amount) * 100;
       
       let statusClass = 'safe';
+      let statusIcon = '🟢';
       if (percentage >= 100) {
         statusClass = 'danger';
+        statusIcon = '🔴';
       } else if (percentage >= limit.warning_percentage) {
         statusClass = 'warning';
+        statusIcon = '🟡';
       }
       
       const item = document.createElement('div');
@@ -183,7 +186,7 @@ export class UIManager {
       
       item.innerHTML = `
         <div class="spending-limit-info">
-          <div class="spending-limit-category">${limit.category}</div>
+          <div class="spending-limit-category">${statusIcon} ${limit.category}</div>
           <div class="spending-limit-amount">Límite: ${this.formatCurrency(limit.amount)}</div>
         </div>
         <div class="spending-limit-progress">

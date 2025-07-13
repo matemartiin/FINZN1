@@ -631,6 +631,7 @@ class FinznApp {
         warningPercentage: parseInt(formData.warningPercentage) || 80
       };
       
+      console.log('Creating spending limit:', limitData);
       await this.data.addSpendingLimit(limitData);
       
       this.modals.hide('add-spending-limit-modal');
