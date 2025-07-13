@@ -174,7 +174,7 @@
                   <div class="card-icon-simple">💵</div>
                   <span class="card-title">
                     Ingresos
-                    <button id="extra-incomes-indicator" class="extra-incomes-indicator hidden" title="Ver ingresos extras">
+                    <button id="incomes-indicator" class="incomes-indicator" title="Ver todos los ingresos del mes">
                       <span class="indicator-count">0</span>
                     </button>
                   </span>
@@ -184,10 +184,6 @@
                   <button id="add-income-btn-dashboard" class="btn btn-primary">
                     <span>➕</span>
                     Agregar Ingreso
-                  </button>
-                  <button id="view-incomes-btn" class="btn btn-secondary btn-sm">
-                    <span>👁️</span>
-                    Ver Detalles
                   </button>
                 </div>
               </div>
@@ -265,6 +261,16 @@
                 </div>
                 <div id="spending-limits-summary" class="spending-limits-summary">
                   <!-- Los límites se cargarán aquí -->
+                </div>
+              </div>
+              
+              <!-- Gráfico de Tendencia Mensual -->
+              <div class="trend-chart-card">
+                <div class="card-header">
+                  <h3>📈 Tendencia de Gastos Mensual</h3>
+                </div>
+                <div class="trend-chart-container">
+                  <canvas id="trend-chart"></canvas>
                 </div>
               </div>
               
@@ -396,32 +402,16 @@
   <div id="view-incomes-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📊 Detalles de Ingresos</h2>
+        <h2>💰 Ingresos del Mes</h2>
         <button class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="incomes-summary">
-          <div class="income-item">
-            <div class="income-type">💰 Ingreso Fijo</div>
-            <div class="income-amount" id="fixed-income-display">$0</div>
-            <div class="income-description">Sueldo mensual</div>
-          </div>
-          <div class="income-item">
-            <div class="income-type">💵 Ingresos Extras</div>
-            <div class="income-amount" id="extra-income-display">$0</div>
-            <div class="income-description">Freelance, bonos, etc.</div>
-          </div>
-        </div>
-        <div id="extra-incomes-list" class="extra-incomes-list">
-          <!-- Lista detallada de ingresos extras -->
+        <div id="all-incomes-list" class="all-incomes-list">
+          <!-- Lista de todos los ingresos del mes -->
         </div>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
-        <button id="add-income-from-modal" class="btn btn-primary">
-          <span>➕</span>
-          Agregar Ingreso
-        </button>
       </div>
     </div>
   </div>
