@@ -429,6 +429,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  transition: opacity 0.3s ease;
 }
 
 .month-selector label {
@@ -887,6 +888,11 @@ h1, h2, h3, h4, h5, h6 {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Hide month selector for non-developer users */
+.month-selector[style*="display: none"] {
+  display: none !important;
 }
 
 /* Spending Limits Section */

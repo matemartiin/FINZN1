@@ -203,6 +203,9 @@ class FinznApp {
     
     // Initialize month selector
     this.initMonthSelector();
+    
+    // Show/hide month selector based on user
+    this.updateMonthSelectorVisibility();
   }
 
   showLogin() {
@@ -250,7 +253,29 @@ class FinznApp {
     select.value = this.currentMonth;
   }
 
+  updateMonthSelectorVisibility() {
+    const currentUser = this.auth.getCurrentUser();
+    const monthSelectorContainer = document.querySelector('.month-selector');
+    
+    if (monthSelectorContainer) {
+      if (currentUser === 'mateo') {
+        monthSelectorContainer.style.display = 'flex';
+      } else {
+        monthSelectorContainer.style.display = 'none';
+      }
+    }
+  }
+
   handleMonthChange(e) {
+    const currentUser = this.auth.getCurrentUser();
+    
+    // Only allow month changes for mateo
+    if (currentUser !== 'mateo') {
+      e.preventDefault();
+      this.ui.showAlert('No tienes permisos para cambiar el mes', 'error');
+      return;
+    }
+    
     const previousMonth = this.currentMonth;
     this.currentMonth = e.target.value;
     
