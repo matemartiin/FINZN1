@@ -216,93 +216,256 @@
           </div>
         </section>
 
-        <!-- Other sections... (keeping them short for brevity) -->
+        <!-- Expenses Section -->
         <section id="expenses-section" class="dashboard-section">
           <div class="section-content">
-            <h1>Gestión de Gastos</h1>
-            <p>Sección de gastos cargada correctamente</p>
+            <div class="section-header">
+              <h1>Gestión de Gastos</h1>
+              <div class="section-actions">
+                <button id="add-expense-btn" class="btn btn-primary">
+                  <span>➕</span>
+                  Agregar Gasto
+                </button>
+              </div>
+            </div>
+            
+            <div class="expenses-container">
+              <div class="expenses-filters">
+                <select id="category-filter">
+                  <option value="">Todas las categorías</option>
+                </select>
+                <input type="date" id="date-filter" />
+                <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
+              </div>
+              
+              <div id="expenses-list" class="expenses-list">
+                <!-- Expenses will be loaded here -->
+              </div>
+            </div>
           </div>
         </section>
 
+        <!-- Savings Section -->
         <section id="savings-section" class="dashboard-section">
           <div class="section-content">
-            <h1>Objetivos de Ahorro</h1>
-            <p>Sección de ahorros cargada correctamente</p>
+            <div class="section-header">
+              <h1>Objetivos de Ahorro</h1>
+              <div class="section-actions">
+                <button id="add-goal-btn" class="btn btn-primary">
+                  <span>🎯</span>
+                  Nuevo Objetivo
+                </button>
+              </div>
+            </div>
+            
+            <div id="goals-list" class="goals-list">
+              <!-- Goals will be loaded here -->
+            </div>
           </div>
         </section>
 
+        <!-- Achievements Section -->
         <section id="achievements-section" class="dashboard-section">
           <div class="section-content">
-            <h1>Logros y Reconocimientos</h1>
-            <p>Sección de logros cargada correctamente</p>
+            <div class="section-header">
+              <h1>Logros y Reconocimientos</h1>
+            </div>
+            
+            <div id="achievements-list" class="achievements-list">
+              <!-- Achievements will be loaded here -->
+            </div>
           </div>
         </section>
 
+        <!-- Settings Section -->
         <section id="settings-section" class="dashboard-section">
           <div class="section-content">
-            <h1>Configuración</h1>
-            <p>Sección de configuración cargada correctamente</p>
+            <div class="section-header">
+              <h1>Configuración</h1>
+            </div>
+            
+            <div class="settings-grid">
+              <div class="settings-card">
+                <h3>Categorías</h3>
+                <p>Gestiona tus categorías de gastos</p>
+                <button id="manage-categories-btn" class="btn btn-secondary">
+                  <span>🏷️</span>
+                  Gestionar
+                </button>
+              </div>
+              
+              <div class="settings-card">
+                <h3>Límites de Gasto</h3>
+                <p>Establece límites por categoría</p>
+                <button id="manage-limits-btn" class="btn btn-secondary">
+                  <span>⚠️</span>
+                  Configurar
+                </button>
+              </div>
+              
+              <div class="settings-card">
+                <h3>Exportar Datos</h3>
+                <p>Descarga tus datos financieros</p>
+                <button id="export-data-btn" class="btn btn-secondary">
+                  <span>📊</span>
+                  Exportar
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       </div>
     </main>
   </div>
 
-  <!-- Test Script to verify JavaScript loading -->
-  <script>
-    console.log('🔥 BASIC SCRIPT LOADED - Testing JavaScript execution');
-    
-    // Test basic functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 DOM LOADED - Setting up basic event listeners');
-      
-      // Test button click
-      const showRegisterBtn = document.getElementById('show-register');
-      const showLoginBtn = document.getElementById('show-login');
-      const loginContainer = document.getElementById('login-container');
-      const registerContainer = document.getElementById('register-container');
-      
-      if (showRegisterBtn) {
-        showRegisterBtn.addEventListener('click', function() {
-          console.log('✅ REGISTER BUTTON CLICKED');
-          if (loginContainer) loginContainer.classList.add('hidden');
-          if (registerContainer) registerContainer.classList.remove('hidden');
-        });
-      }
-      
-      if (showLoginBtn) {
-        showLoginBtn.addEventListener('click', function() {
-          console.log('✅ LOGIN BUTTON CLICKED');
-          if (registerContainer) registerContainer.classList.add('hidden');
-          if (loginContainer) loginContainer.classList.remove('hidden');
-        });
-      }
-      
-      // Test form submission
-      const loginForm = document.getElementById('login-form');
-      const registerForm = document.getElementById('register-form');
-      
-      if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          console.log('✅ LOGIN FORM SUBMITTED');
-          alert('Login form submitted - JavaScript is working!');
-        });
-      }
-      
-      if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          console.log('✅ REGISTER FORM SUBMITTED');
-          alert('Register form submitted - JavaScript is working!');
-        });
-      }
-      
-      console.log('✅ ALL BASIC EVENT LISTENERS SET UP');
-    });
-  </script>
+  <!-- Modals -->
+  
+  <!-- Add Expense Modal -->
+  <div id="add-expense-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Gasto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-expense-form" class="modal-form">
+        <div class="form-group">
+          <label for="expense-description">Descripción</label>
+          <input type="text" id="expense-description" name="description" required />
+        </div>
+        <div class="form-group">
+          <label for="expense-amount">Monto</label>
+          <input type="number" id="expense-amount" name="amount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="expense-category">Categoría</label>
+          <select id="expense-category" name="category" required>
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="expense-date">Fecha</label>
+          <input type="date" id="expense-date" name="transactionDate" required />
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="expense-installments" name="hasInstallments" />
+            Pagar en cuotas
+          </label>
+        </div>
+        <div id="installments-group" class="form-group hidden">
+          <label for="expense-installments-count">Número de cuotas</label>
+          <input type="number" id="expense-installments-count" name="installmentsCount" min="2" max="24" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Agregar Gasto</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <!-- Load main application after basic test -->
+  <!-- Add Income Modal -->
+  <div id="add-income-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Ingreso</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-income-form" class="modal-form">
+        <div class="form-group">
+          <label for="income-type">Tipo de Ingreso</label>
+          <select id="income-type" name="type" required>
+            <option value="fixed">Ingreso Fijo (Sueldo)</option>
+            <option value="extra">Ingreso Extra</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="income-amount">Monto</label>
+          <input type="number" id="income-amount" name="amount" step="0.01" required />
+        </div>
+        <div id="extra-income-group" class="hidden">
+          <div class="form-group">
+            <label for="income-description">Descripción</label>
+            <input type="text" id="income-description" name="description" />
+          </div>
+          <div class="form-group">
+            <label for="income-category">Categoría</label>
+            <select id="income-category" name="category">
+              <option value="freelance">Freelance</option>
+              <option value="bonus">Bonus</option>
+              <option value="investment">Inversión</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Agregar Ingreso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Goal Modal -->
+  <div id="add-goal-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nuevo Objetivo de Ahorro</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-goal-form" class="modal-form">
+        <div class="form-group">
+          <label for="goal-name">Nombre del Objetivo</label>
+          <input type="text" id="goal-name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="goal-target">Monto Objetivo</label>
+          <input type="number" id="goal-target" name="targetAmount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="goal-current">Monto Actual (opcional)</label>
+          <input type="number" id="goal-current" name="currentAmount" step="0.01" value="0" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Objetivo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Chat Widget -->
+  <div id="chat-widget" class="chat-widget">
+    <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">
+      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-icon" />
+    </button>
+    
+    <div id="chat-window" class="chat-window hidden">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <img src="/robot-chat.png" alt="Asistente" class="chat-header-avatar" />
+          <div class="chat-header-text">
+            <h3>Asistente FINZN</h3>
+            <p>Tu consejero financiero</p>
+          </div>
+        </div>
+        <button id="chat-close" class="chat-close">&times;</button>
+      </div>
+      
+      <div id="chat-messages" class="chat-messages">
+        <!-- Messages will be added here -->
+      </div>
+      
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
+        <button type="submit" class="chat-send">
+          <span>📤</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Load main application -->
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
