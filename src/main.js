@@ -615,7 +615,7 @@ class FinznApp {
 
   async handleAddSpendingLimit(e) {
     e.preventDefault();
-    console.log('⚠️ Adding spending limit...');
+    console.log('🚦 Adding spending limit...');
     
     const formData = this.ui.getFormData('add-spending-limit-form');
     
@@ -631,7 +631,7 @@ class FinznApp {
         warningPercentage: parseInt(formData.warningPercentage) || 80
       };
       
-      console.log('Creating spending limit:', limitData);
+      console.log('🚦 Creating spending limit:', limitData);
       await this.data.addSpendingLimit(limitData);
       
       this.modals.hide('add-spending-limit-modal');
@@ -639,7 +639,7 @@ class FinznApp {
       this.updateDashboard();
       
     } catch (error) {
-      console.error('Error adding spending limit:', error);
+      console.error('❌ Error adding spending limit:', error);
       this.ui.showAlert('Error al crear el límite de gasto', 'error');
     }
   }

@@ -416,7 +416,7 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('DataManager: Adding spending limit for user:', userId, limitData);
+      console.log('📊 DataManager: Adding spending limit for user:', userId, limitData);
       
       const limit = {
         user_id: userId,
@@ -425,7 +425,7 @@ export class DataManager {
         warning_percentage: parseInt(limitData.warningPercentage) || 80
       };
 
-      console.log('Inserting limit data:', limit);
+      console.log('📝 Inserting limit data:', limit);
       
       const { data, error } = await supabase
         .from('spending_limits')
@@ -433,16 +433,15 @@ export class DataManager {
         .select();
 
       if (error) {
-        console.error('Error adding spending limit:', error);
-        console.error('Full error details:', JSON.stringify(error, null, 2));
+        console.error('❌ Error adding spending limit:', error);
         return false;
       }
 
-      console.log('Spending limit added successfully:', data);
+      console.log('✅ Spending limit added successfully:', data);
       this.data.spendingLimits.unshift(data[0]);
       return true;
     } catch (error) {
-      console.error('Error in addSpendingLimit:', error);
+      console.error('❌ Error in addSpendingLimit:', error);
       return false;
     }
   }
