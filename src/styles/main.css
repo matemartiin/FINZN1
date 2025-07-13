@@ -527,7 +527,7 @@ body {
 
 /* Sidebar mejorado */
 .sidebar-nav {
-  width: 220px;
+  width: 280px;
   background: var(--bg-primary);
   border-right: 1px solid var(--border-color);
   padding: var(--spacing-xl);
@@ -599,18 +599,6 @@ body {
   background: var(--bg-secondary);
 }
 
-/* Dashboard layout específico */
-.dashboard-first-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-xl);
-  margin-bottom: var(--spacing-2xl);
-}
-
-.dashboard-second-row {
-  width: 100%;
-}
-
 .dashboard-section {
   display: none;
   animation: fadeIn 0.5s ease-out;
@@ -649,6 +637,42 @@ body {
 
 .section-actions {
   display: flex;
+  gap: var(--spacing-lg);
+}
+
+/* Dashboard grid mejorado - LAYOUT ESPECÍFICO */
+.dashboard-grid {
+  display: grid;
+  gap: var(--spacing-xl);
+  grid-template-areas: 
+    "summary summary"
+    "chart chart";
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-areas: 
+      "summary summary"
+      "chart chart";
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Primera fila: Tarjetas de resumen (Balance, Ingresos, Gastos) */
+.summary-cards {
+  grid-area: summary;
+  display: grid;
+  gap: var(--spacing-xl);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Segunda fila: Gráfico ocupando toda la horizontal */
+.chart-section {
+  grid-area: chart;
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-lg);
 }
 
@@ -846,13 +870,12 @@ body {
 }
 
 .chart-mascot-img {
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   box-shadow: var(--shadow-xl);
   border: 4px solid var(--primary-color);
   transition: all var(--transition-normal);
-  object-fit: cover;
 }
 
 .chart-mascot-img:hover {
@@ -1327,7 +1350,7 @@ body {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   border: none;
   cursor: pointer;
   box-shadow: var(--shadow-xl);
@@ -1339,14 +1362,16 @@ body {
 }
 
 .chat-toggle:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: var(--gradient-secondary);
   transform: scale(1.1);
   box-shadow: var(--shadow-glow);
 }
 
 .chat-toggle-icon {
-  font-size: 2rem;
-  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
 }
 
 .chat-window {
@@ -1619,7 +1644,7 @@ body {
     padding: var(--spacing-lg);
   }
   
-  .dashboard-first-row {
+  .summary-cards {
     grid-template-columns: 1fr;
   }
   

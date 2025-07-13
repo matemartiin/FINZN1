@@ -156,7 +156,7 @@ export class UIManager {
           <div class="empty-icon">⚠️</div>
           <h3>No tienes límites de gasto configurados</h3>
           <p>Establece límites para controlar mejor tus gastos</p>
-          <button class="btn btn-primary" onclick="document.getElementById('add-spending-limit-btn').click()">
+          <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
             <span>➕</span>
             Agregar Límite
           </button>

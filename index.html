@@ -153,71 +153,74 @@
       <div class="main-dashboard">
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="dashboard-section active">
-          <!-- Primera fila: Balance, Ingresos, Gastos (horizontal) -->
-          <div class="dashboard-first-row">
-            <div class="summary-card balance-card-new">
-              <div class="card-header-simple">
-                <div class="card-icon-simple">💰</div>
-                <span class="card-title">Balance</span>
-              </div>
-              <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
-              <div class="installments-info">
-                <button id="installments-btn" class="installments-button">
-                  <span id="installments-count">3</span> cuotas activas
-                </button>
-              </div>
-            </div>
-
-            <div class="summary-card income-card">
-              <div class="card-header-simple">
-                <div class="card-icon-simple">💵</div>
-                <span class="card-title">
-                  Ingresos
-                  <button id="extra-incomes-indicator" class="extra-incomes-indicator hidden" title="Ver ingresos extras">
-                    <span class="indicator-count">0</span>
-                  </button>
-                </span>
-              </div>
-              <div class="card-amount" id="income-summary">$3,500</div>
-              <div class="card-action">
-                <button id="add-income-btn-dashboard" class="btn btn-primary">
-                  <span>➕</span>
-                  Agregar Ingreso
-                </button>
-              </div>
-            </div>
-
-            <div class="summary-card expenses-card">
-              <div class="card-header-simple">
-                <div class="card-icon-simple">💳</div>
-                <span class="card-title">Gastos del Mes</span>
-              </div>
-              <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
-              <div class="card-action">
-                <button id="add-expense-btn-dashboard" class="btn btn-primary">
-                  <span>➕</span>
-                  Agregar Gasto
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Segunda fila: Gráfico ocupando toda la horizontal -->
-          <div class="dashboard-second-row">
-            <div class="chart-card-new">
-              <h3>📊 Distribución de Gastos del Mes</h3>
-              <div class="chart-content-with-mascot">
-                <div class="chart-container-new">
-                  <canvas id="expenses-chart"></canvas>
+          <div class="dashboard-grid">
+            <!-- Primera fila: Balance, Ingresos, Gastos -->
+            <div class="summary-cards">
+              <div class="summary-card balance-card-new">
+                <div class="card-header-simple">
+                  <div class="card-icon-simple">💰</div>
+                  <span class="card-title">Balance</span>
                 </div>
-                <div class="chart-mascot">
-                  <div class="chart-mascot-container">
-                    <img src="/ChatGPT Image Jul 2, 2025, 10_45_30 PM.png" alt="FINZN Mascota" class="chart-mascot-img" />
-                    <div class="chart-mascot-tooltip">¡Aquí tienes tu análisis financiero!</div>
+                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
+                <div class="installments-info">
+                  <button id="installments-btn" class="installments-button">
+                    <span id="installments-count">3</span> cuotas activas
+                  </button>
+                </div>
+              </div>
+
+              <div class="summary-card income-card">
+                <div class="card-header-simple">
+                  <div class="card-icon-simple">💵</div>
+                  <span class="card-title">
+                    Ingresos
+                    <button id="extra-incomes-indicator" class="extra-incomes-indicator hidden" title="Ver ingresos extras">
+                      <span class="indicator-count">0</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="card-amount" id="income-summary">$3,500</div>
+                <div class="card-action">
+                  <button id="add-income-btn-dashboard" class="btn btn-primary">
+                    <span>➕</span>
+                    Agregar Ingreso
+                  </button>
+                </div>
+              </div>
+
+              <div class="summary-card expenses-card">
+                <div class="card-header-simple">
+                  <div class="card-icon-simple">💳</div>
+                  <span class="card-title">Gastos del Mes</span>
+                </div>
+                <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
+                <div class="card-action">
+                  <button id="add-expense-btn-dashboard" class="btn btn-primary">
+                    <span>➕</span>
+                    Agregar Gasto
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Segunda fila: Gráfico ocupando toda la horizontal -->
+            <div class="chart-section">
+              <div class="chart-card-new">
+                <h3>📊 Distribución de Gastos del Mes</h3>
+                <div class="chart-content-with-mascot">
+                  <div class="chart-container-new">
+                    <canvas id="expenses-chart"></canvas>
+                  </div>
+                  <div class="chart-mascot">
+                    <div class="chart-mascot-container">
+                      <img src="/mascota-finzn.png" alt="FINZN Mascota" class="chart-mascot-img" />
+                      <div class="chart-mascot-tooltip">¡Aquí tienes tu análisis financiero!</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            
           </div>
         </section>
 
@@ -475,10 +478,6 @@
               <option value="other">Otro</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="income-date">Fecha</label>
-            <input type="date" id="income-date" name="date" />
-          </div>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
@@ -519,7 +518,7 @@
   <!-- Chat Widget -->
   <div id="chat-widget" class="chat-widget">
     <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">
-      <div class="chat-toggle-icon">🤖</div>
+      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-icon" />
     </button>
     
     <div id="chat-window" class="chat-window hidden">
