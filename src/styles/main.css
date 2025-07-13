@@ -561,6 +561,8 @@ body {
 .card-action {
   display: flex;
   justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 /* Tarjetas específicas con tu paleta */
@@ -747,6 +749,157 @@ body {
 /* Expenses list */
 .expenses-container {
   margin-top: var(--spacing-xl);
+}
+
+/* Spending Limits Card */
+.spending-limits-card {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--lavanda);
+}
+
+.spending-limits-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.spending-limits-card h3 {
+  color: var(--text-primary);
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.spending-limits-summary {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.spending-limit-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--success-color);
+}
+
+.spending-limit-summary-item.warning {
+  border-left-color: var(--warning-color);
+}
+
+.spending-limit-summary-item.danger {
+  border-left-color: var(--error-color);
+}
+
+.limit-category-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.limit-status-icon {
+  font-size: 1rem;
+}
+
+.limit-category-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.limit-progress-info {
+  text-align: right;
+}
+
+.limit-amount-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.limit-percentage {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Income Details Modal */
+.incomes-summary {
+  display: grid;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.income-item {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  border-left: 4px solid var(--celeste-suave);
+}
+
+.income-type {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.income-amount {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--lavanda);
+  margin-bottom: var(--spacing-sm);
+}
+
+.income-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.extra-incomes-list {
+  border-top: 2px solid var(--border-color);
+  padding-top: var(--spacing-lg);
+}
+
+.extra-income-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+  border-left: 4px solid var(--durazno-suave);
+}
+
+.extra-income-details {
+  flex: 1;
+}
+
+.extra-income-description {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.extra-income-category {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.extra-income-amount {
+  font-weight: 900;
+  color: var(--durazno-suave);
+  font-size: 1rem;
 }
 
 .expenses-filters {

@@ -146,9 +146,14 @@ export class UIManager {
 
   updateSpendingLimitsList(limits, expenses) {
     const container = document.getElementById('spending-limits-list');
+    const summaryContainer = document.getElementById('spending-limits-summary');
+    
     if (!container) return;
     
     container.innerHTML = '';
+    if (summaryContainer) {
+      summaryContainer.innerHTML = '';
+    }
 
     if (limits.length === 0) {
       container.innerHTML = `
@@ -162,6 +167,14 @@ export class UIManager {
           </button>
         </div>
       `;
+      
+      if (summaryContainer) {
+        summaryContainer.innerHTML = `
+          <div class="empty-state">
+            <p>No hay límites configurados</p>
+          </div>
+        `;
+      }
       return;
     }
 
@@ -181,6 +194,7 @@ export class UIManager {
         statusIcon = '🟡';
       }
       
+      // Add to main list
       const item = document.createElement('div');
       item.className = 'spending-limit-item fade-in';
       
@@ -206,6 +220,25 @@ export class UIManager {
       `;
       
       container.appendChild(item);
+      
+      // Add to summary card
+      if (summaryContainer) {
+        const summaryItem = document.createElement('div');
+        summaryItem.className = `spending-limit-summary-item ${statusClass}`;
+        
+        summaryItem.innerHTML = `
+          <div class="limit-category-info">
+            <span class="limit-status-icon">${statusIcon}</span>
+            <span class="limit-category-name">${limit.category}</span>
+          </div>
+          <div class="limit-progress-info">
+            <div class="limit-amount-info">${this.formatCurrency(currentSpent)} / ${this.formatCurrency(limit.amount)}</div>
+            <div class="limit-percentage">${percentage.toFixed(1)}%</div>
+          </div>
+        `;
+        
+        summaryContainer.appendChild(summaryItem);
+      }
     });
   }
 
@@ -331,6 +364,46 @@ export class UIManager {
     });
   }
 
+  updateIncomeDetails(income, extraIncomes = []) {
+    const fixedIncomeDisplay = document.getElementById('fixed-income-display');
+    const extraIncomeDisplay = document.getElementById('extra-income-display');
+    const extraIncomesList = document.getElementById('extra-incomes-list');
+    
+    if (fixedIncomeDisplay) {
+      fixedIncomeDisplay.textContent = this.formatCurrency(income.fixed || 0);
+    }
+    
+    if (extraIncomeDisplay) {
+      extraIncomeDisplay.textContent = this.formatCurrency(income.extra || 0);
+    }
+    
+    if (extraIncomesList) {
+      extraIncomesList.innerHTML = '';
+      
+      if (extraIncomes.length === 0) {
+        extraIncomesList.innerHTML = `
+          <div class="empty-state">
+            <p>No hay ingresos extras registrados</p>
+          </div>
+        `;
+      } else {
+        extraIncomes.forEach(extraIncome => {
+          const item = document.createElement('div');
+          item.className = 'extra-income-item';
+          
+          item.innerHTML = `
+            <div class="extra-income-details">
+              <div class="extra-income-description">${extraIncome.description}</div>
+              <div class="extra-income-category">${extraIncome.category}</div>
+            </div>
+            <div class="extra-income-amount">${this.formatCurrency(extraIncome.amount)}</div>
+          `;
+          
+          extraIncomesList.appendChild(item);
+        });
+      }
+    }
+  }
   getFormData(formId) {
     const form = document.getElementById(formId);
     if (!form) return {};

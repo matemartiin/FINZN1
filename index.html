@@ -185,6 +185,10 @@
                     <span>➕</span>
                     Agregar Ingreso
                   </button>
+                  <button id="view-incomes-btn" class="btn btn-secondary btn-sm">
+                    <span>👁️</span>
+                    Ver Detalles
+                  </button>
                 </div>
               </div>
 
@@ -248,6 +252,20 @@
                 </select>
                 <input type="date" id="date-filter" />
                 <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
+              </div>
+              
+              <!-- Card de Límites de Gastos -->
+              <div class="spending-limits-card">
+                <div class="card-header">
+                  <h3>🚦 Límites de Gastos Configurados</h3>
+                  <button id="add-spending-limit-btn-card" class="btn btn-primary btn-sm">
+                    <span>➕</span>
+                    Agregar Límite
+                  </button>
+                </div>
+                <div id="spending-limits-summary" class="spending-limits-summary">
+                  <!-- Los límites se cargarán aquí -->
+                </div>
               </div>
               
               <div id="expenses-list" class="expenses-list">
@@ -374,6 +392,40 @@
 
   <!-- Modals -->
   
+  <!-- View Incomes Modal -->
+  <div id="view-incomes-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 Detalles de Ingresos</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="incomes-summary">
+          <div class="income-item">
+            <div class="income-type">💰 Ingreso Fijo</div>
+            <div class="income-amount" id="fixed-income-display">$0</div>
+            <div class="income-description">Sueldo mensual</div>
+          </div>
+          <div class="income-item">
+            <div class="income-type">💵 Ingresos Extras</div>
+            <div class="income-amount" id="extra-income-display">$0</div>
+            <div class="income-description">Freelance, bonos, etc.</div>
+          </div>
+        </div>
+        <div id="extra-incomes-list" class="extra-incomes-list">
+          <!-- Lista detallada de ingresos extras -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
+        <button id="add-income-from-modal" class="btn btn-primary">
+          <span>➕</span>
+          Agregar Ingreso
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Spending Limit Modal -->
   <div id="add-spending-limit-modal" class="modal">
     <div class="modal-content">

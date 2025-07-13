@@ -328,6 +328,10 @@ export class DataManager {
     return this.data.income[month] || { fixed: 0, extra: 0 };
   }
 
+  getExtraIncomes(month) {
+    return this.data.extraIncomes[month] || [];
+  }
+
   // Goals
   async loadGoals() {
     const userId = this.getCurrentUserId();

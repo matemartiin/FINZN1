@@ -168,6 +168,12 @@ class FinznApp {
       addIncomeBtn.addEventListener('click', () => this.showAddIncomeModal());
     }
     
+    // View incomes button
+    const viewIncomesBtn = document.getElementById('view-incomes-btn');
+    if (viewIncomesBtn) {
+      viewIncomesBtn.addEventListener('click', () => this.showViewIncomesModal());
+    }
+    
     // Installments button
     const installmentsBtn = document.getElementById('installments-btn');
     if (installmentsBtn) {
@@ -183,6 +189,7 @@ class FinznApp {
     // Add spending limit button
     const addSpendingLimitBtn = document.getElementById('add-spending-limit-btn');
     const addSpendingLimitBtnExpenses = document.getElementById('add-spending-limit-btn-expenses');
+    const addSpendingLimitBtnCard = document.getElementById('add-spending-limit-btn-card');
     
     if (addSpendingLimitBtn) {
       addSpendingLimitBtn.addEventListener('click', () => this.showAddSpendingLimitModal());
@@ -192,10 +199,23 @@ class FinznApp {
       addSpendingLimitBtnExpenses.addEventListener('click', () => this.showAddSpendingLimitModal());
     }
     
+    if (addSpendingLimitBtnCard) {
+      addSpendingLimitBtnCard.addEventListener('click', () => this.showAddSpendingLimitModal());
+    }
+    
     // Settings buttons
     const manageLimitsBtn = document.getElementById('manage-limits-btn');
     if (manageLimitsBtn) {
       manageLimitsBtn.addEventListener('click', () => this.navigation.showSection('settings'));
+    }
+    
+    // Add income from modal
+    const addIncomeFromModal = document.getElementById('add-income-from-modal');
+    if (addIncomeFromModal) {
+      addIncomeFromModal.addEventListener('click', () => {
+        this.modals.hide('view-incomes-modal');
+        this.showAddIncomeModal();
+      });
     }
   }
 
@@ -488,6 +508,18 @@ class FinznApp {
     console.log('⚠️ Show add spending limit modal');
     this.modals.show('add-spending-limit-modal');
   }
+  
+  showViewIncomesModal() {
+    console.log('👁️ Show view incomes modal');
+    
+    // Update income details
+    const income = this.data.getIncome(this.currentMonth);
+    const extraIncomes = this.data.getExtraIncomes(this.currentMonth);
+    this.ui.updateIncomeDetails(income, extraIncomes);
+    
+    this.modals.show('view-incomes-modal');
+  }
+  
   showInstallmentsModal() {
     console.log('📊 Show installments modal');
     this.ui.showAlert('Función de cuotas próximamente', 'info');
