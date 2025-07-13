@@ -2886,14 +2886,17 @@ textarea:focus-visible {
 }
 .limit-traffic-light {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 4px;
   padding: 6px;
   background: #f1f5f9;
   border-radius: 8px;
-  width: 42px;
+  /* width: 42px; */
+  width: 120px;
   margin-top: 8px;
+  justify-content: between;
+
 }
 
 .light {
@@ -2903,6 +2906,12 @@ textarea:focus-visible {
   opacity: 0.2;
   background-color: #cbd5e1;
   transition: all 0.3s ease;
+}
+
+.lights-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .light.on {
@@ -2926,4 +2935,5 @@ textarea:focus-visible {
   font-weight: bold;
   margin-top: 2px;
   color: #475569;
+  text-align: end;
 }

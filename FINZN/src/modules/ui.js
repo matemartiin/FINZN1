@@ -443,9 +443,11 @@ export class UIManager {
       
       const trafficLightHTML = `
         <div class="limit-traffic-light">
-          <div class="light ${trafficState === 'red' ? 'on red' : 'off'}"></div>
-          <div class="light ${trafficState === 'yellow' ? 'on yellow' : 'off'}"></div>
-          <div class="light ${trafficState === 'green' ? 'on green' : 'off'}"></div>
+          <div class="lights-container"> 
+            <div class="light ${trafficState === 'red' ? 'on red' : 'off'}"></div>
+            <div class="light ${trafficState === 'yellow' ? 'on yellow' : 'off'}"></div>
+            <div class="light ${trafficState === 'green' ? 'on green' : 'off'}"></div>
+          </div>
           <div class="light-label">${Math.round(percentage)}%</div>
         </div>
       `;
