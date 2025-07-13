@@ -271,24 +271,30 @@ export class DataManager {
     try {
       console.log('💰 Adding fixed income:', amount, 'for month:', month);
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('incomes')
         .upsert({
           user_id: userId,
           month: month,
           fixed_amount: parseFloat(amount),
           extra_amount: 0
-        });
+        }, {
+          onConflict: 'user_id,month'
+        })
+        .select();
 
       if (error) {
         console.error('Error adding fixed income:', error);
         return false;
       }
 
-      this.data.income[month] = {
-        fixed: parseFloat(amount),
-        extra: 0
-      };
+      // Update local data with the actual values from database
+      if (data && data.length > 0) {
+        this.data.income[month] = {
+          fixed: parseFloat(data[0].fixed_amount) || 0,
+          extra: parseFloat(data[0].extra_amount) || 0
+        };
+      }
 
       console.log('✅ Fixed income added successfully');
       return true;
