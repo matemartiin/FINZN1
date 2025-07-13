@@ -626,7 +626,6 @@ class FinznApp {
           category: formData.category || 'other'
         };
         await this.data.addExtraIncome(this.currentMonth, extraIncomeData);
-        });
       }
       
       this.modals.hide('add-income-modal');
