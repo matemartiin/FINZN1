@@ -329,9 +329,33 @@ export class DataManager {
   }
 
   getExtraIncomes(month) {
-    // For now, return empty array since we need to implement extra incomes storage
-    // This will be populated when user adds extra incomes
-    return [];
+    return this.data.extraIncomes[month] || [];
+  }
+
+  async loadExtraIncomes(month) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('extra_incomes')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('month', month)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading extra incomes:', error);
+        return [];
+      }
+
+      const extraIncomes = data || [];
+      this.data.extraIncomes[month] = extraIncomes;
+      return extraIncomes;
+    } catch (error) {
+      console.error('Error in loadExtraIncomes:', error);
+      return [];
+    }
   }
 
   async getTrendData() {
