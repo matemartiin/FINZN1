@@ -242,15 +242,21 @@
             </div>
             
             <div class="expenses-container">
-              <div class="expenses-filters">
-                <select id="category-filter">
-                  <option value="">Todas las categorías</option>
-                </select>
-                <input type="date" id="date-filter" />
-                <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
+              <!-- Filtros Card -->
+              <div class="expenses-section-card expenses-filters-card">
+                <div class="card-header">
+                  <h3>🔍 Filtros de Búsqueda</h3>
+                </div>
+                <div class="expenses-filters">
+                  <select id="category-filter">
+                    <option value="">Todas las categorías</option>
+                  </select>
+                  <input type="date" id="date-filter" />
+                  <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
+                </div>
               </div>
               
-              <!-- Card de Límites de Gastos -->
+              <!-- Límites de Gastos Card -->
               <div class="expenses-section-card spending-limits-card">
                 <div class="card-header">
                   <h3>🚦 Límites de Gastos Configurados</h3>
@@ -276,7 +282,9 @@
               
               <!-- Lista de Gastos -->
               <div class="expenses-section-card expenses-list-card">
-                <h3>📋 Lista de Gastos del Mes</h3>
+                <div class="card-header">
+                  <h3>📋 Lista de Gastos del Mes</h3>
+                </div>
                 <div id="expenses-list" class="expenses-list">
                   <!-- Expenses will be loaded here -->
                 </div>
