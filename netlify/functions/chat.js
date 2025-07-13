@@ -32,10 +32,13 @@ export default async (request, context) => {
       });
     }
 
-    const GEMINI_API_KEY = Netlify.env.get('VITE_GEMINI_API_KEY');
+    const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY;
+    
+    console.log('🔑 API Key check:', GEMINI_API_KEY ? 'Present' : 'Missing');
 
     // If no API key, use fallback responses
     if (!GEMINI_API_KEY) {
+      console.log('⚠️ No API key found, using fallback responses');
       const fallbackResponse = getFallbackResponse(message);
       return new Response(JSON.stringify({ reply: fallbackResponse }), {
         status: 200,
@@ -44,6 +47,7 @@ export default async (request, context) => {
     }
 
     try {
+      console.log('🤖 Attempting Gemini API call...');
       const geminiResponse = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${GEMINI_API_KEY}`,
         {
@@ -100,6 +104,7 @@ Pregunta del usuario: ${message}`
       }
 
       const data = await geminiResponse.json();
+      console.log('✅ Gemini API response received');
 
       if (!data.candidates || data.candidates.length === 0) {
         return new Response(JSON.stringify({ 

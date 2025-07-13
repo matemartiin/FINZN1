@@ -100,19 +100,41 @@ export class ChatManager {
     this.showTypingIndicator();
 
     try {
-      // Simple fallback response for now
-      const response = this.getFallbackResponse(message);
+      // Try to use AI chat function first
+      const response = await this.getAIResponse(message);
       
-      // Remove typing indicator and add bot response
-      setTimeout(() => {
-        this.hideTypingIndicator();
-        this.addMessage(response, 'bot');
-      }, 1000);
+      this.hideTypingIndicator();
+      this.addMessage(response, 'bot');
 
     } catch (error) {
       console.error('Chat error:', error);
       this.hideTypingIndicator();
-      this.addMessage('Lo siento, hubo un error. Intenta de nuevo.', 'bot');
+      const fallbackResponse = this.getFallbackResponse(message);
+      this.addMessage(fallbackResponse, 'bot');
+    }
+  }
+
+  async getAIResponse(message) {
+    try {
+      // Try to call the Netlify function for AI chat
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.reply || this.getFallbackResponse(message);
+    } catch (error) {
+      console.error('AI chat error:', error);
+      // Fallback to predefined responses
+      return this.getFallbackResponse(message);
     }
   }
 
