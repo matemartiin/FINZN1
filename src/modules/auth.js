@@ -72,6 +72,11 @@ export class AuthManager {
     try {
       console.log('📝 Attempting to register user:', email);
       
+      // Check if we have a valid Supabase client
+      if (!supabase || typeof supabase.auth?.signUp !== 'function') {
+        throw new Error('Supabase no está configurado correctamente. Verifica las variables de entorno.');
+      }
+      
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
@@ -91,6 +96,9 @@ export class AuthManager {
       if (error) {
         console.error('Registration error:', error);
         
+        // Log the full error for debugging
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+        
         // Handle specific error cases
         if (error.message.includes('User already registered')) {
           throw new Error('Este email ya está registrado. Intenta iniciar sesión.');
@@ -102,7 +110,13 @@ export class AuthManager {
           throw new Error('La contraseña debe tener al menos 6 caracteres.');
         }
         if (error.message.includes('signup is disabled')) {
-          throw new Error('El registro está temporalmente deshabilitado.');
+          throw new Error('El registro está deshabilitado en Supabase. Verifica la configuración en Authentication > Settings.');
+        }
+        if (error.message.includes('signups not allowed')) {
+          throw new Error('Los registros no están permitidos. Contacta al administrador.');
+        }
+        if (error.message.includes('Email signups are disabled')) {
+          throw new Error('Los registros por email están deshabilitados en Supabase. Ve a Authentication > Settings > Auth Providers > Email y actívalo.');
         }
         
         throw new Error(error.message);

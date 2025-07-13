@@ -288,6 +288,12 @@ class FinznApp {
     e.preventDefault();
     console.log('📝 Handling registration...');
     
+    // Clear any previous error messages
+    const errorElement = document.getElementById('register-error');
+    if (errorElement) {
+      errorElement.textContent = '';
+    }
+    
     const username = document.getElementById('register-user').value;
     const password = document.getElementById('register-pass').value;
 
@@ -317,6 +323,12 @@ class FinznApp {
       }
     } catch (error) {
       console.error('Register error:', error);
+      
+      // Show error in the form
+      if (errorElement) {
+        errorElement.textContent = error.message || 'Error al registrar usuario';
+      }
+      
       this.ui.showAlert(error.message || 'Error al registrar usuario', 'error');
     }
   }
