@@ -15,7 +15,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   
   // Create a mock client for development
   console.warn('⚠️ Creating mock Supabase client for development');
-  export const supabase = {
+  const mockClient = {
     auth: {
       signUp: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
       signInWithPassword: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
@@ -31,13 +31,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
       delete: () => Promise.resolve({ error: null })
     })
   };
+  
+  export { mockClient as supabase };
 } else {
   console.log('✅ Creating real Supabase client');
-  export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  const realClient = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false
     }
   });
+  
+  export { realClient as supabase };
 }
