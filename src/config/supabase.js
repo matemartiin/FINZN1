@@ -10,12 +10,13 @@ console.log('🔧 Supabase Config Check:', {
   key: supabaseAnonKey ? 'Present' : 'Missing'
 })
 
+let supabase;
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('❌ Missing Supabase environment variables')
-  
-  // Create a mock client for development
   console.warn('⚠️ Creating mock Supabase client for development');
-  const mockClient = {
+  
+  supabase = {
     auth: {
       signUp: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
       signInWithPassword: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
@@ -31,17 +32,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
       delete: () => Promise.resolve({ error: null })
     })
   };
-  
-  export { mockClient as supabase };
 } else {
   console.log('✅ Creating real Supabase client');
-  const realClient = createClient(supabaseUrl, supabaseAnonKey, {
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false
     }
   });
-  
-  export { realClient as supabase };
 }
+
+export { supabase };
