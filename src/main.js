@@ -115,6 +115,7 @@ class FinznApp {
     const showRegister = document.getElementById('show-register');
     const showLogin = document.getElementById('show-login');
     const logoutBtn = document.getElementById('logout-btn');
+    const generateTestEmail = document.getElementById('generate-test-email');
     
     if (loginForm) {
       loginForm.addEventListener('submit', (e) => this.handleLogin(e));
@@ -134,6 +135,17 @@ class FinznApp {
     
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => this.handleLogout());
+    }
+    
+    if (generateTestEmail) {
+      generateTestEmail.addEventListener('click', () => {
+        const testEmail = this.auth.generateTestEmail();
+        const emailInput = document.getElementById('register-user');
+        if (emailInput) {
+          emailInput.value = testEmail;
+          this.ui.showAlert('Email de prueba generado', 'info');
+        }
+      });
     }
   }
 

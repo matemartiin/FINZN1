@@ -38,33 +38,59 @@ export class AuthManager {
 
   async login(email, password) {
     try {
+      console.log('🔐 Attempting login for:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
+        email: email.trim(),
         password: password,
       });
 
       if (error) {
         console.error('Login error:', error);
-        return false;
+        
+        // Handle specific error cases
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Email o contraseña incorrectos');
+        }
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Por favor confirma tu email antes de iniciar sesión');
+        }
+        
+        throw new Error(error.message);
       }
 
+      console.log('✅ Login successful:', data.user?.email);
       this.currentUser = data.user;
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      throw error;
     }
   }
 
   async register(email, password) {
     try {
-      console.log('Attempting to register user:', email);
+      console.log('📝 Attempting to register user:', email);
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error('Por favor ingresa un email válido');
+      }
+      
+      // Validate password
+      if (password.length < 6) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres');
+      }
       
       const { data, error } = await supabase.auth.signUp({
-        email: email,
+        email: email.trim(),
         password: password,
         options: {
-          emailRedirectTo: undefined // Disable email confirmation
+          emailRedirectTo: undefined, // Disable email confirmation for now
+          data: {
+            email_confirm: true
+          }
         }
       });
 
@@ -81,19 +107,29 @@ export class AuthManager {
         if (error.message.includes('Password')) {
           throw new Error('La contraseña debe tener al menos 6 caracteres.');
         }
+        if (error.message.includes('signup is disabled')) {
+          throw new Error('El registro está temporalmente deshabilitado.');
+        }
         
-        return false;
+        throw new Error(error.message);
       }
 
-      console.log('Registration successful:', data);
+      console.log('✅ Registration successful:', data);
       
       // Check if user was created successfully
       if (data.user) {
         console.log('User created successfully, ID:', data.user.id);
-        return true;
+        
+        // If email confirmation is disabled, user should be able to login immediately
+        if (data.user.email_confirmed_at || data.session) {
+          this.currentUser = data.user;
+          return { success: true, needsConfirmation: false };
+        } else {
+          return { success: true, needsConfirmation: true };
+        }
       }
 
-      return true;
+      return { success: true, needsConfirmation: false };
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -102,6 +138,7 @@ export class AuthManager {
 
   async logout() {
     try {
+      console.log('👋 Logging out...');
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Logout error:', error);
@@ -134,5 +171,12 @@ export class AuthManager {
         localStorage.removeItem(key);
       }
     });
+  }
+
+  // Helper method to generate a random email for testing
+  generateTestEmail() {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    return `test${timestamp}${random}@finzn.app`;
   }
 }

@@ -65,9 +65,16 @@
       <form id="register-form" class="auth-form">
         <div class="input-group">
           <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" />
+          <small class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
         </div>
         <div class="input-group">
           <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" />
+          <small class="input-hint">Mínimo 6 caracteres</small>
+        </div>
+        <div class="input-group">
+          <button type="button" id="generate-test-email" class="btn btn-secondary btn-sm">
+            🎲 Generar email de prueba
+          </button>
         </div>
         <button type="submit" class="btn btn-primary btn-full">
           <span>🚀</span>
