@@ -547,7 +547,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Dashboard Grid */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
   gap: var(--spacing-xl);
 }
 
@@ -559,10 +560,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Summary Cards */
 .summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  display: contents;
 }
 
 .summary-card {
@@ -761,6 +759,19 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes tooltipFadeIn {
   0%, 80% { opacity: 0; transform: translateX(-50%) translateY(10px); }
   100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Orden específico de las cards */
+.balance-card-new {
+  order: 1;
+}
+
+.income-card {
+  order: 2;
+}
+
+.expenses-card {
+  order: 3;
 }
 
 /* Section Content */
@@ -2586,8 +2597,19 @@ h1, h2, h3, h4, h5, h6 {
     padding: var(--spacing-lg);
   }
   
-  .summary-cards {
+  .dashboard-grid {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .summary-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .chart-section {
+    grid-column: 1;
   }
   
   .chart-content-with-mascot {
