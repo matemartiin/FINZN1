@@ -657,6 +657,69 @@
     </div>
   </div>
 
+  <!-- Generate AI Report Modal -->
+  <div id="generate-ai-report-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🤖 Generar Informe Financiero con IA</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-report-options">
+          <div class="form-group">
+            <label for="report-period">Período del Informe</label>
+            <select id="report-period" name="period">
+              <option value="current">Mes Actual</option>
+              <option value="last3">Últimos 3 Meses</option>
+              <option value="last6">Últimos 6 Meses</option>
+              <option value="year">Año Completo</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="report-focus">Enfoque del Informe</label>
+            <select id="report-focus" name="focus">
+              <option value="general">Análisis General</option>
+              <option value="savings">Enfoque en Ahorros</option>
+              <option value="expenses">Análisis de Gastos</option>
+              <option value="budget">Optimización de Presupuesto</option>
+              <option value="goals">Progreso hacia Objetivos</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="report-questions">Preguntas Específicas (Opcional)</label>
+            <textarea id="report-questions" name="questions" rows="3" placeholder="¿Hay algo específico que te gustaría saber sobre tus finanzas?"></textarea>
+          </div>
+        </div>
+        
+        <div id="ai-report-result" class="ai-report-result hidden">
+          <h3>📊 Tu Informe Financiero Personalizado</h3>
+          <div id="ai-report-content" class="ai-report-content">
+            <!-- El informe generado aparecerá aquí -->
+          </div>
+          <div class="ai-report-actions">
+            <button id="download-report-btn" class="btn btn-secondary">
+              <span>📄</span>
+              Descargar PDF
+            </button>
+            <button id="share-report-btn" class="btn btn-secondary">
+              <span>📤</span>
+              Compartir
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="button" id="generate-report-btn" class="btn btn-primary">
+          <span>🤖</span>
+          Generar Informe
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Chat Widget -->
   <div id="chat-widget" class="chat-widget">
     <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">

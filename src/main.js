@@ -706,6 +706,165 @@ class FinznApp {
       this.ui.showAlert('Error al crear el límite de gasto', 'error');
     }
   }
+  
+  async handleGenerateAiReport() {
+    console.log('🤖 Generating AI report...');
+    
+    const period = document.getElementById('report-period').value;
+    const focus = document.getElementById('report-focus').value;
+    const questions = document.getElementById('report-questions').value;
+    
+    const resultDiv = document.getElementById('ai-report-result');
+    const contentDiv = document.getElementById('ai-report-content');
+    const generateBtn = document.getElementById('generate-report-btn');
+    
+    // Show loading state
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<div class="loading-spinner"></div> Generando...';
+    
+    try {
+      // Prepare data for AI analysis
+      const reportData = await this.prepareReportData(period);
+      
+      // Generate report with AI
+      const report = await this.generateAiReport(reportData, focus, questions);
+      
+      // Show result
+      contentDiv.innerHTML = report;
+      resultDiv.classList.remove('hidden');
+      
+      this.ui.showAlert('Informe generado exitosamente', 'success');
+      
+    } catch (error) {
+      console.error('Error generating AI report:', error);
+      this.ui.showAlert('Error al generar el informe', 'error');
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = '<span>🤖</span> Generar Informe';
+    }
+  }
+  
+  async prepareReportData(period) {
+    // Prepare financial data for AI analysis
+    const currentMonth = this.getCurrentMonth();
+    let months = [currentMonth];
+    
+    if (period === 'last3') {
+      months = this.getLastMonths(3);
+    } else if (period === 'last6') {
+      months = this.getLastMonths(6);
+    } else if (period === 'year') {
+      months = this.getLastMonths(12);
+    }
+    
+    const data = {
+      period,
+      months: months.length,
+      totalExpenses: 0,
+      totalIncome: 0,
+      categories: {},
+      goals: this.data.getGoals(),
+      spendingLimits: this.data.getSpendingLimits()
+    };
+    
+    // Aggregate data from all months
+    for (const month of months) {
+      const expenses = await this.data.loadExpenses(month);
+      const income = await this.data.loadIncome(month);
+      const extraIncomes = await this.data.loadExtraIncomes(month);
+      
+      data.totalExpenses += expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      data.totalIncome += parseFloat(income.fixed) + parseFloat(income.extra) + 
+                         extraIncomes.reduce((sum, extra) => sum + parseFloat(extra.amount), 0);
+      
+      // Aggregate by category
+      expenses.forEach(exp => {
+        data.categories[exp.category] = (data.categories[exp.category] || 0) + parseFloat(exp.amount);
+      });
+    }
+    
+    return data;
+  }
+  
+  async generateAiReport(data, focus, questions) {
+    // For now, generate a basic report structure
+    // This can be enhanced with actual AI integration later
+    
+    const balance = data.totalIncome - data.totalExpenses;
+    const savingsRate = data.totalIncome > 0 ? ((balance / data.totalIncome) * 100).toFixed(1) : 0;
+    
+    let report = `
+      <h4>📊 Resumen Financiero</h4>
+      <p><strong>Período:</strong> ${this.getPeriodText(data.period)}</p>
+      <p><strong>Ingresos Totales:</strong> ${this.ui.formatCurrency(data.totalIncome)}</p>
+      <p><strong>Gastos Totales:</strong> ${this.ui.formatCurrency(data.totalExpenses)}</p>
+      <p><strong>Balance:</strong> ${this.ui.formatCurrency(balance)}</p>
+      <p><strong>Tasa de Ahorro:</strong> ${savingsRate}%</p>
+      
+      <h4>💡 Análisis y Recomendaciones</h4>
+    `;
+    
+    // Add analysis based on focus
+    if (focus === 'savings') {
+      report += `
+        <p>Tu tasa de ahorro actual es del ${savingsRate}%. ${savingsRate >= 20 ? 
+          '¡Excelente! Estás ahorrando muy bien.' : 
+          'Te recomendamos intentar ahorrar al menos el 20% de tus ingresos.'}</p>
+      `;
+    } else if (focus === 'expenses') {
+      const topCategory = Object.keys(data.categories).reduce((a, b) => 
+        data.categories[a] > data.categories[b] ? a : b, '');
+      report += `
+        <p>Tu mayor gasto es en <strong>${topCategory}</strong> con ${this.ui.formatCurrency(data.categories[topCategory])}.</p>
+        <p>Considera revisar esta categoría para encontrar oportunidades de ahorro.</p>
+      `;
+    }
+    
+    // Add category breakdown
+    report += `<h4>📈 Gastos por Categoría</h4><ul>`;
+    Object.entries(data.categories)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .forEach(([category, amount]) => {
+        const percentage = ((amount / data.totalExpenses) * 100).toFixed(1);
+        report += `<li><strong>${category}:</strong> ${this.ui.formatCurrency(amount)} (${percentage}%)</li>`;
+      });
+    report += `</ul>`;
+    
+    if (questions) {
+      report += `
+        <h4>❓ Respuesta a tus Preguntas</h4>
+        <p><em>"${questions}"</em></p>
+        <p>Basándome en tus datos financieros, te recomiendo revisar tus patrones de gasto y establecer objetivos específicos de ahorro.</p>
+      `;
+    }
+    
+    return report;
+  }
+  
+  getPeriodText(period) {
+    const periods = {
+      'current': 'Mes Actual',
+      'last3': 'Últimos 3 Meses',
+      'last6': 'Últimos 6 Meses',
+      'year': 'Año Completo'
+    };
+    return periods[period] || 'Período Seleccionado';
+  }
+  
+  getLastMonths(count) {
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 0; i < count; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      months.push(monthKey);
+    }
+    
+    return months;
+  }
+  
   // Expense management methods
   showEditExpenseModal(expenseId) {
     console.log('✏️ Edit expense:', expenseId);
