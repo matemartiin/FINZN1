@@ -898,13 +898,14 @@ body {
 
 .spending-limit-summary-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: var(--spacing-md);
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
   border-left: 4px solid;
   position: relative;
+  gap: var(--spacing-md);
 }
 
 .spending-limit-summary-item.safe {
@@ -933,6 +934,7 @@ body {
   align-items: center;
   gap: var(--spacing-sm);
   margin-left: var(--spacing-md);
+  flex: 1;
 }
 
 .limit-status-icon {
@@ -946,6 +948,7 @@ body {
 
 .limit-progress-info {
   text-align: right;
+  flex: 1;
 }
 
 .limit-amount-info {
@@ -958,6 +961,12 @@ body {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.limit-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
 .trend-chart-container {

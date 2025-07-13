@@ -152,38 +152,25 @@ export class UIManager {
 
   // FIXED: Spending limits with REAL functional semaphore
   updateSpendingLimitsList(limits, expenses) {
-    const container = document.getElementById('spending-limits-list');
     const summaryContainer = document.getElementById('spending-limits-summary');
     
     console.log('🚦 Updating spending limits UI:', { limits: limits.length, expenses: expenses.length });
     
-    if (!container) {
-      console.error('❌ spending-limits-list container not found');
-      return;
-    }
-    
-    container.innerHTML = '';
     if (summaryContainer) {
       summaryContainer.innerHTML = '';
     }
 
     if (limits.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">⚠️</div>
-          <h3>No tienes límites de gasto configurados</h3>
-          <p>Establece límites para controlar mejor tus gastos</p>
-          <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
-            <span>➕</span>
-            Agregar Límite
-          </button>
-        </div>
-      `;
-      
       if (summaryContainer) {
         summaryContainer.innerHTML = `
           <div class="empty-state">
-            <p>No hay límites configurados</p>
+            <div class="empty-icon">⚠️</div>
+            <h3>No tienes límites de gasto configurados</h3>
+            <p>Establece límites para controlar mejor tus gastos</p>
+            <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+              <span>➕</span>
+              Agregar Límite
+            </button>
           </div>
         `;
       }
@@ -229,34 +216,7 @@ export class UIManager {
       
       console.log('🚦 Creating limit item:', { category: limit.category, percentage, statusClass });
       
-      // Add to main list
-      const item = document.createElement('div');
-      item.className = 'spending-limit-item fade-in';
-      
-      item.innerHTML = `
-        <div class="spending-limit-info">
-          <div class="spending-limit-category">${limit.category}</div>
-          <div class="spending-limit-amount">Límite: ${this.formatCurrency(limit.amount)}</div>
-        </div>
-        <div class="spending-limit-progress">
-          <div class="spending-limit-bar">
-            <div class="spending-limit-fill ${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
-          </div>
-          <div class="spending-limit-text">${this.formatCurrency(currentSpent)} / ${this.formatCurrency(limit.amount)} (${percentage.toFixed(1)}%)</div>
-        </div>
-        <div class="spending-limit-actions">
-          <button class="expense-action-btn edit-btn" onclick="window.app.editSpendingLimit('${limit.id}')" title="Editar">
-            ✏️
-          </button>
-          <button class="expense-action-btn delete-btn" onclick="window.app.deleteSpendingLimit('${limit.id}')" title="Eliminar">
-            🗑️
-          </button>
-        </div>
-      `;
-      
-      container.appendChild(item);
-      
-      // Add to summary card with FUNCTIONAL SEMAPHORE
+      // Add to summary card with FUNCTIONAL SEMAPHORE and actions
       if (summaryContainer) {
         const summaryItem = document.createElement('div');
         summaryItem.className = `spending-limit-summary-item ${statusClass}`;
@@ -269,6 +229,14 @@ export class UIManager {
           <div class="limit-progress-info">
             <div class="limit-amount-info">${this.formatCurrency(currentSpent)} / ${this.formatCurrency(limit.amount)}</div>
             <div class="limit-percentage">${percentage.toFixed(1)}%</div>
+          </div>
+          <div class="limit-actions">
+            <button class="expense-action-btn edit-btn" onclick="window.app.editSpendingLimit('${limit.id}')" title="Editar límite">
+              ✏️
+            </button>
+            <button class="expense-action-btn delete-btn" onclick="window.app.deleteSpendingLimit('${limit.id}')" title="Eliminar límite">
+              🗑️
+            </button>
           </div>
         `;
         
