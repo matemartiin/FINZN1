@@ -1,5 +1,6 @@
 @@ .. @@
    async fetchWithRetry(url, options, retries = 3) {
+   }
 -    const baseUrl = window.location.origin.includes('localhost') 
 -      ? 'http://localhost:3001' 
 -      : window.location.origin;
@@ -12,3 +13,4 @@
 +    const fullUrl = `${baseUrl}${endpoint}`;
      
      for (let i = 0; i < retries; i++) {
+     }
