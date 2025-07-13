@@ -83,6 +83,9 @@ class FinznApp {
       // Dashboard events
       this.setupDashboardEvents();
       
+      // Modal events
+      this.setupModalEvents();
+      
       // Theme toggle
       const themeToggle = document.getElementById('theme-toggle');
       if (themeToggle) {
@@ -137,8 +140,14 @@ class FinznApp {
   setupDashboardEvents() {
     // Add expense buttons
     const addExpenseBtn = document.getElementById('add-expense-btn-dashboard');
+    const addExpenseBtnSection = document.getElementById('add-expense-btn');
+    
     if (addExpenseBtn) {
       addExpenseBtn.addEventListener('click', () => this.showAddExpenseModal());
+    }
+    
+    if (addExpenseBtnSection) {
+      addExpenseBtnSection.addEventListener('click', () => this.showAddExpenseModal());
     }
     
     // Add income button
@@ -151,6 +160,60 @@ class FinznApp {
     const installmentsBtn = document.getElementById('installments-btn');
     if (installmentsBtn) {
       installmentsBtn.addEventListener('click', () => this.showInstallmentsModal());
+    }
+    
+    // Add goal button
+    const addGoalBtn = document.getElementById('add-goal-btn');
+    if (addGoalBtn) {
+      addGoalBtn.addEventListener('click', () => this.showAddGoalModal());
+    }
+  }
+
+  setupModalEvents() {
+    // Add expense form
+    const addExpenseForm = document.getElementById('add-expense-form');
+    if (addExpenseForm) {
+      addExpenseForm.addEventListener('submit', (e) => this.handleAddExpense(e));
+    }
+    
+    // Add income form
+    const addIncomeForm = document.getElementById('add-income-form');
+    if (addIncomeForm) {
+      addIncomeForm.addEventListener('submit', (e) => this.handleAddIncome(e));
+    }
+    
+    // Add goal form
+    const addGoalForm = document.getElementById('add-goal-form');
+    if (addGoalForm) {
+      addGoalForm.addEventListener('submit', (e) => this.handleAddGoal(e));
+    }
+    
+    // Installments checkbox
+    const installmentsCheckbox = document.getElementById('expense-installments');
+    const installmentsGroup = document.getElementById('installments-group');
+    
+    if (installmentsCheckbox && installmentsGroup) {
+      installmentsCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          installmentsGroup.classList.remove('hidden');
+        } else {
+          installmentsGroup.classList.add('hidden');
+        }
+      });
+    }
+    
+    // Income type selector
+    const incomeType = document.getElementById('income-type');
+    const extraIncomeGroup = document.getElementById('extra-income-group');
+    
+    if (incomeType && extraIncomeGroup) {
+      incomeType.addEventListener('change', (e) => {
+        if (e.target.value === 'extra') {
+          extraIncomeGroup.classList.remove('hidden');
+        } else {
+          extraIncomeGroup.classList.add('hidden');
+        }
+      });
     }
   }
 
@@ -291,6 +354,12 @@ class FinznApp {
     console.log('📊 Loading user data...');
     try {
       await this.data.loadUserData();
+      
+      // Update categories in selects
+      const categories = this.data.getCategories();
+      this.ui.updateCategoriesSelect(categories, 'expense-category');
+      this.ui.updateCategoriesSelect(categories, 'category-filter');
+      
       console.log('✅ User data loaded successfully');
     } catch (error) {
       console.error('❌ Error loading user data:', error);
@@ -310,6 +379,11 @@ class FinznApp {
       
       // Update UI
       this.ui.updateBalance(balance);
+      this.ui.updateExpensesList(expenses, this);
+      
+      // Update goals
+      const goals = this.data.getGoals();
+      this.ui.updateGoalsList(goals);
       
       // Update charts
       const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
@@ -327,20 +401,193 @@ class FinznApp {
     }
   }
 
-  // Modal methods (placeholders for now)
+  // Modal methods
   showAddExpenseModal() {
     console.log('💳 Show add expense modal');
-    this.ui.showAlert('Función de agregar gasto próximamente', 'info');
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('expense-date');
+    if (dateInput) {
+      dateInput.value = today;
+    }
+    
+    this.modals.show('add-expense-modal');
   }
 
   showAddIncomeModal() {
     console.log('💰 Show add income modal');
-    this.ui.showAlert('Función de agregar ingreso próximamente', 'info');
+    this.modals.show('add-income-modal');
+  }
+
+  showAddGoalModal() {
+    console.log('🎯 Show add goal modal');
+    this.modals.show('add-goal-modal');
   }
 
   showInstallmentsModal() {
     console.log('📊 Show installments modal');
     this.ui.showAlert('Función de cuotas próximamente', 'info');
+  }
+
+  async handleAddExpense(e) {
+    e.preventDefault();
+    console.log('💳 Adding expense...');
+    
+    const formData = this.ui.getFormData('add-expense-form');
+    
+    if (!formData.description || !formData.amount || !formData.category || !formData.transactionDate) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    try {
+      const expenseData = {
+        description: formData.description,
+        amount: parseFloat(formData.amount),
+        category: formData.category,
+        transactionDate: formData.transactionDate,
+        month: this.currentMonth,
+        installment: 1,
+        totalInstallments: 1,
+        recurring: false
+      };
+      
+      // Handle installments
+      if (formData.hasInstallments && formData.installmentsCount) {
+        const installmentsCount = parseInt(formData.installmentsCount);
+        const monthlyAmount = expenseData.amount / installmentsCount;
+        
+        // Create installments for future months
+        for (let i = 0; i < installmentsCount; i++) {
+          const installmentDate = new Date(formData.transactionDate);
+          installmentDate.setMonth(installmentDate.getMonth() + i);
+          
+          const installmentMonth = `${installmentDate.getFullYear()}-${(installmentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+          
+          const installmentData = {
+            ...expenseData,
+            amount: monthlyAmount,
+            month: installmentMonth,
+            installment: i + 1,
+            totalInstallments: installmentsCount,
+            transactionDate: installmentDate.toISOString().split('T')[0]
+          };
+          
+          await this.data.addExpense(installmentData);
+        }
+      } else {
+        await this.data.addExpense(expenseData);
+      }
+      
+      this.modals.hide('add-expense-modal');
+      this.ui.showAlert('Gasto agregado exitosamente', 'success');
+      this.updateDashboard();
+      
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      this.ui.showAlert('Error al agregar el gasto', 'error');
+    }
+  }
+
+  async handleAddIncome(e) {
+    e.preventDefault();
+    console.log('💰 Adding income...');
+    
+    const formData = this.ui.getFormData('add-income-form');
+    
+    if (!formData.amount || !formData.type) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    try {
+      const currentIncome = this.data.getIncome(this.currentMonth);
+      
+      if (formData.type === 'fixed') {
+        await this.data.updateIncome(this.currentMonth, {
+          fixed: parseFloat(formData.amount),
+          extra: currentIncome.extra
+        });
+      } else {
+        await this.data.updateIncome(this.currentMonth, {
+          fixed: currentIncome.fixed,
+          extra: currentIncome.extra + parseFloat(formData.amount)
+        });
+      }
+      
+      this.modals.hide('add-income-modal');
+      this.ui.showAlert('Ingreso agregado exitosamente', 'success');
+      this.updateDashboard();
+      
+    } catch (error) {
+      console.error('Error adding income:', error);
+      this.ui.showAlert('Error al agregar el ingreso', 'error');
+    }
+  }
+
+  async handleAddGoal(e) {
+    e.preventDefault();
+    console.log('🎯 Adding goal...');
+    
+    const formData = this.ui.getFormData('add-goal-form');
+    
+    if (!formData.name || !formData.targetAmount) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    try {
+      const goalData = {
+        name: formData.name,
+        targetAmount: parseFloat(formData.targetAmount),
+        currentAmount: parseFloat(formData.currentAmount) || 0
+      };
+      
+      await this.data.addGoal(goalData);
+      
+      this.modals.hide('add-goal-modal');
+      this.ui.showAlert('Objetivo creado exitosamente', 'success');
+      this.updateDashboard();
+      
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      this.ui.showAlert('Error al crear el objetivo', 'error');
+    }
+  }
+
+  // Expense management methods
+  showEditExpenseModal(expenseId) {
+    console.log('✏️ Edit expense:', expenseId);
+    this.ui.showAlert('Función de editar gasto próximamente', 'info');
+  }
+
+  showDeleteConfirmation(expenseId, description) {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${description}"?`)) {
+      this.deleteExpense(expenseId);
+    }
+  }
+
+  async deleteExpense(expenseId) {
+    try {
+      await this.data.deleteExpense(expenseId);
+      this.ui.showAlert('Gasto eliminado exitosamente', 'success');
+      this.updateDashboard();
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      this.ui.showAlert('Error al eliminar el gasto', 'error');
+    }
+  }
+
+  // Goal management methods
+  addToGoal(goalId) {
+    console.log('💰 Add to goal:', goalId);
+    this.ui.showAlert('Función de agregar a objetivo próximamente', 'info');
+  }
+
+  editGoal(goalId) {
+    console.log('✏️ Edit goal:', goalId);
+    this.ui.showAlert('Función de editar objetivo próximamente', 'info');
   }
 
   getCurrentMonth() {
