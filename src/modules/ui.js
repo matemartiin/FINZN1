@@ -534,6 +534,45 @@ export class UIManager {
     console.log('✅ Installments list updated successfully');
   }
 
+  // Categories Management UI
+  updateCategoriesManagementList(categories) {
+    const container = document.getElementById('categories-management-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (categories.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <p>No hay categorías personalizadas</p>
+        </div>
+      `;
+      return;
+    }
+
+    categories.forEach(category => {
+      const item = document.createElement('div');
+      item.className = 'category-management-item';
+      item.style.borderLeftColor = category.color;
+      
+      item.innerHTML = `
+        <div class="category-info">
+          <div class="category-icon-display" style="background-color: ${category.color}20;">
+            ${category.icon}
+          </div>
+          <div class="category-name-display">${category.name}</div>
+        </div>
+        <div class="category-actions">
+          <button class="expense-action-btn delete-btn" onclick="window.app.deleteCategory('${category.id}')" title="Eliminar">
+            🗑️
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
   clearForm(formId) {
     const form = document.getElementById(formId);
     if (form) {

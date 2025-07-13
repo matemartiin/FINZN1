@@ -595,6 +595,201 @@ export class DataManager {
     return this.data.achievements;
   }
 
+  // Categories Management
+  async addCategory(categoryData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      console.log('🏷️ Adding category:', categoryData);
+      
+      const category = {
+        user_id: userId,
+        name: categoryData.name,
+        icon: categoryData.icon,
+        color: categoryData.color
+      };
+
+      const { data, error } = await supabase
+        .from('categories')
+        .insert([category])
+        .select();
+
+      if (error) {
+        console.error('Error adding category:', error);
+        return false;
+      }
+
+      this.data.categories.push(data[0]);
+      console.log('✅ Category added successfully');
+      return true;
+    } catch (error) {
+      console.error('Error in addCategory:', error);
+      return false;
+    }
+  }
+
+  async deleteCategory(categoryId) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', categoryId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error deleting category:', error);
+        return false;
+      }
+
+      this.data.categories = this.data.categories.filter(cat => cat.id !== categoryId);
+      return true;
+    } catch (error) {
+      console.error('Error in deleteCategory:', error);
+      return false;
+    }
+  }
+
+  // Export/Import Data
+  exportDataToCSV(type = 'expenses') {
+    try {
+      let data = [];
+      let filename = '';
+      let headers = [];
+
+      if (type === 'expenses') {
+        // Export all expenses
+        const allExpenses = [];
+        Object.values(this.data.expenses).forEach(monthExpenses => {
+          allExpenses.push(...monthExpenses);
+        });
+        
+        headers = ['descripcion', 'monto', 'categoria', 'fecha', 'mes'];
+        data = allExpenses.map(expense => [
+          expense.description,
+          expense.amount,
+          expense.category,
+          expense.transaction_date,
+          expense.month
+        ]);
+        filename = 'finzn_gastos.csv';
+        
+      } else if (type === 'incomes') {
+        // Export all incomes
+        const allIncomes = [];
+        
+        // Fixed incomes
+        Object.entries(this.data.income).forEach(([month, income]) => {
+          if (income.fixed > 0) {
+            allIncomes.push(['fijo', income.fixed, 'Sueldo mensual', month]);
+          }
+        });
+        
+        // Extra incomes
+        Object.values(this.data.extraIncomes).forEach(monthIncomes => {
+          monthIncomes.forEach(income => {
+            allIncomes.push(['extra', income.amount, income.description, income.month]);
+          });
+        });
+        
+        headers = ['tipo', 'monto', 'descripcion', 'mes'];
+        data = allIncomes;
+        filename = 'finzn_ingresos.csv';
+      }
+
+      // Create CSV content
+      const csvContent = [headers, ...data]
+        .map(row => row.map(field => `"${field}"`).join(','))
+        .join('\n');
+
+      // Download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      return true;
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      return false;
+    }
+  }
+
+  async importDataFromCSV(file, type = 'expenses') {
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        throw new Error('El archivo CSV debe tener al menos una fila de datos');
+      }
+
+      const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+      const dataRows = lines.slice(1);
+      
+      let imported = 0;
+      let errors = 0;
+
+      for (const row of dataRows) {
+        try {
+          const values = row.split(',').map(v => v.replace(/"/g, '').trim());
+          
+          if (type === 'expenses') {
+            // Expected: descripcion,monto,categoria,fecha
+            if (values.length >= 4) {
+              const expenseData = {
+                description: values[0],
+                amount: parseFloat(values[1]),
+                category: values[2],
+                transactionDate: values[3],
+                month: values[3].substring(0, 7), // YYYY-MM
+                installment: 1,
+                totalInstallments: 1,
+                recurring: false
+              };
+              
+              await this.addExpense(expenseData);
+              imported++;
+            }
+          } else if (type === 'incomes') {
+            // Expected: tipo,monto,descripcion,fecha
+            if (values.length >= 4) {
+              const month = values[3].substring(0, 7); // YYYY-MM
+              
+              if (values[0].toLowerCase() === 'fijo') {
+                await this.addFixedIncome(month, parseFloat(values[1]));
+              } else {
+                const incomeData = {
+                  description: values[2],
+                  amount: parseFloat(values[1]),
+                  category: 'other'
+                };
+                await this.addExtraIncome(month, incomeData);
+              }
+              imported++;
+            }
+          }
+        } catch (rowError) {
+          console.error('Error importing row:', row, rowError);
+          errors++;
+        }
+      }
+
+      return { imported, errors };
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      throw error;
+    }
+  }
+
   // Balance calculations - FIXED
   calculateBalance(month) {
     console.log('💰 Calculating balance for month:', month);

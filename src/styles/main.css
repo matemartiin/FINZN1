@@ -1277,7 +1277,7 @@ body {
 .settings-grid {
   display: grid;
   gap: var(--spacing-xl);
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .settings-card {
@@ -1305,6 +1305,131 @@ body {
   margin-bottom: var(--spacing-lg);
   color: var(--text-secondary);
   font-weight: 600;
+}
+
+/* Categories Management */
+.categories-management {
+  display: grid;
+  gap: var(--spacing-2xl);
+  grid-template-columns: 1fr 1fr;
+}
+
+.add-category-section,
+.categories-list-section {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.add-category-section h3,
+.categories-list-section h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+  font-weight: 900;
+}
+
+.category-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.categories-management-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.category-management-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+  border-left: 4px solid;
+  transition: all var(--transition-normal);
+}
+
+.category-management-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.category-icon-display {
+  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+}
+
+.category-name-display {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.category-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* Import/Export */
+.import-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.file-upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  background: var(--bg-secondary);
+  transition: all var(--transition-normal);
+}
+
+.file-upload-area:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-primary);
+}
+
+.file-upload-area input[type="file"] {
+  margin-bottom: var(--spacing-lg);
+}
+
+.file-upload-info {
+  text-align: left;
+}
+
+.file-upload-info ul {
+  margin-left: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.import-options {
+  display: flex;
+  gap: var(--spacing-xl);
+}
+
+.import-options label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* Spending Limits */

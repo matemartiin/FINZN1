@@ -740,6 +740,28 @@ class FinznApp {
     this.ui.showAlert('Función de editar objetivo próximamente', 'info');
   }
 
+  // Category management methods
+  async deleteCategory(categoryId) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
+      try {
+        await this.data.deleteCategory(categoryId);
+        this.ui.showAlert('Categoría eliminada exitosamente', 'success');
+        
+        // Update categories list
+        const categories = this.data.getCategories();
+        this.ui.updateCategoriesManagementList(categories);
+        
+        // Update selects
+        this.ui.updateCategoriesSelect(categories, 'expense-category');
+        this.ui.updateCategoriesSelect(categories, 'category-filter');
+        this.ui.updateCategoriesSelect(categories, 'limit-category');
+        
+      } catch (error) {
+        console.error('Error deleting category:', error);
+        this.ui.showAlert('Error al eliminar la categoría', 'error');
+      }
+    }
+  }
   // Spending limit management methods
   editSpendingLimit(limitId) {
     console.log('✏️ Edit spending limit:', limitId);
