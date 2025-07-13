@@ -185,15 +185,11 @@ export class UIManager {
       const percentage = (currentSpent / limit.amount) * 100;
       
       let statusClass = 'safe';
-      let semaphore = '🚦';
-      let semaphoreColor = '#4CAF50'; // Verde
       
       if (percentage >= 100) {
         statusClass = 'danger';
-        semaphoreColor = '#F44336'; // Rojo
       } else if (percentage >= limit.warning_percentage) {
         statusClass = 'warning';
-        semaphoreColor = '#FF9800'; // Amarillo
       }
       
       // Add to main list
@@ -228,8 +224,17 @@ export class UIManager {
         const summaryItem = document.createElement('div');
         summaryItem.className = `spending-limit-summary-item ${statusClass}`;
         
+        // Crear semáforo funcional
+        const semaphoreHtml = `
+          <div class="limit-semaphore">
+            <div class="semaphore-light red ${statusClass === 'danger' ? 'active' : ''}"></div>
+            <div class="semaphore-light yellow ${statusClass === 'warning' ? 'active' : ''}"></div>
+            <div class="semaphore-light green ${statusClass === 'safe' ? 'active' : ''}"></div>
+          </div>
+        `;
+        
         summaryItem.innerHTML = `
-          <div class="limit-semaphore" style="color: ${semaphoreColor}">${semaphore}</div>
+          ${semaphoreHtml}
           <div class="limit-category-info">
             <span class="limit-category-name">${limit.category}</span>
           </div>
@@ -369,11 +374,18 @@ export class UIManager {
   updateIncomeDetails(income, extraIncomes = []) {
     const allIncomesList = document.getElementById('all-incomes-list');
     const incomesIndicator = document.getElementById('incomes-indicator');
+    const incomeSummary = document.getElementById('income-summary');
     
     // Update indicator count
     let totalIncomes = 0;
     if (income.fixed > 0) totalIncomes++;
     if (extraIncomes.length > 0) totalIncomes += extraIncomes.length;
+    
+    // Update income summary in dashboard
+    if (incomeSummary) {
+      const totalIncome = income.fixed + income.extra;
+      incomeSummary.textContent = this.formatCurrency(totalIncome);
+    }
     
     if (incomesIndicator) {
       const countElement = incomesIndicator.querySelector('.indicator-count');

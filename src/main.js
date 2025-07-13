@@ -435,6 +435,7 @@ class FinznApp {
       // Load current month data
       const expenses = await this.data.loadExpenses(this.currentMonth);
       const income = await this.data.loadIncome(this.currentMonth);
+      const extraIncomes = await this.data.loadExtraIncomes(this.currentMonth);
       
       // Calculate balance
       const balance = this.data.calculateBalance(this.currentMonth);
@@ -442,6 +443,9 @@ class FinznApp {
       // Update UI
       this.ui.updateBalance(balance);
       this.ui.updateExpensesList(expenses, this);
+      
+      // Update income details (this will show the indicator and total)
+      this.ui.updateIncomeDetails(income, extraIncomes);
       
       // Update goals
       const goals = this.data.getGoals();
