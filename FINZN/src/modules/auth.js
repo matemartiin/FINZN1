@@ -46,26 +46,45 @@ export class AuthManager {
 
   async register(email, password) {
     try {
+      console.log('Attempting to register user:', email);
+      
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
+        options: {
+          emailRedirectTo: undefined // Disable email confirmation
+        }
       });
 
       if (error) {
         console.error('Registration error:', error);
+        
+        // Handle specific error cases
+        if (error.message.includes('User already registered')) {
+          throw new Error('Este email ya está registrado. Intenta iniciar sesión.');
+        }
+        if (error.message.includes('Invalid email')) {
+          throw new Error('Email inválido. Por favor verifica el formato.');
+        }
+        if (error.message.includes('Password')) {
+          throw new Error('La contraseña debe tener al menos 6 caracteres.');
+        }
+        
         return false;
       }
 
-      // For email confirmation disabled, user should be immediately available
-      if (data.user && !data.user.email_confirmed_at) {
-        // Auto-confirm for development (this would normally require email confirmation)
-        console.log('User registered successfully');
+      console.log('Registration successful:', data);
+      
+      // Check if user was created successfully
+      if (data.user) {
+        console.log('User created successfully, ID:', data.user.id);
+        return true;
       }
 
       return true;
     } catch (error) {
       console.error('Registration error:', error);
-      return false;
+      throw error;
     }
   }
 

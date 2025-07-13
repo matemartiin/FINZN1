@@ -155,8 +155,15 @@ class FinznApp {
       return;
     }
 
-    if (password.length < 4) {
-      this.ui.showAlert('La contraseña debe tener al menos 4 caracteres', 'error');
+    if (password.length < 6) {
+      this.ui.showAlert('La contraseña debe tener al menos 6 caracteres', 'error');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(username)) {
+      this.ui.showAlert('Por favor ingresa un email válido', 'error');
       return;
     }
 
@@ -164,13 +171,13 @@ class FinznApp {
       const success = await this.auth.register(username, password);
       if (success) {
         this.showLogin();
-        this.ui.showAlert('Cuenta creada exitosamente. Ahora puedes iniciar sesión.', 'success');
+        this.ui.showAlert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.', 'success');
       } else {
-        this.ui.showAlert('Error al crear la cuenta. El usuario ya existe.', 'error');
+        this.ui.showAlert('Error al crear la cuenta. Intenta con otro email.', 'error');
       }
     } catch (error) {
       console.error('Register error:', error);
-      this.ui.showAlert('Error al registrar usuario', 'error');
+      this.ui.showAlert(error.message || 'Error al registrar usuario', 'error');
     }
   }
 
