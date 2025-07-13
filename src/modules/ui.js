@@ -15,13 +15,14 @@ export class UIManager {
     if (balanceAmount) {
       balanceAmount.textContent = this.formatCurrency(balance.available);
       console.log('💰 Balance amount updated:', balance.available);
+      
       // Change color based on balance
       if (balance.available < 0) {
         balanceAmount.style.color = '#ef4444';
       } else if (balance.available < 1000) {
         balanceAmount.style.color = '#f59e0b';
       } else {
-        balanceAmount.style.color = '#C8B6FF'; // Lavanda from your palette
+        balanceAmount.style.color = '#C8B6FF';
       }
     }
     
@@ -68,7 +69,6 @@ export class UIManager {
       
       const category = this.getCategoryInfo(expense.category);
       
-      // Format transaction date for display
       const transactionDate = expense.transaction_date 
         ? new Date(expense.transaction_date).toLocaleDateString('es-ES', { 
             day: 'numeric', 
@@ -150,11 +150,17 @@ export class UIManager {
     });
   }
 
+  // FIXED: Spending limits with REAL functional semaphore
   updateSpendingLimitsList(limits, expenses) {
     const container = document.getElementById('spending-limits-list');
     const summaryContainer = document.getElementById('spending-limits-summary');
     
-    if (!container) return;
+    console.log('🚦 Updating spending limits UI:', { limits: limits.length, expenses: expenses.length });
+    
+    if (!container) {
+      console.error('❌ spending-limits-list container not found');
+      return;
+    }
     
     container.innerHTML = '';
     if (summaryContainer) {
@@ -185,18 +191,43 @@ export class UIManager {
     }
 
     limits.forEach(limit => {
-      // Calcular gasto actual en la categoría
       const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
       const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
       const percentage = (currentSpent / limit.amount) * 100;
       
       let statusClass = 'safe';
+      let semaphoreHtml = '';
       
       if (percentage >= 100) {
         statusClass = 'danger';
+        semaphoreHtml = `
+          <div class="functional-semaphore">
+            <div class="semaphore-light red active"></div>
+            <div class="semaphore-light yellow"></div>
+            <div class="semaphore-light green"></div>
+          </div>
+        `;
       } else if (percentage >= limit.warning_percentage) {
         statusClass = 'warning';
+        semaphoreHtml = `
+          <div class="functional-semaphore">
+            <div class="semaphore-light red"></div>
+            <div class="semaphore-light yellow active"></div>
+            <div class="semaphore-light green"></div>
+          </div>
+        `;
+      } else {
+        statusClass = 'safe';
+        semaphoreHtml = `
+          <div class="functional-semaphore">
+            <div class="semaphore-light red"></div>
+            <div class="semaphore-light yellow"></div>
+            <div class="semaphore-light green active"></div>
+          </div>
+        `;
       }
+      
+      console.log('🚦 Creating limit item:', { category: limit.category, percentage, statusClass });
       
       // Add to main list
       const item = document.createElement('div');
@@ -225,19 +256,10 @@ export class UIManager {
       
       container.appendChild(item);
       
-      // Add to summary card
+      // Add to summary card with FUNCTIONAL SEMAPHORE
       if (summaryContainer) {
         const summaryItem = document.createElement('div');
         summaryItem.className = `spending-limit-summary-item ${statusClass}`;
-        
-        // Crear semáforo funcional
-        const semaphoreHtml = `
-          <div class="limit-semaphore">
-            <div class="semaphore-light red ${statusClass === 'danger' ? 'active' : ''}"></div>
-            <div class="semaphore-light yellow ${statusClass === 'warning' ? 'active' : ''}"></div>
-            <div class="semaphore-light green ${statusClass === 'safe' ? 'active' : ''}"></div>
-          </div>
-        `;
         
         summaryItem.innerHTML = `
           ${semaphoreHtml}
@@ -253,6 +275,8 @@ export class UIManager {
         summaryContainer.appendChild(summaryItem);
       }
     });
+    
+    console.log('✅ Spending limits UI updated successfully');
   }
 
   updateCategoriesSelect(categories, selectId) {
@@ -276,10 +300,8 @@ export class UIManager {
     
     this.alertContainer.appendChild(alert);
     
-    // Trigger animation
     setTimeout(() => alert.classList.add('show'), 100);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
       alert.classList.remove('show');
       setTimeout(() => {
@@ -291,7 +313,6 @@ export class UIManager {
   }
 
   showMascotAlert(message, type = 'info') {
-    // Clear existing mascot alert
     if (this.mascotAlertTimeout) {
       clearTimeout(this.mascotAlertTimeout);
     }
@@ -299,7 +320,6 @@ export class UIManager {
     const mascotContainer = document.querySelector('.chart-mascot-container');
     if (!mascotContainer) return;
 
-    // Create or update tooltip
     let tooltip = mascotContainer.querySelector('.mascot-alert');
     if (!tooltip) {
       tooltip = document.createElement('div');
@@ -310,7 +330,6 @@ export class UIManager {
     tooltip.textContent = message;
     tooltip.className = `mascot-alert mascot-alert-${type} show`;
 
-    // Auto hide after 3 seconds
     this.mascotAlertTimeout = setTimeout(() => {
       tooltip.classList.remove('show');
     }, 3000);
@@ -326,7 +345,6 @@ export class UIManager {
   }
 
   getCategoryInfo(categoryName) {
-    // Get category info from data manager if available
     if (window.app && window.app.data) {
       const categories = window.app.data.getCategories();
       const category = categories.find(cat => cat.name === categoryName);
@@ -339,7 +357,6 @@ export class UIManager {
       }
     }
     
-    // Fallback to default categories
     const defaultCategories = {
       'Comida': { icon: '🍔', color: '#ef4444' },
       'Transporte': { icon: '🚗', color: '#3b82f6' },
@@ -357,42 +374,38 @@ export class UIManager {
     };
   }
 
-  // Utility methods for form handling
-  clearForm(formId) {
-    const form = document.getElementById(formId);
-    if (form) {
-      form.reset();
-    }
-  }
-
-  setFormData(formId, data) {
-    const form = document.getElementById(formId);
-    if (!form) return;
-
-    Object.keys(data).forEach(key => {
-      const input = form.querySelector(`[name="${key}"]`);
-      if (input) {
-        input.value = data[key];
-      }
-    });
-  }
-
+  // FIXED: Income details with proper counting and display
   updateIncomeDetails(income, extraIncomes = []) {
     const allIncomesList = document.getElementById('all-incomes-list');
     const incomesIndicator = document.getElementById('incomes-indicator');
     const incomeSummary = document.getElementById('income-summary');
     
-    // Update indicator count
+    console.log('💰 Updating income details:', { income, extraIncomes: extraIncomes.length });
+    
+    // Count total incomes
     let totalIncomes = 0;
     if (income.fixed > 0) totalIncomes++;
     if (extraIncomes.length > 0) totalIncomes += extraIncomes.length;
     
+    // Calculate total income amount
+    const extraIncomesTotal = extraIncomes.reduce((sum, extra) => sum + parseFloat(extra.amount), 0);
+    const totalIncome = income.fixed + income.extra + extraIncomesTotal;
+    
+    console.log('💰 Income calculation:', {
+      fixed: income.fixed,
+      extraFromTable: income.extra,
+      extraFromIncomes: extraIncomesTotal,
+      total: totalIncome,
+      count: totalIncomes
+    });
+    
     // Update income summary in dashboard
     if (incomeSummary) {
-      const totalIncome = income.fixed + income.extra;
       incomeSummary.textContent = this.formatCurrency(totalIncome);
+      console.log('💰 Income summary updated:', totalIncome);
     }
     
+    // Update indicator count
     if (incomesIndicator) {
       const countElement = incomesIndicator.querySelector('.indicator-count');
       if (countElement) {
@@ -404,8 +417,11 @@ export class UIManager {
       } else {
         incomesIndicator.classList.add('hidden');
       }
+      
+      console.log('💰 Income indicator updated:', totalIncomes);
     }
     
+    // Update modal content
     if (allIncomesList) {
       allIncomesList.innerHTML = '';
       
@@ -432,7 +448,7 @@ export class UIManager {
           allIncomesList.appendChild(fixedItem);
         }
         
-        // Add extra incomes
+        // Add extra incomes from extra_incomes table
         extraIncomes.forEach(extraIncome => {
           const item = document.createElement('div');
           item.className = 'income-list-item extra';
@@ -450,7 +466,29 @@ export class UIManager {
         });
       }
     }
+    
+    console.log('✅ Income details updated successfully');
   }
+
+  clearForm(formId) {
+    const form = document.getElementById(formId);
+    if (form) {
+      form.reset();
+    }
+  }
+
+  setFormData(formId, data) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    Object.keys(data).forEach(key => {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) {
+        input.value = data[key];
+      }
+    });
+  }
+
   getFormData(formId) {
     const form = document.getElementById(formId);
     if (!form) return {};
@@ -465,7 +503,6 @@ export class UIManager {
     return data;
   }
 
-  // Loading states
   showLoading(elementId) {
     const element = document.getElementById(elementId);
     if (element) {

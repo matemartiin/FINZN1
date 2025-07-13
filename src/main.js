@@ -615,17 +615,17 @@ class FinznApp {
     }
     
     try {
-      const currentIncome = this.data.getIncome(this.currentMonth);
-      
       if (formData.type === 'fixed') {
-        await this.data.updateIncome(this.currentMonth, {
-          fixed: parseFloat(formData.amount),
-          extra: currentIncome.extra
-        });
+        // Add fixed income
+        await this.data.addFixedIncome(this.currentMonth, formData.amount);
       } else {
-        await this.data.updateIncome(this.currentMonth, {
-          fixed: currentIncome.fixed,
-          extra: currentIncome.extra + parseFloat(formData.amount)
+        // Add extra income to extra_incomes table
+        const extraIncomeData = {
+          description: formData.description || 'Ingreso extra',
+          amount: formData.amount,
+          category: formData.category || 'other'
+        };
+        await this.data.addExtraIncome(this.currentMonth, extraIncomeData);
         });
       }
       

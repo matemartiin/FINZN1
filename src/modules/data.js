@@ -35,15 +35,16 @@ export class DataManager {
     try {
       console.log('📊 Loading user data for:', userId);
       
-      // Load all user data in parallel
-      await Promise.all([
-        this.loadCategories(),
-        this.loadGoals(),
-        this.loadSpendingLimits(),
-        this.loadAchievements(),
-        this.loadExpenses(this.currentMonth),
-        this.loadIncome(this.currentMonth)
-      ]);
+      // Load data in correct order - categories first, then everything else
+      await this.loadCategories();
+      await this.loadSpendingLimits();
+      await this.loadGoals();
+      await this.loadAchievements();
+      
+      // Load current month data
+      await this.loadExpenses(this.currentMonth);
+      await this.loadIncome(this.currentMonth);
+      await this.loadExtraIncomes(this.currentMonth);
       
       console.log('✅ User data loaded successfully');
     } catch (error) {
@@ -52,7 +53,6 @@ export class DataManager {
   }
 
   getCurrentUserId() {
-    // This will be set by the auth manager
     return window.app?.auth?.getCurrentUserId() || null;
   }
 
@@ -89,7 +89,6 @@ export class DataManager {
           color: cat.color
         }));
       } else {
-        // Create default categories for new user
         await this.createDefaultCategories();
       }
     } catch (error) {
@@ -129,6 +128,7 @@ export class DataManager {
     if (!userId) return [];
 
     try {
+      console.log('💳 Loading expenses for month:', month);
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
@@ -143,6 +143,7 @@ export class DataManager {
 
       const expenses = data || [];
       this.data.expenses[month] = expenses;
+      console.log('💳 Expenses loaded:', expenses.length, 'items');
       return expenses;
     } catch (error) {
       console.error('Error in loadExpenses:', error);
@@ -155,7 +156,7 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('💳 Adding expense with installments:', expenseData);
+      console.log('💳 Adding expense with data:', expenseData);
       
       const expense = {
         user_id: userId,
@@ -185,7 +186,6 @@ export class DataManager {
 
       console.log('✅ Expense added successfully:', data[0]);
       
-      // Update local data
       if (!this.data.expenses[expense.month]) {
         this.data.expenses[expense.month] = [];
       }
@@ -194,43 +194,6 @@ export class DataManager {
       return true;
     } catch (error) {
       console.error('Error in addExpense:', error);
-      return false;
-    }
-  }
-
-  async updateExpense(expenseId, expenseData) {
-    const userId = this.getCurrentUserId();
-    if (!userId) return false;
-
-    try {
-      const { error } = await supabase
-        .from('expenses')
-        .update({
-          description: expenseData.description,
-          amount: parseFloat(expenseData.amount),
-          category: expenseData.category,
-          transaction_date: expenseData.transactionDate
-        })
-        .eq('id', expenseId)
-        .eq('user_id', userId);
-
-      if (error) {
-        console.error('Error updating expense:', error);
-        return false;
-      }
-
-      // Update local data
-      const month = expenseData.month;
-      if (this.data.expenses[month]) {
-        const index = this.data.expenses[month].findIndex(exp => exp.id === expenseId);
-        if (index !== -1) {
-          this.data.expenses[month][index] = { ...this.data.expenses[month][index], ...expenseData };
-        }
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error in updateExpense:', error);
       return false;
     }
   }
@@ -251,7 +214,6 @@ export class DataManager {
         return false;
       }
 
-      // Update local data
       Object.keys(this.data.expenses).forEach(month => {
         this.data.expenses[month] = this.data.expenses[month].filter(exp => exp.id !== expenseId);
       });
@@ -267,13 +229,13 @@ export class DataManager {
     return this.data.expenses[month] || [];
   }
 
-  // Income
+  // Income - FIXED CALCULATION
   async loadIncome(month) {
     const userId = this.getCurrentUserId();
     if (!userId) return { fixed: 0, extra: 0 };
 
     try {
-      console.log('💰 Loading income for user:', userId, 'month:', month);
+      console.log('💰 Loading income for month:', month);
       
       const { data, error } = await supabase
         .from('incomes')
@@ -295,9 +257,6 @@ export class DataManager {
       console.log('💰 Income loaded:', income);
       this.data.income[month] = income;
       
-      // Also load extra incomes for complete picture
-      await this.loadExtraIncomes(month);
-      
       return income;
     } catch (error) {
       console.error('Error in loadIncome:', error);
@@ -305,34 +264,74 @@ export class DataManager {
     }
   }
 
-  async updateIncome(month, incomeData) {
+  async addFixedIncome(month, amount) {
     const userId = this.getCurrentUserId();
     if (!userId) return false;
 
     try {
+      console.log('💰 Adding fixed income:', amount, 'for month:', month);
+      
       const { error } = await supabase
         .from('incomes')
         .upsert({
           user_id: userId,
           month: month,
-          fixed_amount: parseFloat(incomeData.fixed) || 0,
-          extra_amount: parseFloat(incomeData.extra) || 0
+          fixed_amount: parseFloat(amount),
+          extra_amount: 0
         });
 
       if (error) {
-        console.error('Error updating income:', error);
+        console.error('Error adding fixed income:', error);
         return false;
       }
 
-      // Update local data
       this.data.income[month] = {
-        fixed: parseFloat(incomeData.fixed) || 0,
-        extra: parseFloat(incomeData.extra) || 0
+        fixed: parseFloat(amount),
+        extra: 0
       };
 
+      console.log('✅ Fixed income added successfully');
       return true;
     } catch (error) {
-      console.error('Error in updateIncome:', error);
+      console.error('Error in addFixedIncome:', error);
+      return false;
+    }
+  }
+
+  async addExtraIncome(month, incomeData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      console.log('💵 Adding extra income:', incomeData);
+      
+      const extraIncome = {
+        user_id: userId,
+        description: incomeData.description,
+        amount: parseFloat(incomeData.amount),
+        category: incomeData.category,
+        month: month
+      };
+
+      const { data, error } = await supabase
+        .from('extra_incomes')
+        .insert([extraIncome])
+        .select();
+
+      if (error) {
+        console.error('Error adding extra income:', error);
+        return false;
+      }
+
+      if (!this.data.extraIncomes[month]) {
+        this.data.extraIncomes[month] = [];
+      }
+      this.data.extraIncomes[month].unshift(data[0]);
+
+      console.log('✅ Extra income added successfully');
+      return true;
+    } catch (error) {
+      console.error('Error in addExtraIncome:', error);
       return false;
     }
   }
@@ -341,15 +340,14 @@ export class DataManager {
     return this.data.income[month] || { fixed: 0, extra: 0 };
   }
 
-  getExtraIncomes(month) {
-    return this.data.extraIncomes[month] || [];
-  }
-
+  // Extra Incomes - FIXED LOADING
   async loadExtraIncomes(month) {
     const userId = this.getCurrentUserId();
     if (!userId) return [];
 
     try {
+      console.log('💵 Loading extra incomes for month:', month);
+      
       const { data, error } = await supabase
         .from('extra_incomes')
         .select('*')
@@ -364,6 +362,7 @@ export class DataManager {
 
       const extraIncomes = data || [];
       this.data.extraIncomes[month] = extraIncomes;
+      console.log('💵 Extra incomes loaded:', extraIncomes.length, 'items');
       return extraIncomes;
     } catch (error) {
       console.error('Error in loadExtraIncomes:', error);
@@ -371,12 +370,16 @@ export class DataManager {
     }
   }
 
+  getExtraIncomes(month) {
+    return this.data.extraIncomes[month] || [];
+  }
+
+  // Trend Data
   async getTrendData() {
     const userId = this.getCurrentUserId();
     if (!userId) return [];
 
     try {
-      // Get last 6 months of data
       const months = [];
       const now = new Date();
       
@@ -473,12 +476,14 @@ export class DataManager {
     return this.data.goals;
   }
 
-  // Spending Limits
+  // Spending Limits - FIXED
   async loadSpendingLimits() {
     const userId = this.getCurrentUserId();
     if (!userId) return;
 
     try {
+      console.log('🚦 Loading spending limits for user:', userId);
+      
       const { data, error } = await supabase
         .from('spending_limits')
         .select('*')
@@ -490,6 +495,7 @@ export class DataManager {
       }
 
       this.data.spendingLimits = data || [];
+      console.log('🚦 Spending limits loaded:', this.data.spendingLimits.length, 'items');
     } catch (error) {
       console.error('Error in loadSpendingLimits:', error);
     }
@@ -504,7 +510,7 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('📊 DataManager: Adding spending limit for user:', userId, limitData);
+      console.log('🚦 Adding spending limit:', limitData);
       
       const limit = {
         user_id: userId,
@@ -513,56 +519,21 @@ export class DataManager {
         warning_percentage: parseInt(limitData.warningPercentage) || 80
       };
 
-      console.log('📝 Inserting limit data:', limit);
-      
       const { data, error } = await supabase
         .from('spending_limits')
         .insert([limit])
         .select();
 
       if (error) {
-        console.error('❌ Error adding spending limit:', error);
+        console.error('Error adding spending limit:', error);
         return false;
       }
 
-      console.log('✅ Spending limit added successfully:', data);
       this.data.spendingLimits.unshift(data[0]);
+      console.log('✅ Spending limit added successfully');
       return true;
     } catch (error) {
-      console.error('❌ Error in addSpendingLimit:', error);
-      return false;
-    }
-  }
-
-  async updateSpendingLimit(limitId, limitData) {
-    const userId = this.getCurrentUserId();
-    if (!userId) return false;
-
-    try {
-      const { error } = await supabase
-        .from('spending_limits')
-        .update({
-          category: limitData.category,
-          amount: parseFloat(limitData.amount),
-          warning_percentage: parseInt(limitData.warningPercentage) || 80
-        })
-        .eq('id', limitId)
-        .eq('user_id', userId);
-
-      if (error) {
-        console.error('Error updating spending limit:', error);
-        return false;
-      }
-
-      // Update local data
-      const index = this.data.spendingLimits.findIndex(limit => limit.id === limitId);
-      if (index !== -1) {
-        this.data.spendingLimits[index] = { ...this.data.spendingLimits[index], ...limitData };
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error in updateSpendingLimit:', error);
+      console.error('Error in addSpendingLimit:', error);
       return false;
     }
   }
@@ -583,7 +554,6 @@ export class DataManager {
         return false;
       }
 
-      // Update local data
       this.data.spendingLimits = this.data.spendingLimits.filter(limit => limit.id !== limitId);
       return true;
     } catch (error) {
@@ -619,23 +589,49 @@ export class DataManager {
     return this.data.achievements;
   }
 
-  // Balance calculations
+  // Balance calculations - FIXED
   calculateBalance(month) {
+    console.log('💰 Calculating balance for month:', month);
+    
     const expenses = this.getExpenses(month);
     const income = this.getIncome(month);
+    const extraIncomes = this.getExtraIncomes(month);
     
-    const totalExpenses = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
-    const totalIncome = income.fixed + income.extra;
+    console.log('💰 Balance calculation data:', {
+      expenses: expenses.length,
+      income,
+      extraIncomes: extraIncomes.length
+    });
+    
+    // Calculate total expenses
+    const totalExpenses = expenses.reduce((sum, expense) => {
+      const amount = parseFloat(expense.amount) || 0;
+      return sum + amount;
+    }, 0);
+    
+    // Calculate total income (fixed + extra from incomes table + extra_incomes table)
+    const fixedIncome = parseFloat(income.fixed) || 0;
+    const extraFromIncomes = parseFloat(income.extra) || 0;
+    const extraFromTable = extraIncomes.reduce((sum, extraIncome) => {
+      const amount = parseFloat(extraIncome.amount) || 0;
+      return sum + amount;
+    }, 0);
+    
+    const totalIncome = fixedIncome + extraFromIncomes + extraFromTable;
     const available = totalIncome - totalExpenses;
     
+    // Count installments
     const installments = expenses.filter(exp => exp.total_installments > 1).length;
     
-    return {
+    const result = {
       totalIncome,
       totalExpenses,
       available,
       installments
     };
+    
+    console.log('💰 Balance calculated:', result);
+    return result;
   }
 
   // Category analysis
@@ -645,7 +641,8 @@ export class DataManager {
     
     expenses.forEach(expense => {
       const category = expense.category;
-      categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(expense.amount);
+      const amount = parseFloat(expense.amount) || 0;
+      categoryTotals[category] = (categoryTotals[category] || 0) + amount;
     });
     
     return categoryTotals;
