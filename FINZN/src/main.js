@@ -20,7 +20,7 @@ class FinznApp {
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
     
-    this.currentMonth = this.getCurrentMonth();
+    this.currentMonth = this.getCurrentMonth(); // Siempre detecta el mes actual
     this.currentExpenseId = null; // For editing expenses
     this.init();
   }
@@ -225,6 +225,12 @@ class FinznApp {
   }
 
   async loadUserData() {
+    // Always ensure we're using current month for non-mateo users
+    const currentUser = this.auth.getCurrentUser();
+    if (currentUser !== 'mateo') {
+      this.currentMonth = this.getCurrentMonth();
+    }
+    
     await this.data.loadUserData();
     this.updateUI();
   }
@@ -262,6 +268,8 @@ class FinznApp {
         monthSelectorContainer.style.display = 'flex';
       } else {
         monthSelectorContainer.style.display = 'none';
+        // Force current month for non-mateo users
+        this.currentMonth = this.getCurrentMonth();
       }
     }
   }
@@ -272,6 +280,8 @@ class FinznApp {
     // Only allow month changes for mateo
     if (currentUser !== 'mateo') {
       e.preventDefault();
+      // Reset to current month for non-mateo users
+      e.target.value = this.getCurrentMonth();
       this.ui.showAlert('No tienes permisos para cambiar el mes', 'error');
       return;
     }
