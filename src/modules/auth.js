@@ -86,12 +86,6 @@ export class AuthManager {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password: password,
-        options: {
-          emailRedirectTo: undefined, // Disable email confirmation for now
-          data: {
-            email_confirm: true
-          }
-        }
       });
 
       if (error) {
