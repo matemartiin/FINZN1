@@ -14,8 +14,7 @@ let supabase;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('❌ Missing Supabase environment variables')
-  console.warn('⚠️ Running in DEVELOPMENT MODE - Using mock data');
-  console.log('💡 To use real Supabase: Click "Connect to Supabase" button or add environment variables');
+  console.warn('⚠️ Creating mock Supabase client for development');
   
   supabase = {
     auth: {

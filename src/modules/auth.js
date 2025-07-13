@@ -40,18 +40,6 @@ export class AuthManager {
     try {
       console.log('🔐 Attempting login for:', email);
       
-      // Check if we're in development mode (no Supabase configured)
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        console.log('🔧 Development mode: Simulating login');
-        // Simulate successful login in dev mode
-        this.currentUser = {
-          id: 'dev-user-' + Date.now(),
-          email: email.trim(),
-          email_confirmed_at: new Date().toISOString()
-        };
-        return true;
-      }
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password,
@@ -83,18 +71,6 @@ export class AuthManager {
   async register(email, password) {
     try {
       console.log('📝 Attempting to register user:', email);
-      
-      // Check if we're in development mode (no Supabase configured)
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        console.log('🔧 Development mode: Simulating registration');
-        // Simulate successful registration in dev mode
-        this.currentUser = {
-          id: 'dev-user-' + Date.now(),
-          email: email.trim(),
-          email_confirmed_at: new Date().toISOString()
-        };
-        return { success: true, needsConfirmation: false };
-      }
       
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
