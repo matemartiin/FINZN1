@@ -488,6 +488,56 @@ h1, h2, h3, h4, h5, h6 {
   border-right: 1px solid var(--border-color);
   padding: var(--spacing-lg);
   position: sticky;
+/* Mobile navigation - move to bottom */
+@media (max-width: 768px) {
+  .dashboard-new {
+    flex-direction: column;
+  }
+  
+  .sidebar-nav {
+    order: 2;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    border-right: none;
+    border-top: 1px solid var(--border-color);
+    padding: 10px 0;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .main-dashboard {
+    order: 1;
+    padding-bottom: 80px; /* Space for bottom navigation */
+  }
+  
+  .nav-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+  }
+  
+  .nav-item {
+    flex-direction: column;
+    padding: 8px 12px;
+    min-width: auto;
+    text-align: center;
+  }
+  
+  .nav-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  
+  .nav-label {
+    font-size: 11px;
+    font-weight: 500;
+  }
+}
   top: 80px;
   height: calc(100vh - 80px);
   overflow-y: auto;
