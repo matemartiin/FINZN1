@@ -641,6 +641,70 @@ body {
 .installments-button:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Installments Modal */
+.installments-list {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.installment-item {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  border-left: 4px solid var(--rosa-claro);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all var(--transition-normal);
+}
+
+.installment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.installment-details {
+  flex: 1;
+}
+
+.installment-description {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.installment-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.installment-progress {
+  font-size: 0.8rem;
+  color: var(--rosa-claro);
+  font-weight: 700;
+  background: rgba(255, 201, 222, 0.2);
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm);
+  display: inline-block;
+}
+
+.installment-amount {
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.installment-original {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 /* Gráfico - PROPORCIONES CORREGIDAS */

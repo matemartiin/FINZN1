@@ -414,8 +414,10 @@ export class UIManager {
       
       if (totalIncomes > 0) {
         incomesIndicator.classList.remove('hidden');
+        incomesIndicator.style.display = 'flex';
       } else {
         incomesIndicator.classList.add('hidden');
+        incomesIndicator.style.display = 'none';
       }
       
       console.log('💰 Income indicator updated:', totalIncomes);
@@ -468,6 +470,69 @@ export class UIManager {
     }
     
     console.log('✅ Income details updated successfully');
+  }
+
+  // NUEVO: Update installments list
+  updateInstallmentsList(expenses) {
+    const installmentsList = document.getElementById('installments-list');
+    const installmentsCount = document.getElementById('installments-count');
+    
+    if (!installmentsList) return;
+    
+    console.log('📊 Updating installments list with expenses:', expenses.length);
+    
+    // Filter installments (expenses with total_installments > 1)
+    const installments = expenses.filter(expense => expense.total_installments > 1);
+    
+    console.log('📊 Found installments:', installments.length);
+    
+    // Update count in dashboard
+    if (installmentsCount) {
+      installmentsCount.textContent = installments.length;
+    }
+    
+    installmentsList.innerHTML = '';
+    
+    if (installments.length === 0) {
+      installmentsList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <h3>No hay cuotas activas este mes</h3>
+          <p>Los gastos en cuotas aparecerán aquí</p>
+        </div>
+      `;
+      return;
+    }
+    
+    installments.forEach(installment => {
+      const item = document.createElement('div');
+      item.className = 'installment-item fade-in';
+      
+      const category = this.getCategoryInfo(installment.category);
+      const transactionDate = installment.transaction_date 
+        ? new Date(installment.transaction_date).toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short' 
+          })
+        : 'Sin fecha';
+      
+      item.innerHTML = `
+        <div class="installment-details">
+          <div class="installment-description">${category.icon} ${installment.description}</div>
+          <div class="installment-info">${category.name} • ${transactionDate}</div>
+          <div class="installment-progress">Cuota ${installment.installment} de ${installment.total_installments}</div>
+        </div>
+        <div class="installment-amount">
+          ${this.formatCurrency(installment.amount)}
+          ${installment.original_amount ? `<div class="installment-original">Total: ${this.formatCurrency(installment.original_amount)}</div>` : ''}
+        </div>
+      `;
+      
+      item.style.borderLeftColor = category.color;
+      installmentsList.appendChild(item);
+    });
+    
+    console.log('✅ Installments list updated successfully');
   }
 
   clearForm(formId) {

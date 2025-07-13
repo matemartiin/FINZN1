@@ -453,6 +453,9 @@ class FinznApp {
       // Update income details (this will show the indicator and total)
       this.ui.updateIncomeDetails(income, extraIncomes);
       
+      // Update installments list
+      this.ui.updateInstallmentsList(expenses);
+      
       // Update goals
       const goals = this.data.getGoals();
       this.ui.updateGoalsList(goals);
@@ -532,7 +535,12 @@ class FinznApp {
   
   showInstallmentsModal() {
     console.log('📊 Show installments modal');
-    this.ui.showAlert('Función de cuotas próximamente', 'info');
+    
+    // Update installments list before showing modal
+    const expenses = this.data.getExpenses(this.currentMonth);
+    this.ui.updateInstallmentsList(expenses);
+    
+    this.modals.show('view-installments-modal');
   }
 
   async handleAddExpense(e) {

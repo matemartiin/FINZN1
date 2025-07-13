@@ -163,7 +163,7 @@
                 </div>
                 <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
                 <div class="installments-info">
-                  <button id="installments-btn" class="installments-button">
+                  <button id="installments-btn" class="installments-button" onclick="window.app.showInstallmentsModal()">
                     <span id="installments-count">3</span> cuotas activas
                   </button>
                 </div>
@@ -174,7 +174,7 @@
                   <div class="card-icon-simple">💵</div>
                   <span class="card-title">
                     Ingresos
-                    <button id="incomes-indicator" class="incomes-indicator" title="Ver todos los ingresos del mes">
+                    <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes" onclick="window.app.showViewIncomesModal()">
                       <span class="indicator-count">0</span>
                     </button>
                   </span>
@@ -420,6 +420,24 @@
       <div class="modal-body">
         <div id="all-incomes-list" class="all-incomes-list">
           <!-- Lista de todos los ingresos del mes -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Installments Modal -->
+  <div id="view-installments-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 Cuotas Activas del Mes</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="installments-list" class="installments-list">
+          <!-- Lista de cuotas del mes -->
         </div>
       </div>
       <div class="modal-actions">
