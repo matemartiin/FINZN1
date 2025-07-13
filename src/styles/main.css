@@ -1,31 +1,40 @@
-/* FINZN - Estilos Principales Limpios y Elegantes */
+/* FINZN - Estilos con paleta de colores personalizada */
 
-/* Variables CSS */
+/* Variables CSS con tu paleta de colores */
 :root {
-  /* Colores principales */
-  --primary-color: #B7A6FF;
-  --primary-dark: #9B87FF;
-  --primary-light: #D4C9FF;
-  --secondary-color: #6C63FF;
-  --accent-color: #FF6B9D;
+  /* Tu paleta de colores */
+  --azul-pastel: #A7C7E7;
+  --celeste-suave: #B5EAEA;
+  --lavanda: #C8B6FF;
+  --rosa-claro: #FFC9DE;
+  --durazno-suave: #FFD6A5;
+  --gris-piedra: #E2E2E2;
+  --blanco-hueso: #FAFAFA;
   
-  /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, #B7A6FF 0%, #6C63FF 100%);
-  --gradient-secondary: linear-gradient(135deg, #FF6B9D 0%, #FF8E9B 100%);
+  /* Colores principales basados en tu paleta */
+  --primary-color: var(--lavanda);
+  --primary-dark: #B5A3FF;
+  --primary-light: #D4C9FF;
+  --secondary-color: var(--azul-pastel);
+  --accent-color: var(--rosa-claro);
+  
+  /* Gradientes con tu paleta */
+  --gradient-primary: linear-gradient(135deg, var(--lavanda) 0%, var(--azul-pastel) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--rosa-claro) 0%, var(--durazno-suave) 100%);
   
   /* Colores de estado */
   --success-color: #4CAF50;
   --warning-color: #FF9800;
   --error-color: #F44336;
-  --info-color: #2196F3;
+  --info-color: var(--celeste-suave);
   
   /* Colores neutros */
   --text-primary: #2D3748;
   --text-secondary: #718096;
   --text-muted: #A0AEC0;
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F7FAFC;
-  --bg-tertiary: #EDF2F7;
+  --bg-primary: var(--blanco-hueso);
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: var(--gris-piedra);
   --border-color: #E2E8F0;
   
   /* Espaciado */
@@ -47,7 +56,7 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  --shadow-colored: 0 10px 25px rgba(183, 166, 255, 0.3);
+  --shadow-colored: 0 10px 25px rgba(200, 182, 255, 0.3);
   
   /* Transiciones */
   --transition-fast: 0.15s ease;
@@ -202,7 +211,7 @@ body {
 .input-group input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(183, 166, 255, 0.15);
+  box-shadow: 0 0 0 4px rgba(200, 182, 255, 0.15);
 }
 
 .input-group input::placeholder {
@@ -223,11 +232,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: 14px 28px;
+  padding: 12px 24px;
   border: none;
   border-radius: var(--border-radius-lg);
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-normal);
   text-decoration: none;
@@ -241,7 +250,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(183, 166, 255, 0.4);
+  box-shadow: 0 15px 30px rgba(200, 182, 255, 0.4);
 }
 
 .btn-secondary {
@@ -382,12 +391,12 @@ body {
   width: 100%;
 }
 
-/* Sidebar */
+/* Sidebar - MÁS ANGOSTA */
 .sidebar-nav {
-  width: 180px;
+  width: 160px;
   background: var(--bg-primary);
   border-right: 1px solid var(--border-color);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
 }
 
 .nav-menu {
@@ -399,8 +408,8 @@ body {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: 12px 16px;
+  gap: var(--spacing-sm);
+  padding: 10px 12px;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: all var(--transition-normal);
@@ -420,14 +429,14 @@ body {
 }
 
 .nav-icon {
-  font-size: 1.1rem;
-  width: 20px;
+  font-size: 1rem;
+  width: 18px;
   text-align: center;
 }
 
 .nav-label {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 /* Contenido principal */
@@ -447,7 +456,7 @@ body {
 .section-content {
   background: var(--bg-primary);
   border-radius: var(--border-radius-xl);
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-lg);
 }
 
@@ -455,18 +464,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-lg);
   border-bottom: 2px solid var(--border-color);
 }
 
 .section-header h1 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 900;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.section-actions {
+  display: flex;
+  gap: var(--spacing-md);
 }
 
 /* Dashboard grid */
@@ -482,7 +496,7 @@ body {
 .summary-cards {
   grid-area: summary;
   display: grid;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-lg);
   grid-template-columns: repeat(3, 1fr);
 }
 
@@ -491,32 +505,36 @@ body {
   grid-area: chart;
 }
 
-/* Tarjetas de resumen */
+/* Tarjetas de resumen - PROPORCIONES CORREGIDAS */
 .summary-card {
   background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
   border: 1px solid var(--border-color);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .summary-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .card-header-simple {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
 .card-icon-simple {
-  font-size: 1.5rem;
-  width: 50px;
-  height: 50px;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -526,7 +544,7 @@ body {
 
 .card-title {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
@@ -534,10 +552,10 @@ body {
 }
 
 .card-amount {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 900;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
 .card-action {
@@ -545,9 +563,9 @@ body {
   justify-content: center;
 }
 
-/* Tarjetas específicas */
+/* Tarjetas específicas con tu paleta */
 .balance-card-new {
-  border-left: 4px solid var(--primary-color);
+  border-left: 4px solid var(--lavanda);
 }
 
 .balance-card-new .card-icon-simple {
@@ -563,20 +581,20 @@ body {
 }
 
 .income-card {
-  border-left: 4px solid var(--success-color);
+  border-left: 4px solid var(--celeste-suave);
 }
 
 .income-card .card-icon-simple {
-  background: var(--success-color);
+  background: var(--celeste-suave);
   color: white;
 }
 
 .expenses-card {
-  border-left: 4px solid var(--error-color);
+  border-left: 4px solid var(--rosa-claro);
 }
 
 .expenses-card .card-icon-simple {
-  background: var(--error-color);
+  background: var(--rosa-claro);
   color: white;
 }
 
@@ -585,8 +603,8 @@ body {
   background: var(--gradient-secondary);
   color: white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -603,7 +621,7 @@ body {
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 8px 16px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
@@ -615,20 +633,20 @@ body {
   color: var(--text-primary);
 }
 
-/* Gráfico */
+/* Gráfico - PROPORCIONES CORREGIDAS */
 .chart-card-new {
   background: var(--bg-primary);
   border-radius: var(--border-radius-xl);
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-color);
 }
 
 .chart-card-new h3 {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
   color: var(--text-primary);
   font-weight: 900;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   text-align: center;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -644,7 +662,7 @@ body {
 
 .chart-container-new {
   flex: 1;
-  height: 350px;
+  height: 300px;
   position: relative;
 }
 
@@ -657,26 +675,28 @@ body {
   position: relative;
 }
 
+/* MASCOTA - TAMAÑO CORREGIDO */
 .chart-mascot-img {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  box-shadow: 0 8px 25px rgba(183, 166, 255, 0.3);
-  border: 3px solid var(--primary-color);
+  box-shadow: 0 8px 25px rgba(200, 182, 255, 0.3);
+  border: 3px solid var(--lavanda);
   background: white;
-  padding: 5px;
+  padding: 4px;
+  object-fit: cover;
 }
 
 .chart-mascot-tooltip {
   position: absolute;
-  top: -50px;
+  top: -45px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--primary-color);
+  background: var(--lavanda);
   color: white;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: var(--border-radius);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
   opacity: 0;
@@ -686,6 +706,42 @@ body {
 
 .chart-mascot-container:hover .chart-mascot-tooltip {
   opacity: 1;
+}
+
+/* Mascot Alert */
+.mascot-alert {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--lavanda);
+  color: white;
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  z-index: 1000;
+  max-width: 200px;
+  text-align: center;
+}
+
+.mascot-alert.show {
+  opacity: 1;
+}
+
+.mascot-alert-success {
+  background: var(--success-color);
+}
+
+.mascot-alert-warning {
+  background: var(--warning-color);
+}
+
+.mascot-alert-error {
+  background: var(--error-color);
 }
 
 /* Expenses list */
@@ -736,7 +792,7 @@ body {
 }
 
 .expense-icon {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   width: 40px;
   height: 40px;
   display: flex;
@@ -765,9 +821,9 @@ body {
 
 .expense-installment {
   font-size: 0.75rem;
-  color: var(--accent-color);
+  color: var(--rosa-claro);
   font-weight: 700;
-  background: rgba(255, 107, 157, 0.1);
+  background: rgba(255, 201, 222, 0.2);
   padding: 2px 6px;
   border-radius: var(--border-radius-sm);
   display: inline-block;
@@ -814,7 +870,7 @@ body {
   border-radius: var(--border-radius-xl);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-lg);
-  border-left: 4px solid var(--primary-color);
+  border-left: 4px solid var(--lavanda);
   transition: all var(--transition-normal);
 }
 
@@ -877,7 +933,7 @@ body {
 .settings-grid {
   display: grid;
   gap: var(--spacing-xl);
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .settings-card {
@@ -1120,7 +1176,7 @@ body {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(183, 166, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(200, 182, 255, 0.1);
 }
 
 .form-group input[type="checkbox"] {
@@ -1161,7 +1217,7 @@ body {
 
 .chat-toggle:hover {
   transform: scale(1.1);
-  box-shadow: 0 10px 30px rgba(183, 166, 255, 0.4);
+  box-shadow: 0 10px 30px rgba(200, 182, 255, 0.4);
 }
 
 .chat-toggle-icon {
@@ -1414,12 +1470,14 @@ body {
   
   .nav-item {
     flex-shrink: 0;
-    min-width: 100px;
+    min-width: 80px;
     justify-content: center;
+    flex-direction: column;
+    gap: 4px;
   }
   
   .nav-label {
-    display: none;
+    font-size: 0.7rem;
   }
   
   .summary-cards {
