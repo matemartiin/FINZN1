@@ -209,7 +209,32 @@ class FinznApp {
       manageLimitsBtn.addEventListener('click', () => this.navigation.showSection('settings'));
     }
     
-    // Add income from modal
+    // Settings buttons
+    const manageCategoriesBtn = document.getElementById('manage-categories-btn');
+    const exportDataBtn = document.getElementById('export-data-btn');
+    const importDataBtn = document.getElementById('import-data-btn');
+    const generateAiReportBtn = document.getElementById('generate-ai-report-btn');
+    const backupDataBtn = document.getElementById('backup-data-btn');
+    
+    if (manageCategoriesBtn) {
+      manageCategoriesBtn.addEventListener('click', () => this.showManageCategoriesModal());
+    }
+    
+    if (exportDataBtn) {
+      exportDataBtn.addEventListener('click', () => this.handleExportData());
+    }
+    
+    if (importDataBtn) {
+      importDataBtn.addEventListener('click', () => this.showImportDataModal());
+    }
+    
+    if (generateAiReportBtn) {
+      generateAiReportBtn.addEventListener('click', () => this.showGenerateAiReportModal());
+    }
+    
+    if (backupDataBtn) {
+      backupDataBtn.addEventListener('click', () => this.handleBackupData());
+    }
   }
 
   setupModalEvents() {
@@ -235,6 +260,24 @@ class FinznApp {
     const addSpendingLimitForm = document.getElementById('add-spending-limit-form');
     if (addSpendingLimitForm) {
       addSpendingLimitForm.addEventListener('submit', (e) => this.handleAddSpendingLimit(e));
+    }
+    
+    // Add category form
+    const addCategoryForm = document.getElementById('add-category-form');
+    if (addCategoryForm) {
+      addCategoryForm.addEventListener('submit', (e) => this.handleAddCategory(e));
+    }
+    
+    // Import data button
+    const processImportBtn = document.getElementById('process-import-btn');
+    if (processImportBtn) {
+      processImportBtn.addEventListener('click', () => this.handleImportData());
+    }
+    
+    // Generate AI report button
+    const generateReportBtn = document.getElementById('generate-report-btn');
+    if (generateReportBtn) {
+      generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
     }
     
     // Installments checkbox
@@ -522,6 +565,26 @@ class FinznApp {
     this.modals.show('add-spending-limit-modal');
   }
   
+  showManageCategoriesModal() {
+    console.log('🏷️ Show manage categories modal');
+    
+    // Update categories list before showing modal
+    const categories = this.data.getCategories();
+    this.ui.updateCategoriesManagementList(categories);
+    
+    this.modals.show('manage-categories-modal');
+  }
+  
+  showImportDataModal() {
+    console.log('📥 Show import data modal');
+    this.modals.show('import-data-modal');
+  }
+  
+  showGenerateAiReportModal() {
+    console.log('🤖 Show generate AI report modal');
+    this.modals.show('generate-ai-report-modal');
+  }
+  
   showViewIncomesModal() {
     console.log('👁️ Show view incomes modal');
     
@@ -705,6 +768,101 @@ class FinznApp {
       console.error('❌ Error adding spending limit:', error);
       this.ui.showAlert('Error al crear el límite de gasto', 'error');
     }
+  }
+  
+  async handleAddCategory(e) {
+    e.preventDefault();
+    console.log('🏷️ Adding category...');
+    
+    const formData = this.ui.getFormData('add-category-form');
+    
+    if (!formData.name || !formData.icon) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    try {
+      const categoryData = {
+        name: formData.name,
+        icon: formData.icon,
+        color: formData.color || '#B7A6FF'
+      };
+      
+      await this.data.addCategory(categoryData);
+      
+      // Update categories list in modal
+      const categories = this.data.getCategories();
+      this.ui.updateCategoriesManagementList(categories);
+      
+      // Update all category selects
+      this.ui.updateCategoriesSelect(categories, 'expense-category');
+      this.ui.updateCategoriesSelect(categories, 'category-filter');
+      this.ui.updateCategoriesSelect(categories, 'limit-category');
+      
+      // Clear form
+      this.ui.clearForm('add-category-form');
+      
+      this.ui.showAlert('Categoría agregada exitosamente', 'success');
+      
+    } catch (error) {
+      console.error('Error adding category:', error);
+      this.ui.showAlert('Error al agregar la categoría', 'error');
+    }
+  }
+  
+  handleExportData() {
+    console.log('📊 Exporting data...');
+    
+    // Show options for what to export
+    const exportType = prompt('¿Qué datos quieres exportar?\n1. Gastos\n2. Ingresos\n\nEscribe "gastos" o "ingresos":');
+    
+    if (exportType) {
+      const type = exportType.toLowerCase().includes('gasto') ? 'expenses' : 'incomes';
+      const success = this.data.exportDataToCSV(type);
+      
+      if (success) {
+        this.ui.showAlert(`Datos de ${type === 'expenses' ? 'gastos' : 'ingresos'} exportados exitosamente`, 'success');
+      } else {
+        this.ui.showAlert('Error al exportar los datos', 'error');
+      }
+    }
+  }
+  
+  async handleImportData() {
+    console.log('📥 Importing data...');
+    
+    const fileInput = document.getElementById('import-file');
+    const importType = document.querySelector('input[name="import-type"]:checked')?.value;
+    
+    if (!fileInput.files[0]) {
+      this.ui.showAlert('Por favor selecciona un archivo CSV', 'error');
+      return;
+    }
+    
+    if (!importType) {
+      this.ui.showAlert('Por favor selecciona el tipo de datos a importar', 'error');
+      return;
+    }
+    
+    try {
+      const file = fileInput.files[0];
+      const result = await this.data.importDataFromCSV(file, importType);
+      
+      this.modals.hide('import-data-modal');
+      this.ui.showAlert(`Importación exitosa: ${result.imported} registros importados${result.errors > 0 ? `, ${result.errors} errores` : ''}`, 'success');
+      
+      // Refresh dashboard
+      this.updateDashboard();
+      
+    } catch (error) {
+      console.error('Error importing data:', error);
+      this.ui.showAlert('Error al importar los datos: ' + error.message, 'error');
+    }
+  }
+  
+  handleBackupData() {
+    console.log('☁️ Backup data...');
+    this.ui.showAlert('Función de respaldo próximamente', 'info');
   }
   
   async handleGenerateAiReport() {
