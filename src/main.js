@@ -182,8 +182,14 @@ class FinznApp {
     
     // Add spending limit button
     const addSpendingLimitBtn = document.getElementById('add-spending-limit-btn');
+    const addSpendingLimitBtnExpenses = document.getElementById('add-spending-limit-btn-expenses');
+    
     if (addSpendingLimitBtn) {
       addSpendingLimitBtn.addEventListener('click', () => this.showAddSpendingLimitModal());
+    }
+    
+    if (addSpendingLimitBtnExpenses) {
+      addSpendingLimitBtnExpenses.addEventListener('click', () => this.showAddSpendingLimitModal());
     }
     
     // Settings buttons
