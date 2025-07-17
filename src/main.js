@@ -599,10 +599,6 @@ class FinznApp {
   showInstallmentsModal() {
     console.log('📊 Show installments modal');
     
-    // Update installments list before showing modal
-    const expenses = this.data.getExpenses(this.currentMonth);
-    this.ui.updateInstallmentsList(expenses);
-    
     this.modals.show('view-installments-modal');
   }
 

@@ -442,7 +442,6 @@ export class UIManager {
   // NUEVO: Update installments list
   updateInstallmentsList(expenses) {
     const installmentsList = document.getElementById('installments-list');
-    const installmentsCount = document.getElementById('installments-count');
     
     if (!installmentsList) return;
     
@@ -452,11 +451,6 @@ export class UIManager {
     const installments = expenses.filter(expense => expense.total_installments > 1);
     
     console.log('📊 Found installments:', installments.length);
-    
-    // Update count in dashboard
-    if (installmentsCount) {
-      installmentsCount.textContent = installments.length;
-    }
     
     installmentsList.innerHTML = '';
     
