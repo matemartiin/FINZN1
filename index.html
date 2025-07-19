@@ -622,21 +622,29 @@
           <div class="file-upload-area">
             <input type="file" id="import-file" accept=".csv" />
             <div class="file-upload-info">
-              <p>Formatos soportados:</p>
+              <p><strong>Formatos soportados automáticamente:</strong></p>
               <ul>
-                <li><strong>Gastos:</strong> descripcion,monto,categoria,fecha</li>
+                <li><strong>FINZN Completo:</strong> tipo,descripcion,monto,categoria,fecha,mes,cuota_actual,total_cuotas,monto_original,es_recurrente</li>
+                <li><strong>Gastos:</strong> descripcion,monto,categoria,fecha,cuota_actual,total_cuotas</li>
                 <li><strong>Ingresos:</strong> tipo,monto,descripcion,fecha</li>
+                <li><strong>Banco:</strong> fecha,descripcion,monto (detecta automáticamente gastos/ingresos)</li>
+                <li><strong>Otros formatos:</strong> Se detectan automáticamente por contenido</li>
               </ul>
+              <p><em>El sistema detecta automáticamente el formato y tipo de datos.</em></p>
             </div>
           </div>
           <div class="import-options">
             <label>
-              <input type="radio" name="import-type" value="expenses" checked />
-              Importar Gastos
+              <input type="radio" name="import-type" value="auto" checked />
+              Detección Automática (Recomendado)
+            </label>
+            <label>
+              <input type="radio" name="import-type" value="expenses" />
+              Forzar como Gastos
             </label>
             <label>
               <input type="radio" name="import-type" value="incomes" />
-              Importar Ingresos
+              Forzar como Ingresos
             </label>
           </div>
         </div>
