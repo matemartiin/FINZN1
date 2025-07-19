@@ -5,8 +5,8 @@
 [build.environment]
   NODE_VERSION = "18"
   VITE_GEMINI_API_KEY = ""
-  VITE_SUPABASE_URL = ""
-  VITE_SUPABASE_ANON_KEY = ""
+  VITE_SUPABASE_URL = "YOUR_SUPABASE_URL"
+  VITE_SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"
 
 [[headers]]
   for = "/*"
