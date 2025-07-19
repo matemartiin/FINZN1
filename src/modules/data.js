@@ -667,26 +667,95 @@ export class DataManager {
   }
 
   // Export/Import Data
-  exportDataToCSV(type = 'expenses') {
+  exportDataToCSV(type = 'complete') {
     try {
       let data = [];
       let filename = '';
       let headers = [];
 
-      if (type === 'expenses') {
+      if (type === 'complete') {
+        // Export complete financial data
+        headers = [
+          'tipo', 'descripcion', 'monto', 'categoria', 'fecha', 'mes', 
+          'cuota_actual', 'total_cuotas', 'monto_original', 'es_recurrente'
+        ];
+        
+        const allData = [];
+        
+        // Add all expenses
+        Object.values(this.data.expenses).forEach(monthExpenses => {
+          monthExpenses.forEach(expense => {
+            allData.push([
+              'gasto',
+              expense.description,
+              expense.amount,
+              expense.category,
+              expense.transaction_date,
+              expense.month,
+              expense.installment || 1,
+              expense.total_installments || 1,
+              expense.original_amount || expense.amount,
+              expense.recurring ? 'si' : 'no'
+            ]);
+          });
+        });
+        
+        // Add fixed incomes
+        Object.entries(this.data.income).forEach(([month, income]) => {
+          if (income.fixed > 0) {
+            allData.push([
+              'ingreso_fijo',
+              'Sueldo mensual',
+              income.fixed,
+              'sueldo',
+              `${month}-01`,
+              month,
+              1,
+              1,
+              income.fixed,
+              'si'
+            ]);
+          }
+        });
+        
+        // Add extra incomes
+        Object.values(this.data.extraIncomes).forEach(monthIncomes => {
+          monthIncomes.forEach(income => {
+            allData.push([
+              'ingreso_extra',
+              income.description,
+              income.amount,
+              income.category,
+              income.created_at ? income.created_at.split('T')[0] : `${income.month}-01`,
+              income.month,
+              1,
+              1,
+              income.amount,
+              'no'
+            ]);
+          });
+        });
+        
+        data = allData;
+        filename = 'finzn_datos_completos.csv';
+        
+      } else if (type === 'expenses') {
         // Export all expenses
         const allExpenses = [];
         Object.values(this.data.expenses).forEach(monthExpenses => {
           allExpenses.push(...monthExpenses);
         });
         
-        headers = ['descripcion', 'monto', 'categoria', 'fecha', 'mes'];
+        headers = ['descripcion', 'monto', 'categoria', 'fecha', 'mes', 'cuota_actual', 'total_cuotas', 'monto_original'];
         data = allExpenses.map(expense => [
           expense.description,
           expense.amount,
           expense.category,
           expense.transaction_date,
-          expense.month
+          expense.month,
+          expense.installment || 1,
+          expense.total_installments || 1,
+          expense.original_amount || expense.amount
         ]);
         filename = 'finzn_gastos.csv';
         
@@ -697,18 +766,18 @@ export class DataManager {
         // Fixed incomes
         Object.entries(this.data.income).forEach(([month, income]) => {
           if (income.fixed > 0) {
-            allIncomes.push(['fijo', income.fixed, 'Sueldo mensual', month]);
+            allIncomes.push(['fijo', income.fixed, 'Sueldo mensual', month, `${month}-01`]);
           }
         });
         
         // Extra incomes
         Object.values(this.data.extraIncomes).forEach(monthIncomes => {
           monthIncomes.forEach(income => {
-            allIncomes.push(['extra', income.amount, income.description, income.month]);
+            allIncomes.push(['extra', income.amount, income.description, income.month, income.created_at ? income.created_at.split('T')[0] : `${income.month}-01`]);
           });
         });
         
-        headers = ['tipo', 'monto', 'descripcion', 'mes'];
+        headers = ['tipo', 'monto', 'descripcion', 'mes', 'fecha'];
         data = allIncomes;
         filename = 'finzn_ingresos.csv';
       }
@@ -745,47 +814,313 @@ export class DataManager {
         throw new Error('El archivo CSV debe tener al menos una fila de datos');
       }
 
-      const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+      const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
       const dataRows = lines.slice(1);
       
       let imported = 0;
       let errors = 0;
+      
+      console.log('📥 CSV Headers detected:', headers);
+      
+      // Auto-detect CSV format based on headers
+      const detectedFormat = this.detectCSVFormat(headers);
+      console.log('📥 Detected format:', detectedFormat);
 
       for (const row of dataRows) {
         try {
-          const values = row.split(',').map(v => v.replace(/"/g, '').trim());
+          // Better CSV parsing that handles commas inside quotes
+          const values = this.parseCSVRow(row);
           
-          if (type === 'expenses') {
-            // Expected: descripcion,monto,categoria,fecha
-            if (values.length >= 4) {
-              const expenseData = {
-                description: values[0],
-                amount: parseFloat(values[1]),
-                category: values[2],
-                transactionDate: values[3],
-                month: values[3].substring(0, 7), // YYYY-MM
-                installment: 1,
-                totalInstallments: 1,
-                recurring: false
-              };
-              
-              await this.addExpense(expenseData);
+          if (values.length < 2) continue; // Skip invalid rows
+          
+          // Process based on detected format
+          if (detectedFormat === 'complete') {
+            await this.processCompleteFormatRow(headers, values);
+            imported++;
+          } else if (detectedFormat === 'expenses' || type === 'expenses') {
+            await this.processExpenseRow(headers, values);
+            imported++;
+          } else if (detectedFormat === 'incomes' || type === 'incomes') {
+            await this.processIncomeRow(headers, values);
+            imported++;
+          } else if (detectedFormat === 'bank') {
+            await this.processBankFormatRow(headers, values);
+            imported++;
+          } else {
+            // Try to auto-detect row type
+            const rowType = this.detectRowType(values);
+            if (rowType === 'expense') {
+              await this.processExpenseRow(headers, values);
+              imported++;
+            } else if (rowType === 'income') {
+              await this.processIncomeRow(headers, values);
               imported++;
             }
-          } else if (type === 'incomes') {
-            // Expected: tipo,monto,descripcion,fecha
-            if (values.length >= 4) {
-              const month = values[3].substring(0, 7); // YYYY-MM
-              
-              if (values[0].toLowerCase() === 'fijo') {
-                await this.addFixedIncome(month, parseFloat(values[1]));
-              } else {
-                const incomeData = {
-                  description: values[2],
-                  amount: parseFloat(values[1]),
-                  category: 'other'
-                };
-                await this.addExtraIncome(month, incomeData);
+          }
+        } catch (rowError) {
+          console.error('Error importing row:', row, rowError);
+          errors++;
+        }
+      }
+
+      return { imported, errors };
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      throw error;
+    }
+  }
+  
+  parseCSVRow(row) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    result.push(current.trim());
+    return result.map(v => v.replace(/"/g, ''));
+  }
+  
+  detectCSVFormat(headers) {
+    const headerStr = headers.join(',').toLowerCase();
+    
+    // Complete FINZN format
+    if (headerStr.includes('tipo') && headerStr.includes('cuota_actual') && headerStr.includes('total_cuotas')) {
+      return 'complete';
+    }
+    
+    // Bank statement format
+    if (headerStr.includes('fecha') && (headerStr.includes('debito') || headerStr.includes('credito') || headerStr.includes('movimiento'))) {
+      return 'bank';
+    }
+    
+    // Expense format
+    if (headerStr.includes('gasto') || headerStr.includes('categoria') || headerStr.includes('descripcion')) {
+      return 'expenses';
+    }
+    
+    // Income format
+    if (headerStr.includes('ingreso') || headerStr.includes('sueldo')) {
+      return 'incomes';
+    }
+    
+    return 'unknown';
+  }
+  
+  detectRowType(values) {
+    if (values.length < 2) return 'unknown';
+    
+    const firstValue = values[0].toLowerCase();
+    const amountValue = parseFloat(values[1]);
+    
+    // Check if first column indicates type
+    if (firstValue.includes('gasto') || firstValue.includes('expense')) {
+      return 'expense';
+    }
+    
+    if (firstValue.includes('ingreso') || firstValue.includes('income') || firstValue.includes('sueldo')) {
+      return 'income';
+    }
+    
+    // If amount is negative, likely an expense
+    if (amountValue < 0) {
+      return 'expense';
+    }
+    
+    return 'expense'; // Default to expense
+  }
+  
+  async processCompleteFormatRow(headers, values) {
+    const data = {};
+    headers.forEach((header, index) => {
+      data[header] = values[index] || '';
+    });
+    
+    const tipo = data.tipo || data.type || '';
+    
+    if (tipo.includes('gasto') || tipo.includes('expense')) {
+      const expenseData = {
+        description: data.descripcion || data.description || 'Gasto importado',
+        amount: Math.abs(parseFloat(data.monto || data.amount || 0)),
+        category: data.categoria || data.category || 'Otros',
+        transactionDate: this.parseDate(data.fecha || data.date),
+        month: data.mes || data.month || this.parseDate(data.fecha || data.date).substring(0, 7),
+        installment: parseInt(data.cuota_actual || data.installment || 1),
+        totalInstallments: parseInt(data.total_cuotas || data.total_installments || 1),
+        originalAmount: parseFloat(data.monto_original || data.original_amount) || Math.abs(parseFloat(data.monto || data.amount || 0)),
+        recurring: (data.es_recurrente || data.recurring || '').toLowerCase() === 'si' || (data.es_recurrente || data.recurring || '').toLowerCase() === 'true'
+      };
+      
+      await this.addExpense(expenseData);
+    } else if (tipo.includes('ingreso') || tipo.includes('income')) {
+      const month = data.mes || data.month || this.parseDate(data.fecha || data.date).substring(0, 7);
+      const amount = Math.abs(parseFloat(data.monto || data.amount || 0));
+      
+      if (tipo.includes('fijo') || tipo.includes('fixed')) {
+        await this.addFixedIncome(month, amount);
+      } else {
+        const incomeData = {
+          description: data.descripcion || data.description || 'Ingreso importado',
+          amount: amount,
+          category: data.categoria || data.category || 'other'
+        };
+        await this.addExtraIncome(month, incomeData);
+      }
+    }
+  }
+  
+  async processExpenseRow(headers, values) {
+    const data = {};
+    headers.forEach((header, index) => {
+      data[header] = values[index] || '';
+    });
+    
+    const expenseData = {
+      description: data.descripcion || data.description || data.concepto || values[0] || 'Gasto importado',
+      amount: Math.abs(parseFloat(data.monto || data.amount || data.importe || values[1] || 0)),
+      category: data.categoria || data.category || data.tipo || 'Otros',
+      transactionDate: this.parseDate(data.fecha || data.date || data.transaction_date),
+      month: data.mes || data.month || this.parseDate(data.fecha || data.date || data.transaction_date).substring(0, 7),
+      installment: parseInt(data.cuota_actual || data.installment || 1),
+      totalInstallments: parseInt(data.total_cuotas || data.total_installments || 1),
+      originalAmount: parseFloat(data.monto_original || data.original_amount) || Math.abs(parseFloat(data.monto || data.amount || values[1] || 0)),
+      recurring: false
+    };
+    
+    await this.addExpense(expenseData);
+  }
+  
+  async processIncomeRow(headers, values) {
+    const data = {};
+    headers.forEach((header, index) => {
+      data[header] = values[index] || '';
+    });
+    
+    const month = data.mes || data.month || this.parseDate(data.fecha || data.date).substring(0, 7);
+    const amount = Math.abs(parseFloat(data.monto || data.amount || data.importe || values[1] || 0));
+    const tipo = (data.tipo || data.type || values[0] || '').toLowerCase();
+    
+    if (tipo.includes('fijo') || tipo.includes('fixed') || tipo.includes('sueldo')) {
+      await this.addFixedIncome(month, amount);
+    } else {
+      const incomeData = {
+        description: data.descripcion || data.description || data.concepto || 'Ingreso importado',
+        amount: amount,
+        category: data.categoria || data.category || 'other'
+      };
+      await this.addExtraIncome(month, incomeData);
+    }
+  }
+  
+  async processBankFormatRow(headers, values) {
+    const data = {};
+    headers.forEach((header, index) => {
+      data[header] = values[index] || '';
+    });
+    
+    const amount = parseFloat(data.monto || data.amount || data.importe || values[1] || 0);
+    const description = data.descripcion || data.description || data.concepto || data.detalle || values[0] || 'Movimiento bancario';
+    const date = this.parseDate(data.fecha || data.date);
+    const month = date.substring(0, 7);
+    
+    if (amount < 0) {
+      // Negative amount = expense
+      const expenseData = {
+        description: description,
+        amount: Math.abs(amount),
+        category: this.categorizeTransaction(description),
+        transactionDate: date,
+        month: month,
+        installment: 1,
+        totalInstallments: 1,
+        recurring: false
+      };
+      await this.addExpense(expenseData);
+    } else if (amount > 0) {
+      // Positive amount = income
+      const incomeData = {
+        description: description,
+        amount: amount,
+        category: 'other'
+      };
+      await this.addExtraIncome(month, incomeData);
+    }
+  }
+  
+  parseDate(dateStr) {
+    if (!dateStr) {
+      return new Date().toISOString().split('T')[0];
+    }
+    
+    // Try different date formats
+    const formats = [
+      /(\d{4})-(\d{2})-(\d{2})/, // YYYY-MM-DD
+      /(\d{2})\/(\d{2})\/(\d{4})/, // DD/MM/YYYY
+      /(\d{2})-(\d{2})-(\d{4})/, // DD-MM-YYYY
+      /(\d{4})\/(\d{2})\/(\d{2})/, // YYYY/MM/DD
+    ];
+    
+    for (const format of formats) {
+      const match = dateStr.match(format);
+      if (match) {
+        if (format === formats[0] || format === formats[3]) {
+          // YYYY-MM-DD or YYYY/MM/DD
+          return `${match[1]}-${match[2]}-${match[3]}`;
+        } else {
+          // DD/MM/YYYY or DD-MM-YYYY
+          return `${match[3]}-${match[2]}-${match[1]}`;
+        }
+      }
+    }
+    
+    // If no format matches, try to parse as Date
+    try {
+      const date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+      }
+    } catch (e) {
+      console.warn('Could not parse date:', dateStr);
+    }
+    
+    return new Date().toISOString().split('T')[0];
+  }
+  
+  categorizeTransaction(description) {
+    const desc = description.toLowerCase();
+    
+    if (desc.includes('supermercado') || desc.includes('market') || desc.includes('grocery')) {
+      return 'Supermercado';
+    }
+    if (desc.includes('restaurant') || desc.includes('comida') || desc.includes('food')) {
+      return 'Comida';
+    }
+    if (desc.includes('transporte') || desc.includes('uber') || desc.includes('taxi') || desc.includes('bus')) {
+      return 'Transporte';
+    }
+    if (desc.includes('farmacia') || desc.includes('hospital') || desc.includes('medic')) {
+      return 'Salud';
+    }
+    if (desc.includes('cine') || desc.includes('teatro') || desc.includes('entretenimiento')) {
+      return 'Ocio';
+    }
+    if (desc.includes('telefono') || desc.includes('internet') || desc.includes('luz') || desc.includes('gas')) {
+      return 'Servicios';
+    }
+    
+    return 'Otros';
+  }
               }
               imported++;
             }

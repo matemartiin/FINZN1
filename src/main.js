@@ -818,15 +818,24 @@ class FinznApp {
   handleExportData() {
     console.log('📊 Exporting data...');
     
-    // Show options for what to export
-    const exportType = prompt('¿Qué datos quieres exportar?\n1. Gastos\n2. Ingresos\n\nEscribe "gastos" o "ingresos":');
+    // Show comprehensive export options
+    const exportType = prompt('¿Qué datos quieres exportar?\n1. Completo (gastos + ingresos + cuotas)\n2. Solo gastos\n3. Solo ingresos\n\nEscribe "completo", "gastos" o "ingresos":');
     
     if (exportType) {
-      const type = exportType.toLowerCase().includes('gasto') ? 'expenses' : 'incomes';
+      let type = 'complete';
+      
+      if (exportType.toLowerCase().includes('gasto')) {
+        type = 'expenses';
+      } else if (exportType.toLowerCase().includes('ingreso')) {
+        type = 'incomes';
+      }
+      
       const success = this.data.exportDataToCSV(type);
       
       if (success) {
-        this.ui.showAlert(`Datos de ${type === 'expenses' ? 'gastos' : 'ingresos'} exportados exitosamente`, 'success');
+        const typeText = type === 'complete' ? 'datos completos' : 
+                        type === 'expenses' ? 'gastos' : 'ingresos';
+        this.ui.showAlert(`${typeText.charAt(0).toUpperCase() + typeText.slice(1)} exportados exitosamente`, 'success');
       } else {
         this.ui.showAlert('Error al exportar los datos', 'error');
       }
@@ -837,15 +846,10 @@ class FinznApp {
     console.log('📥 Importing data...');
     
     const fileInput = document.getElementById('import-file');
-    const importType = document.querySelector('input[name="import-type"]:checked')?.value;
+    const importType = document.querySelector('input[name="import-type"]:checked')?.value || 'auto';
     
     if (!fileInput.files[0]) {
       this.ui.showAlert('Por favor selecciona un archivo CSV', 'error');
-      return;
-    }
-    
-    if (!importType) {
-      this.ui.showAlert('Por favor selecciona el tipo de datos a importar', 'error');
       return;
     }
     
@@ -854,7 +858,13 @@ class FinznApp {
       const result = await this.data.importDataFromCSV(file, importType);
       
       this.modals.hide('import-data-modal');
-      this.ui.showAlert(`Importación exitosa: ${result.imported} registros importados${result.errors > 0 ? `, ${result.errors} errores` : ''}`, 'success');
+      
+      let message = `Importación exitosa: ${result.imported} registros importados`;
+      if (result.errors > 0) {
+        message += `, ${result.errors} errores encontrados`;
+      }
+      
+      this.ui.showAlert(message, result.errors > 0 ? 'warning' : 'success');
       
       // Refresh dashboard
       this.updateDashboard();
