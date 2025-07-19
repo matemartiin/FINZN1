@@ -34,7 +34,7 @@ export default async (request, context) => {
 
     const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY;
     
-    console.log('🔑 API Key check:', GEMINI_API_KEY ? 'Present' : 'Missing');
+    console.log('🔑 API Key check:', GEMINI_API_KEY ? `Present (${GEMINI_API_KEY.substring(0, 10)}...)` : 'Missing');
 
     // If no API key, use fallback responses
     if (!GEMINI_API_KEY) {
