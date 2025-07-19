@@ -100,7 +100,7 @@ export class ChatManager {
     this.showTypingIndicator();
 
     try {
-      // Try to use AI chat function first
+      // Get AI response
       const response = await this.getAIResponse(message);
       
       this.hideTypingIndicator();
@@ -115,25 +115,89 @@ export class ChatManager {
   }
 
   async getAIResponse(message) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    console.log('🤖 Attempting Gemini API call...');
+    console.log('🔑 API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'Missing');
+
+    // If no API key, use fallback responses
+    if (!apiKey) {
+      console.log('⚠️ No API key found, using fallback responses');
+      return this.getFallbackResponse(message);
+    }
+
     try {
-      // Try to call the Netlify function for AI chat
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message })
-      });
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
+
+Pregunta del usuario: ${message}`
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 200,
+            },
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_HARASSMENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              },
+              {
+                category: "HARM_CATEGORY_HATE_SPEECH",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              }
+            ]
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let errorMessage = "Error en el servicio de IA";
+        
+        if (response.status === 429) {
+          errorMessage = "¡Muchas consultas! Esperá un minuto y volvé a intentarlo 😊";
+        } else if (response.status === 403) {
+          errorMessage = "Problema con la API key. Contactá al administrador.";
+        } else if (response.status === 400) {
+          errorMessage = "Tu mensaje no pudo ser procesado. Intentá reformularlo.";
+        }
+        
+        console.error("❌ Error de Gemini API:", response.status, response.statusText);
+        return errorMessage;
       }
 
       const data = await response.json();
-      return data.reply || this.getFallbackResponse(message);
+      console.log('✅ Gemini API response received');
+
+      if (!data.candidates || data.candidates.length === 0) {
+        return "No pude generar una respuesta. ¿Podrías reformular tu pregunta?";
+      }
+
+      const reply = data.candidates[0]?.content?.parts?.[0]?.text || 
+                    "No tengo una respuesta clara, ¿podés reformularlo?";
+
+      return reply.trim();
+
     } catch (error) {
-      console.error('AI chat error:', error);
-      // Fallback to predefined responses
+      console.error("❌ Error en la API de Gemini:", error);
+      
+      // Fallback response
       return this.getFallbackResponse(message);
     }
   }
@@ -184,6 +248,22 @@ export class ChatManager {
     
     if (lowerMessage.includes('deuda') || lowerMessage.includes('credito')) {
       return "💳 Para manejar deudas: 1) Lista todas tus deudas, 2) Prioriza las de mayor interés, 3) Paga más del mínimo cuando puedas, 4) Evita nuevas deudas.";
+    }
+    
+    if (lowerMessage.includes('inversion') || lowerMessage.includes('invertir')) {
+      return "📈 Antes de invertir: 1) Ten un fondo de emergencia, 2) Edúcate sobre opciones de inversión, 3) Diversifica tu portafolio, 4) Invierte solo lo que puedas permitirte perder.";
+    }
+    
+    if (lowerMessage.includes('emergencia') || lowerMessage.includes('fondo')) {
+      return "🚨 Un fondo de emergencia debería cubrir 3-6 meses de gastos básicos. Guárdalo en una cuenta de fácil acceso pero separada de tus gastos diarios.";
+    }
+    
+    if (lowerMessage.includes('gasto') || lowerMessage.includes('gastar')) {
+      return "💳 Para controlar gastos: 1) Registra todo lo que gastas, 2) Categoriza tus gastos, 3) Identifica gastos innecesarios, 4) Establece límites por categoría.";
+    }
+    
+    if (lowerMessage.includes('meta') || lowerMessage.includes('objetivo')) {
+      return "🎯 Para lograr tus metas financieras: 1) Define objetivos específicos y medibles, 2) Establece plazos realistas, 3) Crea un plan de ahorro, 4) Revisa tu progreso regularmente.";
     }
     
     return "🤖 Hola! Soy tu asistente financiero. Puedo ayudarte con presupuestos, ahorros, inversiones y planificación financiera. ¿En qué tema específico te gustaría que te ayude?";

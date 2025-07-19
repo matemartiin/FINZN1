@@ -11,14 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8888',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/.netlify/functions')
-      }
-    }
+    host: true
   },
   base: './',
   publicDir: './public',
