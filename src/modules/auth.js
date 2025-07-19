@@ -11,6 +11,13 @@ export class AuthManager {
     
     // Get initial session
     try {
+      // Check if supabase is properly configured
+      if (!supabase || typeof supabase.auth?.getSession !== 'function') {
+        console.warn('⚠️ Supabase not properly configured, using mock auth');
+        this.currentUser = null;
+        return;
+      }
+      
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error('Error getting session:', error);

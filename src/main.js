@@ -457,6 +457,13 @@ class FinznApp {
   async loadUserData() {
     console.log('📊 Loading user data...');
     try {
+      // Check if user is authenticated
+      const currentUser = this.auth.getCurrentUser();
+      if (!currentUser) {
+        console.log('⚠️ No authenticated user, skipping data load');
+        return;
+      }
+      
       await this.data.loadUserData();
       
       // Update categories in selects
@@ -468,6 +475,8 @@ class FinznApp {
       console.log('✅ User data loaded successfully');
     } catch (error) {
       console.error('❌ Error loading user data:', error);
+      // Show user-friendly error message
+      this.ui.showAlert('Error al cargar los datos. Verifica tu conexión.', 'error');
     }
   }
 

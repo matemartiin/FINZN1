@@ -71,13 +71,21 @@ export class DataManager {
     if (!userId) return;
 
     try {
+      console.log('🏷️ Loading categories for user:', userId);
+      
       const { data, error } = await supabase
         .from('categories')
         .select('*')
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Error loading categories:', error);
+        console.error('❌ Error loading categories:', error);
+        // If it's a connection error, create default categories locally
+        if (error.message && error.message.includes('Failed to fetch')) {
+          console.log('🔄 Using default categories due to connection error');
+          this.data.categories = this.getDefaultCategories();
+          return;
+        }
         return;
       }
 
@@ -88,11 +96,16 @@ export class DataManager {
           icon: cat.icon,
           color: cat.color
         }));
+        console.log('✅ Categories loaded from database:', this.data.categories.length);
       } else {
+        console.log('📝 No categories found, creating defaults');
         await this.createDefaultCategories();
       }
     } catch (error) {
-      console.error('Error in loadCategories:', error);
+      console.error('❌ Error in loadCategories:', error);
+      // Fallback to default categories
+      console.log('🔄 Using default categories as fallback');
+      this.data.categories = this.getDefaultCategories();
     }
   }
 
