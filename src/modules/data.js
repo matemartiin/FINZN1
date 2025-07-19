@@ -1121,22 +1121,6 @@ export class DataManager {
     
     return 'Otros';
   }
-              }
-              imported++;
-            }
-          }
-        } catch (rowError) {
-          console.error('Error importing row:', row, rowError);
-          errors++;
-        }
-      }
-
-      return { imported, errors };
-    } catch (error) {
-      console.error('Error importing CSV:', error);
-      throw error;
-    }
-  }
 
   // Balance calculations - FIXED
   calculateBalance(month) {
