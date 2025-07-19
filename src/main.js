@@ -890,6 +890,7 @@ class FinznApp {
     const resultDiv = document.getElementById('ai-report-result');
     const contentDiv = document.getElementById('ai-report-content');
     const generateBtn = document.getElementById('generate-report-btn');
+    const downloadBtn = document.getElementById('download-report-btn');
     
     // Show loading state
     generateBtn.disabled = true;
@@ -899,12 +900,22 @@ class FinznApp {
       // Prepare data for AI analysis
       const reportData = await this.prepareReportData(period);
       
-      // Generate report with AI
-      const report = await this.generateAiReport(reportData, focus, questions);
+      // Generate report with AI using ReportManager
+      const report = await this.reports.generateAIReport(reportData, focus, questions);
       
       // Show result
       contentDiv.innerHTML = report;
       resultDiv.classList.remove('hidden');
+      
+      // Store report data for PDF generation
+      this.currentReportData = reportData;
+      this.currentReportContent = report;
+      
+      // Enable download button
+      if (downloadBtn) {
+        downloadBtn.disabled = false;
+        downloadBtn.onclick = () => this.handleDownloadReport();
+      }
       
       this.ui.showAlert('Informe generado exitosamente', 'success');
       
@@ -914,6 +925,28 @@ class FinznApp {
     } finally {
       generateBtn.disabled = false;
       generateBtn.innerHTML = '<span>🤖</span> Generar Informe';
+    }
+  }
+  
+  async handleDownloadReport() {
+    console.log('📄 Downloading report as PDF...');
+    
+    if (!this.currentReportContent || !this.currentReportData) {
+      this.ui.showAlert('No hay informe para descargar', 'error');
+      return;
+    }
+    
+    try {
+      const success = await this.reports.generatePDF(this.currentReportContent, this.currentReportData);
+      
+      if (success) {
+        this.ui.showAlert('PDF generado exitosamente', 'success');
+      } else {
+        this.ui.showAlert('PDF generado como archivo HTML', 'info');
+      }
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      this.ui.showAlert('Error al generar el PDF', 'error');
     }
   }
   
@@ -957,72 +990,6 @@ class FinznApp {
     }
     
     return data;
-  }
-  
-  async generateAiReport(data, focus, questions) {
-    // For now, generate a basic report structure
-    // This can be enhanced with actual AI integration later
-    
-    const balance = data.totalIncome - data.totalExpenses;
-    const savingsRate = data.totalIncome > 0 ? ((balance / data.totalIncome) * 100).toFixed(1) : 0;
-    
-    let report = `
-      <h4>📊 Resumen Financiero</h4>
-      <p><strong>Período:</strong> ${this.getPeriodText(data.period)}</p>
-      <p><strong>Ingresos Totales:</strong> ${this.ui.formatCurrency(data.totalIncome)}</p>
-      <p><strong>Gastos Totales:</strong> ${this.ui.formatCurrency(data.totalExpenses)}</p>
-      <p><strong>Balance:</strong> ${this.ui.formatCurrency(balance)}</p>
-      <p><strong>Tasa de Ahorro:</strong> ${savingsRate}%</p>
-      
-      <h4>💡 Análisis y Recomendaciones</h4>
-    `;
-    
-    // Add analysis based on focus
-    if (focus === 'savings') {
-      report += `
-        <p>Tu tasa de ahorro actual es del ${savingsRate}%. ${savingsRate >= 20 ? 
-          '¡Excelente! Estás ahorrando muy bien.' : 
-          'Te recomendamos intentar ahorrar al menos el 20% de tus ingresos.'}</p>
-      `;
-    } else if (focus === 'expenses') {
-      const topCategory = Object.keys(data.categories).reduce((a, b) => 
-        data.categories[a] > data.categories[b] ? a : b, '');
-      report += `
-        <p>Tu mayor gasto es en <strong>${topCategory}</strong> con ${this.ui.formatCurrency(data.categories[topCategory])}.</p>
-        <p>Considera revisar esta categoría para encontrar oportunidades de ahorro.</p>
-      `;
-    }
-    
-    // Add category breakdown
-    report += `<h4>📈 Gastos por Categoría</h4><ul>`;
-    Object.entries(data.categories)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
-      .forEach(([category, amount]) => {
-        const percentage = ((amount / data.totalExpenses) * 100).toFixed(1);
-        report += `<li><strong>${category}:</strong> ${this.ui.formatCurrency(amount)} (${percentage}%)</li>`;
-      });
-    report += `</ul>`;
-    
-    if (questions) {
-      report += `
-        <h4>❓ Respuesta a tus Preguntas</h4>
-        <p><em>"${questions}"</em></p>
-        <p>Basándome en tus datos financieros, te recomiendo revisar tus patrones de gasto y establecer objetivos específicos de ahorro.</p>
-      `;
-    }
-    
-    return report;
-  }
-  
-  getPeriodText(period) {
-    const periods = {
-      'current': 'Mes Actual',
-      'last3': 'Últimos 3 Meses',
-      'last6': 'Últimos 6 Meses',
-      'year': 'Año Completo'
-    };
-    return periods[period] || 'Período Seleccionado';
   }
   
   getLastMonths(count) {
