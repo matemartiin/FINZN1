@@ -4,10 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  VITE_GEMINI_API_KEY = "AIzaSyC-azRp6elq_4tI6DfPqGt8IszlZPMQO-I"
-  VITE_SUPABASE_URL = "https://iorzfbiiprbwbdygqipu.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvcnpmYmlpcHJid2JkeWdxaXB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNjg0MzQsImV4cCI6MjA2Nzk0NDQzNH0.k47RZgrlrL8zis_giZAOTFa6uqds1IKElAev1R4X4ig"
-
+  VITE_GEMINI_API_KEY = 
+  VITE_SUPABASE_URL = 
+  VITE_SUPABASE_ANON_KEY = 
 [[headers]]
   for = "/*"
   [headers.values]
