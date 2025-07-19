@@ -1,3 +1,5 @@
+import { GoogleGenAI } from "@google/genai";
+
 export class ChatManager {
   constructor() {
     this.isOpen = false;
