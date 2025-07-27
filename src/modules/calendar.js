@@ -598,6 +598,82 @@ export class CalendarManager {
     this.showCalendarIntegrationModal('outlook');
   }
 
+  showConfigurationHelp(errorType) {
+    const helpContainer = document.getElementById('calendar-help');
+    if (!helpContainer) return;
+
+    const currentOrigin = window.location.origin;
+    let helpContent = '';
+
+    switch (errorType) {
+      case 'google-referrer-blocked':
+        helpContent = `
+          <div class="config-help error">
+            <h4>🔧 Google Calendar API Configuration Required</h4>
+            <p><strong>Error:</strong> HTTP referrer restriction blocking requests</p>
+            <div class="config-steps">
+              <h5>Steps to fix:</h5>
+              <ol>
+                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                <li>Navigate to <strong>APIs & Services → Credentials</strong></li>
+                <li>Find your API key and click <strong>Edit</strong></li>
+                <li>Under <strong>Application restrictions</strong>, add this origin:</li>
+                <li><code>${currentOrigin}</code></li>
+                <li>For development, also add: <code>*.webcontainer-api.io</code></li>
+              </ol>
+            </div>
+          </div>
+        `;
+        break;
+      case 'google-general-error':
+        helpContent = `
+          <div class="config-help warning">
+            <h4>⚠️ Google Calendar Configuration Issue</h4>
+            <p>Please check your Google Calendar API credentials in the .env file</p>
+          </div>
+        `;
+        break;
+    }
+
+    helpContainer.innerHTML = helpContent;
+    helpContainer.style.display = 'block';
+  }
+
+  async authenticateGoogle() {
+    try {
+      console.log('🔐 Authenticating with Google Calendar...');
+      
+      if (!window.gapi || !window.gapi.auth2) {
+        throw new Error('Google API not loaded');
+      }
+
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      
+      if (!authInstance.isSignedIn.get()) {
+        // User needs to sign in
+        const user = await authInstance.signIn();
+        console.log('✅ User signed in to Google:', user.getBasicProfile().getEmail());
+      }
+
+      this.isGoogleAuthenticated = true;
+      this.googleAccessToken = authInstance.currentUser.get().getAuthResponse().access_token;
+      
+      // Save integration status
+      this.integrations.google = true;
+      this.saveIntegrationStatus();
+      
+      // Show success message
+      window.app.ui.showAlert('¡Google Calendar conectado! Los recordatorios aparecerán en tu celular.', 'success');
+      
+      // Sync existing events
+      await this.syncEventsToGoogle();
+      
+    } catch (error) {
+      console.error('❌ Error authenticating with Google:', error);
+      window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
+    }
+  }
+
   async authenticateAndIntegrateGoogle() {
     try {
       console.log('🔐 Authenticating with Google Calendar...');
