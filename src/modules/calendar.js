@@ -65,6 +65,7 @@ export class CalendarManager {
     try {
       if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
         console.log('⚠️ Google Calendar API not configured - missing API key or client ID');
+        this.showConfigurationHelp('google-not-configured');
         return;
       }
 
@@ -76,14 +77,22 @@ export class CalendarManager {
       
       // Check for specific error types
       if (error.error === 'idpiframe_initialization_failed' || 
-          (error.details && error.details.includes('Not a valid origin'))) {
+          (error.details && error.details.includes('Not a valid origin')) ||
+          error.message?.includes('Not a valid origin') ||
+          error.message?.includes('origin not allowed')) {
         console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
         this.showConfigurationHelp('google-origin-blocked');
-      } else if (error.error && error.error.code === 403 && 
-                 (error.error.message.includes('blocked') || 
-                  (error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED')))) {
+      } else if ((error.error && error.error.code === 403) || 
+                 error.status === 403 ||
+                 error.message?.includes('403') ||
+                 error.message?.includes('Forbidden') ||
+                 (error.error && error.error.message?.includes('blocked')) || 
+                 (error.error && error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED'))) {
         console.warn('⚠️ Google Calendar API HTTP referrer blocked.');
         this.showConfigurationHelp('google-referrer-blocked');
+      } else if (error.type === 'tokenFailed' && error.error === 'server_error') {
+        console.warn('⚠️ Google OAuth server error - domain authorization issue.');
+        this.showConfigurationHelp('google-oauth-blocked');
       } else {
         this.showConfigurationHelp('google-general-error');
       }
@@ -594,6 +603,15 @@ export class CalendarManager {
   handleGoogleCalendarIntegration() {
     console.log('📅 Google Calendar integration');
     
+    // Check if we're in a development environment
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' ||
+                         window.location.hostname.includes('webcontainer');
+    
+    if (isDevelopment) {
+      window.app.ui.showAlert('Google Calendar requiere HTTPS en producción. Funcionalidad limitada en desarrollo.', 'warning');
+    }
+    
     if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
       window.app.ui.showAlert('Google Calendar API no está configurado. Revisa las variables de entorno.', 'error');
       this.showConfigurationHelp('google-general-error');
@@ -623,9 +641,25 @@ export class CalendarManager {
     if (!helpContainer) return;
 
     const currentOrigin = window.location.origin;
+    const currentDomain = window.location.hostname;
     let helpContent = '';
 
     switch (errorType) {
+      case 'google-not-configured':
+        helpContent = `
+          <div class="config-help warning">
+            <h4>⚙️ Google Calendar No Configurado</h4>
+            <p>Las variables de entorno de Google Calendar no están configuradas.</p>
+            <div class="config-steps">
+              <h5>Variables necesarias en .env:</h5>
+              <ul>
+                <li><code>VITE_GOOGLE_API_KEY</code></li>
+                <li><code>VITE_GOOGLE_CLIENT_ID</code></li>
+              </ul>
+            </div>
+          </div>
+        `;
+        break;
       case 'google-origin-blocked':
         helpContent = `
           <div class="config-help error">
@@ -640,6 +674,7 @@ export class CalendarManager {
                 <li>Under <strong>Authorized JavaScript origins</strong>, add:</li>
                 <li><code>${currentOrigin}</code></li>
                 <li>For development, also add: <code>*.webcontainer-api.io</code></li>
+                <li>For Netlify: <code>https://*.netlify.app</code></li>
               </ol>
             </div>
           </div>
@@ -659,6 +694,27 @@ export class CalendarManager {
                 <li>Under <strong>Application restrictions</strong>, add this origin:</li>
                 <li><code>${currentOrigin}</code></li>
                 <li>For development, also add: <code>*.webcontainer-api.io</code></li>
+                <li>For Netlify: <code>https://*.netlify.app</code></li>
+              </ol>
+            </div>
+          </div>
+        `;
+        break;
+      case 'google-oauth-blocked':
+        helpContent = `
+          <div class="config-help error">
+            <h4>🚫 Google OAuth Domain Blocked</h4>
+            <p><strong>Error:</strong> Domain not authorized for OAuth requests</p>
+            <div class="config-steps">
+              <h5>Steps to fix:</h5>
+              <ol>
+                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                <li>Navigate to <strong>APIs & Services → Credentials</strong></li>
+                <li>Find your OAuth 2.0 Client ID and click <strong>Edit</strong></li>
+                <li>Under <strong>Authorized JavaScript origins</strong>, add:</li>
+                <li><code>${currentOrigin}</code></li>
+                <li>For Netlify production: <code>https://${currentDomain}</code></li>
+                <li>Wait 5-10 minutes for changes to propagate</li>
               </ol>
             </div>
           </div>
@@ -757,10 +813,21 @@ export class CalendarManager {
     } catch (error) {
       console.error('❌ Error authenticating with Google:', error);
       
+      // Handle different types of authentication errors
       if (error.error === 'popup_closed_by_user') {
         window.app.ui.showAlert('Autenticación cancelada por el usuario.', 'warning');
       } else if (error.error === 'access_denied') {
         window.app.ui.showAlert('Acceso denegado. Necesitas permitir el acceso a Google Calendar.', 'error');
+      } else if (error.type === 'tokenFailed') {
+        if (error.error === 'server_error') {
+          window.app.ui.showAlert('Error del servidor de Google. Verifica la configuración de dominios autorizados.', 'error');
+          this.showConfigurationHelp('google-oauth-blocked');
+        } else {
+          window.app.ui.showAlert('Error de autenticación con Google. Intenta de nuevo.', 'error');
+        }
+      } else if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
+        window.app.ui.showAlert('Dominio no autorizado para Google Calendar. Revisa la configuración.', 'error');
+        this.showConfigurationHelp('google-oauth-blocked');
       } else {
         window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
       }
