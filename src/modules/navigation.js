@@ -26,23 +26,12 @@ export class NavigationManager {
 
   setupSidebarNavigationEvents() {
     const navItems = document.querySelectorAll('.nav-item');
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
     
     navItems.forEach(item => {
       item.addEventListener('click', () => {
         const section = item.getAttribute('data-section');
         this.showSection(section);
         this.setActiveNavItem(item);
-        this.setActiveTabFromSidebar(section);
-      });
-    });
-    
-    // Eventos para navegación móvil
-    mobileNavItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const section = item.getAttribute('data-section');
-        this.showSection(section);
-        this.setActiveMobileNavItem(item);
         this.setActiveTabFromSidebar(section);
       });
     });
@@ -118,31 +107,10 @@ export class NavigationManager {
     activeItem.classList.add('active');
   }
 
-  setActiveMobileNavItem(activeItem) {
-    // Remove active class from all mobile nav items
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-    mobileNavItems.forEach(item => {
-      item.classList.remove('active');
-    });
-
-    // Add active class to clicked item
-    activeItem.classList.add('active');
-  }
-
   setActiveTabFromSidebar(section) {
     // Sync tab navigation with sidebar navigation
     const tabItems = document.querySelectorAll('.tab-item');
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-    
     tabItems.forEach(item => {
-      item.classList.remove('active');
-      if (item.getAttribute('data-section') === section) {
-        item.classList.add('active');
-      }
-    });
-    
-    // Sync mobile navigation
-    mobileNavItems.forEach(item => {
       item.classList.remove('active');
       if (item.getAttribute('data-section') === section) {
         item.classList.add('active');

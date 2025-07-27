@@ -446,57 +446,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-/* ===== MOBILE BOTTOM NAVIGATION ===== */
-.mobile-bottom-nav {
-  display: none; /* Oculto por defecto en desktop */
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  z-index: 1000;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: var(--spacing-xs);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: var(--border-radius-md);
-  text-decoration: none;
-  color: var(--text-secondary);
-  min-height: 60px;
-}
-
-.mobile-nav-item:hover,
-.mobile-nav-item.active {
-  color: var(--primary-color);
-  background: var(--primary-color-light);
-}
-
-.mobile-nav-icon {
-  font-size: 1.5rem;
-  margin-bottom: 2px;
-}
-
-.mobile-nav-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1;
-}
-
-/* Clase helper para ocultar en móvil */
-.desktop-only {
-  display: block;
-}
 
 /* Tab Navigation - NUEVA */
 .main-tabs {
@@ -2652,25 +2601,9 @@ body {
   .transactions-filters,
   .expenses-filters {
     flex-direction: column;
-  /* Ocultar sidebar en móvil */
-  .sidebar-nav {
-    display: none !important;
   }
   
-  /* Mostrar navegación inferior en móvil */
-  .mobile-bottom-nav {
-    display: flex !important;
-  }
-  
-  /* Ajustar contenido principal para navegación inferior */
-  .main-dashboard {
-    padding-bottom: 80px; /* Espacio para la navegación inferior */
-  }
-  
-  /* Ocultar tabs superiores en móvil */
-  .main-tabs {
-    display: none !important;
-  }
+  .expense-item {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-sm);
