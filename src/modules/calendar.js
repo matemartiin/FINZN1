@@ -625,12 +625,25 @@ export class CalendarManager {
     if (!this.isGoogleAuthenticated) return;
     
     try {
-      const startDateTime = new Date(event.date + 'T09:00:00');
-      const endDateTime = new Date(event.date + 'T10:00:00');
+      // Usar hora personalizada o por defecto
+      const eventTime = event.time || '09:00';
+      const duration = event.duration || 60; // minutos
+      
+      const startDateTime = new Date(event.date + 'T' + eventTime + ':00');
+      const endDateTime = new Date(startDateTime.getTime() + (duration * 60000));
+      
+      // Generar título personalizado
+      const customTitle = this.generateCustomTitle(event);
+      
+      // Generar descripción personalizada
+      const customDescription = this.generateCustomDescription(event);
+      
+      // Obtener recordatorios personalizados
+      const customReminders = this.getCustomReminders(event.type);
       
       const googleEvent = {
-        summary: `💰 ${event.title}`,
-        description: this.formatEventDescription(event),
+        summary: customTitle,
+        description: customDescription,
         start: {
           dateTime: startDateTime.toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -641,10 +654,16 @@ export class CalendarManager {
         },
         reminders: {
           useDefault: false,
-          overrides: [
-            { method: 'popup', minutes: 60 }, // 1 hora antes
-            { method: 'popup', minutes: 15 }  // 15 minutos antes
-          ]
+          overrides: customReminders
+        },
+        colorId: this.getEventColor(event.type),
+        extendedProperties: {
+          private: {
+            finznEventId: event.id,
+            finznEventType: event.type,
+            finznAmount: event.amount?.toString() || '',
+            finznCategory: event.category || ''
+          }
         }
       };
       
