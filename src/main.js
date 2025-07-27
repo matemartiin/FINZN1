@@ -260,6 +260,7 @@ class FinznApp {
     // Calendar events
     const addEventBtn = document.getElementById('add-event-btn');
     const syncCalendarBtn = document.getElementById('sync-calendar-btn');
+    const calendarSettingsBtn = document.getElementById('calendar-settings-btn');
     
     if (addEventBtn) {
       addEventBtn.addEventListener('click', () => this.showAddEventModal());
@@ -267,6 +268,10 @@ class FinznApp {
     
     if (syncCalendarBtn) {
       syncCalendarBtn.addEventListener('click', () => this.handleSyncCalendar());
+    }
+    
+    if (calendarSettingsBtn) {
+      calendarSettingsBtn.addEventListener('click', () => this.showCalendarSettingsModal());
     }
   }
 
@@ -317,6 +322,32 @@ class FinznApp {
     const addEventForm = document.getElementById('add-event-form');
     if (addEventForm) {
       addEventForm.addEventListener('submit', (e) => this.handleAddEvent(e));
+    }
+    
+    // Calendar settings
+    const saveSettingsBtn = document.getElementById('save-settings');
+    const resetSettingsBtn = document.getElementById('reset-settings');
+    
+    if (saveSettingsBtn) {
+      saveSettingsBtn.addEventListener('click', () => this.handleSaveCalendarSettings());
+    }
+    
+    if (resetSettingsBtn) {
+      resetSettingsBtn.addEventListener('click', () => this.handleResetCalendarSettings());
+    }
+    
+    // Custom reminder checkbox
+    const reminderCustom = document.getElementById('reminder-custom');
+    const customReminderGroup = document.getElementById('custom-reminder-group');
+    
+    if (reminderCustom && customReminderGroup) {
+      reminderCustom.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          customReminderGroup.classList.remove('hidden');
+        } else {
+          customReminderGroup.classList.add('hidden');
+        }
+      });
     }
     
     // Installments checkbox
@@ -861,7 +892,37 @@ class FinznApp {
       dateInput.value = today;
     }
     
+    // Update categories in event modal
+    const categories = this.data.getCategories();
+    this.ui.updateCategoriesSelect(categories, 'event-category');
+    
     this.modals.show('add-event-modal');
+  }
+  
+  showCalendarSettingsModal() {
+    console.log('⚙️ Show calendar settings modal');
+    
+    // Load current settings
+    const settings = this.calendar.getReminderSettings();
+    
+    // Update template inputs
+    document.getElementById('template-payment').value = settings.titleTemplates.payment || '💰 {title}';
+    document.getElementById('template-income').value = settings.titleTemplates.income || '💵 {title}';
+    document.getElementById('template-goal').value = settings.titleTemplates['goal-deadline'] || '🎯 {title}';
+    document.getElementById('template-review').value = settings.titleTemplates.review || '📊 {title}';
+    document.getElementById('template-reminder').value = settings.titleTemplates.reminder || '⏰ {title}';
+    
+    // Update description template
+    document.getElementById('description-template').value = settings.descriptionTemplate || '';
+    
+    // Update default reminders
+    const defaultReminders = settings.defaultReminders || [];
+    document.getElementById('default-1h').checked = defaultReminders.some(r => r.minutes === 60);
+    document.getElementById('default-15m').checked = defaultReminders.some(r => r.minutes === 15);
+    document.getElementById('default-1d').checked = defaultReminders.some(r => r.minutes === 1440);
+    document.getElementById('default-1w').checked = defaultReminders.some(r => r.minutes === 10080);
+    
+    this.modals.show('calendar-settings-modal');
   }
   
   showUserPreferencesModal() {
@@ -1103,13 +1164,35 @@ class FinznApp {
     }
     
     try {
+      // Procesar recordatorios personalizados
+      const customReminders = [];
+      
+      if (formData.reminder1h) {
+        customReminders.push({ method: 'popup', minutes: 60 });
+      }
+      
+      if (formData.reminder15m) {
+        customReminders.push({ method: 'popup', minutes: 15 });
+      }
+      
+      if (formData.reminderCustom && formData.customReminderMinutes) {
+        customReminders.push({ 
+          method: 'popup', 
+          minutes: parseInt(formData.customReminderMinutes) 
+        });
+      }
+      
       const eventData = {
         title: formData.title,
         type: formData.type,
         date: formData.date,
+        time: formData.time || '09:00',
+        duration: parseInt(formData.duration) || 60,
         amount: parseFloat(formData.amount) || null,
         description: formData.description || '',
-        recurring: formData.recurring || false
+        category: formData.category || 'General',
+        recurring: formData.recurring || false,
+        customReminders: customReminders.length > 0 ? customReminders : null
       };
       
       await this.calendar.addEvent(eventData);
@@ -1133,7 +1216,80 @@ class FinznApp {
   
   handleSyncCalendar() {
     console.log('🔄 Syncing calendar...');
-    this.ui.showAlert('Función de sincronización próximamente', 'info');
+    
+    if (this.calendar.isGoogleAuthenticated) {
+      this.calendar.syncEventsToGoogle();
+      this.ui.showAlert('Sincronizando con Google Calendar...', 'info');
+    } else {
+      this.ui.showAlert('Conecta tu Google Calendar primero para sincronizar', 'warning');
+    }
+  }
+  
+  handleSaveCalendarSettings() {
+    console.log('💾 Saving calendar settings...');
+    
+    try {
+      // Obtener valores de plantillas
+      const titleTemplates = {
+        payment: document.getElementById('template-payment').value,
+        income: document.getElementById('template-income').value,
+        'goal-deadline': document.getElementById('template-goal').value,
+        review: document.getElementById('template-review').value,
+        reminder: document.getElementById('template-reminder').value
+      };
+      
+      // Obtener plantilla de descripción
+      const descriptionTemplate = document.getElementById('description-template').value;
+      
+      // Obtener recordatorios por defecto
+      const defaultReminders = [];
+      
+      if (document.getElementById('default-1h').checked) {
+        defaultReminders.push({ method: 'popup', minutes: 60 });
+      }
+      
+      if (document.getElementById('default-15m').checked) {
+        defaultReminders.push({ method: 'popup', minutes: 15 });
+      }
+      
+      if (document.getElementById('default-1d').checked) {
+        defaultReminders.push({ method: 'popup', minutes: 1440 });
+      }
+      
+      if (document.getElementById('default-1w').checked) {
+        defaultReminders.push({ method: 'popup', minutes: 10080 });
+      }
+      
+      // Actualizar configuración
+      Object.keys(titleTemplates).forEach(type => {
+        this.calendar.setTitleTemplate(type, titleTemplates[type]);
+      });
+      
+      if (descriptionTemplate) {
+        this.calendar.setDescriptionTemplate(descriptionTemplate);
+      }
+      
+      // Actualizar recordatorios por defecto
+      this.calendar.reminderSettings.defaultReminders = defaultReminders;
+      this.calendar.saveReminderSettings();
+      
+      this.modals.hide('calendar-settings-modal');
+      this.ui.showAlert('Configuración guardada exitosamente', 'success');
+      
+    } catch (error) {
+      console.error('Error saving calendar settings:', error);
+      this.ui.showAlert('Error al guardar la configuración', 'error');
+    }
+  }
+  
+  handleResetCalendarSettings() {
+    console.log('🔄 Resetting calendar settings...');
+    
+    if (confirm('¿Estás seguro de que quieres restablecer la configuración por defecto?')) {
+      this.calendar.resetReminderSettings();
+      this.showCalendarSettingsModal(); // Reload modal with default values
+      this.ui.showAlert('Configuración restablecida', 'success');
+    }
   }
   
   async handleQuickAiReport() {

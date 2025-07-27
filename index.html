@@ -383,6 +383,10 @@
             <div class="section-header">
               <h1>Calendario Financiero</h1>
               <div class="section-actions">
+                <button id="calendar-settings-btn" class="btn btn-secondary">
+                  <span>⚙️</span>
+                  Configurar
+                </button>
                 <button id="sync-calendar-btn" class="btn btn-secondary">
                   <span>🔄</span>
                   Sincronizar
@@ -996,6 +1000,14 @@
           <input type="date" id="event-date" name="date" required />
         </div>
         <div class="form-group">
+          <label for="event-time">Hora</label>
+          <input type="time" id="event-time" name="time" value="09:00" />
+        </div>
+        <div class="form-group">
+          <label for="event-duration">Duración (minutos)</label>
+          <input type="number" id="event-duration" name="duration" value="60" min="15" max="480" />
+        </div>
+        <div class="form-group">
           <label for="event-amount">Monto (opcional)</label>
           <input type="number" id="event-amount" name="amount" step="0.01" />
         </div>
@@ -1004,11 +1016,46 @@
           <textarea id="event-description" name="description" rows="3"></textarea>
         </div>
         <div class="form-group">
+          <label for="event-category">Categoría</label>
+          <select id="event-category" name="category">
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>
             <input type="checkbox" id="event-recurring" name="recurring" />
             Evento recurrente
           </label>
         </div>
+        
+        <!-- Configuración de Recordatorios -->
+        <div class="form-section">
+          <h4>⏰ Configuración de Recordatorios</h4>
+          <div class="reminders-config">
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="reminder-1h" name="reminder1h" checked />
+                Recordar 1 hora antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="reminder-15m" name="reminder15m" checked />
+                Recordar 15 minutos antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="reminder-custom" name="reminderCustom" />
+                Recordatorio personalizado
+              </label>
+              <div id="custom-reminder-group" class="hidden">
+                <input type="number" id="custom-reminder-minutes" name="customReminderMinutes" min="1" max="10080" placeholder="Minutos antes" />
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Crear Evento</button>
@@ -1017,6 +1064,86 @@
     </div>
   </div>
 
+  <!-- Calendar Settings Modal -->
+  <div id="calendar-settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Configuración de Recordatorios</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h4>🎨 Plantillas de Títulos</h4>
+          <div class="template-config">
+            <div class="form-group">
+              <label for="template-payment">Pagos/Cuotas</label>
+              <input type="text" id="template-payment" value="💰 {title}" />
+              <small>Usa {title} para el título del evento</small>
+            </div>
+            <div class="form-group">
+              <label for="template-income">Ingresos</label>
+              <input type="text" id="template-income" value="💵 {title}" />
+            </div>
+            <div class="form-group">
+              <label for="template-goal">Objetivos</label>
+              <input type="text" id="template-goal" value="🎯 {title}" />
+            </div>
+            <div class="form-group">
+              <label for="template-review">Revisiones</label>
+              <input type="text" id="template-review" value="📊 {title}" />
+            </div>
+            <div class="form-group">
+              <label for="template-reminder">Recordatorios</label>
+              <input type="text" id="template-reminder" value="⏰ {title}" />
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h4>📝 Plantilla de Descripción</h4>
+          <div class="form-group">
+            <textarea id="description-template" rows="8" placeholder="Usa {description}, {amount}, {category} como variables"></textarea>
+            <small>Variables disponibles: {description}, {amount}, {category}</small>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h4>⏰ Recordatorios por Defecto</h4>
+          <div class="default-reminders">
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="default-1h" checked />
+                1 hora antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="default-15m" checked />
+                15 minutos antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="default-1d" />
+                1 día antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="default-1w" />
+                1 semana antes
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="reset-settings">Restablecer</button>
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="save-settings">Guardar Configuración</button>
+      </div>
+    </div>
+  </div>
   <!-- Chat Widget -->
   <div id="chat-widget" class="chat-widget">
     <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">

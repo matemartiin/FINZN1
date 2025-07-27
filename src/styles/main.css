@@ -1429,12 +1429,40 @@ body {
   font-weight: 600;
   color: var(--text-primary);
   font-size: 0.85rem;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .integration-btn:hover {
   background: var(--bg-tertiary);
   border-color: var(--lavanda);
   transform: translateY(-1px);
+}
+
+.integration-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.integration-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.integration-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.integration-status.connected {
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+.integration-status.connected::before {
+  content: "✅ ";
 }
 
 .google-calendar:hover {
@@ -1823,6 +1851,142 @@ body {
   font-weight: 700;
   font-size: 1rem;
   color: var(--text-primary);
+/* ===== CALENDAR SETTINGS MODAL ===== */
+.calendar-settings-modal .modal-content {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.settings-section {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.settings-section h4 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.template-config .form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.template-config label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.template-config input {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  background: var(--bg-secondary);
+}
+
+.template-config small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: var(--spacing-xs);
+  display: block;
+}
+
+.default-reminders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.default-reminders .form-group {
+  margin-bottom: var(--spacing-sm);
+}
+
+.default-reminders label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.default-reminders label:hover {
+  background: var(--bg-tertiary);
+}
+
+.default-reminders input[type="checkbox"] {
+  margin: 0;
+}
+
+/* ===== ENHANCED EVENT FORM ===== */
+.form-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+.form-section h4 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.reminders-config {
+  background: var(--bg-secondary);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.reminders-config .form-group {
+  margin-bottom: var(--spacing-sm);
+}
+
+.reminders-config label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#custom-reminder-group {
+  margin-top: var(--spacing-sm);
+  margin-left: var(--spacing-lg);
+}
+
+#custom-reminder-group input {
+  width: 150px;
+}
+
+/* ===== RESPONSIVE CALENDAR SETTINGS ===== */
+@media (max-width: 768px) {
+  .calendar-settings-modal .modal-content {
+    max-width: 95vw;
+    margin: var(--spacing-sm);
+  }
+  
+  .template-config input {
+    font-size: 0.9rem;
+  }
+  
+  .default-reminders {
+    grid-template-columns: 1fr;
+  }
+}
+
   margin-bottom: 4px;
 }
 
