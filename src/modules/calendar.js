@@ -9,6 +9,8 @@ export class CalendarManager {
     this.authPromise = null;
     this.googleAuth = null;
     this.gapi = null;
+    this.tokenClient = null;
+    this.accessToken = null;
   }
 
   init() {
@@ -175,7 +177,7 @@ export class CalendarManager {
       this.saveEvents();
       
       // Sync with Google Calendar if connected
-      if (this.isGoogleConnected) {
+      if (this.isGoogleConnected && this.accessToken) {
         await this.syncEventToGoogle(event);
       }
       
@@ -307,7 +309,7 @@ export class CalendarManager {
     });
   }
 
-  // Google Calendar Integration
+  // Google Calendar Integration with NEW Google Identity Services
   async handleGoogleCalendarIntegration() {
     try {
       console.log('🔗 Attempting Google Calendar integration...');
@@ -319,13 +321,13 @@ export class CalendarManager {
       }
     } catch (error) {
       console.error('❌ Google Calendar integration failed:', error);
-      this.showCalendarHelp('google-error', error.message);
+      this.handleGoogleError(error);
     }
   }
 
   async connectGoogleCalendar() {
     try {
-      console.log('🔗 Connecting to Google Calendar...');
+      console.log('🔗 Connecting to Google Calendar with GIS...');
       
       // Check if API keys are configured
       if (!this.checkGoogleConfiguration()) {
@@ -333,20 +335,24 @@ export class CalendarManager {
         return;
       }
 
-      // Load Google APIs
-      await this.loadGoogleAPIs();
+      // Load Google APIs with new GIS
+      await this.loadGoogleGISAPIs();
       
-      // Authenticate
-      await this.performGoogleAuthentication();
+      // Initialize and authenticate
+      await this.initializeGoogleGIS();
+      
+      // Request access token
+      await this.requestGoogleAccessToken();
       
       // Update connection status
       this.isGoogleConnected = true;
       this.updateGoogleConnectionStatus();
+      localStorage.setItem('finzn-google-connected', 'true');
       
       // Sync events
       await this.syncWithGoogleCalendar();
       
-      console.log('✅ Google Calendar connected successfully');
+      console.log('✅ Google Calendar connected successfully with GIS');
       
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Google Calendar conectado exitosamente', 'success');
@@ -370,7 +376,7 @@ export class CalendarManager {
     return !!(apiKey && clientId);
   }
 
-  async loadGoogleAPIs() {
+  async loadGoogleGISAPIs() {
     return new Promise((resolve, reject) => {
       // Check if already loaded
       if (window.gapi && window.google) {
@@ -380,56 +386,38 @@ export class CalendarManager {
         return;
       }
 
-      console.log('📦 Loading Google APIs...');
+      console.log('📦 Loading Google GIS APIs...');
       
       // Load Google API script
-      const script = document.createElement('script');
-      script.src = 'https://apis.google.com/js/api.js';
-      script.onload = () => {
+      const gapiScript = document.createElement('script');
+      gapiScript.src = 'https://apis.google.com/js/api.js';
+      gapiScript.onload = () => {
         // Load Google Identity Services
-        const identityScript = document.createElement('script');
-        identityScript.src = 'https://accounts.google.com/gsi/client';
-        identityScript.onload = () => {
-          console.log('✅ Google APIs loaded');
+        const gisScript = document.createElement('script');
+        gisScript.src = 'https://accounts.google.com/gsi/client';
+        gisScript.onload = () => {
+          console.log('✅ Google GIS APIs loaded');
           this.gapi = window.gapi;
           
           // Small delay to ensure services are ready
-          setTimeout(() => resolve(), 500);
+          setTimeout(() => resolve(), 1000);
         };
-        identityScript.onerror = () => reject(new Error('Failed to load Google Identity Services'));
-        document.head.appendChild(identityScript);
+        gisScript.onerror = () => reject(new Error('Failed to load Google Identity Services'));
+        document.head.appendChild(gisScript);
       };
-      script.onerror = () => reject(new Error('Failed to load Google API'));
-      document.head.appendChild(script);
+      gapiScript.onerror = () => reject(new Error('Failed to load Google API'));
+      document.head.appendChild(gapiScript);
     });
   }
 
-  async performGoogleAuthentication() {
-    if (this.isAuthenticating) {
-      console.log('⏳ Authentication already in progress, waiting...');
-      return this.authPromise;
-    }
-
-    this.isAuthenticating = true;
-    
-    try {
-      this.authPromise = this.performSingleGoogleAuth();
-      const result = await this.authPromise;
-      return result;
-    } finally {
-      this.isAuthenticating = false;
-      this.authPromise = null;
-    }
-  }
-
-  async performSingleGoogleAuth() {
+  async initializeGoogleGIS() {
     try {
       const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-      // Initialize GAPI
+      // Initialize GAPI client
       await new Promise((resolve, reject) => {
-        this.gapi.load('client:auth2', {
+        this.gapi.load('client', {
           callback: resolve,
           onerror: reject
         });
@@ -438,67 +426,81 @@ export class CalendarManager {
       // Initialize the client
       await this.gapi.client.init({
         apiKey: apiKey,
-        clientId: clientId,
-        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-        scope: 'https://www.googleapis.com/auth/calendar'
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
       });
 
-      // Get auth instance
-      this.googleAuth = this.gapi.auth2.getAuthInstance();
-      
-      // Check if already signed in
-      if (this.googleAuth.isSignedIn.get()) {
-        console.log('✅ Already signed in to Google');
-        return true;
-      }
+      // Initialize the OAuth2 token client
+      this.tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'https://www.googleapis.com/auth/calendar',
+        callback: (response) => {
+          if (response.error) {
+            console.error('❌ Token client error:', response);
+            throw new Error(response.error);
+          }
+          
+          console.log('✅ Access token received');
+          this.accessToken = response.access_token;
+          
+          // Set the access token for API calls
+          this.gapi.client.setToken({
+            access_token: this.accessToken
+          });
+        },
+      });
 
-      // Sign in
-      console.log('🔐 Signing in to Google...');
-      await this.googleAuth.signIn();
-      
-      console.log('✅ Google authentication successful');
-      return true;
+      console.log('✅ Google GIS initialized successfully');
       
     } catch (error) {
-      console.error('❌ Google authentication error:', error);
-      
-      // Handle specific error types
-      if (error.error === 'popup_blocked_by_browser') {
-        throw new Error('El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.');
-      } else if (error.error === 'access_denied') {
-        throw new Error('Acceso denegado. Necesitas autorizar el acceso a Google Calendar.');
-      } else if (error.message && error.message.includes('Only one navigator.credentials.get')) {
-        console.log('⏳ Multiple auth requests detected, waiting and retrying...');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        return this.performSingleGoogleAuth();
-      }
-      
+      console.error('❌ Error initializing Google GIS:', error);
       throw error;
     }
   }
 
-  async checkGoogleAuthStatus() {
-    try {
-      if (!this.googleAuth) {
-        return false;
+  async requestGoogleAccessToken() {
+    return new Promise((resolve, reject) => {
+      if (!this.tokenClient) {
+        reject(new Error('Token client not initialized'));
+        return;
       }
-      
-      const isSignedIn = this.googleAuth.isSignedIn.get();
-      console.log('🔍 Google auth status:', isSignedIn);
-      
-      return isSignedIn;
-    } catch (error) {
-      console.error('❌ Error checking Google auth status:', error);
-      return false;
-    }
+
+      // Set up callback for token response
+      const originalCallback = this.tokenClient.callback;
+      this.tokenClient.callback = (response) => {
+        // Restore original callback
+        this.tokenClient.callback = originalCallback;
+        
+        if (response.error) {
+          console.error('❌ Token request error:', response);
+          reject(new Error(response.error));
+          return;
+        }
+        
+        console.log('✅ Access token received successfully');
+        this.accessToken = response.access_token;
+        
+        // Set the access token for API calls
+        this.gapi.client.setToken({
+          access_token: this.accessToken
+        });
+        
+        resolve(response);
+      };
+
+      // Request access token
+      console.log('🔐 Requesting Google access token...');
+      this.tokenClient.requestAccessToken({
+        prompt: 'consent'
+      });
+    });
   }
 
   async syncWithGoogleCalendar() {
     try {
       console.log('🔄 Syncing with Google Calendar...');
       
-      if (!this.googleAuth || !this.googleAuth.isSignedIn.get()) {
-        throw new Error('Not authenticated with Google');
+      if (!this.accessToken) {
+        throw new Error('No access token available');
       }
 
       // Get events from Google Calendar
@@ -549,7 +551,7 @@ export class CalendarManager {
 
   async syncEventToGoogle(event) {
     try {
-      if (!this.googleAuth || !this.googleAuth.isSignedIn.get()) {
+      if (!this.accessToken) {
         console.log('⚠️ Not connected to Google Calendar, skipping sync');
         return;
       }
@@ -600,13 +602,16 @@ export class CalendarManager {
     try {
       console.log('🔌 Disconnecting from Google Calendar...');
       
-      if (this.googleAuth) {
-        await this.googleAuth.signOut();
+      // Revoke the access token
+      if (this.accessToken) {
+        window.google.accounts.oauth2.revoke(this.accessToken);
       }
       
       this.isGoogleConnected = false;
-      this.googleAuth = null;
+      this.accessToken = null;
+      this.tokenClient = null;
       this.updateGoogleConnectionStatus();
+      localStorage.removeItem('finzn-google-connected');
       
       console.log('✅ Google Calendar disconnected');
       
@@ -655,6 +660,8 @@ export class CalendarManager {
       helpType = 'google-oauth-blocked';
     } else if (error.error === 'tokenFailed' && error.idpId === 'google') {
       helpType = 'google-oauth-blocked';
+    } else if (error.error === 'idpiframe_initialization_failed') {
+      helpType = 'google-gis-migration';
     }
     
     this.showCalendarHelp(helpType, message);
@@ -680,7 +687,7 @@ export class CalendarManager {
     try {
       console.log('🔄 Syncing calendar...');
       
-      if (this.isGoogleConnected) {
+      if (this.isGoogleConnected && this.accessToken) {
         await this.syncWithGoogleCalendar();
         
         if (window.app && window.app.ui) {
@@ -761,6 +768,22 @@ export class CalendarManager {
         `;
         break;
         
+      case 'google-gis-migration':
+        helpContent = `
+          <div class="help-section info">
+            <h4>🔄 Migración a Google Identity Services</h4>
+            <p>Google ha actualizado sus librerías de autenticación. La aplicación ahora usa las nuevas Google Identity Services (GIS).</p>
+            <p><strong>Si sigues teniendo problemas:</strong></p>
+            <ol>
+              <li>Verifica que tu OAuth 2.0 Client ID esté configurado correctamente</li>
+              <li>Asegúrate de que el dominio esté autorizado</li>
+              <li>Limpia la caché del navegador</li>
+              <li>Intenta en modo incógnito</li>
+            </ol>
+          </div>
+        `;
+        break;
+        
       case 'apple-not-implemented':
         helpContent = `
           <div class="help-section info">
@@ -787,11 +810,11 @@ export class CalendarManager {
     helpContainer.innerHTML = helpContent;
     helpContainer.style.display = 'block';
     
-    // Auto-hide after 10 seconds for non-critical messages
+    // Auto-hide after 15 seconds for non-critical messages
     if (!type.includes('config') && !type.includes('oauth-blocked')) {
       setTimeout(() => {
         helpContainer.style.display = 'none';
-      }, 10000);
+      }, 15000);
     }
   }
 
