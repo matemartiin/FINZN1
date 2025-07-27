@@ -2,6 +2,8 @@ export class CalendarManager {
   constructor() {
     this.currentDate = new Date();
     this.events = [];
+    this.isAuthenticating = false; // Flag to prevent concurrent auth requests
+    this.authPromise = null; // Store ongoing auth promise
     this.integrations = {
       google: false,
       apple: false
@@ -600,30 +602,52 @@ export class CalendarManager {
   }
 
   // Integration methods
-  handleGoogleCalendarIntegration() {
-    console.log('📅 Google Calendar integration');
+  async handleGoogleCalendarIntegration() {
+    console.log('🔗 Handling Google Calendar integration...');
     
-    // Check if we're in a development environment
-    const isDevelopment = window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1' ||
-                         window.location.hostname.includes('webcontainer');
-    
-    if (isDevelopment) {
-      window.app.ui.showAlert('Google Calendar requiere HTTPS en producción. Funcionalidad limitada en desarrollo.', 'warning');
+    // Prevent multiple concurrent authentication attempts
+    if (this.isAuthenticating) {
+      console.log('⏳ Authentication already in progress, waiting...');
+      if (this.authPromise) {
+        try {
+          return await this.authPromise;
+        } catch (error) {
+          console.log('⚠️ Previous authentication failed, retrying...');
+        }
+      }
     }
     
-    if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
-      window.app.ui.showAlert('Google Calendar API no está configurado. Revisa las variables de entorno.', 'error');
-      this.showConfigurationHelp('google-general-error');
-      return;
+    try {
+      this.isAuthenticating = true;
+      this.authPromise = this.performGoogleAuthentication();
+      const result = await this.authPromise;
+      return result;
+    } catch (error) {
+      console.error('❌ Google Calendar integration failed:', error);
+      this.showCalendarHelp('google-auth-failed');
+      throw error;
+    } finally {
+      this.isAuthenticating = false;
+      this.authPromise = null;
     }
-    
-    if (!window.gapi) {
-      window.app.ui.showAlert('Google API no está cargado. Intenta recargar la página.', 'error');
-      return;
+  }
+  
+  async performGoogleAuthentication() {
+    try {
+      // Check if already authenticated
+      const isAuthenticated = await this.checkGoogleAuthStatus();
+      if (isAuthenticated) {
+        console.log('✅ Already authenticated with Google Calendar');
+        return { success: true, message: 'Already authenticated' };
+      }
+      
+      // Authenticate with Google
+      const authResult = await this.authenticateAndIntegrateGoogle();
+      return authResult;
+      
+    } catch (error) {
+      throw error;
     }
-    
-    this.authenticateAndIntegrateGoogle();
   }
 
   handleAppleCalendarIntegration() {
@@ -770,68 +794,110 @@ export class CalendarManager {
   }
 
   async authenticateAndIntegrateGoogle() {
+    console.log('🔐 Starting Google authentication...');
+    
+    // Double-check we're not already authenticating
+    if (this.isAuthenticating && this.authPromise && this.authPromise !== this.performGoogleAuthentication()) {
+      throw new Error('Another authentication is already in progress');
+    }
+    
     try {
-      console.log('🔐 Authenticating with Google Calendar...');
+      // Load Google Identity Services
+      await this.loadGoogleIdentityServices();
       
-      if (!window.gapi || !window.gapi.auth2) {
-        console.error('❌ Google API not loaded');
-        window.app.ui.showAlert('Google Calendar API no está disponible. Revisa la configuración.', 'error');
-        return;
-      }
-
-      const authInstance = window.gapi.auth2.getAuthInstance();
+      // Initialize Google Identity Services
+      await this.initializeGoogleIdentity();
       
-      if (!authInstance) {
-        console.error('❌ Google Auth instance not available');
-        window.app.ui.showAlert('Error de autenticación de Google. Intenta recargar la página.', 'error');
-        return;
-      }
-      
-      if (!authInstance.isSignedIn.get()) {
-        // User needs to sign in
-        console.log('🔐 User needs to sign in...');
-        const user = await authInstance.signIn();
-        console.log('✅ User signed in to Google:', user.getBasicProfile().getEmail());
-      } else {
-        console.log('✅ User already signed in to Google');
-      }
-
-      this.isGoogleAuthenticated = true;
-      this.googleAccessToken = authInstance.currentUser.get().getAuthResponse().access_token;
-      
-      // Save integration status
-      this.integrations.google = true;
-      this.saveIntegrationStatus();
-      this.updateIntegrationStatus();
-      
-      // Show success message
-      window.app.ui.showAlert('¡Google Calendar conectado! Los recordatorios aparecerán en tu celular.', 'success');
-      
-      // Sync existing events
-      await this.syncEventsToGoogle();
-      
-    } catch (error) {
-      console.error('❌ Error authenticating with Google:', error);
-      
-      // Handle different types of authentication errors
-      if (error.error === 'popup_closed_by_user') {
-        window.app.ui.showAlert('Autenticación cancelada por el usuario.', 'warning');
-      } else if (error.error === 'access_denied') {
-        window.app.ui.showAlert('Acceso denegado. Necesitas permitir el acceso a Google Calendar.', 'error');
-      } else if (error.type === 'tokenFailed') {
-        if (error.error === 'server_error') {
-          window.app.ui.showAlert('Error del servidor de Google. Verifica la configuración de dominios autorizados.', 'error');
+      // Attempt authentication
+      try {
+        const response = await google.accounts.id.prompt();
+        console.log('✅ Google authentication successful');
+        return this.handleSuccessfulGoogleAuth(response);
+      } catch (authError) {
+        // Handle specific concurrent request error
+        if (authError.message && authError.message.includes('Only one navigator.credentials.get request')) {
+          console.log('⚠️ Concurrent authentication request detected, waiting and retrying...');
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+          
+          // Reset flags and try once more
+          this.isAuthenticating = false;
+          this.authPromise = null;
+          
+          // Single retry attempt
+          return await this.performSingleGoogleAuth();
+        }
+        
+        console.error('❌ Error authenticating with Google:', authError);
+        
+        // Handle different types of authentication errors
+        if (authError.error === 'popup_closed_by_user') {
+          window.app.ui.showAlert('Autenticación cancelada por el usuario.', 'warning');
+        } else if (authError.error === 'access_denied') {
+          window.app.ui.showAlert('Acceso denegado. Necesitas permitir el acceso a Google Calendar.', 'error');
+        } else if (authError.type === 'tokenFailed') {
+          if (authError.error === 'server_error') {
+            window.app.ui.showAlert('Error del servidor de Google. Verifica la configuración de dominios autorizados.', 'error');
+            this.showConfigurationHelp('google-oauth-blocked');
+          } else {
+            window.app.ui.showAlert('Error de autenticación con Google. Intenta de nuevo.', 'error');
+          }
+        } else if (authError.message?.includes('403') || authError.message?.includes('Forbidden')) {
+          window.app.ui.showAlert('Dominio no autorizado para Google Calendar. Revisa la configuración.', 'error');
           this.showConfigurationHelp('google-oauth-blocked');
         } else {
-          window.app.ui.showAlert('Error de autenticación con Google. Intenta de nuevo.', 'error');
+          window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
         }
-      } else if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
-        window.app.ui.showAlert('Dominio no autorizado para Google Calendar. Revisa la configuración.', 'error');
-        this.showConfigurationHelp('google-oauth-blocked');
-      } else {
-        window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
+        
+        throw authError;
       }
+      
+    } catch (error) {
+      console.error('❌ Error in Google authentication process:', error);
+      throw error;
     }
+  }
+  
+  async performSingleGoogleAuth() {
+    console.log('🔄 Performing single Google authentication attempt...');
+    
+    try {
+      const response = await google.accounts.id.prompt();
+      console.log('✅ Single Google authentication successful');
+      return this.handleSuccessfulGoogleAuth(response);
+    } catch (error) {
+      console.error('❌ Single authentication attempt failed:', error);
+      throw error;
+    }
+  }
+  
+  async loadGoogleIdentityServices() {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (window.google && window.google.accounts) {
+        console.log('✅ Google Identity Services already loaded');
+        resolve();
+        return;
+      }
+
+      console.log('📡 Loading Google Identity Services...');
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        console.log('✅ Google Identity Services loaded');
+        // Small delay to ensure Google services are fully initialized
+        setTimeout(resolve, 100);
+      };
+      
+      script.onerror = () => {
+        console.error('❌ Failed to load Google Identity Services');
+        reject(new Error('Failed to load Google Identity Services'));
+      };
+      
+      document.head.appendChild(script);
+    });
   }
 
   async syncEventsToGoogle() {
