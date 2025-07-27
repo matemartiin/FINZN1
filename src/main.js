@@ -87,6 +87,7 @@ class FinznApp {
       
       // Dashboard events
       this.setupDashboardEvents();
+      const calendarSettingsBtn = document.getElementById('calendar-settings-btn');
       
       // Modal events
       this.setupModalEvents();
@@ -195,6 +196,10 @@ class FinznApp {
     const addGoalBtn = document.getElementById('add-goal-btn');
     if (addGoalBtn) {
       addGoalBtn.addEventListener('click', () => this.showAddGoalModal());
+      if (calendarSettingsBtn) {
+        calendarSettingsBtn.addEventListener('click', () => this.showCalendarSettingsModal());
+      }
+      
     }
     
     // Add spending limit button

@@ -1426,6 +1426,7 @@ body {
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: all var(--transition-normal);
+  width: 100%;
   font-weight: 600;
   color: var(--text-primary);
   font-size: 0.85rem;
@@ -1446,14 +1447,21 @@ body {
   gap: 2px;
 }
 
+  flex: 1;
 .integration-name {
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 0.9em;
 }
 
 .integration-status {
   font-size: 0.8rem;
   color: var(--text-muted);
+  font-weight: 500;
+}
+
+.integration-status[style*="color: #10b981"] {
+  font-weight: 600;
 }
 
 .integration-status.connected {
