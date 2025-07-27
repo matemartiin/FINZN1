@@ -1,148 +1,28 @@
 export class CalendarManager {
   constructor() {
-    this.currentDate = new Date();
     this.events = [];
-    this.isAuthenticating = false; // Flag to prevent concurrent auth requests
-    this.authPromise = null; // Store ongoing auth promise
-    this.integrations = {
-      google: false,
-      apple: false
-    };
-    this.integrationMethods = {
-      phase: 3, // Direct mobile integration
-      supportedCalendars: ['google', 'apple']
-    };
-    
-    // Google Calendar API configuration
-    this.googleConfig = {
-      apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
-      clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      discoveryDoc: 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
-      scopes: 'https://www.googleapis.com/auth/calendar.events'
-    };
-    
-    // Authentication states
-    this.isGoogleAuthenticated = false;
-    this.googleAccessToken = null;
-    
-    // Configuración de recordatorios personalizados
-    this.reminderSettings = {
-      defaultReminders: [
-        { method: 'popup', minutes: 60 },
-        { method: 'popup', minutes: 15 }
-      ],
-      customReminders: {},
-      titleTemplates: {
-        payment: '💰 {title}',
-        income: '💵 {title}',
-        'goal-deadline': '🎯 {title}',
-        review: '📊 {title}',
-        reminder: '⏰ {title}'
-      },
-      descriptionTemplate: `{description}
-
-💰 Monto: {amount}
-🏷️ Categoría: {category}
-📱 Creado desde FINZN - Tu compañero financiero inteligente
-
-¿Necesitas ayuda? Revisa tu dashboard de FINZN para más detalles.`
-    };
-    
-    // Cargar configuración guardada
-    this.loadReminderSettings();
+    this.currentDate = new Date();
+    this.isGoogleConnected = false;
+    this.isAppleConnected = false;
+    this.googleCalendarId = 'primary';
+    this.isAuthenticating = false;
+    this.authPromise = null;
+    this.googleAuth = null;
+    this.gapi = null;
   }
 
-  async init() {
-    console.log('📅 Initializing Calendar Manager with mobile integration...');
-    this.loadIntegrationStatus();
+  init() {
+    console.log('📅 Initializing Calendar Manager...');
     this.setupEventListeners();
-    this.loadEvents();
     this.renderCalendar();
-    
-    // Initialize Google Calendar API if available
-    await this.initializeGoogleCalendar();
-  }
-
-  async initializeGoogleCalendar() {
-    try {
-      if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
-        console.log('⚠️ Google Calendar API not configured - missing API key or client ID');
-        this.showConfigurationHelp('google-not-configured');
-        return;
-      }
-
-      // Load Google API
-      await this.loadGoogleAPI();
-      console.log('✅ Google Calendar API initialized');
-    } catch (error) {
-      console.error('❌ Error initializing Google Calendar:', error.message || error);
-      
-      // Check for specific error types
-      if (error.error === 'idpiframe_initialization_failed' || 
-          (error.details && error.details.includes('Not a valid origin')) ||
-          error.message?.includes('Not a valid origin') ||
-          error.message?.includes('origin not allowed')) {
-        console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
-        this.showConfigurationHelp('google-origin-blocked');
-      } else if ((error.error && error.error.code === 403) || 
-                 error.status === 403 ||
-                 error.message?.includes('403') ||
-                 error.message?.includes('Forbidden') ||
-                 (error.error && error.error.message?.includes('blocked')) || 
-                 (error.error && error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED'))) {
-        console.warn('⚠️ Google Calendar API HTTP referrer blocked.');
-        this.showConfigurationHelp('google-referrer-blocked');
-      } else if (error.type === 'tokenFailed' && error.error === 'server_error') {
-        console.warn('⚠️ Google OAuth server error - domain authorization issue.');
-        this.showConfigurationHelp('google-oauth-blocked');
-      } else {
-        this.showConfigurationHelp('google-general-error');
-      }
-      
-      // Disable Google integration but continue with app
-      this.integrations.google = false;
-      this.isGoogleAuthenticated = false;
-    }
-  }
-
-  loadGoogleAPI() {
-    return new Promise((resolve, reject) => {
-      if (window.gapi) {
-        console.log('✅ Google API already loaded');
-        resolve();
-        return;
-      }
-
-      console.log('📡 Loading Google API script...');
-      const script = document.createElement('script');
-      script.src = 'https://apis.google.com/js/api.js';
-      script.onload = () => {
-        console.log('📡 Google API script loaded, initializing client...');
-        window.gapi.load('client:auth2', async () => {
-          try {
-            await window.gapi.client.init({
-              apiKey: this.googleConfig.apiKey,
-              clientId: this.googleConfig.clientId,
-              discoveryDocs: [this.googleConfig.discoveryDoc],
-              scope: this.googleConfig.scopes
-            });
-            console.log('✅ Google API client initialized successfully');
-            resolve();
-          } catch (error) {
-            console.error('Google API client init error:', error);
-            reject(error);
-          }
-        });
-      };
-      script.onerror = (error) => {
-        console.error('Failed to load Google API script:', error);
-        reject(new Error('Failed to load Google API script'));
-      };
-      document.head.appendChild(script);
-    });
+    this.loadEvents();
+    this.updateTodayEvents();
+    this.updateUpcomingPayments();
+    this.checkGoogleConnection();
   }
 
   setupEventListeners() {
+    // Calendar navigation
     const prevBtn = document.getElementById('prev-month');
     const nextBtn = document.getElementById('next-month');
     
@@ -153,10 +33,10 @@ export class CalendarManager {
     if (nextBtn) {
       nextBtn.addEventListener('click', () => this.nextMonth());
     }
-    
+
     // Integration buttons
-    const googleBtn = document.querySelector('.google-calendar');
-    const appleBtn = document.querySelector('.apple-calendar');
+    const googleBtn = document.querySelector('.integration-btn.google-calendar');
+    const appleBtn = document.querySelector('.integration-btn.apple-calendar');
     
     if (googleBtn) {
       googleBtn.addEventListener('click', () => this.handleGoogleCalendarIntegration());
@@ -165,147 +45,11 @@ export class CalendarManager {
     if (appleBtn) {
       appleBtn.addEventListener('click', () => this.handleAppleCalendarIntegration());
     }
-  }
 
-  async loadEvents() {
-    try {
-      // Load events from localStorage for now
-      const savedEvents = localStorage.getItem('finzn-calendar-events');
-      if (savedEvents) {
-        this.events = JSON.parse(savedEvents);
-      }
-      
-      // Generate automatic events from financial data
-      await this.generateAutomaticEvents();
-      
-      console.log('📅 Events loaded:', this.events.length);
-    } catch (error) {
-      console.error('Error loading calendar events:', error);
-    }
-  }
-
-  async generateAutomaticEvents() {
-    if (!window.app || !window.app.data) return;
-    
-    try {
-      // Get current month expenses with installments
-      const currentMonth = this.getCurrentMonth();
-      const expenses = await window.app.data.loadExpenses(currentMonth);
-      
-      // Generate events for installments
-      expenses.forEach(expense => {
-        if (expense.total_installments > 1) {
-          // Create events for future installments
-          for (let i = expense.installment; i < expense.total_installments; i++) {
-            const futureDate = new Date(expense.transaction_date);
-            futureDate.setMonth(futureDate.getMonth() + (i - expense.installment + 1));
-            
-            const eventId = `installment-${expense.id}-${i + 1}`;
-            
-            // Check if event already exists
-            if (!this.events.find(e => e.id === eventId)) {
-              this.events.push({
-                id: eventId,
-                title: `Cuota ${i + 1}/${expense.total_installments}: ${expense.description}`,
-                type: 'payment',
-                date: futureDate.toISOString().split('T')[0],
-                amount: expense.amount,
-                description: `Cuota de ${expense.description}`,
-                automatic: true,
-                category: expense.category
-              });
-            }
-          }
-        }
-      });
-      
-      // Generate monthly income events
-      const income = await window.app.data.loadIncome(currentMonth);
-      if (income.fixed > 0) {
-        // Create recurring income event for next months
-        for (let i = 1; i <= 3; i++) {
-          const futureDate = new Date();
-          futureDate.setMonth(futureDate.getMonth() + i);
-          futureDate.setDate(1); // First day of month
-          
-          const eventId = `income-${futureDate.getFullYear()}-${futureDate.getMonth() + 1}`;
-          
-          if (!this.events.find(e => e.id === eventId)) {
-            this.events.push({
-              id: eventId,
-              title: 'Sueldo mensual',
-              type: 'income',
-              date: futureDate.toISOString().split('T')[0],
-              amount: income.fixed,
-              description: 'Ingreso fijo mensual',
-              automatic: true,
-              recurring: true
-            });
-          }
-        }
-      }
-      
-      // Save updated events
-      this.saveEvents();
-      
-    } catch (error) {
-      console.error('Error generating automatic events:', error);
-    }
-  }
-
-  saveEvents() {
-    try {
-      localStorage.setItem('finzn-calendar-events', JSON.stringify(this.events));
-    } catch (error) {
-      console.error('Error saving calendar events:', error);
-    }
-  }
-
-  async addEvent(eventData) {
-    const event = {
-      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      ...eventData,
-      automatic: false,
-      created_at: new Date().toISOString(),
-      synced_to_google: false,
-      synced_to_apple: false
-    };
-    
-    this.events.push(event);
-    this.saveEvents();
-    
-    console.log('📅 Event added:', event);
-    
-    // Auto-sync to connected calendars
-    await this.autoSyncNewEvent(event);
-    
-    // Refresh calendar display
-    this.renderCalendar();
-    this.updateSidebarWidgets();
-    
-    return event;
-  }
-
-  async autoSyncNewEvent(event) {
-    try {
-      // Sync to Google Calendar if connected
-      if (this.integrations.google && this.isGoogleAuthenticated) {
-        await this.createGoogleCalendarEvent(event);
-        event.synced_to_google = true;
-        window.app.ui.showAlert('Recordatorio agregado a Google Calendar 📱', 'success');
-      }
-      
-      // For Apple, we'll generate ICS file on demand
-      if (this.integrations.apple) {
-        // Apple events are synced via ICS download
-        console.log('🍎 Apple Calendar integration ready for sync');
-      }
-      
-      this.saveEvents();
-      
-    } catch (error) {
-      console.error('❌ Error auto-syncing event:', error);
-      window.app.ui.showAlert('Evento creado, pero no se pudo sincronizar automáticamente', 'warning');
+    // Sync button
+    const syncBtn = document.getElementById('sync-calendar-btn');
+    if (syncBtn) {
+      syncBtn.addEventListener('click', () => this.syncCalendar());
     }
   }
 
@@ -314,7 +58,7 @@ export class CalendarManager {
     const monthYearElement = document.getElementById('calendar-month-year');
     
     if (!calendarGrid || !monthYearElement) return;
-    
+
     // Update month/year display
     const monthNames = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -322,257 +66,62 @@ export class CalendarManager {
     ];
     
     monthYearElement.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-    
+
     // Clear calendar
     calendarGrid.innerHTML = '';
-    
+
     // Add day headers
     const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     dayHeaders.forEach(day => {
       const dayHeader = document.createElement('div');
       dayHeader.className = 'calendar-day-header';
       dayHeader.textContent = day;
-      dayHeader.style.cssText = `
-        background: var(--bg-secondary);
-        padding: var(--spacing-sm);
-        font-weight: 700;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        text-align: center;
-        border-bottom: 1px solid var(--border-color);
-      `;
       calendarGrid.appendChild(dayHeader);
     });
-    
+
     // Get first day of month and number of days
     const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
     const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-    
-    // Add empty cells for days before month starts
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      const emptyDay = document.createElement('div');
-      emptyDay.className = 'calendar-day other-month';
-      calendarGrid.appendChild(emptyDay);
-    }
-    
-    // Add days of the month
-    const today = new Date();
-    const currentMonth = `${this.currentDate.getFullYear()}-${(this.currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
-    
-    for (let day = 1; day <= daysInMonth; day++) {
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+    // Generate calendar days
+    for (let i = 0; i < 42; i++) {
+      const currentDay = new Date(startDate);
+      currentDay.setDate(startDate.getDate() + i);
+      
       const dayElement = document.createElement('div');
       dayElement.className = 'calendar-day';
       
-      const dayDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day);
-      const dateString = dayDate.toISOString().split('T')[0];
+      if (currentDay.getMonth() !== this.currentDate.getMonth()) {
+        dayElement.classList.add('other-month');
+      }
       
-      // Check if it's today
-      if (dayDate.toDateString() === today.toDateString()) {
+      if (this.isToday(currentDay)) {
         dayElement.classList.add('today');
       }
       
-      // Add day number
-      const dayNumber = document.createElement('div');
-      dayNumber.className = 'calendar-day-number';
-      dayNumber.textContent = day;
-      dayElement.appendChild(dayNumber);
-      
-      // Add events for this day
-      const dayEvents = this.events.filter(event => event.date === dateString);
-      dayEvents.slice(0, 3).forEach(event => { // Show max 3 events per day
-        const eventElement = document.createElement('div');
-        eventElement.className = `calendar-event ${event.type}`;
-        eventElement.textContent = event.title.length > 15 ? 
-          event.title.substring(0, 15) + '...' : event.title;
-        eventElement.title = event.title;
-        dayElement.appendChild(eventElement);
-      });
-      
-      // Add more indicator if there are more than 3 events
-      if (dayEvents.length > 3) {
-        const moreElement = document.createElement('div');
-        moreElement.className = 'calendar-more';
-        moreElement.textContent = `+${dayEvents.length - 3} más`;
-        moreElement.style.cssText = `
-          font-size: 0.6rem;
-          color: var(--text-muted);
-          font-weight: 600;
-          text-align: center;
-          margin-top: 2px;
-        `;
-        dayElement.appendChild(moreElement);
+      // Check for events on this day
+      const dayEvents = this.getEventsForDate(currentDay);
+      if (dayEvents.length > 0) {
+        dayElement.classList.add('has-events');
       }
       
-      // Add click handler
-      dayElement.addEventListener('click', () => this.handleDayClick(dateString, dayEvents));
+      dayElement.innerHTML = `
+        <div class="calendar-day-number">${currentDay.getDate()}</div>
+        <div class="calendar-day-events">
+          ${dayEvents.slice(0, 2).map(event => `
+            <div class="calendar-event ${event.type}" title="${event.title}">
+              ${event.title.substring(0, 10)}${event.title.length > 10 ? '...' : ''}
+            </div>
+          `).join('')}
+          ${dayEvents.length > 2 ? `<div class="calendar-event-more">+${dayEvents.length - 2} más</div>` : ''}
+        </div>
+      `;
       
+      dayElement.addEventListener('click', () => this.selectDate(currentDay));
       calendarGrid.appendChild(dayElement);
     }
-    
-    // Update sidebar widgets
-    this.updateSidebarWidgets();
-  }
-
-  handleDayClick(dateString, events) {
-    console.log('📅 Day clicked:', dateString, events);
-    
-    if (events.length === 0) {
-      // No events, maybe show add event option
-      if (confirm('¿Quieres agregar un evento para este día?')) {
-        // Pre-fill the add event modal with this date
-        const dateInput = document.getElementById('event-date');
-        if (dateInput) {
-          dateInput.value = dateString;
-        }
-        window.app.showAddEventModal();
-      }
-    } else {
-      // Show events for this day
-      this.showDayEvents(dateString, events);
-    }
-  }
-
-  showDayEvents(dateString, events) {
-    const date = new Date(dateString);
-    const dateStr = date.toLocaleDateString('es-ES', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    
-    let eventsHtml = `<h4>Eventos para ${dateStr}</h4><div class="day-events-list">`;
-    
-    events.forEach(event => {
-      eventsHtml += `
-        <div class="day-event-item ${event.type}">
-          <div class="day-event-title">${event.title}</div>
-          <div class="day-event-description">${event.description}</div>
-          ${event.amount ? `<div class="day-event-amount">${this.formatCurrency(event.amount)}</div>` : ''}
-        </div>
-      `;
-    });
-    
-    eventsHtml += '</div>';
-    
-    // Show in a simple alert for now (could be improved with a proper modal)
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = eventsHtml;
-    
-    // Create a simple modal-like display
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-    `;
-    
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      background: var(--bg-primary);
-      border-radius: var(--border-radius-xl);
-      padding: var(--spacing-xl);
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-xl);
-    `;
-    
-    modal.innerHTML = eventsHtml + `
-      <div style="margin-top: var(--spacing-lg); text-align: center;">
-        <button onclick="this.closest('[style*=fixed]').remove()" class="btn btn-secondary">Cerrar</button>
-      </div>
-    `;
-    
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    
-    // Close on overlay click
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        overlay.remove();
-      }
-    });
-  }
-
-  updateSidebarWidgets() {
-    this.updateTodayEvents();
-    this.updateUpcomingPayments();
-  }
-
-  updateTodayEvents() {
-    const container = document.getElementById('today-events');
-    if (!container) return;
-    
-    const today = new Date().toISOString().split('T')[0];
-    const todayEvents = this.events.filter(event => event.date === today);
-    
-    container.innerHTML = '';
-    
-    if (todayEvents.length === 0) {
-      container.innerHTML = '<p class="widget-empty">No hay eventos hoy</p>';
-      return;
-    }
-    
-    todayEvents.forEach(event => {
-      const eventElement = document.createElement('div');
-      eventElement.className = `event-item ${event.type}`;
-      eventElement.innerHTML = `
-        <div class="event-title">${event.title}</div>
-        <div class="event-time">${event.amount ? this.formatCurrency(event.amount) : ''}</div>
-      `;
-      container.appendChild(eventElement);
-    });
-  }
-
-  updateUpcomingPayments() {
-    const container = document.getElementById('upcoming-payments');
-    if (!container) return;
-    
-    const today = new Date();
-    const nextWeek = new Date();
-    nextWeek.setDate(today.getDate() + 7);
-    
-    const upcomingPayments = this.events.filter(event => {
-      const eventDate = new Date(event.date);
-      return event.type === 'payment' && 
-             eventDate >= today && 
-             eventDate <= nextWeek;
-    }).sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    container.innerHTML = '';
-    
-    if (upcomingPayments.length === 0) {
-      container.innerHTML = '<p class="widget-empty">No hay pagos próximos</p>';
-      return;
-    }
-    
-    upcomingPayments.forEach(payment => {
-      const paymentElement = document.createElement('div');
-      paymentElement.className = 'event-item payment';
-      
-      const paymentDate = new Date(payment.date);
-      const daysUntil = Math.ceil((paymentDate - today) / (1000 * 60 * 60 * 24));
-      
-      paymentElement.innerHTML = `
-        <div class="event-title">${payment.title}</div>
-        <div class="event-time">
-          ${daysUntil === 0 ? 'Hoy' : daysUntil === 1 ? 'Mañana' : `En ${daysUntil} días`}
-          ${payment.amount ? ` - ${this.formatCurrency(payment.amount)}` : ''}
-        </div>
-      `;
-      container.appendChild(paymentElement);
-    });
   }
 
   previousMonth() {
@@ -585,919 +134,665 @@ export class CalendarManager {
     this.renderCalendar();
   }
 
-  getUpcomingEvents(days = 7) {
+  isToday(date) {
     const today = new Date();
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + days);
-    
-    return this.events.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate >= today && eventDate <= futureDate;
-    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+    return date.toDateString() === today.toDateString();
   }
 
-  refresh() {
-    this.loadEvents();
-    this.renderCalendar();
+  selectDate(date) {
+    console.log('📅 Selected date:', date);
+    // You can add functionality here for when a date is selected
   }
 
-  // Integration methods
-  async handleGoogleCalendarIntegration() {
-    console.log('🔗 Handling Google Calendar integration...');
-    
-    // Prevent multiple concurrent authentication attempts
-    if (this.isAuthenticating) {
-      console.log('⏳ Authentication already in progress, waiting...');
-      if (this.authPromise) {
-        try {
-          return await this.authPromise;
-        } catch (error) {
-          console.log('⚠️ Previous authentication failed, retrying...');
-        }
-      }
-    }
-    
+  getEventsForDate(date) {
+    const dateStr = date.toISOString().split('T')[0];
+    return this.events.filter(event => event.date === dateStr);
+  }
+
+  async addEvent(eventData) {
     try {
-      this.isAuthenticating = true;
-      this.authPromise = this.performGoogleAuthentication();
-      const result = await this.authPromise;
-      return result;
+      console.log('📅 Adding calendar event:', eventData);
+      
+      const event = {
+        id: this.generateEventId(),
+        title: eventData.title,
+        type: eventData.type,
+        date: eventData.date,
+        time: eventData.time || '09:00',
+        duration: eventData.duration || 60,
+        amount: eventData.amount || null,
+        description: eventData.description || '',
+        category: eventData.category || '',
+        recurring: eventData.recurring || false,
+        reminders: this.getDefaultReminders(),
+        createdAt: new Date().toISOString()
+      };
+
+      // Add to local events
+      this.events.push(event);
+      
+      // Save to localStorage
+      this.saveEvents();
+      
+      // Sync with Google Calendar if connected
+      if (this.isGoogleConnected) {
+        await this.syncEventToGoogle(event);
+      }
+      
+      // Update UI
+      this.renderCalendar();
+      this.updateTodayEvents();
+      this.updateUpcomingPayments();
+      
+      console.log('✅ Event added successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error adding event:', error);
+      return false;
+    }
+  }
+
+  generateEventId() {
+    return 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  getDefaultReminders() {
+    return [
+      { minutes: 60, enabled: true },
+      { minutes: 15, enabled: true }
+    ];
+  }
+
+  loadEvents() {
+    try {
+      const savedEvents = localStorage.getItem('finzn-calendar-events');
+      if (savedEvents) {
+        this.events = JSON.parse(savedEvents);
+        console.log('📅 Loaded events:', this.events.length);
+      }
+    } catch (error) {
+      console.error('❌ Error loading events:', error);
+      this.events = [];
+    }
+  }
+
+  saveEvents() {
+    try {
+      localStorage.setItem('finzn-calendar-events', JSON.stringify(this.events));
+      console.log('💾 Events saved to localStorage');
+    } catch (error) {
+      console.error('❌ Error saving events:', error);
+    }
+  }
+
+  updateTodayEvents() {
+    const container = document.getElementById('today-events');
+    if (!container) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const todayEvents = this.events.filter(event => event.date === today);
+
+    container.innerHTML = '';
+
+    if (todayEvents.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state-small">
+          <p>No hay eventos para hoy</p>
+        </div>
+      `;
+      return;
+    }
+
+    todayEvents.forEach(event => {
+      const eventElement = document.createElement('div');
+      eventElement.className = `today-event ${event.type}`;
+      
+      eventElement.innerHTML = `
+        <div class="event-time">${event.time}</div>
+        <div class="event-details">
+          <div class="event-title">${event.title}</div>
+          ${event.amount ? `<div class="event-amount">${this.formatCurrency(event.amount)}</div>` : ''}
+        </div>
+      `;
+      
+      container.appendChild(eventElement);
+    });
+  }
+
+  updateUpcomingPayments() {
+    const container = document.getElementById('upcoming-payments');
+    if (!container) return;
+
+    // Get upcoming payment events (next 7 days)
+    const today = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+
+    const upcomingPayments = this.events.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate >= today && 
+             eventDate <= nextWeek && 
+             (event.type === 'payment' || event.amount);
+    });
+
+    container.innerHTML = '';
+
+    if (upcomingPayments.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state-small">
+          <p>No hay pagos próximos</p>
+        </div>
+      `;
+      return;
+    }
+
+    upcomingPayments.forEach(payment => {
+      const paymentElement = document.createElement('div');
+      paymentElement.className = 'upcoming-payment';
+      
+      const eventDate = new Date(payment.date);
+      const daysUntil = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+      
+      paymentElement.innerHTML = `
+        <div class="payment-info">
+          <div class="payment-title">${payment.title}</div>
+          <div class="payment-date">
+            ${daysUntil === 0 ? 'Hoy' : daysUntil === 1 ? 'Mañana' : `En ${daysUntil} días`}
+          </div>
+        </div>
+        ${payment.amount ? `<div class="payment-amount">${this.formatCurrency(payment.amount)}</div>` : ''}
+      `;
+      
+      container.appendChild(paymentElement);
+    });
+  }
+
+  // Google Calendar Integration
+  async handleGoogleCalendarIntegration() {
+    try {
+      console.log('🔗 Attempting Google Calendar integration...');
+      
+      if (this.isGoogleConnected) {
+        await this.disconnectGoogleCalendar();
+      } else {
+        await this.connectGoogleCalendar();
+      }
     } catch (error) {
       console.error('❌ Google Calendar integration failed:', error);
-      this.showCalendarHelp('google-auth-failed');
-      throw error;
+      this.showCalendarHelp('google-error', error.message);
+    }
+  }
+
+  async connectGoogleCalendar() {
+    try {
+      console.log('🔗 Connecting to Google Calendar...');
+      
+      // Check if API keys are configured
+      if (!this.checkGoogleConfiguration()) {
+        this.showCalendarHelp('google-config');
+        return;
+      }
+
+      // Load Google APIs
+      await this.loadGoogleAPIs();
+      
+      // Authenticate
+      await this.performGoogleAuthentication();
+      
+      // Update connection status
+      this.isGoogleConnected = true;
+      this.updateGoogleConnectionStatus();
+      
+      // Sync events
+      await this.syncWithGoogleCalendar();
+      
+      console.log('✅ Google Calendar connected successfully');
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Google Calendar conectado exitosamente', 'success');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error connecting to Google Calendar:', error);
+      this.handleGoogleError(error);
+    }
+  }
+
+  checkGoogleConfiguration() {
+    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    
+    console.log('🔧 Google Config Check:', {
+      apiKey: apiKey ? 'Present' : 'Missing',
+      clientId: clientId ? 'Present' : 'Missing'
+    });
+    
+    return !!(apiKey && clientId);
+  }
+
+  async loadGoogleAPIs() {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (window.gapi && window.google) {
+        console.log('✅ Google APIs already loaded');
+        this.gapi = window.gapi;
+        resolve();
+        return;
+      }
+
+      console.log('📦 Loading Google APIs...');
+      
+      // Load Google API script
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.onload = () => {
+        // Load Google Identity Services
+        const identityScript = document.createElement('script');
+        identityScript.src = 'https://accounts.google.com/gsi/client';
+        identityScript.onload = () => {
+          console.log('✅ Google APIs loaded');
+          this.gapi = window.gapi;
+          
+          // Small delay to ensure services are ready
+          setTimeout(() => resolve(), 500);
+        };
+        identityScript.onerror = () => reject(new Error('Failed to load Google Identity Services'));
+        document.head.appendChild(identityScript);
+      };
+      script.onerror = () => reject(new Error('Failed to load Google API'));
+      document.head.appendChild(script);
+    });
+  }
+
+  async performGoogleAuthentication() {
+    if (this.isAuthenticating) {
+      console.log('⏳ Authentication already in progress, waiting...');
+      return this.authPromise;
+    }
+
+    this.isAuthenticating = true;
+    
+    try {
+      this.authPromise = this.performSingleGoogleAuth();
+      const result = await this.authPromise;
+      return result;
     } finally {
       this.isAuthenticating = false;
       this.authPromise = null;
     }
   }
-  
-  async performGoogleAuthentication() {
-    try {
-      // Check if already authenticated
-      const isAuthenticated = await this.checkGoogleAuthStatus();
-      if (isAuthenticated) {
-        console.log('✅ Already authenticated with Google Calendar');
-        return { success: true, message: 'Already authenticated' };
-      }
-      
-      // Authenticate with Google
-      const authResult = await this.authenticateAndIntegrateGoogle();
-      return authResult;
-      
-    } catch (error) {
-      throw error;
-    }
-  }
 
-  handleAppleCalendarIntegration() {
-    console.log('📅 Apple Calendar integration');
-    this.integrateWithAppleCalendar();
-  }
-
-  handleOutlookIntegration() {
-    console.log('📅 Outlook Calendar integration');
-    this.showCalendarIntegrationModal('outlook');
-  }
-
-  showConfigurationHelp(errorType) {
-    const helpContainer = document.getElementById('calendar-help');
-    if (!helpContainer) return;
-
-    const currentOrigin = window.location.origin;
-    const currentDomain = window.location.hostname;
-    let helpContent = '';
-
-    switch (errorType) {
-      case 'google-not-configured':
-        helpContent = `
-          <div class="config-help warning">
-            <h4>⚙️ Google Calendar No Configurado</h4>
-            <p>Las variables de entorno de Google Calendar no están configuradas.</p>
-            <div class="config-steps">
-              <h5>Variables necesarias en .env:</h5>
-              <ul>
-                <li><code>VITE_GOOGLE_API_KEY</code></li>
-                <li><code>VITE_GOOGLE_CLIENT_ID</code></li>
-              </ul>
-            </div>
-          </div>
-        `;
-        break;
-      case 'google-origin-blocked':
-        helpContent = `
-          <div class="config-help error">
-            <h4>🔧 Google Calendar API Configuration Required</h4>
-            <p><strong>Error:</strong> Origin not registered for OAuth client</p>
-            <div class="config-steps">
-              <h5>Steps to fix:</h5>
-              <ol>
-                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                <li>Navigate to <strong>APIs & Services → Credentials</strong></li>
-                <li>Find your OAuth 2.0 Client ID and click <strong>Edit</strong></li>
-                <li>Under <strong>Authorized JavaScript origins</strong>, add:</li>
-                <li><code>${currentOrigin}</code></li>
-                <li>For development, also add: <code>*.webcontainer-api.io</code></li>
-                <li>For Netlify: <code>https://*.netlify.app</code></li>
-              </ol>
-            </div>
-          </div>
-        `;
-        break;
-      case 'google-referrer-blocked':
-        helpContent = `
-          <div class="config-help error">
-            <h4>🔧 Google Calendar API Configuration Required</h4>
-            <p><strong>Error:</strong> HTTP referrer restriction blocking requests</p>
-            <div class="config-steps">
-              <h5>Steps to fix:</h5>
-              <ol>
-                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                <li>Navigate to <strong>APIs & Services → Credentials</strong></li>
-                <li>Find your API key and click <strong>Edit</strong></li>
-                <li>Under <strong>Application restrictions</strong>, add this origin:</li>
-                <li><code>${currentOrigin}</code></li>
-                <li>For development, also add: <code>*.webcontainer-api.io</code></li>
-                <li>For Netlify: <code>https://*.netlify.app</code></li>
-              </ol>
-            </div>
-          </div>
-        `;
-        break;
-      case 'google-oauth-blocked':
-        helpContent = `
-          <div class="config-help error">
-            <h4>🚫 Google OAuth Domain Blocked</h4>
-            <p><strong>Error:</strong> Domain not authorized for OAuth requests</p>
-            <div class="config-steps">
-              <h5>Steps to fix:</h5>
-              <ol>
-                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                <li>Navigate to <strong>APIs & Services → Credentials</strong></li>
-                <li>Find your OAuth 2.0 Client ID and click <strong>Edit</strong></li>
-                <li>Under <strong>Authorized JavaScript origins</strong>, add:</li>
-                <li><code>${currentOrigin}</code></li>
-                <li>For Netlify production: <code>https://${currentDomain}</code></li>
-                <li>Wait 5-10 minutes for changes to propagate</li>
-              </ol>
-            </div>
-          </div>
-        `;
-        break;
-      case 'google-general-error':
-        helpContent = `
-          <div class="config-help warning">
-            <h4>⚠️ Google Calendar Configuration Issue</h4>
-            <p>Please check your Google Calendar API credentials in the .env file</p>
-          </div>
-        `;
-        break;
-    }
-
-    helpContainer.innerHTML = helpContent;
-    helpContainer.style.display = 'block';
-  }
-
-  async authenticateGoogle() {
-    try {
-      console.log('🔐 Authenticating with Google Calendar...');
-      
-      if (!window.gapi || !window.gapi.auth2) {
-        throw new Error('Google API not loaded');
-      }
-
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      
-      if (!authInstance.isSignedIn.get()) {
-        // User needs to sign in
-        const user = await authInstance.signIn();
-        console.log('✅ User signed in to Google:', user.getBasicProfile().getEmail());
-      }
-
-      this.isGoogleAuthenticated = true;
-      this.googleAccessToken = authInstance.currentUser.get().getAuthResponse().access_token;
-      
-      // Save integration status
-      this.integrations.google = true;
-      this.saveIntegrationStatus();
-      
-      // Show success message
-      window.app.ui.showAlert('¡Google Calendar conectado! Los recordatorios aparecerán en tu celular.', 'success');
-      
-      // Sync existing events
-      await this.syncEventsToGoogle();
-      
-    } catch (error) {
-      console.error('❌ Error authenticating with Google:', error);
-      window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
-    }
-  }
-
-  async authenticateAndIntegrateGoogle() {
-    console.log('🔐 Starting Google authentication...');
-    
-    // Double-check we're not already authenticating
-    if (this.isAuthenticating && this.authPromise && this.authPromise !== this.performGoogleAuthentication()) {
-      throw new Error('Another authentication is already in progress');
-    }
-    
-    try {
-      // Load Google Identity Services
-      await this.loadGoogleIdentityServices();
-      
-      // Initialize Google Identity Services
-      await this.initializeGoogleIdentity();
-      
-      // Attempt authentication
-      try {
-        const response = await google.accounts.id.prompt();
-        console.log('✅ Google authentication successful');
-        return this.handleSuccessfulGoogleAuth(response);
-      } catch (authError) {
-        // Handle specific concurrent request error
-        if (authError.message && authError.message.includes('Only one navigator.credentials.get request')) {
-          console.log('⚠️ Concurrent authentication request detected, waiting and retrying...');
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-          
-          // Reset flags and try once more
-          this.isAuthenticating = false;
-          this.authPromise = null;
-          
-          // Single retry attempt
-          return await this.performSingleGoogleAuth();
-        }
-        
-        console.error('❌ Error authenticating with Google:', authError);
-        
-        // Handle different types of authentication errors
-        if (authError.error === 'popup_closed_by_user') {
-          window.app.ui.showAlert('Autenticación cancelada por el usuario.', 'warning');
-        } else if (authError.error === 'access_denied') {
-          window.app.ui.showAlert('Acceso denegado. Necesitas permitir el acceso a Google Calendar.', 'error');
-        } else if (authError.type === 'tokenFailed') {
-          if (authError.error === 'server_error') {
-            window.app.ui.showAlert('Error del servidor de Google. Verifica la configuración de dominios autorizados.', 'error');
-            this.showConfigurationHelp('google-oauth-blocked');
-          } else {
-            window.app.ui.showAlert('Error de autenticación con Google. Intenta de nuevo.', 'error');
-          }
-        } else if (authError.message?.includes('403') || authError.message?.includes('Forbidden')) {
-          window.app.ui.showAlert('Dominio no autorizado para Google Calendar. Revisa la configuración.', 'error');
-          this.showConfigurationHelp('google-oauth-blocked');
-        } else {
-          window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
-        }
-        
-        throw authError;
-      }
-      
-    } catch (error) {
-      console.error('❌ Error in Google authentication process:', error);
-      throw error;
-    }
-  }
-  
   async performSingleGoogleAuth() {
-    console.log('🔄 Performing single Google authentication attempt...');
-    
     try {
-      const response = await google.accounts.id.prompt();
-      console.log('✅ Single Google authentication successful');
-      return this.handleSuccessfulGoogleAuth(response);
+      const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+      // Initialize GAPI
+      await new Promise((resolve, reject) => {
+        this.gapi.load('client:auth2', {
+          callback: resolve,
+          onerror: reject
+        });
+      });
+
+      // Initialize the client
+      await this.gapi.client.init({
+        apiKey: apiKey,
+        clientId: clientId,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+        scope: 'https://www.googleapis.com/auth/calendar'
+      });
+
+      // Get auth instance
+      this.googleAuth = this.gapi.auth2.getAuthInstance();
+      
+      // Check if already signed in
+      if (this.googleAuth.isSignedIn.get()) {
+        console.log('✅ Already signed in to Google');
+        return true;
+      }
+
+      // Sign in
+      console.log('🔐 Signing in to Google...');
+      await this.googleAuth.signIn();
+      
+      console.log('✅ Google authentication successful');
+      return true;
+      
     } catch (error) {
-      console.error('❌ Single authentication attempt failed:', error);
+      console.error('❌ Google authentication error:', error);
+      
+      // Handle specific error types
+      if (error.error === 'popup_blocked_by_browser') {
+        throw new Error('El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.');
+      } else if (error.error === 'access_denied') {
+        throw new Error('Acceso denegado. Necesitas autorizar el acceso a Google Calendar.');
+      } else if (error.message && error.message.includes('Only one navigator.credentials.get')) {
+        console.log('⏳ Multiple auth requests detected, waiting and retrying...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return this.performSingleGoogleAuth();
+      }
+      
       throw error;
     }
   }
-  
-  async loadGoogleIdentityServices() {
-    return new Promise((resolve, reject) => {
-      // Check if already loaded
-      if (window.google && window.google.accounts) {
-        console.log('✅ Google Identity Services already loaded');
-        resolve();
+
+  async checkGoogleAuthStatus() {
+    try {
+      if (!this.googleAuth) {
+        return false;
+      }
+      
+      const isSignedIn = this.googleAuth.isSignedIn.get();
+      console.log('🔍 Google auth status:', isSignedIn);
+      
+      return isSignedIn;
+    } catch (error) {
+      console.error('❌ Error checking Google auth status:', error);
+      return false;
+    }
+  }
+
+  async syncWithGoogleCalendar() {
+    try {
+      console.log('🔄 Syncing with Google Calendar...');
+      
+      if (!this.googleAuth || !this.googleAuth.isSignedIn.get()) {
+        throw new Error('Not authenticated with Google');
+      }
+
+      // Get events from Google Calendar
+      const response = await this.gapi.client.calendar.events.list({
+        calendarId: this.googleCalendarId,
+        timeMin: new Date().toISOString(),
+        maxResults: 50,
+        singleEvents: true,
+        orderBy: 'startTime'
+      });
+
+      const googleEvents = response.result.items || [];
+      console.log('📅 Retrieved Google Calendar events:', googleEvents.length);
+
+      // Convert Google events to our format
+      googleEvents.forEach(googleEvent => {
+        const existingEvent = this.events.find(e => e.googleId === googleEvent.id);
+        
+        if (!existingEvent) {
+          const event = {
+            id: this.generateEventId(),
+            googleId: googleEvent.id,
+            title: googleEvent.summary || 'Sin título',
+            type: 'imported',
+            date: googleEvent.start.date || googleEvent.start.dateTime.split('T')[0],
+            time: googleEvent.start.dateTime ? 
+                  new Date(googleEvent.start.dateTime).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 
+                  '00:00',
+            description: googleEvent.description || '',
+            createdAt: new Date().toISOString()
+          };
+          
+          this.events.push(event);
+        }
+      });
+
+      this.saveEvents();
+      this.renderCalendar();
+      this.updateTodayEvents();
+      
+      console.log('✅ Google Calendar sync completed');
+      
+    } catch (error) {
+      console.error('❌ Error syncing with Google Calendar:', error);
+      throw error;
+    }
+  }
+
+  async syncEventToGoogle(event) {
+    try {
+      if (!this.googleAuth || !this.googleAuth.isSignedIn.get()) {
+        console.log('⚠️ Not connected to Google Calendar, skipping sync');
         return;
       }
 
-      console.log('📡 Loading Google Identity Services...');
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      
-      script.onload = () => {
-        console.log('✅ Google Identity Services loaded');
-        // Small delay to ensure Google services are fully initialized
-        setTimeout(resolve, 100);
-      };
-      
-      script.onerror = () => {
-        console.error('❌ Failed to load Google Identity Services');
-        reject(new Error('Failed to load Google Identity Services'));
-      };
-      
-      document.head.appendChild(script);
-    });
-  }
-
-  async syncEventsToGoogle() {
-    if (!this.isGoogleAuthenticated) return;
-    
-    try {
-      console.log('🔄 Syncing events to Google Calendar...');
-      
-      const eventsToSync = this.events.filter(event => 
-        !event.synced_to_google && 
-        new Date(event.date) >= new Date()
-      );
-      
-      for (const event of eventsToSync) {
-        await this.createGoogleCalendarEvent(event);
-        event.synced_to_google = true;
-      }
-      
-      this.saveEvents();
-      console.log(`✅ Synced ${eventsToSync.length} events to Google Calendar`);
-      
-    } catch (error) {
-      console.error('❌ Error syncing events to Google:', error);
-    }
-  }
-
-  async createGoogleCalendarEvent(event) {
-    if (!this.isGoogleAuthenticated) return;
-    
-    try {
-      console.log('📅 Creating Google Calendar event:', event.title);
-      
-      // Usar hora personalizada o por defecto
-      const eventTime = event.time || '09:00';
-      const duration = event.duration || 60; // minutos
-      
-      const startDateTime = new Date(event.date + 'T' + eventTime + ':00');
-      const endDateTime = new Date(startDateTime.getTime() + (duration * 60000));
-      
-      // Generar título personalizado
-      const customTitle = this.generateCustomTitle(event);
-      
-      // Generar descripción personalizada
-      const customDescription = this.generateCustomDescription(event);
-      
-      // Obtener recordatorios personalizados
-      const customReminders = this.getCustomReminders(event.type);
-      
       const googleEvent = {
-        summary: customTitle,
-        description: customDescription,
+        summary: event.title,
+        description: event.description,
         start: {
-          dateTime: startDateTime.toISOString(),
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          dateTime: `${event.date}T${event.time}:00`,
+          timeZone: 'America/Argentina/Buenos_Aires'
         },
         end: {
-          dateTime: endDateTime.toISOString(),
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          dateTime: this.calculateEndTime(event.date, event.time, event.duration),
+          timeZone: 'America/Argentina/Buenos_Aires'
         },
         reminders: {
           useDefault: false,
-          overrides: customReminders
-        },
-        colorId: this.getEventColor(event.type),
-        extendedProperties: {
-          private: {
-            finznEventId: event.id,
-            finznEventType: event.type,
-            finznAmount: event.amount?.toString() || '',
-            finznCategory: event.category || ''
-          }
+          overrides: event.reminders.filter(r => r.enabled).map(r => ({
+            method: 'popup',
+            minutes: r.minutes
+          }))
         }
       };
-      
-      console.log('📅 Google event data prepared:', googleEvent);
-      
-      const response = await window.gapi.client.calendar.events.insert({
-        calendarId: 'primary',
+
+      const response = await this.gapi.client.calendar.events.insert({
+        calendarId: this.googleCalendarId,
         resource: googleEvent
       });
-      
-      console.log('✅ Event created in Google Calendar:', response.result.id);
-      return response.result;
+
+      // Update local event with Google ID
+      event.googleId = response.result.id;
+      this.saveEvents();
+
+      console.log('✅ Event synced to Google Calendar:', response.result.id);
       
     } catch (error) {
-      console.error('❌ Error creating Google Calendar event:', error);
+      console.error('❌ Error syncing event to Google:', error);
+    }
+  }
+
+  calculateEndTime(date, time, duration) {
+    const startDateTime = new Date(`${date}T${time}:00`);
+    const endDateTime = new Date(startDateTime.getTime() + (duration * 60000));
+    return endDateTime.toISOString().slice(0, 19);
+  }
+
+  async disconnectGoogleCalendar() {
+    try {
+      console.log('🔌 Disconnecting from Google Calendar...');
       
-      if (error.status === 401) {
-        console.warn('🔐 Authentication expired, trying to refresh...');
-        this.isGoogleAuthenticated = false;
-        window.app.ui.showAlert('Sesión de Google expirada. Vuelve a conectar Google Calendar.', 'warning');
-      } else if (error.status === 403) {
-        console.warn('🚫 Insufficient permissions for Google Calendar');
-        window.app.ui.showAlert('Permisos insuficientes para Google Calendar. Revisa la configuración.', 'error');
+      if (this.googleAuth) {
+        await this.googleAuth.signOut();
       }
       
-      throw error;
+      this.isGoogleConnected = false;
+      this.googleAuth = null;
+      this.updateGoogleConnectionStatus();
+      
+      console.log('✅ Google Calendar disconnected');
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Google Calendar desconectado', 'info');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error disconnecting Google Calendar:', error);
     }
   }
 
-  integrateWithAppleCalendar() {
-    // Apple Calendar integration using webcal:// protocol
-    console.log('🍎 Integrating with Apple Calendar...');
+  updateGoogleConnectionStatus() {
+    const statusElement = document.getElementById('google-status');
+    if (statusElement) {
+      statusElement.textContent = this.isGoogleConnected ? 'Conectado' : 'No conectado';
+      statusElement.className = this.isGoogleConnected ? 'connected' : 'disconnected';
+    }
+
+    const googleBtn = document.querySelector('.integration-btn.google-calendar');
+    if (googleBtn) {
+      googleBtn.classList.toggle('connected', this.isGoogleConnected);
+    }
+  }
+
+  checkGoogleConnection() {
+    // Check if we have stored Google connection info
+    const hasGoogleConnection = localStorage.getItem('finzn-google-connected') === 'true';
+    if (hasGoogleConnection) {
+      this.isGoogleConnected = true;
+      this.updateGoogleConnectionStatus();
+    }
+  }
+
+  handleGoogleError(error) {
+    console.error('❌ Google Calendar error:', error);
     
-    // Generate ICS file for Apple Calendar
-    const upcomingEvents = this.events.filter(event => 
-      new Date(event.date) >= new Date()
-    );
+    let helpType = 'google-error';
+    let message = error.message || 'Error desconocido';
     
-    if (upcomingEvents.length === 0) {
-      window.app.ui.showAlert('No hay eventos próximos para sincronizar', 'info');
-      return;
+    if (error.message && error.message.includes('popup_blocked')) {
+      helpType = 'google-popup-blocked';
+    } else if (error.message && error.message.includes('access_denied')) {
+      helpType = 'google-access-denied';
+    } else if (error.message && error.message.includes('server_error')) {
+      helpType = 'google-oauth-blocked';
+    } else if (error.error === 'tokenFailed' && error.idpId === 'google') {
+      helpType = 'google-oauth-blocked';
     }
     
-    const icsContent = this.generateICSForApple(upcomingEvents);
-    this.downloadICSForApple(icsContent);
+    this.showCalendarHelp(helpType, message);
     
-    // Mark as integrated
-    this.integrations.apple = true;
-    this.saveIntegrationStatus();
+    if (window.app && window.app.ui) {
+      window.app.ui.showAlert('Error al conectar con Google Calendar. Revisa la configuración.', 'error');
+    }
+  }
+
+  // Apple Calendar Integration (placeholder)
+  async handleAppleCalendarIntegration() {
+    console.log('🍎 Apple Calendar integration not yet implemented');
     
-    window.app.ui.showAlert('Archivo de calendario generado. Ábrelo en tu iPhone para agregar los recordatorios.', 'success');
-  }
-
-  generateICSForApple(events) {
-    let icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//FINZN//Calendar//ES
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:FINZN - Recordatorios Financieros
-X-WR-CALDESC:Recordatorios automáticos de FINZN`;
-
-    events.forEach(event => {
-      const eventTime = event.time || '09:00';
-      const duration = event.duration || 60;
-      
-      const startDate = new Date(event.date + 'T' + eventTime + ':00');
-      const endDate = new Date(startDate.getTime() + (duration * 60000));
-      
-      const customTitle = this.generateCustomTitle(event);
-      const customDescription = this.generateCustomDescription(event);
-      const customReminders = this.getCustomReminders(event.type);
-      
-      icsContent += `
-BEGIN:VEVENT
-UID:${event.id}@finzn.app
-DTSTART:${this.formatICSDate(startDate)}
-DTEND:${this.formatICSDate(endDate)}
-SUMMARY:${customTitle}
-DESCRIPTION:${customDescription.replace(/\n/g, '\\n')}`;
-
-      // Agregar recordatorios personalizados
-      customReminders.forEach(reminder => {
-        icsContent += `
-BEGIN:VALARM
-TRIGGER:-PT${reminder.minutes}M
-ACTION:DISPLAY
-DESCRIPTION:${customTitle}
-END:VALARM`;
-      });
-
-      icsContent += `
-CREATED:${this.formatICSDate(new Date())}
-LAST-MODIFIED:${this.formatICSDate(new Date())}
-END:VEVENT`;
-    });
-
-    icsContent += `
-END:VCALENDAR`;
-
-    return icsContent;
-  }
-
-  downloadICSForApple(content) {
-    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+    this.showCalendarHelp('apple-not-implemented');
     
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'FINZN_Recordatorios.ics';
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    if (window.app && window.app.ui) {
+      window.app.ui.showAlert('Integración con Apple Calendar próximamente', 'info');
+    }
   }
 
-  showCalendarIntegrationModal(calendarType) {
-    const modal = this.createIntegrationModal(calendarType);
-    document.body.appendChild(modal);
-    modal.classList.add('active');
+  // Calendar sync
+  async syncCalendar() {
+    try {
+      console.log('🔄 Syncing calendar...');
+      
+      if (this.isGoogleConnected) {
+        await this.syncWithGoogleCalendar();
+        
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('Calendario sincronizado correctamente', 'success');
+        }
+      } else {
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('No hay calendarios conectados para sincronizar', 'warning');
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Error syncing calendar:', error);
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al sincronizar el calendario', 'error');
+      }
+    }
   }
 
-  createIntegrationModal(calendarType) {
-    const modal = document.createElement('div');
-    modal.className = 'modal calendar-integration-modal';
-    modal.id = `${calendarType}-integration-modal`;
+  // Help system
+  showCalendarHelp(type, details = '') {
+    const helpContainer = document.getElementById('calendar-help');
+    if (!helpContainer) return;
 
-    const calendarNames = {
-      google: 'Google Calendar',
-      outlook: 'Outlook Calendar',
-      apple: 'Apple Calendar'
-    };
-
-    const calendarIcons = {
-      google: '📅',
-      outlook: '📅',
-      apple: '📅'
-    };
-
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>${calendarIcons[calendarType]} Integrar con ${calendarNames[calendarType]}</h2>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="integration-options">
-            <h4>Selecciona los eventos a sincronizar:</h4>
-            <div class="event-types-selection">
-              <label class="checkbox-label">
-                <input type="checkbox" id="${calendarType}-payments" checked>
-                <span class="checkmark"></span>
-                Pagos y Cuotas
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="${calendarType}-income" checked>
-                <span class="checkmark"></span>
-                Ingresos Esperados
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="${calendarType}-goals">
-                <span class="checkmark"></span>
-                Fechas Límite de Objetivos
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="${calendarType}-reviews">
-                <span class="checkmark"></span>
-                Revisiones Financieras
-              </label>
-            </div>
-            
-            <div class="integration-method-info">
-              <h4>Método de Integración Actual: URLs de Calendario</h4>
-              <p>Los eventos se abrirán en tu calendario para que los agregues manualmente. 
-              En futuras actualizaciones tendremos sincronización automática.</p>
-            </div>
+    let helpContent = '';
+    
+    switch (type) {
+      case 'google-config':
+        helpContent = `
+          <div class="help-section error">
+            <h4>⚙️ Configuración de Google Calendar Requerida</h4>
+            <p>Para usar Google Calendar necesitas configurar las credenciales:</p>
+            <ol>
+              <li>Ve a <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+              <li>Crea un proyecto y habilita Google Calendar API</li>
+              <li>Crea credenciales (API Key y OAuth 2.0 Client ID)</li>
+              <li>Configura las variables de entorno en tu aplicación</li>
+            </ol>
           </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="button" class="btn btn-primary" onclick="window.app.calendar.processCalendarIntegration('${calendarType}')">
-            <span>🔗</span>
-            Integrar Eventos
-          </button>
-        </div>
-      </div>
-    `;
-
-    // Add event listeners
-    const closeBtn = modal.querySelector('.modal-close');
-    const cancelBtn = modal.querySelector('.modal-cancel');
-    
-    const closeModal = () => {
-      modal.classList.remove('active');
-      setTimeout(() => modal.remove(), 300);
-    };
-
-    closeBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    return modal;
-  }
-
-  async processCalendarIntegration(calendarType) {
-    console.log(`🔗 Processing ${calendarType} calendar integration...`);
-    
-    // Get selected event types
-    const selectedTypes = [];
-    const checkboxes = document.querySelectorAll(`#${calendarType}-integration-modal input[type="checkbox"]:checked`);
-    checkboxes.forEach(checkbox => {
-      selectedTypes.push(checkbox.id.replace(`${calendarType}-`, ''));
-    });
-
-    if (selectedTypes.length === 0) {
-      window.app.ui.showAlert('Selecciona al menos un tipo de evento', 'warning');
-      return;
-    }
-
-    // Get events to integrate based on selected types
-    const eventsToIntegrate = this.getEventsForIntegration(selectedTypes);
-    
-    if (eventsToIntegrate.length === 0) {
-      window.app.ui.showAlert('No hay eventos disponibles para integrar', 'info');
-      return;
-    }
-
-    // Process integration based on current phase
-    switch (this.integrationMethods.phase) {
-      case 1:
-        await this.integrateWithURLs(calendarType, eventsToIntegrate);
+        `;
         break;
-      case 2:
-        await this.integrateWithICS(calendarType, eventsToIntegrate);
+        
+      case 'google-popup-blocked':
+        helpContent = `
+          <div class="help-section warning">
+            <h4>🚫 Ventana Emergente Bloqueada</h4>
+            <p>Tu navegador bloqueó la ventana de autenticación de Google.</p>
+            <p><strong>Solución:</strong> Permite ventanas emergentes para este sitio y vuelve a intentar.</p>
+          </div>
+        `;
         break;
-      case 3:
-        await this.integrateWithAPI(calendarType, eventsToIntegrate);
+        
+      case 'google-access-denied':
+        helpContent = `
+          <div class="help-section warning">
+            <h4>❌ Acceso Denegado</h4>
+            <p>Denegaste el acceso a Google Calendar.</p>
+            <p><strong>Solución:</strong> Vuelve a intentar y autoriza el acceso cuando se te solicite.</p>
+          </div>
+        `;
         break;
-    }
-
-    // Close modal
-    const modal = document.getElementById(`${calendarType}-integration-modal`);
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(() => modal.remove(), 300);
-    }
-  }
-
-  getEventsForIntegration(selectedTypes) {
-    const eventsToIntegrate = [];
-    
-    // Filter events based on selected types
-    this.events.forEach(event => {
-      let shouldInclude = false;
-      
-      if (selectedTypes.includes('payments') && event.type === 'payment') {
-        shouldInclude = true;
-      }
-      if (selectedTypes.includes('income') && event.type === 'income') {
-        shouldInclude = true;
-      }
-      if (selectedTypes.includes('goals') && event.type === 'goal-deadline') {
-        shouldInclude = true;
-      }
-      if (selectedTypes.includes('reviews') && event.type === 'review') {
-        shouldInclude = true;
-      }
-      
-      if (shouldInclude) {
-        eventsToIntegrate.push(event);
-      }
-    });
-    
-    return eventsToIntegrate;
-  }
-
-  // PHASE 1: URL Integration
-  async integrateWithURLs(calendarType, events) {
-    console.log(`🔗 Phase 1: Integrating ${events.length} events with ${calendarType} using URLs`);
-    
-    let successCount = 0;
-    
-    for (const event of events) {
-      try {
-        const calendarURL = this.generateCalendarURL(calendarType, event);
         
-        // Open calendar URL in new tab
-        window.open(calendarURL, '_blank');
-        successCount++;
+      case 'google-oauth-blocked':
+        helpContent = `
+          <div class="help-section error">
+            <h4>🔒 Dominio No Autorizado</h4>
+            <p>Tu dominio no está autorizado en Google Cloud Console.</p>
+            <p><strong>Dominio actual:</strong> ${window.location.origin}</p>
+            <ol>
+              <li>Ve a <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+              <li>Ve a APIs & Services → Credentials</li>
+              <li>Edita tu OAuth 2.0 Client ID</li>
+              <li>Agrega <code>${window.location.origin}</code> a "Authorized JavaScript origins"</li>
+              <li>Guarda y espera 5-10 minutos para que se propague</li>
+            </ol>
+          </div>
+        `;
+        break;
         
-        // Small delay between opens to avoid popup blocking
-        await new Promise(resolve => setTimeout(resolve, 500));
+      case 'apple-not-implemented':
+        helpContent = `
+          <div class="help-section info">
+            <h4>🍎 Apple Calendar</h4>
+            <p>La integración con Apple Calendar estará disponible próximamente.</p>
+            <p>Por ahora puedes usar Google Calendar o agregar eventos manualmente.</p>
+          </div>
+        `;
+        break;
         
-      } catch (error) {
-        console.error(`Error creating calendar URL for event ${event.id}:`, error);
-      }
-    }
-    
-    window.app.ui.showAlert(
-      `Se abrieron ${successCount} eventos en ${this.getCalendarName(calendarType)}. Agrega los que necesites.`,
-      'success'
-    );
-    
-    // Mark integration as attempted
-    this.integrations[calendarType] = true;
-    this.saveIntegrationStatus();
-  }
-
-  generateCalendarURL(calendarType, event) {
-    const startDate = new Date(event.date + 'T09:00:00');
-    const endDate = new Date(event.date + 'T10:00:00');
-    
-    switch (calendarType) {
-      case 'google':
-        return this.createGoogleCalendarURL(event, startDate, endDate);
-      case 'outlook':
-        return this.createOutlookCalendarURL(event, startDate, endDate);
-      case 'apple':
-        return this.createAppleCalendarURL(event, startDate, endDate);
+      case 'google-error':
       default:
-        throw new Error(`Unsupported calendar type: ${calendarType}`);
-    }
-  }
-
-  createGoogleCalendarURL(event, startDate, endDate) {
-    const baseUrl = 'https://calendar.google.com/calendar/render';
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: event.title,
-      dates: `${this.formatGoogleDate(startDate)}/${this.formatGoogleDate(endDate)}`,
-      details: this.formatEventDescription(event),
-      location: ''
-    });
-    return `${baseUrl}?${params.toString()}`;
-  }
-
-  createOutlookCalendarURL(event, startDate, endDate) {
-    const baseUrl = 'https://outlook.live.com/calendar/0/deeplink/compose';
-    const params = new URLSearchParams({
-      subject: event.title,
-      startdt: startDate.toISOString(),
-      enddt: endDate.toISOString(),
-      body: this.formatEventDescription(event)
-    });
-    return `${baseUrl}?${params.toString()}`;
-  }
-
-  createAppleCalendarURL(event, startDate, endDate) {
-    // Apple Calendar doesn't have direct URL scheme, so we'll generate a webcal URL
-    // This will be enhanced in Phase 2 with ICS files
-    const baseUrl = 'https://calendar.google.com/calendar/render';
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: `[FINZN] ${event.title}`,
-      dates: `${this.formatGoogleDate(startDate)}/${this.formatGoogleDate(endDate)}`,
-      details: `${this.formatEventDescription(event)}\n\nCreado desde FINZN`,
-      location: ''
-    });
-    return `${baseUrl}?${params.toString()}`;
-  }
-
-  formatGoogleDate(date) {
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  }
-
-  formatEventDescription(event) {
-    let description = event.description || '';
-    
-    if (event.amount) {
-      description += `\n\nMonto: ${this.formatCurrency(event.amount)}`;
-    }
-    
-    if (event.category) {
-      description += `\nCategoría: ${event.category}`;
-    }
-    
-    description += '\n\n📱 Creado desde FINZN - Tu compañero financiero inteligente';
-    
-    return description;
-  }
-
-  // PHASE 2: ICS File Integration (Preparado para futuro)
-  async integrateWithICS(calendarType, events) {
-    console.log(`📁 Phase 2: Integrating ${events.length} events with ICS files`);
-    
-    // Generate ICS file with all events
-    const icsContent = this.generateICSFile(events);
-    this.downloadICSFile(icsContent, `FINZN_Events_${calendarType}.ics`);
-    
-    window.app.ui.showAlert(
-      `Archivo de calendario descargado. Impórtalo en ${this.getCalendarName(calendarType)}.`,
-      'success'
-    );
-  }
-
-  generateICSFile(events) {
-    let icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//FINZN//Calendar//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH`;
-
-    events.forEach(event => {
-      const startDate = new Date(event.date + 'T09:00:00');
-      const endDate = new Date(event.date + 'T10:00:00');
-      
-      icsContent += `
-BEGIN:VEVENT
-UID:${event.id}@finzn.app
-DTSTART:${this.formatICSDate(startDate)}
-DTEND:${this.formatICSDate(endDate)}
-SUMMARY:${event.title}
-DESCRIPTION:${this.formatEventDescription(event).replace(/\n/g, '\\n')}
-CREATED:${this.formatICSDate(new Date())}
-LAST-MODIFIED:${this.formatICSDate(new Date())}
-END:VEVENT`;
-    });
-
-    icsContent += `
-END:VCALENDAR`;
-
-    return icsContent;
-  }
-
-  formatICSDate(date) {
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  }
-
-  downloadICSFile(content, filename) {
-    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  // PHASE 3: Native API Integration (Preparado para futuro)
-  async integrateWithAPI(calendarType, events) {
-    console.log(`🔗 Phase 3: Integrating ${events.length} events with native ${calendarType} API`);
-    
-    switch (calendarType) {
-      case 'google':
-        await this.integrateWithGoogleAPI(events);
-        break;
-      case 'outlook':
-        await this.integrateWithOutlookAPI(events);
-        break;
-      case 'apple':
-        await this.integrateWithAppleAPI(events);
+        helpContent = `
+          <div class="help-section error">
+            <h4>❌ Error de Google Calendar</h4>
+            <p>Ocurrió un error al conectar con Google Calendar:</p>
+            <p><code>${details}</code></p>
+            <p>Verifica tu configuración e intenta nuevamente.</p>
+          </div>
+        `;
         break;
     }
-  }
-
-  async integrateWithGoogleAPI(events) {
-    // TODO: Implement Google Calendar API integration
-    window.app.ui.showAlert('Integración con Google Calendar API próximamente', 'info');
-  }
-
-  async integrateWithOutlookAPI(events) {
-    // TODO: Implement Microsoft Graph API integration
-    window.app.ui.showAlert('Integración con Outlook API próximamente', 'info');
-  }
-
-  async integrateWithAppleAPI(events) {
-    // TODO: Implement CalDAV integration
-    window.app.ui.showAlert('Integración con Apple Calendar API próximamente', 'info');
-  }
-
-  // Utility methods
-  getCalendarName(calendarType) {
-    const names = {
-      google: 'Google Calendar',
-      outlook: 'Outlook Calendar',
-      apple: 'Apple Calendar'
-    };
-    return names[calendarType] || calendarType;
-  }
-
-  saveIntegrationStatus() {
-    try {
-      localStorage.setItem('finzn-calendar-integrations', JSON.stringify(this.integrations));
-    } catch (error) {
-      console.error('Error saving integration status:', error);
+    
+    helpContainer.innerHTML = helpContent;
+    helpContainer.style.display = 'block';
+    
+    // Auto-hide after 10 seconds for non-critical messages
+    if (!type.includes('config') && !type.includes('oauth-blocked')) {
+      setTimeout(() => {
+        helpContainer.style.display = 'none';
+      }, 10000);
     }
-  }
-
-  loadIntegrationStatus() {
-    try {
-      const saved = localStorage.getItem('finzn-calendar-integrations');
-      if (saved) {
-        this.integrations = { ...this.integrations, ...JSON.parse(saved) };
-      }
-    } catch (error) {
-      console.error('Error loading integration status:', error);
-    }
-  }
-
-  // Method to upgrade integration phase
-  upgradeToPhase(newPhase) {
-    if (newPhase >= 1 && newPhase <= 3) {
-      this.integrationMethods.phase = newPhase;
-      console.log(`📈 Calendar integration upgraded to Phase ${newPhase}`);
-      
-      const phaseNames = {
-        1: 'URLs de Calendario',
-        2: 'Archivos ICS',
-        3: 'APIs Nativas'
-      };
-      
-      window.app.ui.showAlert(
-        `Integración actualizada a: ${phaseNames[newPhase]}`,
-        'success'
-      );
-    }
-  }
-
-  // Utility methods
-  getCurrentMonth() {
-    const now = new Date();
-    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
   }
 
   formatCurrency(amount) {
@@ -1507,116 +802,5 @@ END:VCALENDAR`;
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
-  }
-
-  // ===== MÉTODOS DE PERSONALIZACIÓN =====
-  
-  generateCustomTitle(event) {
-    const template = this.reminderSettings.titleTemplates[event.type] || '⏰ {title}';
-    return template.replace('{title}', event.title);
-  }
-  
-  generateCustomDescription(event) {
-    let description = this.reminderSettings.descriptionTemplate;
-    
-    // Reemplazar variables
-    description = description.replace('{description}', event.description || event.title);
-    description = description.replace('{amount}', event.amount ? this.formatCurrency(event.amount) : 'No especificado');
-    description = description.replace('{category}', event.category || 'General');
-    
-    return description;
-  }
-  
-  getCustomReminders(eventType) {
-    // Recordatorios personalizados por tipo de evento
-    if (this.reminderSettings.customReminders[eventType]) {
-      return this.reminderSettings.customReminders[eventType];
-    }
-    
-    // Recordatorios por defecto
-    return this.reminderSettings.defaultReminders;
-  }
-  
-  getEventColor(eventType) {
-    const colors = {
-      payment: '11',      // Rojo - Pagos
-      income: '10',       // Verde - Ingresos
-      'goal-deadline': '9', // Azul - Objetivos
-      review: '6',        // Naranja - Revisiones
-      reminder: '7'       // Turquesa - Recordatorios
-    };
-    
-    return colors[eventType] || '7';
-  }
-  
-  // Configurar recordatorios personalizados
-  setCustomReminders(eventType, reminders) {
-    this.reminderSettings.customReminders[eventType] = reminders;
-    this.saveReminderSettings();
-  }
-  
-  // Configurar plantillas de título
-  setTitleTemplate(eventType, template) {
-    this.reminderSettings.titleTemplates[eventType] = template;
-    this.saveReminderSettings();
-  }
-  
-  // Configurar plantilla de descripción
-  setDescriptionTemplate(template) {
-    this.reminderSettings.descriptionTemplate = template;
-    this.saveReminderSettings();
-  }
-  
-  // Guardar configuración
-  saveReminderSettings() {
-    try {
-      localStorage.setItem('finzn-reminder-settings', JSON.stringify(this.reminderSettings));
-    } catch (error) {
-      console.error('Error saving reminder settings:', error);
-    }
-  }
-  
-  // Cargar configuración
-  loadReminderSettings() {
-    try {
-      const saved = localStorage.getItem('finzn-reminder-settings');
-      if (saved) {
-        const savedSettings = JSON.parse(saved);
-        this.reminderSettings = { ...this.reminderSettings, ...savedSettings };
-      }
-    } catch (error) {
-      console.error('Error loading reminder settings:', error);
-    }
-  }
-  
-  // Obtener configuración actual
-  getReminderSettings() {
-    return this.reminderSettings;
-  }
-  
-  // Restablecer configuración por defecto
-  resetReminderSettings() {
-    this.reminderSettings = {
-      defaultReminders: [
-        { method: 'popup', minutes: 60 },
-        { method: 'popup', minutes: 15 }
-      ],
-      customReminders: {},
-      titleTemplates: {
-        payment: '💰 {title}',
-        income: '💵 {title}',
-        'goal-deadline': '🎯 {title}',
-        review: '📊 {title}',
-        reminder: '⏰ {title}'
-      },
-      descriptionTemplate: `{description}
-
-💰 Monto: {amount}
-🏷️ Categoría: {category}
-📱 Creado desde FINZN - Tu compañero financiero inteligente
-
-¿Necesitas ayuda? Revisa tu dashboard de FINZN para más detalles.`
-    };
-    this.saveReminderSettings();
   }
 }
