@@ -453,22 +453,73 @@ class FinznApp {
 
   // Authentication methods
   async handleLogin(e) {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     
-    const email = document.getElementById('login-user').value;
+    console.log('🔐 Login form submitted');
+    
+    const email = document.getElementById('login-user').value.trim();
     const password = document.getElementById('login-pass').value;
     const errorDiv = document.getElementById('login-error');
+    const submitBtn = e?.target?.querySelector('button[type="submit"]');
+    
+    // Clear previous errors
+    if (errorDiv) {
+      errorDiv.textContent = '';
+      errorDiv.style.display = 'none';
+    }
+    
+    // Disable submit button to prevent double submission
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Iniciando sesión...';
+    }
+    
+    // Validate inputs
+    if (!email || !password) {
+      this.showError('login-error', 'Por favor completa todos los campos');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>✨</span> Iniciar Sesión';
+      }
+      return;
+    }
     
     try {
-      errorDiv.textContent = '';
-      await this.auth.login(email, password);
+      console.log('🔐 Attempting login with email:', email);
       
-      // Reload the page to initialize the app properly
-      window.location.reload();
+      const success = await this.auth.login(email, password);
+      
+      if (success) {
+        console.log('✅ Login successful, loading user data...');
+        
+        // Load user data first
+        await this.data.loadUserData();
+        
+        // Show main app
+        this.showMainApp();
+        
+        // Update dashboard
+        this.updateDashboard();
+        
+        // Show success message
+        this.ui.showAlert('¡Bienvenido de vuelta! 👋', 'success');
+        
+      } else {
+        throw new Error('Login failed');
+      }
       
     } catch (error) {
-      console.error('Login error:', error);
-      errorDiv.textContent = error.message;
+      console.error('❌ Login error:', error);
+      this.showError('login-error', error.message || 'Error al iniciar sesión');
+    } finally {
+      // Re-enable submit button
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>✨</span> Iniciar Sesión';
+      }
     }
   }
 
