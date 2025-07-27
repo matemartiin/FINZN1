@@ -1071,6 +1071,501 @@ class FinznApp {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
   }
+
+  async deleteExpense(expenseId) {
+    if (confirm('¿Estás seguro de que quieres eliminar este gasto?')) {
+      try {
+        await this.data.deleteExpense(expenseId);
+        this.updateDashboard();
+        this.ui.showAlert('Gasto eliminado exitosamente', 'success');
+      } catch (error) {
+        console.error('Error deleting expense:', error);
+        this.ui.showAlert('Error al eliminar el gasto', 'error');
+      }
+    }
+  }
+
+  showDeleteConfirmation(expenseId, description) {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${description}"?`)) {
+      this.deleteExpense(expenseId);
+    }
+  }
+
+  async deleteCategory(categoryId) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
+      try {
+        await this.data.deleteCategory(categoryId);
+        this.updateDashboard();
+        this.ui.showAlert('Categoría eliminada exitosamente', 'success');
+      } catch (error) {
+        console.error('Error deleting category:', error);
+        this.ui.showAlert('Error al eliminar la categoría', 'error');
+      }
+    }
+  }
+
+  async deleteSpendingLimit(limitId) {
+    if (confirm('¿Estás seguro de que quieres eliminar este límite de gasto?')) {
+      try {
+        await this.data.deleteSpendingLimit(limitId);
+        this.updateDashboard();
+        this.ui.showAlert('Límite eliminado exitosamente', 'success');
+      } catch (error) {
+        console.error('Error deleting spending limit:', error);
+        this.ui.showAlert('Error al eliminar el límite', 'error');
+      }
+    }
+  }
+
+  // UI state methods
+  showAuthContainer() {
+    document.getElementById('login-container').classList.remove('hidden');
+    document.getElementById('register-container').classList.add('hidden');
+    document.getElementById('app').classList.add('hidden');
+  }
+
+  showRegisterContainer() {
+    document.getElementById('login-container').classList.add('hidden');
+    document.getElementById('register-container').classList.remove('hidden');
+    document.getElementById('app').classList.add('hidden');
+  }
+
+  showLoginContainer() {
+    document.getElementById('login-container').classList.remove('hidden');
+    document.getElementById('register-container').classList.add('hidden');
+    document.getElementById('app').classList.add('hidden');
+  }
+
+  showMainApp() {
+    document.getElementById('login-container').classList.add('hidden');
+    document.getElementById('register-container').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+  }
+
+  updateTransactionsTimeline() {
+    const container = document.getElementById('transactions-timeline');
+    if (!container) return;
+
+    console.log('🔄 Updating transactions timeline...');
+    
+    // Get current month data
+    const expenses = this.data.getExpenses(this.currentMonth);
+    const income = this.data.getIncome(this.currentMonth);
+    const extraIncomes = this.data.getExtraIncomes(this.currentMonth);
+    
+    // Combine all transactions
+    const transactions = [];
+    
+    // Add expenses
+    expenses.forEach(expense => {
+      transactions.push({
+        type: 'expense',
+        date: expense.transaction_date,
+        description: expense.description,
+        amount: -parseFloat(expense.amount),
+        category: expense.category,
+        id: expense.id
+      });
+    });
+    
+    // Add fixed income
+    if (income.fixed > 0) {
+      transactions.push({
+        type: 'income',
+        date: `${this.currentMonth}-01`,
+        description: 'Sueldo mensual',
+        amount: parseFloat(income.fixed),
+        category: 'sueldo',
+        id: `income-fixed-${this.currentMonth}`
+      });
+    }
+    
+    // Add extra incomes
+    extraIncomes.forEach(extraIncome => {
+      transactions.push({
+        type: 'income',
+        date: extraIncome.created_at ? extraIncome.created_at.split('T')[0] : `${this.currentMonth}-01`,
+        description: extraIncome.description,
+        amount: parseFloat(extraIncome.amount),
+        category: extraIncome.category,
+        id: extraIncome.id
+      });
+    });
+    
+    // Sort by date (newest first)
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Clear container
+    container.innerHTML = '';
+    
+    if (transactions.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <h3>No hay transacciones este mes</h3>
+          <p>Las transacciones aparecerán aquí cuando agregues gastos o ingresos</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Group by date
+    const groupedTransactions = {};
+    transactions.forEach(transaction => {
+      const date = transaction.date;
+      if (!groupedTransactions[date]) {
+        groupedTransactions[date] = [];
+      }
+      groupedTransactions[date].push(transaction);
+    });
+    
+    // Render timeline
+    Object.entries(groupedTransactions).forEach(([date, dayTransactions]) => {
+      const dateGroup = document.createElement('div');
+      dateGroup.className = 'timeline-date-group';
+      
+      const dateHeader = document.createElement('div');
+      dateHeader.className = 'timeline-date-header';
+      dateHeader.textContent = new Date(date).toLocaleDateString('es-ES', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      dateGroup.appendChild(dateHeader);
+      
+      dayTransactions.forEach(transaction => {
+        const item = document.createElement('div');
+        item.className = `timeline-item ${transaction.type}`;
+        
+        const category = this.ui.getCategoryInfo(transaction.category);
+        
+        item.innerHTML = `
+          <div class="timeline-icon">${category.icon}</div>
+          <div class="timeline-content">
+            <div class="timeline-description">${transaction.description}</div>
+            <div class="timeline-category">${category.name}</div>
+          </div>
+          <div class="timeline-amount ${transaction.amount < 0 ? 'negative' : 'positive'}">
+            ${this.ui.formatCurrency(Math.abs(transaction.amount))}
+          </div>
+        `;
+        
+        dateGroup.appendChild(item);
+      });
+      
+      container.appendChild(dateGroup);
+    });
+    
+    console.log('✅ Transactions timeline updated');
+  }
+
+  updatePlanningWidgets() {
+    console.log('🎯 Updating planning widgets...');
+    
+    // Update goals widget in dashboard
+    const goalsWidget = document.getElementById('goals-widget');
+    if (goalsWidget) {
+      const goals = this.data.getGoals();
+      goalsWidget.innerHTML = '';
+      
+      if (goals.length === 0) {
+        goalsWidget.innerHTML = '<p class="widget-empty">No hay objetivos configurados</p>';
+      } else {
+        goals.slice(0, 3).forEach(goal => {
+          const progress = (goal.current_amount / goal.target_amount) * 100;
+          const goalElement = document.createElement('div');
+          goalElement.className = 'widget-goal-item';
+          goalElement.innerHTML = `
+            <div class="widget-goal-name">${goal.name}</div>
+            <div class="widget-goal-progress">
+              <div class="widget-progress-bar">
+                <div class="widget-progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+              </div>
+              <span class="widget-progress-text">${progress.toFixed(1)}%</span>
+            </div>
+          `;
+          goalsWidget.appendChild(goalElement);
+        });
+        
+        if (goals.length > 3) {
+          const moreElement = document.createElement('div');
+          moreElement.className = 'widget-more';
+          moreElement.innerHTML = `<button class="btn btn-secondary btn-sm" onclick="window.app.navigation.navigateTo('planning', 'goals')">Ver todos (${goals.length})</button>`;
+          goalsWidget.appendChild(moreElement);
+        }
+      }
+    }
+    
+    console.log('✅ Planning widgets updated');
+  }
+
+  updateReportsData() {
+    console.log('📊 Updating reports data...');
+    
+    // Update achievements in dashboard
+    const achievementsWidget = document.getElementById('achievements-widget');
+    if (achievementsWidget) {
+      const achievements = this.data.getAchievements();
+      achievementsWidget.innerHTML = '';
+      
+      if (achievements.length === 0) {
+        achievementsWidget.innerHTML = '<p class="widget-empty">No hay logros desbloqueados</p>';
+      } else {
+        achievements.slice(0, 3).forEach(achievement => {
+          const achievementElement = document.createElement('div');
+          achievementElement.className = 'widget-achievement-item';
+          achievementElement.innerHTML = `
+            <div class="widget-achievement-title">${achievement.title}</div>
+            <div class="widget-achievement-description">${achievement.description}</div>
+          `;
+          achievementsWidget.appendChild(achievementElement);
+        });
+        
+        if (achievements.length > 3) {
+          const moreElement = document.createElement('div');
+          moreElement.className = 'widget-more';
+          moreElement.innerHTML = `<button class="btn btn-secondary btn-sm" onclick="window.app.navigation.navigateTo('reports', 'achievements')">Ver todos (${achievements.length})</button>`;
+          achievementsWidget.appendChild(moreElement);
+        }
+      }
+    }
+    
+    console.log('✅ Reports data updated');
+  }
+
+  // Additional utility methods
+  async addToGoal(goalId) {
+    const amount = prompt('¿Cuánto quieres agregar a este objetivo?');
+    if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
+      try {
+        // This would need to be implemented in DataManager
+        // await this.data.addToGoal(goalId, parseFloat(amount));
+        this.updateDashboard();
+        this.ui.showAlert('Monto agregado al objetivo exitosamente', 'success');
+      } catch (error) {
+        console.error('Error adding to goal:', error);
+        this.ui.showAlert('Error al agregar monto al objetivo', 'error');
+      }
+    }
+  }
+
+  async editGoal(goalId) {
+    this.ui.showAlert('Función de editar objetivo próximamente disponible', 'info');
+  }
+
+  async editSpendingLimit(limitId) {
+    this.ui.showAlert('Función de editar límite próximamente disponible', 'info');
+  }
+
+  async showEditExpenseModal(expenseId) {
+    this.ui.showAlert('Función de editar gasto próximamente disponible', 'info');
+  }
+
+  // Filter methods for transactions
+  setupTransactionFilters() {
+    const typeFilter = document.getElementById('transaction-type-filter');
+    const categoryFilter = document.getElementById('category-filter');
+    const dateFilter = document.getElementById('date-filter');
+    const clearFilters = document.getElementById('clear-filters');
+    
+    if (typeFilter) {
+      typeFilter.addEventListener('change', () => this.applyTransactionFilters());
+    }
+    
+    if (categoryFilter) {
+      categoryFilter.addEventListener('change', () => this.applyTransactionFilters());
+    }
+    
+    if (dateFilter) {
+      dateFilter.addEventListener('change', () => this.applyTransactionFilters());
+    }
+    
+    if (clearFilters) {
+      clearFilters.addEventListener('click', () => this.clearTransactionFilters());
+    }
+    
+    // Setup expense filters
+    const expenseCategoryFilter = document.getElementById('expense-category-filter');
+    const expenseDateFilter = document.getElementById('expense-date-filter');
+    const clearExpenseFilters = document.getElementById('clear-expense-filters');
+    
+    if (expenseCategoryFilter) {
+      expenseCategoryFilter.addEventListener('change', () => this.applyExpenseFilters());
+    }
+    
+    if (expenseDateFilter) {
+      expenseDateFilter.addEventListener('change', () => this.applyExpenseFilters());
+    }
+    
+    if (clearExpenseFilters) {
+      clearExpenseFilters.addEventListener('click', () => this.clearExpenseFilters());
+    }
+  }
+
+  applyTransactionFilters() {
+    const typeFilter = document.getElementById('transaction-type-filter')?.value;
+    const categoryFilter = document.getElementById('category-filter')?.value;
+    const dateFilter = document.getElementById('date-filter')?.value;
+    
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    
+    timelineItems.forEach(item => {
+      let show = true;
+      
+      if (typeFilter && !item.classList.contains(typeFilter)) {
+        show = false;
+      }
+      
+      if (categoryFilter) {
+        const categoryElement = item.querySelector('.timeline-category');
+        if (!categoryElement || !categoryElement.textContent.includes(categoryFilter)) {
+          show = false;
+        }
+      }
+      
+      if (dateFilter) {
+        const dateGroup = item.closest('.timeline-date-group');
+        const dateHeader = dateGroup?.querySelector('.timeline-date-header');
+        if (dateHeader) {
+          const itemDate = new Date(dateHeader.textContent);
+          const filterDate = new Date(dateFilter);
+          if (itemDate.toDateString() !== filterDate.toDateString()) {
+            show = false;
+          }
+        }
+      }
+      
+      item.style.display = show ? 'flex' : 'none';
+    });
+  }
+
+  clearTransactionFilters() {
+    const typeFilter = document.getElementById('transaction-type-filter');
+    const categoryFilter = document.getElementById('category-filter');
+    const dateFilter = document.getElementById('date-filter');
+    
+    if (typeFilter) typeFilter.value = '';
+    if (categoryFilter) categoryFilter.value = '';
+    if (dateFilter) dateFilter.value = '';
+    
+    this.applyTransactionFilters();
+  }
+
+  applyExpenseFilters() {
+    const categoryFilter = document.getElementById('expense-category-filter')?.value;
+    const dateFilter = document.getElementById('expense-date-filter')?.value;
+    
+    const expenseItems = document.querySelectorAll('.expense-item');
+    
+    expenseItems.forEach(item => {
+      let show = true;
+      
+      if (categoryFilter) {
+        const categoryElement = item.querySelector('.expense-category');
+        if (!categoryElement || !categoryElement.textContent.includes(categoryFilter)) {
+          show = false;
+        }
+      }
+      
+      if (dateFilter) {
+        const categoryElement = item.querySelector('.expense-category');
+        if (categoryElement) {
+          const dateText = categoryElement.textContent.split('•')[1]?.trim();
+          if (dateText) {
+            const itemDate = new Date(dateText);
+            const filterDate = new Date(dateFilter);
+            if (itemDate.toDateString() !== filterDate.toDateString()) {
+              show = false;
+            }
+          }
+        }
+      }
+      
+      item.style.display = show ? 'flex' : 'none';
+    });
+  }
+
+  clearExpenseFilters() {
+    const categoryFilter = document.getElementById('expense-category-filter');
+    const dateFilter = document.getElementById('expense-date-filter');
+    
+    if (categoryFilter) categoryFilter.value = '';
+    if (dateFilter) dateFilter.value = '';
+    
+    this.applyExpenseFilters();
+  }
+
+  // Dashboard widget updates
+  updateUpcomingEvents() {
+    const container = document.getElementById('upcoming-events');
+    if (!container) return;
+    
+    if (this.calendar) {
+      const upcomingEvents = this.calendar.getUpcomingEvents(7);
+      container.innerHTML = '';
+      
+      if (upcomingEvents.length === 0) {
+        container.innerHTML = '<p class="widget-empty">No hay eventos próximos</p>';
+      } else {
+        upcomingEvents.slice(0, 3).forEach(event => {
+          const eventElement = document.createElement('div');
+          eventElement.className = 'widget-event-item';
+          
+          const eventDate = new Date(event.date);
+          const today = new Date();
+          const daysUntil = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+          
+          eventElement.innerHTML = `
+            <div class="widget-event-title">${event.title}</div>
+            <div class="widget-event-date">
+              ${daysUntil === 0 ? 'Hoy' : daysUntil === 1 ? 'Mañana' : `En ${daysUntil} días`}
+            </div>
+          `;
+          container.appendChild(eventElement);
+        });
+        
+        if (upcomingEvents.length > 3) {
+          const moreElement = document.createElement('div');
+          moreElement.className = 'widget-more';
+          moreElement.innerHTML = `<button class="btn btn-secondary btn-sm" onclick="window.app.navigation.navigateTo('calendar')">Ver todos (${upcomingEvents.length})</button>`;
+          container.appendChild(moreElement);
+        }
+      }
+    }
+  }
+
+  updateLimitsWidget() {
+    const container = document.getElementById('limits-widget');
+    if (!container) return;
+    
+    const expenses = this.data.getExpenses(this.currentMonth);
+    const limits = this.data.getSpendingLimits();
+    const alerts = this.data.checkSpendingLimits(this.currentMonth);
+    
+    container.innerHTML = '';
+    
+    if (alerts.length === 0) {
+      container.innerHTML = '<p class="widget-empty">Todos los límites bajo control</p>';
+    } else {
+      alerts.slice(0, 3).forEach(alert => {
+        const alertElement = document.createElement('div');
+        alertElement.className = `widget-alert-item ${alert.type}`;
+        alertElement.innerHTML = `
+          <div class="widget-alert-message">${alert.message}</div>
+          <div class="widget-alert-percentage">${alert.percentage}%</div>
+        `;
+        container.appendChild(alertElement);
+      });
+      
+      if (alerts.length > 3) {
+        const moreElement = document.createElement('div');
+        moreElement.className = 'widget-more';
+        moreElement.innerHTML = `<button class="btn btn-secondary btn-sm" onclick="window.app.navigation.navigateTo('planning', 'limits')">Ver todos (${alerts.length})</button>`;
+        container.appendChild(moreElement);
+      }
+    }
+  }
 }
 
 // Initialize the app when DOM is loaded
