@@ -6,9 +6,28 @@ export class CalendarManager {
       google: false,
       apple: false
     };
-    this.integrationMethods = {
-      phase: 3, // Direct mobile integration
-      supportedCalendars: ['google', 'apple']
+    
+    // Configuración de recordatorios personalizable
+    this.reminderSettings = {
+      defaultReminders: [
+        { method: 'popup', minutes: 60 },   // 1 hora antes
+        { method: 'popup', minutes: 15 }    // 15 minutos antes
+      ],
+      customReminders: {},  // Por tipo de evento
+      titleTemplates: {
+        payment: '💰 {title}',
+        income: '💵 {title}',
+        'goal-deadline': '🎯 {title}',
+        review: '📊 {title}',
+        reminder: '⏰ {title}'
+      },
+      descriptionTemplate: `{description}
+
+💰 Monto: {amount}
+🏷️ Categoría: {category}
+📱 Creado desde FINZN - Tu compañero financiero inteligente
+
+¿Necesitas ayuda? Revisa tu dashboard de FINZN para más detalles.`
     };
     
     // Google Calendar API configuration
@@ -22,6 +41,9 @@ export class CalendarManager {
     // Authentication states
     this.isGoogleAuthenticated = false;
     this.googleAccessToken = null;
+    
+    // Load saved settings
+    this.loadReminderSettings();
   }
 
   async init() {
@@ -77,14 +99,6 @@ export class CalendarManager {
       script.onerror = reject;
       document.head.appendChild(script);
     });
-  }
-
-  init() {
-    console.log('📅 Initializing Calendar Manager...');
-    this.loadIntegrationStatus();
-    this.setupEventListeners();
-    this.loadEvents();
-    this.renderCalendar();
   }
 
   setupEventListeners() {
@@ -625,25 +639,12 @@ export class CalendarManager {
     if (!this.isGoogleAuthenticated) return;
     
     try {
-      // Usar hora personalizada o por defecto
-      const eventTime = event.time || '09:00';
-      const duration = event.duration || 60; // minutos
-      
-      const startDateTime = new Date(event.date + 'T' + eventTime + ':00');
-      const endDateTime = new Date(startDateTime.getTime() + (duration * 60000));
-      
-      // Generar título personalizado
-      const customTitle = this.generateCustomTitle(event);
-      
-      // Generar descripción personalizada
-      const customDescription = this.generateCustomDescription(event);
-      
-      // Obtener recordatorios personalizados
-      const customReminders = this.getCustomReminders(event.type);
+      const startDateTime = new Date(event.date + 'T09:00:00');
+      const endDateTime = new Date(event.date + 'T10:00:00');
       
       const googleEvent = {
-        summary: customTitle,
-        description: customDescription,
+        summary: `💰 ${event.title}`,
+        description: this.formatEventDescription(event),
         start: {
           dateTime: startDateTime.toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -654,16 +655,10 @@ export class CalendarManager {
         },
         reminders: {
           useDefault: false,
-          overrides: customReminders
-        },
-        colorId: this.getEventColor(event.type),
-        extendedProperties: {
-          private: {
-            finznEventId: event.id,
-            finznEventType: event.type,
-            finznAmount: event.amount?.toString() || '',
-            finznCategory: event.category || ''
-          }
+          overrides: [
+            { method: 'popup', minutes: 60 }, // 1 hora antes
+            { method: 'popup', minutes: 15 }  // 15 minutos antes
+          ]
         }
       };
       
@@ -1182,4 +1177,19 @@ END:VCALENDAR`;
       maximumFractionDigits: 0
     }).format(amount);
   }
+
+  loadReminderSettings() {
+    try {
+      const saved = localStorage.getItem('finzn-reminder-settings');
+      if (saved) {
+        this.reminderSettings = { ...this.reminderSettings, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.error('Error loading reminder settings:', error);
+    }
+  }
+
+  integrationMethods = {
+    phase: 1
+  };
 }
