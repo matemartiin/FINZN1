@@ -453,73 +453,22 @@ class FinznApp {
 
   // Authentication methods
   async handleLogin(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    e.preventDefault();
     
-    console.log('🔐 Login form submitted');
-    
-    const email = document.getElementById('login-user').value.trim();
+    const email = document.getElementById('login-user').value;
     const password = document.getElementById('login-pass').value;
     const errorDiv = document.getElementById('login-error');
-    const submitBtn = e?.target?.querySelector('button[type="submit"]');
-    
-    // Clear previous errors
-    if (errorDiv) {
-      errorDiv.textContent = '';
-      errorDiv.style.display = 'none';
-    }
-    
-    // Disable submit button to prevent double submission
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Iniciando sesión...';
-    }
-    
-    // Validate inputs
-    if (!email || !password) {
-      this.showError('login-error', 'Por favor completa todos los campos');
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>✨</span> Iniciar Sesión';
-      }
-      return;
-    }
     
     try {
-      console.log('🔐 Attempting login with email:', email);
+      errorDiv.textContent = '';
+      await this.auth.login(email, password);
       
-      const success = await this.auth.login(email, password);
-      
-      if (success) {
-        console.log('✅ Login successful, loading user data...');
-        
-        // Load user data first
-        await this.data.loadUserData();
-        
-        // Show main app
-        this.showMainApp();
-        
-        // Update dashboard
-        this.updateDashboard();
-        
-        // Show success message
-        this.ui.showAlert('¡Bienvenido de vuelta! 👋', 'success');
-        
-      } else {
-        throw new Error('Login failed');
-      }
+      // Reload the page to initialize the app properly
+      window.location.reload();
       
     } catch (error) {
-      console.error('❌ Login error:', error);
-      this.showError('login-error', error.message || 'Error al iniciar sesión');
-    } finally {
-      // Re-enable submit button
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>✨</span> Iniciar Sesión';
-      }
+      console.error('Login error:', error);
+      errorDiv.textContent = error.message;
     }
   }
 
@@ -1121,76 +1070,6 @@ class FinznApp {
   getCurrentMonth() {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-  }
-
-  async deleteExpense(expenseId) {
-    if (confirm('¿Estás seguro de que quieres eliminar este gasto?')) {
-      try {
-        await this.data.deleteExpense(expenseId);
-        this.updateDashboard();
-        this.ui.showAlert('Gasto eliminado exitosamente', 'success');
-      } catch (error) {
-        console.error('Error deleting expense:', error);
-        this.ui.showAlert('Error al eliminar el gasto', 'error');
-      }
-    }
-  }
-
-  showDeleteConfirmation(expenseId, description) {
-    if (confirm(`¿Estás seguro de que quieres eliminar "${description}"?`)) {
-      this.deleteExpense(expenseId);
-    }
-  }
-
-  async deleteCategory(categoryId) {
-    if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
-      try {
-        await this.data.deleteCategory(categoryId);
-        this.updateDashboard();
-        this.ui.showAlert('Categoría eliminada exitosamente', 'success');
-      } catch (error) {
-        console.error('Error deleting category:', error);
-        this.ui.showAlert('Error al eliminar la categoría', 'error');
-      }
-    }
-  }
-
-  async deleteSpendingLimit(limitId) {
-    if (confirm('¿Estás seguro de que quieres eliminar este límite de gasto?')) {
-      try {
-        await this.data.deleteSpendingLimit(limitId);
-        this.updateDashboard();
-        this.ui.showAlert('Límite eliminado exitosamente', 'success');
-      } catch (error) {
-        console.error('Error deleting spending limit:', error);
-        this.ui.showAlert('Error al eliminar el límite', 'error');
-      }
-    }
-  }
-
-  // UI state methods
-  showAuthContainer() {
-    document.getElementById('login-container').classList.remove('hidden');
-    document.getElementById('register-container').classList.add('hidden');
-    document.getElementById('app').classList.add('hidden');
-  }
-
-  showRegisterContainer() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('register-container').classList.remove('hidden');
-    document.getElementById('app').classList.add('hidden');
-  }
-
-  showLoginContainer() {
-    document.getElementById('login-container').classList.remove('hidden');
-    document.getElementById('register-container').classList.add('hidden');
-    document.getElementById('app').classList.add('hidden');
-  }
-
-  showMainApp() {
-    document.getElementById('login-container').classList.add('hidden');
-    document.getElementById('register-container').classList.add('hidden');
-    document.getElementById('app').classList.remove('hidden');
   }
 
   updateTransactionsTimeline() {
