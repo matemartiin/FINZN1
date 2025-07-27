@@ -568,33 +568,108 @@ body {
 }
 
 .widget-card {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
-  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
+  border: 1px solid var(--border-color);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .widget-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .widget-card h4 {
   margin-bottom: var(--spacing-md);
   color: var(--text-primary);
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 900;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.widget-card h4::before {
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  content: attr(data-icon);
 }
 
 .upcoming-events,
 .limits-widget,
 .goals-widget {
   margin-bottom: var(--spacing-md);
-  min-height: 100px;
+  min-height: 80px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.widget-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-lg);
+  font-size: 0.9rem;
+}
+
+.widget-success {
+  color: var(--success-color);
+  font-weight: 600;
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+}
+
+.widget-event-item,
+.widget-limit-item,
+.widget-goal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--lavanda);
+  font-size: 0.85rem;
+}
+
+.widget-event-date,
+.widget-limit-percentage,
+.widget-goal-progress {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.widget-event-title,
+.widget-limit-category,
+.widget-goal-name {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.widget-limit-item.warning {
+  border-left-color: var(--warning-color);
+}
+
+.widget-limit-item.danger {
+  border-left-color: var(--error-color);
 }
 
 /* Tarjetas de resumen - PROPORCIONES CORREGIDAS */
