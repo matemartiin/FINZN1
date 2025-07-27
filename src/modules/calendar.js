@@ -144,15 +144,10 @@ export class CalendarManager {
     
     // Integration buttons
     const googleBtn = document.querySelector('.google-calendar');
-    const outlookBtn = document.querySelector('.outlook-calendar');
     const appleBtn = document.querySelector('.apple-calendar');
     
     if (googleBtn) {
       googleBtn.addEventListener('click', () => this.handleGoogleCalendarIntegration());
-    }
-    
-    if (outlookBtn) {
-      outlookBtn.addEventListener('click', () => this.handleOutlookIntegration());
     }
     
     if (appleBtn) {
