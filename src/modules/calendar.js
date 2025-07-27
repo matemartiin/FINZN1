@@ -7,10 +7,15 @@ export class CalendarManager {
       outlook: false,
       apple: false
     };
+    this.integrationMethods = {
+      phase: 1, // 1: URLs, 2: ICS Files, 3: Native APIs
+      supportedCalendars: ['google', 'outlook', 'apple']
+    };
   }
 
   init() {
     console.log('📅 Initializing Calendar Manager...');
+    this.loadIntegrationStatus();
     this.setupEventListeners();
     this.loadEvents();
     this.renderCalendar();
@@ -455,17 +460,425 @@ export class CalendarManager {
   // Integration methods
   handleGoogleCalendarIntegration() {
     console.log('📅 Google Calendar integration');
-    window.app.ui.showAlert('Integración con Google Calendar próximamente', 'info');
+    this.showCalendarIntegrationModal('google');
   }
 
   handleOutlookIntegration() {
     console.log('📅 Outlook integration');
-    window.app.ui.showAlert('Integración con Outlook próximamente', 'info');
+    this.showCalendarIntegrationModal('outlook');
   }
 
   handleAppleCalendarIntegration() {
     console.log('📅 Apple Calendar integration');
-    window.app.ui.showAlert('Integración con Apple Calendar próximamente', 'info');
+    this.showCalendarIntegrationModal('apple');
+  }
+
+  showCalendarIntegrationModal(calendarType) {
+    const modal = this.createIntegrationModal(calendarType);
+    document.body.appendChild(modal);
+    modal.classList.add('active');
+  }
+
+  createIntegrationModal(calendarType) {
+    const modal = document.createElement('div');
+    modal.className = 'modal calendar-integration-modal';
+    modal.id = `${calendarType}-integration-modal`;
+
+    const calendarNames = {
+      google: 'Google Calendar',
+      outlook: 'Outlook Calendar',
+      apple: 'Apple Calendar'
+    };
+
+    const calendarIcons = {
+      google: '📅',
+      outlook: '📅',
+      apple: '📅'
+    };
+
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>${calendarIcons[calendarType]} Integrar con ${calendarNames[calendarType]}</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="integration-options">
+            <h4>Selecciona los eventos a sincronizar:</h4>
+            <div class="event-types-selection">
+              <label class="checkbox-label">
+                <input type="checkbox" id="${calendarType}-payments" checked>
+                <span class="checkmark"></span>
+                Pagos y Cuotas
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="${calendarType}-income" checked>
+                <span class="checkmark"></span>
+                Ingresos Esperados
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="${calendarType}-goals">
+                <span class="checkmark"></span>
+                Fechas Límite de Objetivos
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="${calendarType}-reviews">
+                <span class="checkmark"></span>
+                Revisiones Financieras
+              </label>
+            </div>
+            
+            <div class="integration-method-info">
+              <h4>Método de Integración Actual: URLs de Calendario</h4>
+              <p>Los eventos se abrirán en tu calendario para que los agregues manualmente. 
+              En futuras actualizaciones tendremos sincronización automática.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="window.app.calendar.processCalendarIntegration('${calendarType}')">
+            <span>🔗</span>
+            Integrar Eventos
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Add event listeners
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.modal-cancel');
+    
+    const closeModal = () => {
+      modal.classList.remove('active');
+      setTimeout(() => modal.remove(), 300);
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    return modal;
+  }
+
+  async processCalendarIntegration(calendarType) {
+    console.log(`🔗 Processing ${calendarType} calendar integration...`);
+    
+    // Get selected event types
+    const selectedTypes = [];
+    const checkboxes = document.querySelectorAll(`#${calendarType}-integration-modal input[type="checkbox"]:checked`);
+    checkboxes.forEach(checkbox => {
+      selectedTypes.push(checkbox.id.replace(`${calendarType}-`, ''));
+    });
+
+    if (selectedTypes.length === 0) {
+      window.app.ui.showAlert('Selecciona al menos un tipo de evento', 'warning');
+      return;
+    }
+
+    // Get events to integrate based on selected types
+    const eventsToIntegrate = this.getEventsForIntegration(selectedTypes);
+    
+    if (eventsToIntegrate.length === 0) {
+      window.app.ui.showAlert('No hay eventos disponibles para integrar', 'info');
+      return;
+    }
+
+    // Process integration based on current phase
+    switch (this.integrationMethods.phase) {
+      case 1:
+        await this.integrateWithURLs(calendarType, eventsToIntegrate);
+        break;
+      case 2:
+        await this.integrateWithICS(calendarType, eventsToIntegrate);
+        break;
+      case 3:
+        await this.integrateWithAPI(calendarType, eventsToIntegrate);
+        break;
+    }
+
+    // Close modal
+    const modal = document.getElementById(`${calendarType}-integration-modal`);
+    if (modal) {
+      modal.classList.remove('active');
+      setTimeout(() => modal.remove(), 300);
+    }
+  }
+
+  getEventsForIntegration(selectedTypes) {
+    const eventsToIntegrate = [];
+    
+    // Filter events based on selected types
+    this.events.forEach(event => {
+      let shouldInclude = false;
+      
+      if (selectedTypes.includes('payments') && event.type === 'payment') {
+        shouldInclude = true;
+      }
+      if (selectedTypes.includes('income') && event.type === 'income') {
+        shouldInclude = true;
+      }
+      if (selectedTypes.includes('goals') && event.type === 'goal-deadline') {
+        shouldInclude = true;
+      }
+      if (selectedTypes.includes('reviews') && event.type === 'review') {
+        shouldInclude = true;
+      }
+      
+      if (shouldInclude) {
+        eventsToIntegrate.push(event);
+      }
+    });
+    
+    return eventsToIntegrate;
+  }
+
+  // PHASE 1: URL Integration
+  async integrateWithURLs(calendarType, events) {
+    console.log(`🔗 Phase 1: Integrating ${events.length} events with ${calendarType} using URLs`);
+    
+    let successCount = 0;
+    
+    for (const event of events) {
+      try {
+        const calendarURL = this.generateCalendarURL(calendarType, event);
+        
+        // Open calendar URL in new tab
+        window.open(calendarURL, '_blank');
+        successCount++;
+        
+        // Small delay between opens to avoid popup blocking
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error) {
+        console.error(`Error creating calendar URL for event ${event.id}:`, error);
+      }
+    }
+    
+    window.app.ui.showAlert(
+      `Se abrieron ${successCount} eventos en ${this.getCalendarName(calendarType)}. Agrega los que necesites.`,
+      'success'
+    );
+    
+    // Mark integration as attempted
+    this.integrations[calendarType] = true;
+    this.saveIntegrationStatus();
+  }
+
+  generateCalendarURL(calendarType, event) {
+    const startDate = new Date(event.date + 'T09:00:00');
+    const endDate = new Date(event.date + 'T10:00:00');
+    
+    switch (calendarType) {
+      case 'google':
+        return this.createGoogleCalendarURL(event, startDate, endDate);
+      case 'outlook':
+        return this.createOutlookCalendarURL(event, startDate, endDate);
+      case 'apple':
+        return this.createAppleCalendarURL(event, startDate, endDate);
+      default:
+        throw new Error(`Unsupported calendar type: ${calendarType}`);
+    }
+  }
+
+  createGoogleCalendarURL(event, startDate, endDate) {
+    const baseUrl = 'https://calendar.google.com/calendar/render';
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: event.title,
+      dates: `${this.formatGoogleDate(startDate)}/${this.formatGoogleDate(endDate)}`,
+      details: this.formatEventDescription(event),
+      location: ''
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  createOutlookCalendarURL(event, startDate, endDate) {
+    const baseUrl = 'https://outlook.live.com/calendar/0/deeplink/compose';
+    const params = new URLSearchParams({
+      subject: event.title,
+      startdt: startDate.toISOString(),
+      enddt: endDate.toISOString(),
+      body: this.formatEventDescription(event)
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  createAppleCalendarURL(event, startDate, endDate) {
+    // Apple Calendar doesn't have direct URL scheme, so we'll generate a webcal URL
+    // This will be enhanced in Phase 2 with ICS files
+    const baseUrl = 'https://calendar.google.com/calendar/render';
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: `[FINZN] ${event.title}`,
+      dates: `${this.formatGoogleDate(startDate)}/${this.formatGoogleDate(endDate)}`,
+      details: `${this.formatEventDescription(event)}\n\nCreado desde FINZN`,
+      location: ''
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  formatGoogleDate(date) {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  }
+
+  formatEventDescription(event) {
+    let description = event.description || '';
+    
+    if (event.amount) {
+      description += `\n\nMonto: ${this.formatCurrency(event.amount)}`;
+    }
+    
+    if (event.category) {
+      description += `\nCategoría: ${event.category}`;
+    }
+    
+    description += '\n\n📱 Creado desde FINZN - Tu compañero financiero inteligente';
+    
+    return description;
+  }
+
+  // PHASE 2: ICS File Integration (Preparado para futuro)
+  async integrateWithICS(calendarType, events) {
+    console.log(`📁 Phase 2: Integrating ${events.length} events with ICS files`);
+    
+    // Generate ICS file with all events
+    const icsContent = this.generateICSFile(events);
+    this.downloadICSFile(icsContent, `FINZN_Events_${calendarType}.ics`);
+    
+    window.app.ui.showAlert(
+      `Archivo de calendario descargado. Impórtalo en ${this.getCalendarName(calendarType)}.`,
+      'success'
+    );
+  }
+
+  generateICSFile(events) {
+    let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//FINZN//Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH`;
+
+    events.forEach(event => {
+      const startDate = new Date(event.date + 'T09:00:00');
+      const endDate = new Date(event.date + 'T10:00:00');
+      
+      icsContent += `
+BEGIN:VEVENT
+UID:${event.id}@finzn.app
+DTSTART:${this.formatICSDate(startDate)}
+DTEND:${this.formatICSDate(endDate)}
+SUMMARY:${event.title}
+DESCRIPTION:${this.formatEventDescription(event).replace(/\n/g, '\\n')}
+CREATED:${this.formatICSDate(new Date())}
+LAST-MODIFIED:${this.formatICSDate(new Date())}
+END:VEVENT`;
+    });
+
+    icsContent += `
+END:VCALENDAR`;
+
+    return icsContent;
+  }
+
+  formatICSDate(date) {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  }
+
+  downloadICSFile(content, filename) {
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // PHASE 3: Native API Integration (Preparado para futuro)
+  async integrateWithAPI(calendarType, events) {
+    console.log(`🔗 Phase 3: Integrating ${events.length} events with native ${calendarType} API`);
+    
+    switch (calendarType) {
+      case 'google':
+        await this.integrateWithGoogleAPI(events);
+        break;
+      case 'outlook':
+        await this.integrateWithOutlookAPI(events);
+        break;
+      case 'apple':
+        await this.integrateWithAppleAPI(events);
+        break;
+    }
+  }
+
+  async integrateWithGoogleAPI(events) {
+    // TODO: Implement Google Calendar API integration
+    window.app.ui.showAlert('Integración con Google Calendar API próximamente', 'info');
+  }
+
+  async integrateWithOutlookAPI(events) {
+    // TODO: Implement Microsoft Graph API integration
+    window.app.ui.showAlert('Integración con Outlook API próximamente', 'info');
+  }
+
+  async integrateWithAppleAPI(events) {
+    // TODO: Implement CalDAV integration
+    window.app.ui.showAlert('Integración con Apple Calendar API próximamente', 'info');
+  }
+
+  // Utility methods
+  getCalendarName(calendarType) {
+    const names = {
+      google: 'Google Calendar',
+      outlook: 'Outlook Calendar',
+      apple: 'Apple Calendar'
+    };
+    return names[calendarType] || calendarType;
+  }
+
+  saveIntegrationStatus() {
+    try {
+      localStorage.setItem('finzn-calendar-integrations', JSON.stringify(this.integrations));
+    } catch (error) {
+      console.error('Error saving integration status:', error);
+    }
+  }
+
+  loadIntegrationStatus() {
+    try {
+      const saved = localStorage.getItem('finzn-calendar-integrations');
+      if (saved) {
+        this.integrations = { ...this.integrations, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.error('Error loading integration status:', error);
+    }
+  }
+
+  // Method to upgrade integration phase
+  upgradeToPhase(newPhase) {
+    if (newPhase >= 1 && newPhase <= 3) {
+      this.integrationMethods.phase = newPhase;
+      console.log(`📈 Calendar integration upgraded to Phase ${newPhase}`);
+      
+      const phaseNames = {
+        1: 'URLs de Calendario',
+        2: 'Archivos ICS',
+        3: 'APIs Nativas'
+      };
+      
+      window.app.ui.showAlert(
+        `Integración actualizada a: ${phaseNames[newPhase]}`,
+        'success'
+      );
+    }
   }
 
   // Utility methods
