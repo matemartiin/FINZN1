@@ -64,7 +64,7 @@ export class CalendarManager {
   async initializeGoogleCalendar() {
     try {
       if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
-        console.log('⚠️ Google Calendar API not configured');
+        console.log('⚠️ Google Calendar API not configured - missing API key or client ID');
         return;
       }
 
@@ -75,12 +75,12 @@ export class CalendarManager {
       console.error('❌ Error initializing Google Calendar:', error.message || error);
       
       // Check for specific error types
-      if (error.error === 'idpiframe_initialization_failed' || 
-          (error.error && error.error.code === 403 && error.error.message && error.error.message.includes('blocked'))) {
+      if (error.error === 'idpiframe_initialization_failed') {
         console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
-        this.showConfigurationHelp('google-referrer-blocked');
-      } else if ((error.error && error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED')) ||
-                 (error.error && error.error.code === 403)) {
+        this.showConfigurationHelp('google-origin-blocked');
+      } else if (error.error && error.error.code === 403 && 
+                 (error.error.message.includes('blocked') || 
+                  (error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED')))) {
         console.warn('⚠️ Google Calendar API HTTP referrer blocked.');
         this.showConfigurationHelp('google-referrer-blocked');
       } else {
@@ -89,19 +89,23 @@ export class CalendarManager {
       
       // Disable Google integration but continue with app
       this.integrations.google = false;
+      this.isGoogleAuthenticated = false;
     }
   }
 
   loadGoogleAPI() {
     return new Promise((resolve, reject) => {
       if (window.gapi) {
+        console.log('✅ Google API already loaded');
         resolve();
         return;
       }
 
+      console.log('📡 Loading Google API script...');
       const script = document.createElement('script');
       script.src = 'https://apis.google.com/js/api.js';
       script.onload = () => {
+        console.log('📡 Google API script loaded, initializing client...');
         window.gapi.load('client:auth2', async () => {
           try {
             await window.gapi.client.init({
@@ -110,6 +114,7 @@ export class CalendarManager {
               discoveryDocs: [this.googleConfig.discoveryDoc],
               scope: this.googleConfig.scopes
             });
+            console.log('✅ Google API client initialized successfully');
             resolve();
           } catch (error) {
             console.error('Google API client init error:', error);
@@ -592,6 +597,18 @@ export class CalendarManager {
   // Integration methods
   handleGoogleCalendarIntegration() {
     console.log('📅 Google Calendar integration');
+    
+    if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
+      window.app.ui.showAlert('Google Calendar API no está configurado. Revisa las variables de entorno.', 'error');
+      this.showConfigurationHelp('google-general-error');
+      return;
+    }
+    
+    if (!window.gapi) {
+      window.app.ui.showAlert('Google API no está cargado. Intenta recargar la página.', 'error');
+      return;
+    }
+    
     this.authenticateAndIntegrateGoogle();
   }
 
@@ -613,6 +630,25 @@ export class CalendarManager {
     let helpContent = '';
 
     switch (errorType) {
+      case 'google-origin-blocked':
+        helpContent = `
+          <div class="config-help error">
+            <h4>🔧 Google Calendar API Configuration Required</h4>
+            <p><strong>Error:</strong> Origin not registered for OAuth client</p>
+            <div class="config-steps">
+              <h5>Steps to fix:</h5>
+              <ol>
+                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                <li>Navigate to <strong>APIs & Services → Credentials</strong></li>
+                <li>Find your OAuth 2.0 Client ID and click <strong>Edit</strong></li>
+                <li>Under <strong>Authorized JavaScript origins</strong>, add:</li>
+                <li><code>${currentOrigin}</code></li>
+                <li>For development, also add: <code>*.webcontainer-api.io</code></li>
+              </ol>
+            </div>
+          </div>
+        `;
+        break;
       case 'google-referrer-blocked':
         helpContent = `
           <div class="config-help error">
@@ -686,15 +722,26 @@ export class CalendarManager {
       console.log('🔐 Authenticating with Google Calendar...');
       
       if (!window.gapi || !window.gapi.auth2) {
-        throw new Error('Google API not loaded');
+        console.error('❌ Google API not loaded');
+        window.app.ui.showAlert('Google Calendar API no está disponible. Revisa la configuración.', 'error');
+        return;
       }
 
       const authInstance = window.gapi.auth2.getAuthInstance();
       
+      if (!authInstance) {
+        console.error('❌ Google Auth instance not available');
+        window.app.ui.showAlert('Error de autenticación de Google. Intenta recargar la página.', 'error');
+        return;
+      }
+      
       if (!authInstance.isSignedIn.get()) {
         // User needs to sign in
+        console.log('🔐 User needs to sign in...');
         const user = await authInstance.signIn();
         console.log('✅ User signed in to Google:', user.getBasicProfile().getEmail());
+      } else {
+        console.log('✅ User already signed in to Google');
       }
 
       this.isGoogleAuthenticated = true;
@@ -703,6 +750,7 @@ export class CalendarManager {
       // Save integration status
       this.integrations.google = true;
       this.saveIntegrationStatus();
+      this.updateIntegrationStatus();
       
       // Show success message
       window.app.ui.showAlert('¡Google Calendar conectado! Los recordatorios aparecerán en tu celular.', 'success');
@@ -712,7 +760,14 @@ export class CalendarManager {
       
     } catch (error) {
       console.error('❌ Error authenticating with Google:', error);
-      window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
+      
+      if (error.error === 'popup_closed_by_user') {
+        window.app.ui.showAlert('Autenticación cancelada por el usuario.', 'warning');
+      } else if (error.error === 'access_denied') {
+        window.app.ui.showAlert('Acceso denegado. Necesitas permitir el acceso a Google Calendar.', 'error');
+      } else {
+        window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
+      }
     }
   }
 
@@ -744,6 +799,8 @@ export class CalendarManager {
     if (!this.isGoogleAuthenticated) return;
     
     try {
+      console.log('📅 Creating Google Calendar event:', event.title);
+      
       // Usar hora personalizada o por defecto
       const eventTime = event.time || '09:00';
       const duration = event.duration || 60; // minutos
@@ -786,6 +843,8 @@ export class CalendarManager {
         }
       };
       
+      console.log('📅 Google event data prepared:', googleEvent);
+      
       const response = await window.gapi.client.calendar.events.insert({
         calendarId: 'primary',
         resource: googleEvent
@@ -796,6 +855,16 @@ export class CalendarManager {
       
     } catch (error) {
       console.error('❌ Error creating Google Calendar event:', error);
+      
+      if (error.status === 401) {
+        console.warn('🔐 Authentication expired, trying to refresh...');
+        this.isGoogleAuthenticated = false;
+        window.app.ui.showAlert('Sesión de Google expirada. Vuelve a conectar Google Calendar.', 'warning');
+      } else if (error.status === 403) {
+        console.warn('🚫 Insufficient permissions for Google Calendar');
+        window.app.ui.showAlert('Permisos insuficientes para Google Calendar. Revisa la configuración.', 'error');
+      }
+      
       throw error;
     }
   }
