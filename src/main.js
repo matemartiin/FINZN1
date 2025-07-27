@@ -81,6 +81,11 @@ class FinznApp {
   setupEventListeners() {
     console.log('🔗 Setting up event listeners...');
     
+    // Calendar section elements - declare at the top
+    const calendarSettingsBtn = document.getElementById('calendar-settings-btn');
+    const syncCalendarBtn = document.getElementById('sync-calendar-btn');
+    const addEventBtn = document.getElementById('add-event-btn');
+    
     try {
       // Auth events
       this.setupAuthEvents();
@@ -192,10 +197,6 @@ class FinznApp {
       installmentsBtn.addEventListener('click', () => this.showInstallmentsModal());
     }
     
-    // Add goal button
-    const addGoalBtn = document.getElementById('add-goal-btn');
-    if (addGoalBtn) {
-      addGoalBtn.addEventListener('click', () => this.showAddGoalModal());
       if (calendarSettingsBtn) {
         calendarSettingsBtn.addEventListener('click', () => this.showCalendarSettingsModal());
       }

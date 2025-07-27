@@ -75,7 +75,8 @@ export class CalendarManager {
       console.error('❌ Error initializing Google Calendar:', error.message || error);
       
       // Check for specific error types
-      if (error.error === 'idpiframe_initialization_failed') {
+      if (error.error === 'idpiframe_initialization_failed' || 
+          (error.details && error.details.includes('Not a valid origin'))) {
         console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
         this.showConfigurationHelp('google-origin-blocked');
       } else if (error.error && error.error.code === 403 && 
