@@ -1449,6 +1449,84 @@ body {
   border-color: #007aff;
 }
 
+/* Calendar Integration Styles */
+.calendar-integration-modal .modal-content {
+  max-width: 600px;
+}
+
+.integration-options {
+  padding: var(--spacing-lg) 0;
+}
+
+.event-types-selection {
+  margin: var(--spacing-lg) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+  background-color: var(--bg-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.integration-method-info {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--primary-color);
+}
+
+.integration-method-info h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary-color);
+  font-size: 1rem;
+}
+
+.integration-method-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 /* Planning Tabs - NUEVO */
 .planning-tabs,
 .reports-tabs {
