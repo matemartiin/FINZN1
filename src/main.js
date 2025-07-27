@@ -7,6 +7,7 @@ import { ChatManager } from './modules/chat.js';
 import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
+import { CalendarManager } from './modules/calendar.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -24,6 +25,7 @@ class FinznApp {
     this.reports = new ReportManager();
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
+    this.calendar = new CalendarManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -41,6 +43,9 @@ class FinznApp {
       
       // Initialize navigation
       this.navigation.init();
+      
+      // Initialize calendar
+      this.calendar.init();
       
       // Initialize modals
       this.modals.init();
@@ -164,8 +169,14 @@ class FinznApp {
     
     // Add income button
     const addIncomeBtn = document.getElementById('add-income-btn-dashboard');
+    const addIncomeBtnTransactions = document.getElementById('add-income-btn-transactions');
+    
     if (addIncomeBtn) {
       addIncomeBtn.addEventListener('click', () => this.showAddIncomeModal());
+    }
+    
+    if (addIncomeBtnTransactions) {
+      addIncomeBtnTransactions.addEventListener('click', () => this.showAddIncomeModal());
     }
     
     // View incomes button
@@ -213,8 +224,10 @@ class FinznApp {
     const manageCategoriesBtn = document.getElementById('manage-categories-btn');
     const exportDataBtn = document.getElementById('export-data-btn');
     const importDataBtn = document.getElementById('import-data-btn');
-    const generateAiReportBtn = document.getElementById('generate-ai-report-btn');
+    const generateAiReportBtnReports = document.getElementById('generate-ai-report-btn-reports');
+    const generateQuickReport = document.getElementById('generate-quick-report');
     const backupDataBtn = document.getElementById('backup-data-btn');
+    const userPreferencesBtn = document.getElementById('user-preferences-btn');
     
     if (manageCategoriesBtn) {
       manageCategoriesBtn.addEventListener('click', () => this.showManageCategoriesModal());
@@ -228,12 +241,32 @@ class FinznApp {
       importDataBtn.addEventListener('click', () => this.showImportDataModal());
     }
     
-    if (generateAiReportBtn) {
-      generateAiReportBtn.addEventListener('click', () => this.showGenerateAiReportModal());
+    if (generateAiReportBtnReports) {
+      generateAiReportBtnReports.addEventListener('click', () => this.showGenerateAiReportModal());
+    }
+    
+    if (generateQuickReport) {
+      generateQuickReport.addEventListener('click', () => this.handleQuickAiReport());
     }
     
     if (backupDataBtn) {
       backupDataBtn.addEventListener('click', () => this.handleBackupData());
+    }
+    
+    if (userPreferencesBtn) {
+      userPreferencesBtn.addEventListener('click', () => this.showUserPreferencesModal());
+    }
+    
+    // Calendar events
+    const addEventBtn = document.getElementById('add-event-btn');
+    const syncCalendarBtn = document.getElementById('sync-calendar-btn');
+    
+    if (addEventBtn) {
+      addEventBtn.addEventListener('click', () => this.showAddEventModal());
+    }
+    
+    if (syncCalendarBtn) {
+      syncCalendarBtn.addEventListener('click', () => this.handleSyncCalendar());
     }
   }
 
@@ -278,6 +311,12 @@ class FinznApp {
     const generateReportBtn = document.getElementById('generate-report-btn');
     if (generateReportBtn) {
       generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
+    }
+    
+    // Add event form
+    const addEventForm = document.getElementById('add-event-form');
+    if (addEventForm) {
+      addEventForm.addEventListener('submit', (e) => this.handleAddEvent(e));
     }
     
     // Installments checkbox
@@ -470,6 +509,7 @@ class FinznApp {
       const categories = this.data.getCategories();
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'category-filter');
+      this.ui.updateCategoriesSelect(categories, 'expense-category-filter');
       this.ui.updateCategoriesSelect(categories, 'limit-category');
       
       console.log('✅ User data loaded successfully');
@@ -530,6 +570,14 @@ class FinznApp {
       const trendData = await this.data.getTrendData();
       this.charts.updateTrendChart(trendData);
       
+      // Update dashboard widgets
+      this.updateDashboardWidgets();
+      
+      // Update transactions timeline if in transactions section
+      if (this.navigation.getCurrentSection() === 'transactions') {
+        this.updateTransactionsTimeline();
+      }
+      
       // Show mascot message based on balance
       if (balance.available < 0) {
         this.ui.showMascotAlert('¡Cuidado! Estás gastando más de lo que ingresas', 'warning');
@@ -542,6 +590,215 @@ class FinznApp {
     } catch (error) {
       console.error('❌ Error updating dashboard:', error);
       this.ui.showAlert('Error al cargar los datos. Intenta refrescar la página.', 'error');
+    }
+  }
+
+  updateDashboardWidgets() {
+    console.log('🔄 Updating dashboard widgets...');
+    
+    try {
+      // Update upcoming events widget
+      this.updateUpcomingEventsWidget();
+      
+      // Update limits widget
+      this.updateLimitsWidget();
+      
+      // Update goals widget
+      this.updateGoalsWidget();
+      
+    } catch (error) {
+      console.error('❌ Error updating dashboard widgets:', error);
+    }
+  }
+
+  updateUpcomingEventsWidget() {
+    const container = document.getElementById('upcoming-events');
+    if (!container) return;
+    
+    // Get upcoming events from calendar
+    const upcomingEvents = this.calendar.getUpcomingEvents(7); // Next 7 days
+    
+    container.innerHTML = '';
+    
+    if (upcomingEvents.length === 0) {
+      container.innerHTML = '<p class="widget-empty">No hay eventos próximos</p>';
+      return;
+    }
+    
+    upcomingEvents.slice(0, 3).forEach(event => {
+      const eventElement = document.createElement('div');
+      eventElement.className = 'widget-event-item';
+      eventElement.innerHTML = `
+        <div class="widget-event-date">${event.date}</div>
+        <div class="widget-event-title">${event.title}</div>
+      `;
+      container.appendChild(eventElement);
+    });
+  }
+
+  updateLimitsWidget() {
+    const container = document.getElementById('limits-widget');
+    if (!container) return;
+    
+    const limits = this.data.getSpendingLimits();
+    const expenses = this.data.getExpenses(this.currentMonth);
+    
+    container.innerHTML = '';
+    
+    if (limits.length === 0) {
+      container.innerHTML = '<p class="widget-empty">No hay límites configurados</p>';
+      return;
+    }
+    
+    // Show only critical limits (>80%)
+    const criticalLimits = limits.filter(limit => {
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+      return percentage >= 80;
+    });
+    
+    if (criticalLimits.length === 0) {
+      container.innerHTML = '<p class="widget-success">✅ Todos los límites bajo control</p>';
+      return;
+    }
+    
+    criticalLimits.slice(0, 3).forEach(limit => {
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+      
+      const limitElement = document.createElement('div');
+      limitElement.className = `widget-limit-item ${percentage >= 100 ? 'danger' : 'warning'}`;
+      limitElement.innerHTML = `
+        <div class="widget-limit-category">${limit.category}</div>
+        <div class="widget-limit-percentage">${percentage.toFixed(0)}%</div>
+      `;
+      container.appendChild(limitElement);
+    });
+  }
+
+  updateGoalsWidget() {
+    const container = document.getElementById('goals-widget');
+    if (!container) return;
+    
+    const goals = this.data.getGoals();
+    
+    container.innerHTML = '';
+    
+    if (goals.length === 0) {
+      container.innerHTML = '<p class="widget-empty">No hay objetivos configurados</p>';
+      return;
+    }
+    
+    // Show goals closest to completion
+    const sortedGoals = goals
+      .map(goal => ({
+        ...goal,
+        progress: (goal.current_amount / goal.target_amount) * 100
+      }))
+      .sort((a, b) => b.progress - a.progress);
+    
+    sortedGoals.slice(0, 3).forEach(goal => {
+      const goalElement = document.createElement('div');
+      goalElement.className = 'widget-goal-item';
+      goalElement.innerHTML = `
+        <div class="widget-goal-name">${goal.name}</div>
+        <div class="widget-goal-progress">${goal.progress.toFixed(0)}%</div>
+      `;
+      container.appendChild(goalElement);
+    });
+  }
+
+  updateTransactionsTimeline() {
+    console.log('📋 Updating transactions timeline...');
+    
+    const container = document.getElementById('transactions-timeline');
+    if (!container) return;
+    
+    try {
+      const expenses = this.data.getExpenses(this.currentMonth);
+      const income = this.data.getIncome(this.currentMonth);
+      const extraIncomes = this.data.getExtraIncomes(this.currentMonth);
+      
+      // Combine all transactions
+      const transactions = [];
+      
+      // Add expenses
+      expenses.forEach(expense => {
+        transactions.push({
+          type: 'expense',
+          date: expense.transaction_date,
+          description: expense.description,
+          category: expense.category,
+          amount: expense.amount,
+          created_at: expense.created_at
+        });
+      });
+      
+      // Add fixed income
+      if (income.fixed > 0) {
+        transactions.push({
+          type: 'income',
+          date: `${this.currentMonth}-01`,
+          description: 'Sueldo mensual',
+          category: 'Sueldo',
+          amount: income.fixed,
+          created_at: `${this.currentMonth}-01T00:00:00Z`
+        });
+      }
+      
+      // Add extra incomes
+      extraIncomes.forEach(extraIncome => {
+        transactions.push({
+          type: 'income',
+          date: extraIncome.created_at ? extraIncome.created_at.split('T')[0] : `${this.currentMonth}-01`,
+          description: extraIncome.description,
+          category: extraIncome.category,
+          amount: extraIncome.amount,
+          created_at: extraIncome.created_at
+        });
+      });
+      
+      // Sort by date (newest first)
+      transactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      container.innerHTML = '';
+      
+      if (transactions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>No hay transacciones este mes</p>
+          </div>
+        `;
+        return;
+      }
+      
+      transactions.forEach(transaction => {
+        const item = document.createElement('div');
+        item.className = `timeline-item ${transaction.type}`;
+        
+        const transactionDate = new Date(transaction.date).toLocaleDateString('es-ES', { 
+          day: 'numeric', 
+          month: 'short' 
+        });
+        
+        item.innerHTML = `
+          <div class="timeline-date">${transactionDate}</div>
+          <div class="timeline-content">
+            <div class="timeline-description">${transaction.description}</div>
+            <div class="timeline-category">${transaction.category}</div>
+          </div>
+          <div class="timeline-amount ${transaction.type}">
+            ${transaction.type === 'expense' ? '-' : '+'}${this.ui.formatCurrency(transaction.amount)}
+          </div>
+        `;
+        
+        container.appendChild(item);
+      });
+      
+    } catch (error) {
+      console.error('❌ Error updating transactions timeline:', error);
     }
   }
 
@@ -592,6 +849,24 @@ class FinznApp {
   showGenerateAiReportModal() {
     console.log('🤖 Show generate AI report modal');
     this.modals.show('generate-ai-report-modal');
+  }
+  
+  showAddEventModal() {
+    console.log('📅 Show add event modal');
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('event-date');
+    if (dateInput) {
+      dateInput.value = today;
+    }
+    
+    this.modals.show('add-event-modal');
+  }
+  
+  showUserPreferencesModal() {
+    console.log('👤 Show user preferences modal');
+    this.ui.showAlert('Función de preferencias próximamente', 'info');
   }
   
   showViewIncomesModal() {
@@ -802,6 +1077,7 @@ class FinznApp {
       // Update all category selects
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'category-filter');
+      this.ui.updateCategoriesSelect(categories, 'expense-category-filter');
       this.ui.updateCategoriesSelect(categories, 'limit-category');
       
       // Clear form
@@ -813,6 +1089,112 @@ class FinznApp {
       console.error('Error adding category:', error);
       this.ui.showAlert('Error al agregar la categoría', 'error');
     }
+  }
+  
+  async handleAddEvent(e) {
+    e.preventDefault();
+    console.log('📅 Adding calendar event...');
+    
+    const formData = this.ui.getFormData('add-event-form');
+    
+    if (!formData.title || !formData.type || !formData.date) {
+      this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+    
+    try {
+      const eventData = {
+        title: formData.title,
+        type: formData.type,
+        date: formData.date,
+        amount: parseFloat(formData.amount) || null,
+        description: formData.description || '',
+        recurring: formData.recurring || false
+      };
+      
+      await this.calendar.addEvent(eventData);
+      
+      this.modals.hide('add-event-modal');
+      this.ui.showAlert('Evento agregado exitosamente', 'success');
+      
+      // Refresh calendar if in calendar section
+      if (this.navigation.getCurrentSection() === 'calendar') {
+        this.calendar.refresh();
+      }
+      
+      // Update dashboard widgets
+      this.updateDashboardWidgets();
+      
+    } catch (error) {
+      console.error('Error adding event:', error);
+      this.ui.showAlert('Error al agregar el evento', 'error');
+    }
+  }
+  
+  handleSyncCalendar() {
+    console.log('🔄 Syncing calendar...');
+    this.ui.showAlert('Función de sincronización próximamente', 'info');
+  }
+  
+  async handleQuickAiReport() {
+    console.log('🤖 Generating quick AI report...');
+    
+    const period = document.getElementById('report-period-reports').value;
+    const focus = document.getElementById('report-focus-reports').value;
+    
+    const generateBtn = document.getElementById('generate-quick-report');
+    
+    // Show loading state
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<div class="loading-spinner"></div> Generando...';
+    
+    try {
+      // Prepare data for AI analysis
+      const reportData = await this.prepareReportData(period);
+      
+      // Generate report with AI using ReportManager
+      const report = await this.reports.generateAIReport(reportData, focus, '');
+      
+      // Show result in reports history
+      this.addReportToHistory(report, period, focus);
+      
+      this.ui.showAlert('Informe generado exitosamente', 'success');
+      
+    } catch (error) {
+      console.error('Error generating quick AI report:', error);
+      this.ui.showAlert('Error al generar el informe', 'error');
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = '<span>🤖</span> Generar Reporte Rápido';
+    }
+  }
+  
+  addReportToHistory(report, period, focus) {
+    const container = document.getElementById('reports-history');
+    if (!container) return;
+    
+    const reportItem = document.createElement('div');
+    reportItem.className = 'report-history-item';
+    
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('es-ES');
+    
+    reportItem.innerHTML = `
+      <div class="report-history-header">
+        <h5>Reporte ${focus} - ${period}</h5>
+        <span class="report-date">${dateStr}</span>
+      </div>
+      <div class="report-history-content">
+        ${report.substring(0, 200)}...
+      </div>
+      <div class="report-history-actions">
+        <button class="btn btn-secondary btn-sm" onclick="this.parentElement.parentElement.querySelector('.report-history-content').innerHTML = \`${report.replace(/`/g, '\\`')}\`">
+          Ver Completo
+        </button>
+      </div>
+    `;
+    
+    container.insertBefore(reportItem, container.firstChild);
   }
   
   handleExportData() {

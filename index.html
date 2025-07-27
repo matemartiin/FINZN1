@@ -151,8 +151,32 @@
 
       <!-- Main Content Area -->
       <div class="main-dashboard">
+        <!-- Tab Navigation -->
+        <div class="main-tabs">
+          <div class="tab-item active" data-section="dashboard">
+            <div class="tab-icon">📊</div>
+            <span class="tab-label">Dashboard</span>
+          </div>
+          <div class="tab-item" data-section="transactions">
+            <div class="tab-icon">💳</div>
+            <span class="tab-label">Transacciones</span>
+          </div>
+          <div class="tab-item" data-section="calendar">
+            <div class="tab-icon">📅</div>
+            <span class="tab-label">Calendario</span>
+          </div>
+          <div class="tab-item" data-section="planning">
+            <div class="tab-icon">🎯</div>
+            <span class="tab-label">Planificación</span>
+          </div>
+          <div class="tab-item" data-section="reports">
+            <div class="tab-icon">📊</div>
+            <span class="tab-label">Reportes</span>
+          </div>
+        </div>
+
         <!-- Dashboard Section -->
-        <section id="dashboard-section" class="dashboard-section active">
+        <section id="dashboard-section" class="tab-section active">
           <div class="dashboard-grid">
             <!-- Primera fila: Balance, Ingresos, Gastos -->
             <div class="summary-cards">
@@ -220,16 +244,47 @@
                 </div>
               </div>
             </div>
+
+            <!-- Tercera fila: Widgets adicionales -->
+            <div class="dashboard-widgets">
+              <div class="widget-card">
+                <h4>📅 Próximos Eventos</h4>
+                <div id="upcoming-events" class="upcoming-events">
+                  <!-- Eventos del calendario aparecerán aquí -->
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.app.navigation.showSection('calendar')">
+                  Ver Calendario Completo
+                </button>
+              </div>
+              
+              <div class="widget-card">
+                <h4>🚦 Estado de Límites</h4>
+                <div id="limits-widget" class="limits-widget">
+                  <!-- Resumen de límites aparecerá aquí -->
+                </div>
+              </div>
+              
+              <div class="widget-card">
+                <h4>🎯 Progreso de Objetivos</h4>
+                <div id="goals-widget" class="goals-widget">
+                  <!-- Resumen de objetivos aparecerá aquí -->
+                </div>
+              </div>
+            </div>
             
           </div>
         </section>
 
-        <!-- Expenses Section -->
-        <section id="expenses-section" class="dashboard-section">
+        <!-- Transactions Section (antes Expenses) -->
+        <section id="transactions-section" class="tab-section">
           <div class="section-content">
             <div class="section-header">
-              <h1>Gestión de Gastos</h1>
+              <h1>Gestión de Transacciones</h1>
               <div class="section-actions">
+                <button id="add-income-btn-transactions" class="btn btn-secondary">
+                  <span>💰</span>
+                  Agregar Ingreso
+                </button>
                 <button id="add-spending-limit-btn-expenses" class="btn btn-secondary">
                   <span>⚠️</span>
                   Agregar Límite
@@ -241,13 +296,18 @@
               </div>
             </div>
             
-            <div class="expenses-container">
-              <!-- Filtros Card -->
-              <div class="expenses-section-card expenses-filters-card">
+            <div class="transactions-container">
+              <!-- Filtros y Vista Unificada -->
+              <div class="transactions-section-card transactions-filters-card">
                 <div class="card-header">
-                  <h3>🔍 Filtros de Búsqueda</h3>
+                  <h3>🔍 Filtros y Vista</h3>
                 </div>
-                <div class="expenses-filters">
+                <div class="transactions-filters">
+                  <select id="transaction-type-filter">
+                    <option value="">Todos los tipos</option>
+                    <option value="expense">Solo Gastos</option>
+                    <option value="income">Solo Ingresos</option>
+                  </select>
                   <select id="category-filter">
                     <option value="">Todas las categorías</option>
                   </select>
@@ -256,8 +316,32 @@
                 </div>
               </div>
               
+              <!-- Timeline de Transacciones -->
+              <div class="transactions-section-card transactions-timeline-card">
+                <div class="card-header">
+                  <h3>📋 Timeline de Transacciones</h3>
+                </div>
+                <div id="transactions-timeline" class="transactions-timeline">
+                  <!-- Timeline unificado aparecerá aquí -->
+                </div>
+              </div>
+              
+              <!-- Filtros Card -->
+              <div class="transactions-section-card expenses-filters-card">
+                <div class="card-header">
+                  <h3>🔍 Filtros de Gastos</h3>
+                </div>
+                <div class="expenses-filters">
+                  <select id="expense-category-filter">
+                    <option value="">Todas las categorías</option>
+                  </select>
+                  <input type="date" id="expense-date-filter" />
+                  <button id="clear-expense-filters" class="btn btn-secondary">Limpiar</button>
+                </div>
+              </div>
+              
               <!-- Límites de Gastos Card -->
-              <div class="expenses-section-card spending-limits-card">
+              <div class="transactions-section-card spending-limits-card">
                 <div class="card-header">
                   <h3>🚦 Límites de Gastos Configurados</h3>
                   <button id="add-spending-limit-btn-card" class="btn btn-primary btn-sm">
@@ -271,7 +355,7 @@
               </div>
               
               <!-- Gráfico de Tendencia Mensual -->
-              <div class="expenses-section-card trend-chart-card">
+              <div class="transactions-section-card trend-chart-card">
                 <div class="card-header">
                   <h3>📈 Tendencia de Gastos Mensual</h3>
                 </div>
@@ -281,7 +365,7 @@
               </div>
               
               <!-- Lista de Gastos -->
-              <div class="expenses-section-card expenses-list-card">
+              <div class="transactions-section-card expenses-list-card">
                 <div class="card-header">
                   <h3>📋 Lista de Gastos del Mes</h3>
                 </div>
@@ -293,11 +377,79 @@
           </div>
         </section>
 
-        <!-- Savings Section -->
-        <section id="savings-section" class="dashboard-section">
+        <!-- Calendar Section (NUEVO) -->
+        <section id="calendar-section" class="tab-section">
           <div class="section-content">
             <div class="section-header">
-              <h1>Objetivos de Ahorro</h1>
+              <h1>Calendario Financiero</h1>
+              <div class="section-actions">
+                <button id="sync-calendar-btn" class="btn btn-secondary">
+                  <span>🔄</span>
+                  Sincronizar
+                </button>
+                <button id="add-event-btn" class="btn btn-primary">
+                  <span>📅</span>
+                  Nuevo Evento
+                </button>
+              </div>
+            </div>
+            
+            <div class="calendar-container">
+              <!-- Calendario Principal -->
+              <div class="calendar-main">
+                <div class="calendar-header">
+                  <button id="prev-month" class="calendar-nav-btn">‹</button>
+                  <h3 id="calendar-month-year">Enero 2025</h3>
+                  <button id="next-month" class="calendar-nav-btn">›</button>
+                </div>
+                <div id="calendar-grid" class="calendar-grid">
+                  <!-- El calendario se generará aquí -->
+                </div>
+              </div>
+              
+              <!-- Panel lateral del calendario -->
+              <div class="calendar-sidebar">
+                <div class="calendar-widget">
+                  <h4>📋 Eventos de Hoy</h4>
+                  <div id="today-events" class="today-events">
+                    <!-- Eventos del día actual -->
+                  </div>
+                </div>
+                
+                <div class="calendar-widget">
+                  <h4>⏰ Próximos Vencimientos</h4>
+                  <div id="upcoming-payments" class="upcoming-payments">
+                    <!-- Próximos pagos y cuotas -->
+                  </div>
+                </div>
+                
+                <div class="calendar-widget">
+                  <h4>🔗 Integración</h4>
+                  <div class="calendar-integrations">
+                    <button class="integration-btn google-calendar">
+                      <span>📅</span>
+                      Google Calendar
+                    </button>
+                    <button class="integration-btn outlook-calendar">
+                      <span>📅</span>
+                      Outlook
+                    </button>
+                    <button class="integration-btn apple-calendar">
+                      <span>📅</span>
+                      Apple Calendar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Planning Section (antes Savings + nuevas funciones) -->
+        <section id="planning-section" class="tab-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Planificación Financiera</h1>
               <div class="section-actions">
                 <button id="add-goal-btn" class="btn btn-primary">
                   <span>🎯</span>
@@ -306,27 +458,120 @@
               </div>
             </div>
             
-            <div id="goals-list" class="goals-list">
-              <!-- Goals will be loaded here -->
+            <div class="planning-tabs">
+              <div class="planning-tab-nav">
+                <button class="planning-tab-btn active" data-tab="goals">🎯 Objetivos</button>
+                <button class="planning-tab-btn" data-tab="limits">🚦 Límites</button>
+                <button class="planning-tab-btn" data-tab="budget">💰 Presupuesto</button>
+              </div>
+              
+              <div class="planning-tab-content">
+                <div id="goals-tab" class="planning-tab active">
+                  <div id="goals-list" class="goals-list">
+                    <!-- Goals will be loaded here -->
+                  </div>
+                </div>
+                
+                <div id="limits-tab" class="planning-tab">
+                  <div class="limits-management">
+                    <div id="spending-limits-management" class="spending-limits-management">
+                      <!-- Gestión completa de límites -->
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="budget-tab" class="planning-tab">
+                  <div class="budget-planning">
+                    <h4>📊 Planificación de Presupuesto</h4>
+                    <div id="budget-planner" class="budget-planner">
+                      <!-- Herramientas de planificación presupuestaria -->
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- Achievements Section -->
-        <section id="achievements-section" class="dashboard-section">
+        <!-- Reports Section (antes Achievements + AI Reports) -->
+        <section id="reports-section" class="tab-section">
           <div class="section-content">
             <div class="section-header">
-              <h1>Logros y Reconocimientos</h1>
+              <h1>Reportes y Logros</h1>
+              <div class="section-actions">
+                <button id="generate-ai-report-btn-reports" class="btn btn-primary">
+                  <span>🤖</span>
+                  Generar Reporte IA
+                </button>
+              </div>
             </div>
             
-            <div id="achievements-list" class="achievements-list">
-              <!-- Achievements will be loaded here -->
+            <div class="reports-tabs">
+              <div class="reports-tab-nav">
+                <button class="reports-tab-btn active" data-tab="achievements">🏆 Logros</button>
+                <button class="reports-tab-btn" data-tab="ai-reports">🤖 Reportes IA</button>
+                <button class="reports-tab-btn" data-tab="statistics">📊 Estadísticas</button>
+              </div>
+              
+              <div class="reports-tab-content">
+                <div id="achievements-tab" class="reports-tab active">
+                  <div id="achievements-list" class="achievements-list">
+                    <!-- Achievements will be loaded here -->
+                  </div>
+                </div>
+                
+                <div id="ai-reports-tab" class="reports-tab">
+                  <div class="ai-reports-section">
+                    <div class="ai-reports-options">
+                      <div class="form-group">
+                        <label for="report-period-reports">Período del Informe</label>
+                        <select id="report-period-reports" name="period">
+                          <option value="current">Mes Actual</option>
+                          <option value="last3">Últimos 3 Meses</option>
+                          <option value="last6">Últimos 6 Meses</option>
+                          <option value="year">Año Completo</option>
+                        </select>
+                      </div>
+                      
+                      <div class="form-group">
+                        <label for="report-focus-reports">Enfoque del Informe</label>
+                        <select id="report-focus-reports" name="focus">
+                          <option value="general">Análisis General</option>
+                          <option value="savings">Enfoque en Ahorros</option>
+                          <option value="expenses">Análisis de Gastos</option>
+                          <option value="budget">Optimización de Presupuesto</option>
+                          <option value="goals">Progreso hacia Objetivos</option>
+                        </select>
+                      </div>
+                      
+                      <button id="generate-quick-report" class="btn btn-primary">
+                        <span>🤖</span>
+                        Generar Reporte Rápido
+                      </button>
+                    </div>
+                    
+                    <div id="reports-history" class="reports-history">
+                      <h4>📋 Historial de Reportes</h4>
+                      <!-- Historial de reportes generados -->
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="statistics-tab" class="reports-tab">
+                  <div class="statistics-section">
+                    <h4>📊 Estadísticas Avanzadas</h4>
+                    <div id="advanced-statistics" class="advanced-statistics">
+                      <!-- Estadísticas detalladas -->
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         <!-- Settings Section -->
-        <section id="settings-section" class="dashboard-section">
+        <section id="settings-section" class="tab-section">
           <div class="section-content">
             <div class="section-header">
               <h1>Configuración</h1>
@@ -361,20 +606,20 @@
               </div>
               
               <div class="settings-card">
-                <h3>Generar Informe IA</h3>
-                <p>Análisis financiero inteligente personalizado</p>
-                <button id="generate-ai-report-btn" class="btn btn-secondary">
-                  <span>🤖</span>
-                  Generar Informe
-                </button>
-              </div>
-              
-              <div class="settings-card">
                 <h3>Respaldo de Datos</h3>
                 <p>Respalda y restaura tu información</p>
                 <button id="backup-data-btn" class="btn btn-secondary">
                   <span>☁️</span>
                   Respaldar
+                </button>
+              </div>
+              
+              <div class="settings-card">
+                <h3>Preferencias de Usuario</h3>
+                <p>Configura tu experiencia personalizada</p>
+                <button id="user-preferences-btn" class="btn btn-secondary">
+                  <span>👤</span>
+                  Configurar
                 </button>
               </div>
             </div>
@@ -719,6 +964,54 @@
           Generar Informe
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Add Calendar Event Modal -->
+  <div id="add-event-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📅 Nuevo Evento Financiero</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-event-form" class="modal-form">
+        <div class="form-group">
+          <label for="event-title">Título del Evento</label>
+          <input type="text" id="event-title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="event-type">Tipo de Evento</label>
+          <select id="event-type" name="type" required>
+            <option value="payment">Pago/Cuota</option>
+            <option value="income">Ingreso Esperado</option>
+            <option value="goal-deadline">Fecha Límite de Objetivo</option>
+            <option value="review">Revisión Financiera</option>
+            <option value="reminder">Recordatorio</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="event-date">Fecha</label>
+          <input type="date" id="event-date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label for="event-amount">Monto (opcional)</label>
+          <input type="number" id="event-amount" name="amount" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="event-description">Descripción</label>
+          <textarea id="event-description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="event-recurring" name="recurring" />
+            Evento recurrente
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Evento</button>
+        </div>
+      </form>
     </div>
   </div>
 
