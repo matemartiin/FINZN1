@@ -4,12 +4,78 @@ export class CalendarManager {
     this.events = [];
     this.integrations = {
       google: false,
-      outlook: false,
       apple: false
     };
     this.integrationMethods = {
-      phase: 1, // 1: URLs, 2: ICS Files, 3: Native APIs
-      supportedCalendars: ['google', 'outlook', 'apple']
+      phase: 3, // Direct mobile integration
+      supportedCalendars: ['google', 'apple']
+    };
+    
+    // Google Calendar API configuration
+    this.googleConfig = {
+      apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+      clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      discoveryDoc: 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
+      scopes: 'https://www.googleapis.com/auth/calendar.events'
+    };
+    
+    // Authentication states
+    this.isGoogleAuthenticated = false;
+    this.googleAccessToken = null;
+  }
+
+  async init() {
+    console.log('📅 Initializing Calendar Manager with mobile integration...');
+    this.loadIntegrationStatus();
+    this.setupEventListeners();
+    this.loadEvents();
+    this.renderCalendar();
+    
+    // Initialize Google Calendar API if available
+    await this.initializeGoogleCalendar();
+  }
+
+  async initializeGoogleCalendar() {
+    try {
+      if (!this.googleConfig.apiKey || !this.googleConfig.clientId) {
+        console.log('⚠️ Google Calendar API not configured');
+        return;
+      }
+
+      // Load Google API
+      await this.loadGoogleAPI();
+      console.log('✅ Google Calendar API initialized');
+    } catch (error) {
+      console.error('❌ Error initializing Google Calendar:', error);
+    }
+  }
+
+  loadGoogleAPI() {
+    return new Promise((resolve, reject) => {
+      if (window.gapi) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.onload = () => {
+        window.gapi.load('client:auth2', async () => {
+          try {
+            await window.gapi.client.init({
+              apiKey: this.googleConfig.apiKey,
+              clientId: this.googleConfig.clientId,
+              discoveryDocs: [this.googleConfig.discoveryDoc],
+              scope: this.googleConfig.scopes
+            });
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
     };
   }
 
@@ -150,7 +216,9 @@ export class CalendarManager {
       id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       ...eventData,
       automatic: false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      synced_to_google: false,
+      synced_to_apple: false
     };
     
     this.events.push(event);
@@ -158,11 +226,37 @@ export class CalendarManager {
     
     console.log('📅 Event added:', event);
     
+    // Auto-sync to connected calendars
+    await this.autoSyncNewEvent(event);
+    
     // Refresh calendar display
     this.renderCalendar();
     this.updateSidebarWidgets();
     
     return event;
+  }
+
+  async autoSyncNewEvent(event) {
+    try {
+      // Sync to Google Calendar if connected
+      if (this.integrations.google && this.isGoogleAuthenticated) {
+        await this.createGoogleCalendarEvent(event);
+        event.synced_to_google = true;
+        window.app.ui.showAlert('Recordatorio agregado a Google Calendar 📱', 'success');
+      }
+      
+      // For Apple, we'll generate ICS file on demand
+      if (this.integrations.apple) {
+        // Apple events are synced via ICS download
+        console.log('🍎 Apple Calendar integration ready for sync');
+      }
+      
+      this.saveEvents();
+      
+    } catch (error) {
+      console.error('❌ Error auto-syncing event:', error);
+      window.app.ui.showAlert('Evento creado, pero no se pudo sincronizar automáticamente', 'warning');
+    }
   }
 
   renderCalendar() {
@@ -460,17 +554,192 @@ export class CalendarManager {
   // Integration methods
   handleGoogleCalendarIntegration() {
     console.log('📅 Google Calendar integration');
-    this.showCalendarIntegrationModal('google');
-  }
-
-  handleOutlookIntegration() {
-    console.log('📅 Outlook integration');
-    this.showCalendarIntegrationModal('outlook');
+    this.authenticateAndIntegrateGoogle();
   }
 
   handleAppleCalendarIntegration() {
     console.log('📅 Apple Calendar integration');
-    this.showCalendarIntegrationModal('apple');
+    this.integrateWithAppleCalendar();
+  }
+
+  async authenticateAndIntegrateGoogle() {
+    try {
+      console.log('🔐 Authenticating with Google Calendar...');
+      
+      if (!window.gapi || !window.gapi.auth2) {
+        throw new Error('Google API not loaded');
+      }
+
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      
+      if (!authInstance.isSignedIn.get()) {
+        // User needs to sign in
+        const user = await authInstance.signIn();
+        console.log('✅ User signed in to Google:', user.getBasicProfile().getEmail());
+      }
+
+      this.isGoogleAuthenticated = true;
+      this.googleAccessToken = authInstance.currentUser.get().getAuthResponse().access_token;
+      
+      // Save integration status
+      this.integrations.google = true;
+      this.saveIntegrationStatus();
+      
+      // Show success message
+      window.app.ui.showAlert('¡Google Calendar conectado! Los recordatorios aparecerán en tu celular.', 'success');
+      
+      // Sync existing events
+      await this.syncEventsToGoogle();
+      
+    } catch (error) {
+      console.error('❌ Error authenticating with Google:', error);
+      window.app.ui.showAlert('Error al conectar con Google Calendar. Intenta de nuevo.', 'error');
+    }
+  }
+
+  async syncEventsToGoogle() {
+    if (!this.isGoogleAuthenticated) return;
+    
+    try {
+      console.log('🔄 Syncing events to Google Calendar...');
+      
+      const eventsToSync = this.events.filter(event => 
+        !event.synced_to_google && 
+        new Date(event.date) >= new Date()
+      );
+      
+      for (const event of eventsToSync) {
+        await this.createGoogleCalendarEvent(event);
+        event.synced_to_google = true;
+      }
+      
+      this.saveEvents();
+      console.log(`✅ Synced ${eventsToSync.length} events to Google Calendar`);
+      
+    } catch (error) {
+      console.error('❌ Error syncing events to Google:', error);
+    }
+  }
+
+  async createGoogleCalendarEvent(event) {
+    if (!this.isGoogleAuthenticated) return;
+    
+    try {
+      const startDateTime = new Date(event.date + 'T09:00:00');
+      const endDateTime = new Date(event.date + 'T10:00:00');
+      
+      const googleEvent = {
+        summary: `💰 ${event.title}`,
+        description: this.formatEventDescription(event),
+        start: {
+          dateTime: startDateTime.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        },
+        end: {
+          dateTime: endDateTime.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 60 }, // 1 hora antes
+            { method: 'popup', minutes: 15 }  // 15 minutos antes
+          ]
+        }
+      };
+      
+      const response = await window.gapi.client.calendar.events.insert({
+        calendarId: 'primary',
+        resource: googleEvent
+      });
+      
+      console.log('✅ Event created in Google Calendar:', response.result.id);
+      return response.result;
+      
+    } catch (error) {
+      console.error('❌ Error creating Google Calendar event:', error);
+      throw error;
+    }
+  }
+
+  integrateWithAppleCalendar() {
+    // Apple Calendar integration using webcal:// protocol
+    console.log('🍎 Integrating with Apple Calendar...');
+    
+    // Generate ICS file for Apple Calendar
+    const upcomingEvents = this.events.filter(event => 
+      new Date(event.date) >= new Date()
+    );
+    
+    if (upcomingEvents.length === 0) {
+      window.app.ui.showAlert('No hay eventos próximos para sincronizar', 'info');
+      return;
+    }
+    
+    const icsContent = this.generateICSForApple(upcomingEvents);
+    this.downloadICSForApple(icsContent);
+    
+    // Mark as integrated
+    this.integrations.apple = true;
+    this.saveIntegrationStatus();
+    
+    window.app.ui.showAlert('Archivo de calendario generado. Ábrelo en tu iPhone para agregar los recordatorios.', 'success');
+  }
+
+  generateICSForApple(events) {
+    let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//FINZN//Calendar//ES
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:FINZN - Recordatorios Financieros
+X-WR-CALDESC:Recordatorios automáticos de FINZN`;
+
+    events.forEach(event => {
+      const startDate = new Date(event.date + 'T09:00:00');
+      const endDate = new Date(event.date + 'T10:00:00');
+      
+      icsContent += `
+BEGIN:VEVENT
+UID:${event.id}@finzn.app
+DTSTART:${this.formatICSDate(startDate)}
+DTEND:${this.formatICSDate(endDate)}
+SUMMARY:💰 ${event.title}
+DESCRIPTION:${this.formatEventDescription(event).replace(/\n/g, '\\n')}
+BEGIN:VALARM
+TRIGGER:-PT1H
+ACTION:DISPLAY
+DESCRIPTION:Recordatorio: ${event.title}
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:Recordatorio: ${event.title}
+END:VALARM
+CREATED:${this.formatICSDate(new Date())}
+LAST-MODIFIED:${this.formatICSDate(new Date())}
+END:VEVENT`;
+    });
+
+    icsContent += `
+END:VCALENDAR`;
+
+    return icsContent;
+  }
+
+  downloadICSForApple(content) {
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'FINZN_Recordatorios.ics';
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
   }
 
   showCalendarIntegrationModal(calendarType) {
