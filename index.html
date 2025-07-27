@@ -123,24 +123,28 @@
 
     <!-- Dashboard with New Layout -->
     <main class="dashboard-new">
-      <!-- Sidebar Navigation -->
-      <aside class="sidebar-nav">
+      <!-- Sidebar Navigation (Desktop) -->
+      <aside class="sidebar-nav desktop-only">
         <nav class="nav-menu">
           <div class="nav-item active" data-section="dashboard">
             <div class="nav-icon">📊</div>
             <span class="nav-label">Dashboard</span>
           </div>
-          <div class="nav-item" data-section="expenses">
+          <div class="nav-item" data-section="transactions">
             <div class="nav-icon">💳</div>
-            <span class="nav-label">Gastos</span>
+            <span class="nav-label">Transacciones</span>
           </div>
-          <div class="nav-item" data-section="savings">
+          <div class="nav-item" data-section="calendar">
+            <div class="nav-icon">📅</div>
+            <span class="nav-label">Calendario</span>
+          </div>
+          <div class="nav-item" data-section="planning">
             <div class="nav-icon">🎯</div>
-            <span class="nav-label">Ahorros</span>
+            <span class="nav-label">Planificación</span>
           </div>
-          <div class="nav-item" data-section="achievements">
+          <div class="nav-item" data-section="reports">
             <div class="nav-icon">🏆</div>
-            <span class="nav-label">Logros</span>
+            <span class="nav-label">Reportes</span>
           </div>
           <div class="nav-item" data-section="settings">
             <div class="nav-icon">⚙️</div>
@@ -148,6 +152,30 @@
           </div>
         </nav>
       </aside>
+
+      <!-- Mobile Bottom Navigation -->
+      <nav class="mobile-bottom-nav">
+        <div class="mobile-nav-item active" data-section="dashboard">
+          <div class="mobile-nav-icon">📊</div>
+          <span class="mobile-nav-label">Dashboard</span>
+        </div>
+        <div class="mobile-nav-item" data-section="transactions">
+          <div class="mobile-nav-icon">💳</div>
+          <span class="mobile-nav-label">Transacciones</span>
+        </div>
+        <div class="mobile-nav-item" data-section="calendar">
+          <div class="mobile-nav-icon">📅</div>
+          <span class="mobile-nav-label">Calendario</span>
+        </div>
+        <div class="mobile-nav-item" data-section="planning">
+          <div class="mobile-nav-icon">🎯</div>
+          <span class="mobile-nav-label">Planificación</span>
+        </div>
+        <div class="mobile-nav-item" data-section="reports">
+          <div class="mobile-nav-icon">🏆</div>
+          <span class="mobile-nav-label">Reportes</span>
+        </div>
+      </nav>
 
       <!-- Main Content Area -->
       <div class="main-dashboard">
