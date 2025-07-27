@@ -79,9 +79,9 @@ export class DataManager {
         .eq('user_id', userId);
 
       if (error) {
-        console.error('❌ Error loading categories:', error);
+        console.error('❌ Error loading categories:', error.message || error);
         // If it's a connection error, create default categories locally
-        if (error.message && error.message.includes('Failed to fetch')) {
+        if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('Supabase not configured'))) {
           console.log('🔄 Using default categories due to connection error');
           this.data.categories = this.getDefaultCategories();
           return;
@@ -99,7 +99,13 @@ export class DataManager {
         console.log('✅ Categories loaded from database:', this.data.categories.length);
       } else {
         console.log('📝 No categories found, creating defaults');
-        await this.createDefaultCategories();
+        // Only try to create if we have a real connection
+        if (error || !data) {
+          console.log('🔄 Using default categories as fallback');
+          this.data.categories = this.getDefaultCategories();
+        } else {
+          await this.createDefaultCategories();
+        }
       }
     } catch (error) {
       console.error('❌ Error in loadCategories:', error);

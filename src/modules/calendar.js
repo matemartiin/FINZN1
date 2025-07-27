@@ -72,7 +72,16 @@ export class CalendarManager {
       await this.loadGoogleAPI();
       console.log('✅ Google Calendar API initialized');
     } catch (error) {
-      console.error('❌ Error initializing Google Calendar:', error);
+      console.error('❌ Error initializing Google Calendar:', error.message || error);
+      
+      // Check if it's an origin error
+      if (error.error === 'idpiframe_initialization_failed') {
+        console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
+        window.app?.ui?.showAlert('Google Calendar no configurado. Revisa la configuración de origen en Google Cloud Console.', 'warning');
+      }
+      
+      // Disable Google integration but continue with app
+      this.integrations.google = false;
     }
   }
 
@@ -96,11 +105,15 @@ export class CalendarManager {
             });
             resolve();
           } catch (error) {
+            console.error('Google API client init error:', error);
             reject(error);
           }
         });
       };
-      script.onerror = reject;
+      script.onerror = (error) => {
+        console.error('Failed to load Google API script:', error);
+        reject(new Error('Failed to load Google API script'));
+      };
       document.head.appendChild(script);
     });
   }
