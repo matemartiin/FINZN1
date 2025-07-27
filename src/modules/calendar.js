@@ -75,10 +75,12 @@ export class CalendarManager {
       console.error('❌ Error initializing Google Calendar:', error.message || error);
       
       // Check for specific error types
-      if (error.error === 'idpiframe_initialization_failed') {
+      if (error.error === 'idpiframe_initialization_failed' || 
+          (error.error && error.error.code === 403 && error.error.message && error.error.message.includes('blocked'))) {
         console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
         this.showConfigurationHelp('google-referrer-blocked');
-      } else if (error.error && error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED')) {
+      } else if ((error.error && error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED')) ||
+                 (error.error && error.error.code === 403)) {
         console.warn('⚠️ Google Calendar API HTTP referrer blocked.');
         this.showConfigurationHelp('google-referrer-blocked');
       } else {

@@ -457,13 +457,22 @@ export class DataManager {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading goals:', error);
+        console.error('Error loading goals:', error.message || error);
+        // If it's a connection error, use empty array as fallback
+        if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('Supabase not configured'))) {
+          console.log('🔄 Using empty goals due to connection error');
+          this.data.goals = [];
+          return;
+        }
         return;
       }
 
       this.data.goals = data || [];
     } catch (error) {
       console.error('Error in loadGoals:', error);
+      // Fallback to empty array on any error
+      console.log('🔄 Using empty goals as fallback');
+      this.data.goals = [];
     }
   }
 
@@ -515,7 +524,13 @@ export class DataManager {
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Error loading spending limits:', error);
+        console.error('Error loading spending limits:', error.message || error);
+        // If it's a connection error, use empty array as fallback
+        if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('Supabase not configured'))) {
+          console.log('🔄 Using empty spending limits due to connection error');
+          this.data.spendingLimits = [];
+          return;
+        }
         return;
       }
 
@@ -523,6 +538,9 @@ export class DataManager {
       console.log('🚦 Spending limits loaded:', this.data.spendingLimits.length, 'items');
     } catch (error) {
       console.error('Error in loadSpendingLimits:', error);
+      // Fallback to empty array on any error
+      console.log('🔄 Using empty spending limits as fallback');
+      this.data.spendingLimits = [];
     }
   }
 
@@ -600,13 +618,22 @@ export class DataManager {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading achievements:', error);
+        console.error('Error loading achievements:', error.message || error);
+        // If it's a connection error, use empty array as fallback
+        if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('Supabase not configured'))) {
+          console.log('🔄 Using empty achievements due to connection error');
+          this.data.achievements = [];
+          return;
+        }
         return;
       }
 
       this.data.achievements = data || [];
     } catch (error) {
       console.error('Error in loadAchievements:', error);
+      // Fallback to empty array on any error
+      console.log('🔄 Using empty achievements as fallback');
+      this.data.achievements = [];
     }
   }
 
