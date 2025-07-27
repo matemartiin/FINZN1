@@ -74,10 +74,15 @@ export class CalendarManager {
     } catch (error) {
       console.error('❌ Error initializing Google Calendar:', error.message || error);
       
-      // Check if it's an origin error
+      // Check for specific error types
       if (error.error === 'idpiframe_initialization_failed') {
         console.warn('⚠️ Google Calendar API origin not configured. Add current origin to Google Cloud Console.');
-        window.app?.ui?.showAlert('Google Calendar no configurado. Revisa la configuración de origen en Google Cloud Console.', 'warning');
+        this.showConfigurationHelp('google-referrer-blocked');
+      } else if (error.error && error.error.details && error.error.details.some(detail => detail.reason === 'API_KEY_HTTP_REFERRER_BLOCKED')) {
+        console.warn('⚠️ Google Calendar API HTTP referrer blocked.');
+        this.showConfigurationHelp('google-referrer-blocked');
+      } else {
+        this.showConfigurationHelp('google-general-error');
       }
       
       // Disable Google integration but continue with app
