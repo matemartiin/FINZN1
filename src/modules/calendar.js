@@ -76,7 +76,7 @@ export class CalendarManager {
       };
       script.onerror = reject;
       document.head.appendChild(script);
-    };
+    });
   }
 
   init() {
@@ -625,25 +625,12 @@ export class CalendarManager {
     if (!this.isGoogleAuthenticated) return;
     
     try {
-      // Usar hora personalizada o por defecto
-      const eventTime = event.time || '09:00';
-      const duration = event.duration || 60; // minutos
-      
-      const startDateTime = new Date(event.date + 'T' + eventTime + ':00');
-      const endDateTime = new Date(startDateTime.getTime() + (duration * 60000));
-      
-      // Generar título personalizado
-      const customTitle = this.generateCustomTitle(event);
-      
-      // Generar descripción personalizada
-      const customDescription = this.generateCustomDescription(event);
-      
-      // Obtener recordatorios personalizados
-      const customReminders = this.getCustomReminders(event.type);
+      const startDateTime = new Date(event.date + 'T09:00:00');
+      const endDateTime = new Date(event.date + 'T10:00:00');
       
       const googleEvent = {
-        summary: customTitle,
-        description: customDescription,
+        summary: `💰 ${event.title}`,
+        description: this.formatEventDescription(event),
         start: {
           dateTime: startDateTime.toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -654,16 +641,10 @@ export class CalendarManager {
         },
         reminders: {
           useDefault: false,
-          overrides: customReminders
-        },
-        colorId: this.getEventColor(event.type),
-        extendedProperties: {
-          private: {
-            finznEventId: event.id,
-            finznEventType: event.type,
-            finznAmount: event.amount?.toString() || '',
-            finznCategory: event.category || ''
-          }
+          overrides: [
+            { method: 'popup', minutes: 60 }, // 1 hora antes
+            { method: 'popup', minutes: 15 }  // 15 minutos antes
+          ]
         }
       };
       
@@ -715,35 +696,26 @@ X-WR-CALNAME:FINZN - Recordatorios Financieros
 X-WR-CALDESC:Recordatorios automáticos de FINZN`;
 
     events.forEach(event => {
-      const eventTime = event.time || '09:00';
-      const duration = event.duration || 60;
-      
-      const startDate = new Date(event.date + 'T' + eventTime + ':00');
-      const endDate = new Date(startDate.getTime() + (duration * 60000));
-      
-      const customTitle = this.generateCustomTitle(event);
-      const customDescription = this.generateCustomDescription(event);
-      const customReminders = this.getCustomReminders(event.type);
+      const startDate = new Date(event.date + 'T09:00:00');
+      const endDate = new Date(event.date + 'T10:00:00');
       
       icsContent += `
 BEGIN:VEVENT
 UID:${event.id}@finzn.app
 DTSTART:${this.formatICSDate(startDate)}
 DTEND:${this.formatICSDate(endDate)}
-SUMMARY:${customTitle}
-DESCRIPTION:${customDescription.replace(/\n/g, '\\n')}`;
-
-      // Agregar recordatorios personalizados
-      customReminders.forEach(reminder => {
-        icsContent += `
+SUMMARY:💰 ${event.title}
+DESCRIPTION:${this.formatEventDescription(event).replace(/\n/g, '\\n')}
 BEGIN:VALARM
-TRIGGER:-PT${reminder.minutes}M
+TRIGGER:-PT1H
 ACTION:DISPLAY
-DESCRIPTION:${customTitle}
-END:VALARM`;
-      });
-
-      icsContent += `
+DESCRIPTION:Recordatorio: ${event.title}
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:Recordatorio: ${event.title}
+END:VALARM
 CREATED:${this.formatICSDate(new Date())}
 LAST-MODIFIED:${this.formatICSDate(new Date())}
 END:VEVENT`;
@@ -767,7 +739,6 @@ END:VCALENDAR`;
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }
   }
 
   showCalendarIntegrationModal(calendarType) {
@@ -1191,116 +1162,5 @@ END:VCALENDAR`;
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
-  }
-
-  // ===== MÉTODOS DE PERSONALIZACIÓN =====
-  
-  generateCustomTitle(event) {
-    const template = this.reminderSettings.titleTemplates[event.type] || '⏰ {title}';
-    return template.replace('{title}', event.title);
-  }
-  
-  generateCustomDescription(event) {
-    let description = this.reminderSettings.descriptionTemplate;
-    
-    // Reemplazar variables
-    description = description.replace('{description}', event.description || event.title);
-    description = description.replace('{amount}', event.amount ? this.formatCurrency(event.amount) : 'No especificado');
-    description = description.replace('{category}', event.category || 'General');
-    
-    return description;
-  }
-  
-  getCustomReminders(eventType) {
-    // Recordatorios personalizados por tipo de evento
-    if (this.reminderSettings.customReminders[eventType]) {
-      return this.reminderSettings.customReminders[eventType];
-    }
-    
-    // Recordatorios por defecto
-    return this.reminderSettings.defaultReminders;
-  }
-  
-  getEventColor(eventType) {
-    const colors = {
-      payment: '11',      // Rojo - Pagos
-      income: '10',       // Verde - Ingresos
-      'goal-deadline': '9', // Azul - Objetivos
-      review: '6',        // Naranja - Revisiones
-      reminder: '7'       // Turquesa - Recordatorios
-    };
-    
-    return colors[eventType] || '7';
-  }
-  
-  // Configurar recordatorios personalizados
-  setCustomReminders(eventType, reminders) {
-    this.reminderSettings.customReminders[eventType] = reminders;
-    this.saveReminderSettings();
-  }
-  
-  // Configurar plantillas de título
-  setTitleTemplate(eventType, template) {
-    this.reminderSettings.titleTemplates[eventType] = template;
-    this.saveReminderSettings();
-  }
-  
-  // Configurar plantilla de descripción
-  setDescriptionTemplate(template) {
-    this.reminderSettings.descriptionTemplate = template;
-    this.saveReminderSettings();
-  }
-  
-  // Guardar configuración
-  saveReminderSettings() {
-    try {
-      localStorage.setItem('finzn-reminder-settings', JSON.stringify(this.reminderSettings));
-    } catch (error) {
-      console.error('Error saving reminder settings:', error);
-    }
-  }
-  
-  // Cargar configuración
-  loadReminderSettings() {
-    try {
-      const saved = localStorage.getItem('finzn-reminder-settings');
-      if (saved) {
-        const savedSettings = JSON.parse(saved);
-        this.reminderSettings = { ...this.reminderSettings, ...savedSettings };
-      }
-    } catch (error) {
-      console.error('Error loading reminder settings:', error);
-    }
-  }
-  
-  // Obtener configuración actual
-  getReminderSettings() {
-    return this.reminderSettings;
-  }
-  
-  // Restablecer configuración por defecto
-  resetReminderSettings() {
-    this.reminderSettings = {
-      defaultReminders: [
-        { method: 'popup', minutes: 60 },
-        { method: 'popup', minutes: 15 }
-      ],
-      customReminders: {},
-      titleTemplates: {
-        payment: '💰 {title}',
-        income: '💵 {title}',
-        'goal-deadline': '🎯 {title}',
-        review: '📊 {title}',
-        reminder: '⏰ {title}'
-      },
-      descriptionTemplate: `{description}
-
-💰 Monto: {amount}
-🏷️ Categoría: {category}
-📱 Creado desde FINZN - Tu compañero financiero inteligente
-
-¿Necesitas ayuda? Revisa tu dashboard de FINZN para más detalles.`
-    };
-    this.saveReminderSettings();
   }
 }
