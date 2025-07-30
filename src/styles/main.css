@@ -2878,21 +2878,6 @@ body {
   .main-tabs {
     overflow-x: auto;
     scrollbar-width: none;
-  
-  .chat-window {
-    width: 300px;
-    height: 400px;
-  }
-  
-  .simple-client-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .simple-client-item .client-actions {
-    align-self: flex-end;
-  }
     -ms-overflow-style: none;
   }
   

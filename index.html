@@ -1065,68 +1065,19 @@
               <div class="form-group">
                 <label for="category-color">Color</label>
                 <input type="color" id="category-color" name="color" value="#B7A6FF" />
-            <button id="add-client-btn" class="btn btn-primary">
-              <span>👤</span>
-              Agregar Cliente
-            </button>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <span>➕</span>
+                Agregar Categoría
+              </button>
+            </form>
+          </div>
+          
+          <div class="categories-list-section">
+            <h3>Categorías Existentes</h3>
             <div id="categories-management-list" class="categories-management-list">
               <!-- Categories will be loaded here -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Chat IA Widget -->
-      <div id="chat-widget" class="chat-widget">
-        <div id="chat-toggle" class="chat-toggle">
-          <div class="chat-robot">🤖</div>
-          <div class="chat-pulse"></div>
-        </div>
-        
-        <div id="chat-window" class="chat-window hidden">
-          <div class="chat-header">
-            <div class="chat-title">
-              <img src="/robot-chat.png" alt="FINZN AI" class="chat-avatar-img" />
-              <div>
-                <div class="chat-name">FINZN AI</div>
-                <div id="chat-status" class="chat-status">En línea</div>
-              </div>
             </div>
-            <div class="chat-controls">
-              <button id="chat-minimize" class="chat-control-btn" title="Minimizar">−</button>
-              <button id="chat-close" class="chat-control-btn" title="Cerrar">×</button>
-            </div>
-          </div>
-          
-          <div id="chat-messages" class="chat-messages">
-            <!-- Messages will be added here -->
-          </div>
-          
-          <div id="chat-suggestions" class="chat-suggestions">
-            <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">💰 Consejos de ahorro</button>
-            <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">📊 Analizar gastos</button>
-            <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">📋 Organizar presupuesto</button>
-          </div>
-          
-          <form id="chat-form" class="chat-form">
-            <div class="chat-input-container">
-              <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
-              <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
-              <button type="submit" class="chat-send-btn">➤</button>
-            </div>
-          </form>
-        </div>
-        
-        <div id="chat-minimized" class="chat-minimized hidden">
-          <div id="chat-restore" class="chat-restore">
-            <img src="/robot-chat.png" alt="FINZN AI" class="chat-avatar-img" />
-            <div class="chat-minimized-text">FINZN AI</div>
-          </div>
-        </div>
-        
-        <div id="chat-notification" class="chat-notification" style="display: none;">
-          <div class="notification-content">
-            <img src="/robot-chat.png" alt="FINZN AI" class="chat-avatar-img" />
-            <div class="notification-text">Nuevo mensaje</div>
           </div>
         </div>
       </div>
@@ -1259,13 +1210,6 @@
           <input type="text" id="event-title" name="title" required />
         </div>
         <div class="form-group">
-          <label for="event-client">Cliente (opcional)</label>
-          <select id="event-client" name="client">
-            <option value="">Sin cliente asociado</option>
-            <!-- Clients will be populated here -->
-          </select>
-        </div>
-        <div class="form-group">
           <label for="event-type">Tipo de Evento</label>
           <select id="event-type" name="type" required>
             <option value="payment">Pago/Cuota</option>
@@ -1304,16 +1248,63 @@
         <div class="form-group">
           <label>
             <input type="checkbox" id="event-recurring" name="recurring" />
-          <!-- Client Search and Filters -->
-          <div class="clients-controls">
-            <input type="text" id="client-search" placeholder="🔍 Buscar cliente..." class="search-input" />
-            <select id="client-status-filter" class="filter-select">
-              <option value="">Todos los estados</option>
-              <option value="active">Activos</option>
-              <option value="inactive">Inactivos</option>
-            </select>
+            Evento recurrente
+          </label>
+        </div>
+        
+        <!-- Configuración de Recordatorios -->
+        <div class="form-section">
+          <h4>⏰ Configuración de Recordatorios</h4>
+          <div class="reminders-config">
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="reminder-1h" name="reminder1h" checked />
+                Recordar 1 hora antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="reminder-15m" name="reminder15m" checked />
+                Recordar 15 minutos antes
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="reminder-custom" name="reminderCustom" />
+                Recordatorio personalizado
+              </label>
+              <div id="custom-reminder-group" class="hidden">
+                <input type="number" id="custom-reminder-minutes" name="customReminderMinutes" min="1" max="10080" placeholder="Minutos antes" />
+              </div>
+            </div>
           </div>
         </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Calendar Settings Modal -->
+  <div id="calendar-settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Configuración de Recordatorios</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h4>🎨 Plantillas de Títulos</h4>
+          <div class="template-config">
+            <div class="form-group">
+              <label for="template-payment">Pagos/Cuotas</label>
+              <input type="text" id="template-payment" value="💰 {title}" />
+              <small>Usa {title} para el título del evento</small>
+            </div>
+            <div class="form-group">
               <label for="template-income">Ingresos</label>
               <input type="text" id="template-income" value="💵 {title}" />
             </div>
@@ -1432,7 +1423,11 @@
         <img src="/robot-chat.png" alt="Chat" class="minimized-avatar" />
         <span class="minimized-text">Chat minimizado</span>
         <button id="chat-restore" class="chat-restore-btn">↗</button>
-          <!-- Simple Clients List -->
-          <div id="clients-list" class="simple-clients-list">
+      </div>
+    </div>
+  </div>
+
+  <!-- Load main application -->
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
