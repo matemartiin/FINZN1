@@ -1,3497 +1,1452 @@
-/* FINZN - Estilos con paleta de colores personalizada */
-
-/* Variables CSS con tu paleta de colores */
-:root {
-  /* Tu paleta de colores */
-  --azul-pastel: #A7C7E7;
-  --celeste-suave: #B5EAEA;
-  --lavanda: #C8B6FF;
-  --rosa-claro: #FFC9DE;
-  --durazno-suave: #FFD6A5;
-  --gris-piedra: #E2E2E2;
-  --blanco-hueso: #FAFAFA;
-  
-  /* Colores principales basados en tu paleta */
-  --primary-color: var(--lavanda);
-  --primary-dark: #B5A3FF;
-  --primary-light: #D4C9FF;
-  --secondary-color: var(--azul-pastel);
-  --accent-color: var(--rosa-claro);
-  
-  /* Gradientes con tu paleta */
-  --gradient-primary: linear-gradient(135deg, var(--lavanda) 0%, var(--azul-pastel) 100%);
-  --gradient-secondary: linear-gradient(135deg, var(--rosa-claro) 0%, var(--durazno-suave) 100%);
-  
-  /* Colores de estado */
-  --success-color: #4CAF50;
-  --warning-color: #FF9800;
-  --error-color: #F44336;
-  --info-color: var(--celeste-suave);
-  
-  /* Colores neutros */
-  --text-primary: #2D3748;
-  --text-secondary: #718096;
-  --text-muted: #A0AEC0;
-  --bg-primary: var(--blanco-hueso);
-  --bg-secondary: #F8F9FA;
-  --bg-tertiary: var(--gris-piedra);
-  --border-color: #E2E8F0;
-  
-  /* Espaciado */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  
-  /* Bordes */
-  --border-radius: 12px;
-  --border-radius-sm: 8px;
-  --border-radius-lg: 16px;
-  --border-radius-xl: 20px;
-  
-  /* Sombras */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  --shadow-colored: 0 10px 25px rgba(200, 182, 255, 0.3);
-  
-  /* Transiciones */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
-}
-
-/* Tema oscuro */
-.darkmode {
-  --text-primary: #F7FAFC;
-  --text-secondary: #E2E8F0;
-  --text-muted: #A0AEC0;
-  --bg-primary: #1A202C;
-  --bg-secondary: #2D3748;
-  --bg-tertiary: #4A5568;
-  --border-color: #4A5568;
-}
-
-/* Reset y base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  transition: background-color var(--transition-normal), color var(--transition-normal);
-}
-
-/* Utilidades */
-.hidden {
-  display: none !important;
-}
-
-.fade-in {
-  animation: fadeIn 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Sistema de alertas */
-.alert-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.alert {
-  padding: 16px 20px;
-  border-radius: var(--border-radius-lg);
-  color: white;
-  font-weight: 600;
-  box-shadow: var(--shadow-xl);
-  transform: translateX(100%);
-  opacity: 0;
-  transition: all var(--transition-normal);
-  max-width: 350px;
-}
-
-.alert.show {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.alert-success { background: var(--success-color); }
-.alert-error { background: var(--error-color); }
-.alert-warning { background: var(--warning-color); }
-.alert-info { background: var(--info-color); }
-
-/* Contenedor de autenticación */
-.auth-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-lg);
-  background: var(--gradient-primary);
-}
-
-.auth-card {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-2xl);
-  box-shadow: var(--shadow-xl);
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-}
-
-.auth-header {
-  margin-bottom: var(--spacing-2xl);
-}
-
-.auth-logo {
-  margin-bottom: var(--spacing-xl);
-}
-
-.auth-title {
-  font-size: 2.5rem;
-  font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: var(--spacing-md);
-}
-
-.auth-subtitle {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.auth-description {
-  color: var(--text-muted);
-  font-size: 1rem;
-}
-
-.auth-form {
-  margin-bottom: var(--spacing-xl);
-}
-
-.input-group {
-  margin-bottom: var(--spacing-xl);
-  position: relative;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 16px 20px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  font-size: 1.1rem;
-  transition: all var(--transition-normal);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(200, 182, 255, 0.15);
-}
-
-.input-group input::placeholder {
-  color: var(--text-muted);
-}
-
-.input-hint {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 6px;
-  display: block;
-  text-align: left;
-}
-
-/* Botones */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: 12px 24px;
-  border: none;
-  border-radius: var(--border-radius-lg);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: var(--shadow-colored);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(200, 182, 255, 0.4);
-}
-
-.btn-secondary {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-  background: var(--border-color);
-  transform: translateY(-2px);
-}
-
-.btn-full {
-  width: 100%;
-}
-
-.btn-sm {
-  padding: 8px 16px;
-  font-size: 0.9rem;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  cursor: pointer;
-  font-weight: 700;
-  text-decoration: underline;
-}
-
-.link-btn:hover {
-  color: var(--primary-dark);
-}
-
-.error-message {
-  color: var(--error-color);
-  font-size: 0.95rem;
-  margin-top: var(--spacing-sm);
-  font-weight: 600;
-}
-
-.auth-footer {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-/* Aplicación principal */
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-secondary);
-}
-
-/* Header */
-.header {
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  padding: var(--spacing-lg) 0;
-  box-shadow: var(--shadow-md);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-xl);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.logo {
-  font-size: 1.8rem;
-  font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.month-selector {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.month-selector select {
-  padding: 8px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.user-info {
-  font-weight: 700;
-  color: var(--text-secondary);
-  padding: 8px 16px;
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-/* Dashboard principal */
-.dashboard-new {
-  flex: 1;
-  display: flex;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* Sidebar - OCULTA EN DESKTOP, VISIBLE EN MOBILE */
-.sidebar-nav {
-  display: none;
-  background: var(--bg-primary);
-  border-right: 1px solid var(--border-color);
-  padding: var(--spacing-md);
-}
-
-.nav-menu {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 10px 12px;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.nav-item:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.nav-item.active {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: var(--shadow-colored);
-}
-
-.nav-icon {
-  font-size: 1rem;
-  width: 18px;
-  text-align: center;
-}
-
-.nav-label {
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-/* Contenido principal */
-.main-dashboard {
-  flex: 1;
-  padding: var(--spacing-xl);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Tab Navigation - NUEVA */
-.main-tabs {
-  display: flex;
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-sm);
-  margin-bottom: var(--spacing-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
-  overflow-x: auto;
-  gap: var(--spacing-sm);
-}
-
-.tab-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 12px 20px;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  color: var(--text-secondary);
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-  min-width: 120px;
-  justify-content: center;
-}
-
-.tab-item:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.tab-item.active {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: var(--shadow-colored);
-}
-
-.tab-icon {
-  font-size: 1.1rem;
-}
-
-.tab-label {
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.tab-section {
-  display: none;
-  flex: 1;
-}
-
-.tab-section.active {
-  display: block;
-}
-
-.section-content {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-lg);
-  height: 100%;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 2px solid var(--border-color);
-}
-
-.section-header h1 {
-  font-size: 1.8rem;
-  font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.section-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* Dashboard grid */
-.dashboard-grid {
-  display: grid;
-  gap: var(--spacing-xl);
-  grid-template-areas: 
-    "summary summary summary"
-    "chart chart chart"
-    "widgets widgets widgets";
-}
-
-/* Primera fila: Tarjetas de resumen */
-.summary-cards {
-  grid-area: summary;
-  display: grid;
-  gap: var(--spacing-lg);
-  grid-template-columns: repeat(3, 1fr);
-}
-
-/* Segunda fila: Gráfico */
-.chart-section {
-  grid-area: chart;
-}
-
-/* Tercera fila: Widgets adicionales */
-.dashboard-widgets {
-  grid-area: widgets;
-  display: grid;
-  gap: var(--spacing-lg);
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.widget-card {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-normal);
-  border: 1px solid var(--border-color);
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.widget-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.widget-card h4 {
-  margin-bottom: var(--spacing-md);
-  color: var(--text-primary);
-  font-weight: 900;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.widget-card h4::before {
-  font-size: 1.2rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  content: attr(data-icon);
-}
-
-.upcoming-events,
-.limits-widget,
-.goals-widget {
-  margin-bottom: var(--spacing-md);
-  min-height: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  flex: 1;
-}
-
-.widget-empty {
-  color: var(--text-muted);
-  font-style: italic;
-  text-align: center;
-  padding: var(--spacing-lg);
-  font-size: 0.9rem;
-}
-
-.widget-success {
-  color: var(--success-color);
-  font-weight: 600;
-  text-align: center;
-  padding: var(--spacing-md);
-  background: rgba(76, 175, 80, 0.1);
-  border-radius: var(--border-radius);
-  font-size: 0.9rem;
-}
-
-.widget-event-item,
-.widget-limit-item,
-.widget-goal-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius-sm);
-  border-left: 3px solid var(--lavanda);
-  font-size: 0.85rem;
-}
-
-.widget-event-date,
-.widget-limit-percentage,
-.widget-goal-progress {
-  font-weight: 700;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-}
-
-.widget-event-title,
-.widget-limit-category,
-.widget-goal-name {
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.widget-limit-item.warning {
-  border-left-color: var(--warning-color);
-}
-
-.widget-limit-item.danger {
-  border-left-color: var(--error-color);
-}
-
-/* Tarjetas de resumen - PROPORCIONES CORREGIDAS */
-.summary-card {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-normal);
-  border: 1px solid var(--border-color);
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.summary-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.card-header-simple {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-.card-icon-simple {
-  font-size: 1.2rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-}
-
-.card-title {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.card-amount {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-md);
-}
-
-.card-action {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-}
-
-/* Tarjetas específicas con tu paleta */
-.balance-card-new {
-  border-left: 4px solid var(--lavanda);
-}
-
-.balance-card-new .card-icon-simple {
-  background: var(--gradient-primary);
-  color: white;
-}
-
-.balance-amount-new {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.income-card {
-  border-left: 4px solid var(--celeste-suave);
-}
-
-.income-card .card-icon-simple {
-  background: var(--celeste-suave);
-  color: white;
-}
-
-.expenses-card {
-  border-left: 4px solid var(--rosa-claro);
-}
-
-.expenses-card .card-icon-simple {
-  background: var(--rosa-claro);
-  color: white;
-}
-
-/* Indicadores */
-.incomes-indicator {
-  background: var(--celeste-suave);
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 900;
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  margin-left: var(--spacing-sm);
-  box-shadow: 0 2px 4px rgba(181, 234, 234, 0.3);
-}
-
-.incomes-indicator:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(181, 234, 234, 0.5);
-  background: var(--azul-pastel);
-}
-
-.incomes-indicator.visible {
-  display: flex !important;
-  opacity: 1;
-  visibility: visible;
-}
-
-.installments-info {
-  text-align: center;
-}
-
-.installments-button {
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.installments-button:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Installments Modal */
-.installments-list {
-  display: grid;
-  gap: var(--spacing-lg);
-}
-
-.installment-item {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  border-left: 4px solid var(--rosa-claro);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all var(--transition-normal);
-}
-
-.installment-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.installment-details {
-  flex: 1;
-}
-
-.installment-description {
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-  font-size: 1rem;
-}
-
-.installment-info {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.installment-progress {
-  font-size: 0.8rem;
-  color: var(--rosa-claro);
-  font-weight: 700;
-  background: rgba(255, 201, 222, 0.2);
-  padding: 2px 8px;
-  border-radius: var(--border-radius-sm);
-  display: inline-block;
-}
-
-.installment-amount {
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: var(--text-primary);
-}
-
-.installment-original {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-/* Gráfico - PROPORCIONES CORREGIDAS */
-.chart-card-new {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-color);
-}
-
-.chart-card-new h3 {
-  margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
-  font-weight: 900;
-  font-size: 1.2rem;
-  text-align: center;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.chart-content-with-mascot {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
-}
-
-.chart-container-new {
-  flex: 1;
-  height: 300px;
-  position: relative;
-}
-
-.chart-mascot {
-  flex-shrink: 0;
-  text-align: center;
-}
-
-.chart-mascot-container {
-  position: relative;
-}
-
-/* MASCOTA - TAMAÑO CORREGIDO */
-.chart-mascot-img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  box-shadow: 0 8px 25px rgba(200, 182, 255, 0.3);
-  border: 3px solid var(--lavanda);
-  background: white;
-  padding: 4px;
-  object-fit: cover;
-}
-
-.chart-mascot-tooltip {
-  position: absolute;
-  top: -45px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--lavanda);
-  color: white;
-  padding: 6px 10px;
-  border-radius: var(--border-radius);
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  z-index: 1000;
-}
-
-.chart-mascot-container:hover .chart-mascot-tooltip {
-  opacity: 1;
-}
-
-/* Mascot Alert */
-.mascot-alert {
-  position: absolute;
-  top: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--lavanda);
-  color: white;
-  padding: 8px 12px;
-  border-radius: var(--border-radius);
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity var(--transition-normal);
-  z-index: 1000;
-  max-width: 200px;
-  text-align: center;
-}
-
-.mascot-alert.show {
-  opacity: 1;
-}
-
-.mascot-alert-success {
-  background: var(--success-color);
-}
-
-.mascot-alert-warning {
-  background: var(--warning-color);
-}
-
-.mascot-alert-error {
-  background: var(--error-color);
-}
-
-/* Mascot Styles */
-.mascot-container {
-  position: fixed;
-  bottom: 120px;
-  right: 30px;
-  z-index: 999;
-}
-
-.mascot-avatar {
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.mascot-avatar:hover {
-  transform: scale(1.1);
-}
-
-.mascot-avatar.bounce {
-  animation: mascotBounce 0.6s ease-in-out;
-}
-
-@keyframes mascotBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.mascot-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: box-shadow 0.3s ease;
-}
-
-.mascot-avatar:hover .mascot-image {
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-}
-
-.mascot-bubble {
-  position: absolute;
-  bottom: 70px;
-  right: 0;
-  background: white;
-  border: 2px solid var(--primary-color);
-  border-radius: 15px;
-  padding: 12px 16px;
-  max-width: 200px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.3s ease;
-}
-
-.mascot-bubble.hidden {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-}
-
-.mascot-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  right: 20px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid var(--primary-color);
-}
-
-.mascot-bubble.welcome {
-  border-color: var(--success-color);
-}
-
-.mascot-bubble.warning {
-  border-color: var(--warning-color);
-}
-
-.mascot-bubble.success {
-  border-color: var(--success-color);
-}
-
-.mascot-message {
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--text-color);
-}
-
-/* Dashboard Styles */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  padding: 20px;
-}
-
-/* New Dashboard Card Styles */
-.income-expenses-card .income-expenses-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 15px;
-}
-
-.income-column, .expenses-column {
-  text-align: center;
-  padding: 15px;
-  border-radius: 8px;
-  background: var(--card-bg);
-}
-
-.income-column {
-  border-left: 4px solid var(--success-color);
-}
-
-.expenses-column {
-  border-left: 4px solid var(--primary-color);
-}
-
-.amount-display {
-  font-size: 1.8em;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.income-column .amount-display {
-  color: var(--success-color);
-}
-
-.expenses-column .amount-display {
-  color: var(--primary-color);
-}
-
-.label {
-  font-size: 0.9em;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-}
-
-.balance-subtitle {
-  font-size: 0.9em;
-  color: var(--text-secondary);
-  margin-top: 10px;
-}
-
-/* Goals Progress */
-.goals-progress-card .goals-progress-list {
-  margin-top: 15px;
-}
-
-.goal-progress-item {
-  margin-bottom: 15px;
-  padding: 12px;
-  background: var(--card-bg);
-  border-radius: 8px;
-  border-left: 4px solid var(--accent-color);
-}
-
-.goal-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.goal-name {
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.goal-percentage {
-  font-weight: bold;
-  color: var(--accent-color);
-}
-
-.progress-bar {
-  height: 8px;
-  background: var(--border-color);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
-  transition: width 0.3s ease;
-}
-
-/* Collapsible Chart */
-.expenses-chart-card .chart-container.collapsible {
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-  max-height: 400px;
-  opacity: 1;
-}
-
-.expenses-chart-card .chart-container.collapsed {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-}
-
-.top-categories {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid var(--border-color);
-}
-
-.top-category-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  font-size: 0.9em;
-}
-
-.category-rank {
-  background: var(--primary-color);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 0.8em;
-  font-weight: bold;
-  min-width: 24px;
-  text-align: center;
-}
-
-.category-icon {
-  font-size: 1.2em;
-}
-
-.category-name {
-  flex: 1;
-  font-weight: 500;
-}
-
-.category-amount {
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-/* Limits Alerts */
-.limits-alert-card {
-  border-left: 4px solid var(--warning-color);
-}
-
-.limits-alerts {
-  margin-top: 15px;
-}
-
-.limit-alert {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background: var(--card-bg);
-}
-
-.limit-alert.warning {
-  border-left: 4px solid var(--warning-color);
-  background: rgba(245, 158, 11, 0.1);
-}
-
-.limit-alert.danger {
-  border-left: 4px solid var(--error-color);
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.alert-icon {
-  font-size: 1.5em;
-}
-
-.alert-info {
-  flex: 1;
-}
-
-.alert-category {
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.alert-details {
-  font-size: 0.9em;
-  color: var(--text-secondary);
-}
-
-/* Contacts Styles */
-.contacts-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.contacts-filters-section {
-  margin-bottom: 20px;
-}
-
-.contacts-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.contact-card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-left: 4px solid var(--primary-color);
-}
-
-.contact-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-}
-
-.contact-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.contact-type-icon {
-  font-size: 2em;
-  background: var(--primary-color);
-  color: white;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.contact-status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.8em;
-  font-weight: bold;
-}
-
-.contact-status-badge.active {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--success-color);
-}
-
-.contact-status-badge.inactive {
-  background: rgba(107, 114, 128, 0.2);
-  color: var(--text-secondary);
-}
-
-.contact-info {
-  margin-bottom: 15px;
-}
-
-.contact-name {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 5px;
-}
-
-.contact-type {
-  color: var(--text-secondary);
-  font-size: 0.9em;
-  margin-bottom: 8px;
-}
-
-.contact-amount {
-  color: var(--success-color);
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.contact-reminder {
-  color: var(--warning-color);
-  font-size: 0.9em;
-  margin-bottom: 5px;
-}
-
-.contact-notes {
-  color: var(--text-secondary);
-  font-size: 0.9em;
-  font-style: italic;
-}
-
-.contact-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.contact-action-btn {
-  background: none;
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 1.1em;
-}
-
-.contact-action-btn:hover {
-  background: var(--hover-bg);
-}
-
-.contact-action-btn.edit-btn:hover {
-  background: rgba(59, 130, 246, 0.1);
-}
-
-.contact-action-btn.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-}
-
-/* Recent Contacts in Dashboard */
-.recent-contacts {
-  margin-top: 15px;
-}
-
-.recent-contact-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  margin-bottom: 8px;
-  background: var(--card-bg);
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.recent-contact-item:hover {
-  background: var(--hover-bg);
-}
-
-.contact-icon {
-  font-size: 1.5em;
-  width: 35px;
-  height: 35px;
-  background: var(--primary-color);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.contact-details {
-  flex: 1;
-}
-
-.contact-details .contact-name {
-  font-size: 0.95em;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.contact-details .contact-amount {
-  font-size: 0.85em;
-  color: var(--success-color);
-}
-
-/* Transactions Section Layout - NUEVA ESTRUCTURA */
-.transactions-container {
-  display: grid;
-  gap: var(--spacing-2xl);
-  grid-template-columns: 1fr;
-}
-
-.transactions-section-card {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-color);
-}
-
-/* Individual card styling */
-.transactions-filters-card {
-  border-left: 4px solid var(--lavanda);
-}
-
-.transactions-timeline-card {
-  border-left: 4px solid var(--azul-pastel);
-}
-
-.expenses-filters-card {
-  border-left: 4px solid var(--durazno-suave);
-}
-
-.spending-limits-card {
-  border-left: 4px solid var(--lavanda);
-}
-
-.trend-chart-card {
-  border-left: 4px solid var(--azul-pastel);
-}
-
-.expenses-list-card {
-  border-left: 4px solid var(--rosa-claro);
-}
-
-.transactions-section-card .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 2px solid var(--border-color);
-}
-
-.transactions-section-card h3 {
-  color: var(--text-primary);
-  font-weight: 900;
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-/* Transactions filters */
-.transactions-filters {
-  display: flex;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
-}
-
-.transactions-filters select,
-.transactions-filters input {
-  padding: 8px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-/* Transactions Timeline */
-.transactions-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.timeline-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  border-left: 4px solid;
-  transition: all var(--transition-normal);
-}
-
-.timeline-item:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.timeline-item.expense {
-  border-left-color: var(--rosa-claro);
-}
-
-.timeline-item.income {
-  border-left-color: var(--celeste-suave);
-}
-
-.timeline-date {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  min-width: 80px;
-}
-
-.timeline-content {
-  flex: 1;
-}
-
-.timeline-description {
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.timeline-category {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.timeline-amount {
-  font-weight: 900;
-  font-size: 1rem;
-}
-
-.timeline-amount.expense {
-  color: var(--rosa-claro);
-}
-
-.timeline-amount.income {
-  color: var(--celeste-suave);
-}
-
-/* Expenses filters */
-.expenses-filters {
-  display: flex;
-  gap: var(--spacing-lg);
-}
-
-.expenses-filters select,
-.expenses-filters input {
-  padding: 8px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.spending-limits-summary {
-  display: grid;
-  gap: var(--spacing-md);
-}
-
-.spending-limit-summary-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md);
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  border-left: 4px solid;
-  position: relative;
-  gap: var(--spacing-md);
-}
-
-.spending-limit-summary-item.safe {
-  border-left-color: var(--success-color);
-}
-
-.spending-limit-summary-item.warning {
-  border-left-color: var(--warning-color);
-}
-
-.spending-limit-summary-item.danger {
-  border-left-color: var(--error-color);
-}
-
-.limit-semaphore {
-  position: absolute;
-  left: -2px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-}
-
-.limit-category-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-left: var(--spacing-md);
-  flex: 1;
-}
-
-.limit-status-icon {
-  font-size: 1rem;
-}
-
-.limit-category-name {
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.limit-progress-info {
-  text-align: right;
-  flex: 1;
-}
-
-.limit-amount-info {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.limit-percentage {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.limit-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-  flex-shrink: 0;
-}
-
-.trend-chart-container {
-  height: 300px;
-  position: relative;
-}
-
-/* Calendar Styles - NUEVO */
-.calendar-container {
-  display: grid;
-  gap: var(--spacing-xl);
-  grid-template-columns: 1fr 300px;
-  height: 600px;
-}
-
-.calendar-main {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border-color);
-}
-
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 2px solid var(--border-color);
-}
-
-.calendar-header h3 {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.calendar-nav-btn {
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  transition: all var(--transition-normal);
-}
-
-.calendar-nav-btn:hover {
-  background: var(--gradient-primary);
-  color: white;
-  border-color: var(--lavanda);
-  transform: scale(1.05);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  background: var(--border-color);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-}
-
-.calendar-day {
-  background: var(--bg-primary);
-  padding: var(--spacing-md);
-  min-height: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.calendar-day:hover {
-  background: var(--bg-secondary);
-}
-
-.calendar-day.today {
-  background: var(--gradient-primary);
-  color: white;
-}
-
-.calendar-day.other-month {
-  background: var(--bg-tertiary);
-  color: var(--text-muted);
-}
-
-.calendar-day-number {
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.calendar-event {
-  background: var(--lavanda);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.calendar-event.payment {
-  background: var(--rosa-claro);
-}
-
-.calendar-event.income {
-  background: var(--celeste-suave);
-}
-
-.calendar-event.goal {
-  background: var(--durazno-suave);
-}
-
-.calendar-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.calendar-widget {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border-color);
-}
-
-.calendar-widget h4 {
-  margin-bottom: var(--spacing-md);
-  color: var(--text-primary);
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.today-events,
-.upcoming-payments {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.event-item {
-  padding: var(--spacing-sm);
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-sm);
-  border-left: 3px solid var(--lavanda);
-  font-size: 0.85rem;
-}
-
-.event-item.payment {
-  border-left-color: var(--rosa-claro);
-}
-
-.event-item.income {
-  border-left-color: var(--celeste-suave);
-}
-
-.event-title {
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.event-time {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.calendar-integrations {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.integration-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  width: 100%;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 0.85rem;
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.integration-btn:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--lavanda);
-  transform: translateY(-1px);
-}
-
-.integration-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  flex: 1;
-}
-
-.integration-name {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 0.9em;
-}
-
-.integration-status {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.integration-status[style*="color: #10b981"] {
-  font-weight: 600;
-}
-
-.integration-status.connected {
-  color: var(--success-color);
-  font-weight: 500;
-}
-
-.integration-status.connected::before {
-  content: "✅ ";
-}
-
-.google-calendar:hover {
-  border-color: #4285f4;
-}
-
-.outlook-calendar:hover {
-  border-color: #0078d4;
-}
-
-.apple-calendar:hover {
-  border-color: #007aff;
-}
-
-/* Calendar Integration Styles */
-.calendar-integration-modal .modal-content {
-  max-width: 600px;
-}
-
-.integration-options {
-  padding: var(--spacing-lg) 0;
-}
-
-.event-types-selection {
-  margin: var(--spacing-lg) 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-md);
-  transition: background-color 0.2s ease;
-}
-
-.checkbox-label:hover {
-  background-color: var(--bg-secondary);
-}
-
-.checkbox-label input[type="checkbox"] {
-  display: none;
-}
-
-.checkmark {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.checkbox-label input[type="checkbox"]:checked + .checkmark {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
-  content: '✓';
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.integration-method-info {
-  margin-top: var(--spacing-xl);
-  padding: var(--spacing-lg);
-  background-color: var(--bg-secondary);
-  border-radius: var(--border-radius-md);
-  border-left: 4px solid var(--primary-color);
-}
-
-.integration-method-info h4 {
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary-color);
-  font-size: 1rem;
-}
-
-.integration-method-info p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-/* ===== CALENDAR SETTINGS MODAL ===== */
-.calendar-settings-modal .modal-content {
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.settings-section {
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.settings-section:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-}
-
-.settings-section h4 {
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-md);
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.template-config .form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.template-config label {
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.template-config input {
-  width: 100%;
-  font-family: 'Courier New', monospace;
-  background: var(--bg-secondary);
-}
-
-.template-config small {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  margin-top: var(--spacing-xs);
-  display: block;
-}
-
-.default-reminders {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-sm);
-}
-
-.default-reminders .form-group {
-  margin-bottom: var(--spacing-sm);
-}
-
-.default-reminders label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-weight: 500;
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius);
-  background: var(--bg-secondary);
-  transition: all 0.2s ease;
-}
-
-.default-reminders label:hover {
-  background: var(--bg-tertiary);
-}
-
-.default-reminders input[type="checkbox"] {
-  margin: 0;
-}
-
-/* ===== ENHANCED EVENT FORM ===== */
-.form-section {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--border-color);
-}
-
-.form-section h4 {
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-md);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.reminders-config {
-  background: var(--bg-secondary);
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-}
-
-.reminders-config .form-group {
-  margin-bottom: var(--spacing-sm);
-}
-
-.reminders-config label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-weight: 500;
-  cursor: pointer;
-}
-
-#custom-reminder-group {
-  margin-top: var(--spacing-sm);
-  margin-left: var(--spacing-lg);
-}
-
-#custom-reminder-group input {
-  width: 150px;
-}
-
-.config-help {
-  margin: 15px 0;
-  padding: 15px;
-  border-radius: 8px;
-  border-left: 4px solid;
-}
-
-.config-help.error {
-  background-color: #fef2f2;
-  border-left-color: #ef4444;
-  color: #991b1b;
-}
-
-.config-help.warning {
-  background-color: #fffbeb;
-  border-left-color: #f59e0b;
-  color: #92400e;
-}
-
-.config-help h4 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-}
-
-.config-help p {
-  margin: 5px 0;
-}
-
-.config-steps {
-  margin-top: 10px;
-}
-
-.config-steps h5 {
-  margin: 10px 0 5px 0;
-  font-size: 14px;
-}
-
-.config-steps ol {
-  margin: 5px 0;
-  padding-left: 20px;
-}
-
-.config-steps li {
-  margin: 5px 0;
-  line-height: 1.4;
-}
-
-.config-steps code {
-  background-color: rgba(0, 0, 0, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-}
-
-.config-steps a {
-  color: #2563eb;
-  text-decoration: underline;
-}
-
-/* ===== RESPONSIVE CALENDAR SETTINGS ===== */
-@media (max-width: 768px) {
-  .calendar-settings-modal .modal-content {
-    max-width: 95vw;
-    margin: var(--spacing-sm);
-  }
-  
-  .template-config input {
-    font-size: 0.9rem;
-  }
-  
-  .default-reminders {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Planning Tabs - NUEVO */
-.planning-tabs,
-.reports-tabs {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.planning-tab-nav,
-.reports-tab-nav {
-  display: flex;
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-sm);
-  margin-bottom: var(--spacing-xl);
-  gap: var(--spacing-sm);
-}
-
-.planning-tab-btn,
-.reports-tab-btn {
-  flex: 1;
-  padding: var(--spacing-md);
-  background: transparent;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  font-weight: 600;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.planning-tab-btn:hover,
-.reports-tab-btn:hover {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-.planning-tab-btn.active,
-.reports-tab-btn.active {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: var(--shadow-sm);
-}
-
-.planning-tab-content,
-.reports-tab-content {
-  flex: 1;
-  position: relative;
-}
-
-.planning-tab,
-.reports-tab {
-  display: none;
-  height: 100%;
-}
-
-.planning-tab.active,
-.reports-tab.active {
-  display: block;
-}
-
-.limits-management,
-.budget-planning,
-.ai-reports-section,
-.statistics-section {
-  height: 100%;
-  overflow-y: auto;
-}
-
-.spending-limits-management {
-  display: grid;
-  gap: var(--spacing-lg);
-}
-
-.budget-planner {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border-color);
-  min-height: 300px;
-}
-
-.ai-reports-options {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  border: 1px solid var(--border-color);
-}
-
-.reports-history {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border-color);
-  min-height: 300px;
-}
-
-.advanced-statistics {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--border-color);
-  min-height: 400px;
-}
-
-/* Income Details Modal */
-.all-incomes-list {
-  display: grid;
-  gap: var(--spacing-lg);
-}
-
-.income-list-item {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  border-left: 4px solid;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.income-list-item.fixed {
-  border-left-color: var(--celeste-suave);
-}
-
-.income-list-item.extra {
-  border-left-color: var(--durazno-suave);
-}
-
-.income-item-details {
-  flex: 1;
-}
-
-.income-item-type {
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
-  font-size: 0.9rem;
-}
-
-.income-item-description {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.income-item-amount {
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: var(--text-primary);
-}
-
-.income-item-date {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-  margin-top: 4px;
-}
-
-.extra-incomes-list {
-  border-top: 2px solid var(--border-color);
-  padding-top: var(--spacing-lg);
-}
-
-.extra-income-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  margin-bottom: var(--spacing-md);
-  border-left: 4px solid var(--durazno-suave);
-}
-
-.extra-income-details {
-  flex: 1;
-}
-
-.extra-income-description {
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.extra-income-category {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.extra-income-amount {
-  font-weight: 900;
-  color: var(--durazno-suave);
-  font-size: 1rem;
-}
-
-/* FUNCTIONAL SEMAPHORE - FIXED */
-.functional-semaphore {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  background: #1a1a1a;
-  padding: 4px;
-  border-radius: 8px;
-  border: 2px solid #333;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  width: 24px;
-  height: 60px;
-  justify-content: space-around;
-}
-
-.semaphore-light {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid #333;
-  opacity: 0.3;
-  transition: all 0.3s ease;
-}
-
-.semaphore-light.red {
-  background: #666;
-}
-
-.semaphore-light.yellow {
-  background: #666;
-}
-
-.semaphore-light.green {
-  background: #666;
-}
-
-.semaphore-light.red.active {
-  background: #ff4444;
-  opacity: 1;
-  box-shadow: 0 0 8px #ff4444;
-}
-
-.semaphore-light.yellow.active {
-  background: #ffaa00;
-  opacity: 1;
-  box-shadow: 0 0 8px #ffaa00;
-}
-
-.semaphore-light.green.active {
-  background: #00ff44;
-  opacity: 1;
-  box-shadow: 0 0 8px #00ff44;
-}
-
-.expenses-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.expense-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  background: var(--bg-primary);
-  border-radius: var(--border-radius);
-  border-left: 4px solid var(--border-color);
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-normal);
-}
-
-.expense-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.expense-icon {
-  font-size: 1.3rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: 50%;
-}
-
-.expense-details {
-  flex: 1;
-}
-
-.expense-description {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.expense-category {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.expense-installment {
-  font-size: 0.75rem;
-  color: var(--rosa-claro);
-  font-weight: 700;
-  background: rgba(255, 201, 222, 0.2);
-  padding: 2px 6px;
-  border-radius: var(--border-radius-sm);
-  display: inline-block;
-  margin-top: 4px;
-}
-
-.expense-amount {
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: var(--text-primary);
-}
-
-.expense-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.expense-action-btn {
-  background: none;
-  border: none;
-  padding: 6px;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: 1rem;
-}
-
-.expense-action-btn:hover {
-  background: var(--bg-secondary);
-}
-
-.edit-btn { color: var(--info-color); }
-.delete-btn { color: var(--error-color); }
-
-/* Goals */
-.goals-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-}
-
-.goal-item {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-lg);
-  border-left: 4px solid var(--lavanda);
-  transition: all var(--transition-normal);
-}
-
-.goal-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
-}
-
-.goal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
-}
-
-.goal-name {
-  font-weight: 900;
-  font-size: 1.2rem;
-  color: var(--text-primary);
-}
-
-.goal-amount {
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
-.goal-progress {
-  margin-bottom: var(--spacing-lg);
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: var(--spacing-sm);
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--gradient-primary);
-  transition: width var(--transition-slow);
-  border-radius: 4px;
-}
-
-.progress-text {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  text-align: center;
-  font-weight: 700;
-}
-
-.goal-actions {
-  display: flex;
-  gap: var(--spacing-lg);
-}
-
-/* Settings */
-.settings-grid {
-  display: grid;
-  gap: var(--spacing-xl);
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.settings-card {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-lg);
-  text-align: center;
-  transition: all var(--transition-normal);
-}
-
-.settings-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
-}
-
-.settings-card h3 {
-  margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
-  font-weight: 900;
-  font-size: 1.2rem;
-}
-
-.settings-card p {
-  margin-bottom: var(--spacing-lg);
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-/* AI Report Styles */
-.ai-report-options {
-  margin-bottom: var(--spacing-xl);
-}
-
-.ai-report-result {
-  margin-top: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius-lg);
-  border-left: 4px solid var(--lavanda);
-}
-
-.ai-report-content {
-  background: var(--bg-primary);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius);
-  margin: var(--spacing-lg) 0;
-  line-height: 1.6;
-  font-size: 0.95rem;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.ai-report-content h4 {
-  color: var(--lavanda);
-  margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
-  font-weight: 700;
-}
-
-.ai-report-content p {
-  margin-bottom: var(--spacing-md);
-  color: var(--text-primary);
-}
-
-.ai-report-content ul {
-  margin: var(--spacing-sm) 0 var(--spacing-md) var(--spacing-lg);
-  color: var(--text-secondary);
-}
-
-.ai-report-content li {
-  margin-bottom: var(--spacing-sm);
-}
-
-.ai-report-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: center;
-  margin-top: var(--spacing-lg);
-}
-
-.ai-report-loading {
-  text-align: center;
-  padding: var(--spacing-xl);
-  color: var(--text-secondary);
-}
-
-.ai-report-loading .loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  border-top-color: var(--lavanda);
-  animation: spin 1s ease-in-out infinite;
-  margin-right: var(--spacing-sm);
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Enhanced AI Report Styles */
-.report-header {
-  background: var(--gradient-primary);
-  color: white;
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  margin-bottom: var(--spacing-xl);
-  text-align: center;
-}
-
-.report-header h3 {
-  color: white;
-  margin-bottom: var(--spacing-lg);
-  font-size: 1.5rem;
-}
-
-.report-metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--spacing-lg);
-  margin-top: var(--spacing-lg);
-}
-
-.metric {
-  background: rgba(255, 255, 255, 0.1);
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
-  text-align: center;
-}
-
-.metric-label {
-  display: block;
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin-bottom: var(--spacing-sm);
-}
-
-.metric-value {
-  display: block;
-  font-size: 1.3rem;
-  font-weight: 900;
-}
-
-.metric-value.positive {
-  color: #4ade80;
-}
-
-.metric-value.negative {
-  color: #f87171;
-}
-
-.category-analysis {
-  margin: var(--spacing-xl) 0;
-}
-
-.category-item {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-  border-left: 4px solid var(--lavanda);
-}
-
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-sm);
-}
-
-.category-rank {
-  background: var(--lavanda);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.category-name {
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.category-amount {
-  font-weight: 900;
-  color: var(--lavanda);
-}
-
-.category-insight {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.recommendations {
-  margin: var(--spacing-xl) 0;
-}
-
-.recommendation {
-  background: var(--bg-secondary);
-  border-left: 4px solid var(--azul-pastel);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-  border-radius: 0 var(--border-radius) var(--border-radius) 0;
-}
-
-.recommendation.urgent {
-  border-left-color: var(--warning-color);
-  background: rgba(255, 152, 0, 0.1);
-}
-
-.action-plan {
-  margin: var(--spacing-xl) 0;
-}
-
-.action-period {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-  border: 1px solid var(--border-color);
-}
-
-.action-period h5 {
-  color: var(--lavanda);
-  margin-bottom: var(--spacing-md);
-  font-size: 1.1rem;
-}
-
-.action-period ul {
-  margin-left: var(--spacing-lg);
-}
-
-.action-period li {
-  margin-bottom: var(--spacing-sm);
-  color: var(--text-primary);
-}
-
-.action-period li.urgent {
-  color: var(--error-color);
-  font-weight: 700;
-}
-
-.question-section {
-  background: var(--bg-secondary);
-  border-left: 4px solid var(--lavanda);
-  padding: var(--spacing-lg);
-  border-radius: 0 var(--border-radius) var(--border-radius) 0;
-  margin: var(--spacing-xl) 0;
-}
-
-.question-section em {
-  color: var(--text-secondary);
-  font-style: italic;
-  display: block;
-  margin-bottom: var(--spacing-md);
-}
-
-.numbered-item, .bullet-item {
-  margin-bottom: var(--spacing-sm);
-  padding-left: var(--spacing-md);
-}
-
-.ai-content h4 {
-  color: var(--lavanda);
-  margin: var(--spacing-xl) 0 var(--spacing-lg) 0;
-  font-weight: 900;
-  font-size: 1.2rem;
-}
-
-.ai-content p {
-  margin-bottom: var(--spacing-lg);
-  line-height: 1.7;
-  color: var(--text-primary);
-}
-
-.ai-content strong {
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-/* Empty states */
-.empty-state {
-  text-align: center;
-  padding: var(--spacing-2xl);
-  color: var(--text-secondary);
-}
-
-.empty-icon {
-  font-size: 3rem;
-  margin-bottom: var(--spacing-lg);
-  opacity: 0.7;
-}
-
-.empty-state h3 {
-  margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
-  font-weight: 900;
-  font-size: 1.3rem;
-}
-
-.empty-state p {
-  margin-bottom: var(--spacing-lg);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-/* Modals */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all var(--transition-normal);
-}
-
-.modal.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.modal-content {
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-2xl);
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  transform: scale(0.9);
-  transition: transform var(--transition-normal);
-  box-shadow: var(--shadow-xl);
-}
-
-.modal.active .modal-content {
-  transform: scale(1);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 2px solid var(--border-color);
-}
-
-.modal-header h2 {
-  color: var(--text-primary);
-  font-weight: 900;
-  font-size: 1.3rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-secondary);
-  padding: 4px;
-  border-radius: 50%;
-  transition: all var(--transition-fast);
-}
-
-.modal-close:hover {
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.form-group label {
-  font-weight: 700;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: 12px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 0.9rem;
-  transition: all var(--transition-fast);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(200, 182, 255, 0.1);
-}
-
-.form-group input[type="checkbox"] {
-  width: auto;
-  margin-right: var(--spacing-sm);
-}
-
-.modal-actions {
-  display: flex;
-  gap: var(--spacing-lg);
-  justify-content: flex-end;
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--border-color);
-}
-
-/* Chat Widget */
-.chat-widget {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-}
-
-.chat-toggle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--gradient-primary);
-  border: none;
-  cursor: pointer;
-  box-shadow: var(--shadow-xl);
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chat-toggle:hover {
-  transform: scale(1.1);
-  box-shadow: 0 10px 30px rgba(200, 182, 255, 0.4);
-}
-
-.chat-toggle-icon {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-}
-
-.chat-window {
-  position: absolute;
-  bottom: 80px;
-  right: 0;
-  width: 350px;
-  height: 500px;
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-xl);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transform: scale(0.9) translateY(20px);
-  opacity: 0;
-  transition: all var(--transition-normal);
-}
-
-.chat-window:not(.hidden) {
-  transform: scale(1) translateY(0);
-  opacity: 1;
-}
-
-.chat-header {
-  background: var(--gradient-primary);
-  color: white;
-  padding: var(--spacing-lg);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-header-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.chat-header-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.chat-header-text h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 900;
-}
-
-.chat-header-text p {
-  margin: 0;
-  font-size: 0.8rem;
-  opacity: 0.9;
-}
-
-.chat-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
-  transition: background-color var(--transition-fast);
-}
-
-.chat-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.chat-messages {
-  flex: 1;
-  padding: var(--spacing-lg);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  background: var(--bg-secondary);
-}
-
-.chat-message {
-  display: flex;
-  gap: var(--spacing-sm);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all var(--transition-normal);
-}
-
-.chat-message.fade-in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.chat-avatar {
-  flex-shrink: 0;
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  background: var(--gradient-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-avatar-icon {
-  font-size: 0.8rem;
-  color: white;
-  font-weight: 900;
-}
-
-.chat-avatar-img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
-.chat-text {
-  max-width: 75%;
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
-  font-size: 0.85rem;
-  line-height: 1.4;
-  font-weight: 600;
-}
-
-.user-text {
-  background: var(--gradient-primary);
-  color: white;
-  margin-left: auto;
-}
-
-.bot-text {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.chat-message.user {
-  flex-direction: row-reverse;
-}
-
-.chat-message.user .chat-text {
-  margin-left: auto;
-}
-
-.typing-indicator .chat-text {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.typing-animation {
-  display: flex;
-  gap: 3px;
-}
-
-.typing-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--text-secondary);
-  border-radius: 50%;
-  animation: typing 1.4s infinite ease-in-out;
-}
-
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes typing {
-  0%, 80%, 100% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.typing-text {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.chat-form {
-  padding: var(--spacing-lg);
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  gap: var(--spacing-sm);
-  background: var(--bg-primary);
-}
-
-.chat-form input {
-  flex: 1;
-  padding: 10px 14px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 0.85rem;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.chat-form input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.chat-send {
-  background: var(--gradient-primary);
-  color: white;
-  border: none;
-  border-radius: var(--border-radius);
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: 0.9rem;
-}
-
-.chat-send:hover {
-  transform: translateY(-1px);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    padding: 15px;
-  }
-  
-  .income-expenses-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .contacts-list {
-    grid-template-columns: 1fr;
-  }
-  
-  .mascot-container {
-    bottom: 100px;
-    right: 20px;
-  }
-  
-  .mascot-bubble {
-    max-width: 180px;
-    right: -10px;
-  }
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .main-tabs {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  
-  .main-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .tab-item {
-    min-width: 100px;
-  }
-  
-  .tab-label {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 769px) {
-  .header-content {
-    padding: 0 var(--spacing-lg);
-  }
-  
-  .month-selector {
-    display: none;
-  }
-  
-  .chat-window {
-    width: 300px;
-    height: 400px;
-  }
-  
-  .transactions-filters,
-  .expenses-filters {
-    flex-direction: column;
-  }
-  
-  .expense-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-  }
-  
-  .modal-content {
-    width: 95%;
-    padding: var(--spacing-lg);
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-  
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-lg);
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-card {
-    padding: var(--spacing-xl);
-  }
-  
-  .auth-title {
-    font-size: 2rem;
-  }
-  
-  .card-amount {
-    font-size: 1.5rem;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-  }
-  
-  .chat-widget {
-    bottom: 15px;
-    right: 15px;
-  }
-  
-  .chat-toggle {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .chat-toggle-icon {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .chat-window {
-    width: calc(100vw - 30px);
-    height: 60vh;
-    bottom: 70px;
-    right: -15px;
-  }
-}
-
-/* Scrollbar personalizado */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
-}
-
-/* Focus states */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINZN - Tu Compañero Financiero</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="icon" type="image/png" href="public/isotipo.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="lightmode">
+    <!-- Alert Container -->
+    <div id="alert-container" class="alert-container"></div>
+
+    <!-- Login Container -->
+    <div id="login-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="public/isotipo.png" alt="FINZN" class="auth-logo">
+                <h1>FINZN</h1>
+                <p>Tu compañero financiero inteligente</p>
+            </div>
+            
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-user">Email</label>
+                    <input type="email" id="login-user" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-pass">Contraseña</label>
+                    <input type="password" id="login-pass" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
+                
+                <div id="login-error" class="error-message"></div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>¿No tienes cuenta? <button type="button" id="show-register" class="link-btn">Regístrate</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Container -->
+    <div id="register-container" class="auth-container hidden">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="public/isotipo.png" alt="FINZN" class="auth-logo">
+                <h1>Crear Cuenta</h1>
+                <p>Únete a FINZN y toma control de tus finanzas</p>
+            </div>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-user">Email</label>
+                    <input type="email" id="register-user" required>
+                    <button type="button" id="generate-test-email" class="btn btn-secondary btn-small">Generar Email de Prueba</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-pass">Contraseña</label>
+                    <input type="password" id="register-pass" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Crear Cuenta</button>
+                
+                <div id="register-error" class="error-message"></div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>¿Ya tienes cuenta? <button type="button" id="show-login" class="link-btn">Inicia Sesión</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="public/isotipo.png" alt="FINZN" class="header-logo">
+                <h1 class="header-title">FINZN</h1>
+            </div>
+            
+            <div class="header-center">
+                <select id="month-select" class="month-selector">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-toggle" title="Cambiar tema">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <div class="user-info">
+                    <span id="user-name">Usuario</span>
+                    <button id="logout-btn" class="logout-btn" title="Cerrar sesión">🚪</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-navigation">
+            <div class="tab-item active" data-section="dashboard">
+                <span class="tab-icon">🏠</span>
+                <span class="tab-label">Dashboard</span>
+            </div>
+            <div class="tab-item" data-section="clients">
+                <span class="tab-icon">👥</span>
+                <span class="tab-label">Clientes</span>
+            </div>
+            <div class="tab-item" data-section="transactions">
+                <span class="tab-icon">💳</span>
+                <span class="tab-label">Transacciones</span>
+            </div>
+            <div class="tab-item" data-section="calendar">
+                <span class="tab-icon">📅</span>
+                <span class="tab-label">Calendario</span>
+            </div>
+            <div class="tab-item" data-section="planning">
+                <span class="tab-icon">🎯</span>
+                <span class="tab-label">Planificación</span>
+            </div>
+            <div class="tab-item" data-section="reports">
+                <span class="tab-icon">📊</span>
+                <span class="tab-label">Reportes</span>
+            </div>
+            <div class="tab-item" data-section="settings">
+                <span class="tab-icon">⚙️</span>
+                <span class="tab-label">Configuración</span>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="tab-section active">
+                <!-- Balance Card -->
+                <div class="balance-card">
+                    <div class="balance-header">
+                        <h2>Balance Disponible</h2>
+                        <button class="btn btn-secondary">Ver Detalle</button>
+                    </div>
+                    <div class="balance-amount" id="balance-amount-new">$0</div>
+                    <div class="balance-summary" id="income-vs-expenses-summary">
+                        Ingresos: $0 • Gastos: $0
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button id="add-expense-btn-dashboard" class="quick-action-btn expense">
+                        <span class="action-icon">💳</span>
+                        <span class="action-label">Agregar Gasto</span>
+                    </button>
+                    <button id="add-income-btn-dashboard" class="quick-action-btn income">
+                        <span class="action-icon">💰</span>
+                        <span class="action-label">Agregar Ingreso</span>
+                    </button>
+                    <button id="add-spending-limit-btn-card" class="quick-action-btn limit">
+                        <span class="action-icon">⚠️</span>
+                        <span class="action-label">Límite de Gasto</span>
+                    </button>
+                    <button id="generate-quick-report" class="quick-action-btn report">
+                        <span class="action-icon">📊</span>
+                        <span class="action-label">Generar Reporte</span>
+                    </button>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Expenses Chart -->
+                    <div class="dashboard-card chart-card">
+                        <div class="card-header">
+                            <h3>Gastos por Categoría</h3>
+                            <button id="toggle-expenses-chart" class="toggle-btn">▼</button>
+                        </div>
+                        <div id="expenses-chart-container" class="chart-container">
+                            <canvas id="expenses-chart"></canvas>
+                        </div>
+                        <div class="chart-mascot-container">
+                            <img src="public/mascota-finzn.png" alt="Mascota FINZN" class="chart-mascot">
+                        </div>
+                    </div>
+
+                    <!-- Recent Expenses -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Gastos Recientes</h3>
+                            <button id="add-expense-btn" class="btn btn-primary btn-small">
+                                <span>➕</span>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="expenses-list" class="expenses-list">
+                            <!-- Expenses will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Income Summary -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Resumen de Ingresos</h3>
+                            <div id="incomes-indicator" class="indicator-badge" style="display: flex;">
+                                <span class="indicator-count">0</span>
+                                <span class="indicator-label">ingresos</span>
+                            </div>
+                        </div>
+                        <div class="income-summary-content">
+                            <div class="income-total">
+                                <span class="income-label">Total del Mes:</span>
+                                <span id="income-summary" class="income-amount">$0</span>
+                            </div>
+                            <div id="income-details" class="income-details">
+                                <!-- Income details will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Goals Progress -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Progreso de Objetivos</h3>
+                            <button id="add-goal-btn" class="btn btn-primary btn-small">
+                                <span>🎯</span>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="dashboard-goals-progress" class="goals-progress">
+                            <!-- Goals will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Spending Limits -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Límites de Gasto</h3>
+                            <button id="add-spending-limit-btn-expenses" class="btn btn-primary btn-small">
+                                <span>⚠️</span>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="spending-limits-summary" class="spending-limits-summary">
+                            <!-- Spending limits will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Top Categories -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Categorías Principales</h3>
+                        </div>
+                        <div id="top-categories-summary" class="top-categories">
+                            <!-- Top categories will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Installments -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Cuotas Activas</h3>
+                            <button id="installments-btn" class="btn btn-secondary btn-small">
+                                <span>📊</span>
+                                Ver Todas
+                            </button>
+                        </div>
+                        <div id="installments-summary" class="installments-summary">
+                            <!-- Installments will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Trend Chart -->
+                    <div class="dashboard-card chart-card">
+                        <div class="card-header">
+                            <h3>Tendencia de Gastos</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clients Section -->
+            <section id="clients-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Gestión de Clientes</h2>
+                    <button id="add-client-btn" class="btn btn-primary">
+                        <span>👤</span>
+                        Agregar Cliente
+                    </button>
+                </div>
+
+                <!-- Client Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-clients">0</div>
+                            <div class="stat-label">Total Clientes</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="active-clients">0</div>
+                            <div class="stat-label">Activos</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="new-clients-month">0</div>
+                            <div class="stat-label">Nuevos este Mes</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="age-range-dominant">-</div>
+                            <div class="stat-label">Rango Dominante</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Filters -->
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <input type="text" id="client-search" placeholder="Buscar clientes..." class="search-input">
+                        <select id="client-status-filter" class="filter-select">
+                            <option value="">Todos los estados</option>
+                            <option value="active">Activos</option>
+                            <option value="inactive">Inactivos</option>
+                        </select>
+                        <select id="client-age-range-filter" class="filter-select">
+                            <option value="">Todos los rangos</option>
+                            <option value="menor_18">Menor de 18</option>
+                            <option value="18_25">18-25 años</option>
+                            <option value="26_35">26-35 años</option>
+                            <option value="36_50">36-50 años</option>
+                            <option value="51_mas">51+ años</option>
+                        </select>
+                        <select id="client-type-filter" class="filter-select">
+                            <option value="">Todos los tipos</option>
+                            <option value="individual">Individual</option>
+                            <option value="business">Empresa</option>
+                        </select>
+                        <button id="clear-client-filters" class="btn btn-secondary">Limpiar</button>
+                    </div>
+                    <div class="view-controls">
+                        <button id="grid-view-btn" class="view-btn active">📱</button>
+                        <button id="list-view-btn" class="view-btn">📋</button>
+                    </div>
+                </div>
+
+                <!-- Clients List -->
+                <div id="clients-list" class="clients-list grid-view">
+                    <!-- Clients will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Transactions Section -->
+            <section id="transactions-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Historial de Transacciones</h2>
+                    <div class="header-actions">
+                        <button id="add-income-btn-transactions" class="btn btn-success">
+                            <span>💰</span>
+                            Agregar Ingreso
+                        </button>
+                        <button class="btn btn-primary" onclick="window.app.showAddExpenseModal()">
+                            <span>💳</span>
+                            Agregar Gasto
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Transaction Timeline -->
+                <div class="transactions-timeline">
+                    <div class="timeline-header">
+                        <h3>Movimientos del Mes</h3>
+                    </div>
+                    <div id="transactions-timeline-content" class="timeline-content">
+                        <!-- Timeline will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Section -->
+            <section id="calendar-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Calendario Financiero</h2>
+                    <div class="header-actions">
+                        <button id="add-event-btn" class="btn btn-primary">
+                            <span>📅</span>
+                            Agregar Evento
+                        </button>
+                        <button id="calendar-settings-btn" class="btn btn-secondary">
+                            <span>⚙️</span>
+                            Configuración
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-grid">
+                    <!-- Calendar Widget -->
+                    <div class="calendar-widget">
+                        <div class="calendar-header">
+                            <button id="prev-month" class="calendar-nav-btn">‹</button>
+                            <h3 id="calendar-month-year">Enero 2024</h3>
+                            <button id="next-month" class="calendar-nav-btn">›</button>
+                        </div>
+                        <div id="calendar-grid" class="calendar-days">
+                            <!-- Calendar days will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Today's Events -->
+                    <div class="calendar-sidebar">
+                        <div class="sidebar-section">
+                            <h4>Eventos de Hoy</h4>
+                            <div id="today-events" class="today-events">
+                                <!-- Today's events will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h4>Próximos Pagos</h4>
+                            <div id="upcoming-payments" class="upcoming-payments">
+                                <!-- Upcoming payments will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Integration -->
+                <div class="calendar-integration">
+                    <h3>Integración con Calendarios</h3>
+                    <div class="integration-options">
+                        <button class="integration-btn google-calendar">
+                            <span class="integration-icon">📅</span>
+                            <div class="integration-info">
+                                <div class="integration-name">Google Calendar</div>
+                                <div class="integration-status" id="google-status">No conectado</div>
+                            </div>
+                        </button>
+                        <button class="integration-btn apple-calendar">
+                            <span class="integration-icon">🍎</span>
+                            <div class="integration-info">
+                                <div class="integration-name">Apple Calendar</div>
+                                <div class="integration-status">Próximamente</div>
+                            </div>
+                        </button>
+                    </div>
+                    <button id="sync-calendar-btn" class="btn btn-primary">
+                        <span>🔄</span>
+                        Sincronizar
+                    </button>
+                </div>
+
+                <!-- Calendar Help -->
+                <div id="calendar-help" class="calendar-help" style="display: none;">
+                    <!-- Help content will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Planning Section -->
+            <section id="planning-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Planificación Financiera</h2>
+                </div>
+
+                <!-- Planning Tabs -->
+                <div class="planning-tabs">
+                    <button class="planning-tab-btn active" data-tab="goals">🎯 Objetivos</button>
+                    <button class="planning-tab-btn" data-tab="limits">⚠️ Límites</button>
+                    <button class="planning-tab-btn" data-tab="contacts">📇 Contactos</button>
+                </div>
+
+                <!-- Goals Tab -->
+                <div id="goals-tab" class="planning-tab active">
+                    <div class="tab-header">
+                        <h3>Objetivos de Ahorro</h3>
+                        <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
+                            <span>🎯</span>
+                            Nuevo Objetivo
+                        </button>
+                    </div>
+                    <div id="goals-list" class="goals-list">
+                        <!-- Goals will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Limits Tab -->
+                <div id="limits-tab" class="planning-tab">
+                    <div class="tab-header">
+                        <h3>Límites de Gasto</h3>
+                        <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+                            <span>⚠️</span>
+                            Nuevo Límite
+                        </button>
+                    </div>
+                    <div id="limits-list" class="limits-list">
+                        <!-- Limits will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Contacts Tab -->
+                <div id="contacts-tab" class="planning-tab">
+                    <div class="tab-header">
+                        <h3>Gestión de Contactos</h3>
+                        <button id="add-contact-btn" class="btn btn-primary">
+                            <span>➕</span>
+                            Agregar Contacto
+                        </button>
+                    </div>
+
+                    <!-- Contact Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📇</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="total-contacts">0</div>
+                                <div class="stat-label">Total Contactos</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="contacts-with-amount">0</div>
+                                <div class="stat-label">Con Monto</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="pending-reminders">0</div>
+                                <div class="stat-label">Recordatorios</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="contacts-by-type">-</div>
+                                <div class="stat-label">Tipo Principal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Filters -->
+                    <div class="filters-section">
+                        <div class="filters-row">
+                            <input type="text" id="contact-search" placeholder="Buscar contactos..." class="search-input">
+                            <select id="contact-type-filter" class="filter-select">
+                                <option value="">Todos los tipos</option>
+                                <option value="persona">Persona</option>
+                                <option value="empresa">Empresa</option>
+                                <option value="alquiler">Alquiler</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                            <select id="contact-status-filter" class="filter-select">
+                                <option value="">Todos los estados</option>
+                                <option value="active">Activos</option>
+                                <option value="inactive">Inactivos</option>
+                            </select>
+                            <button id="clear-contact-filters" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </div>
+
+                    <!-- Contacts List -->
+                    <div id="contacts-list" class="contacts-list">
+                        <!-- Contacts will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Recent Contacts Widget -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h4>Contactos Recientes</h4>
+                        </div>
+                        <div id="recent-contacts-list" class="recent-contacts">
+                            <!-- Recent contacts will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Reportes y Análisis</h2>
+                </div>
+
+                <!-- Reports Tabs -->
+                <div class="reports-tabs">
+                    <button class="reports-tab-btn active" data-tab="ai-reports">🤖 Reportes IA</button>
+                    <button class="reports-tab-btn" data-tab="achievements">🏆 Logros</button>
+                </div>
+
+                <!-- AI Reports Tab -->
+                <div id="ai-reports-tab" class="reports-tab active">
+                    <div class="tab-header">
+                        <h3>Reportes con Inteligencia Artificial</h3>
+                        <button id="generate-ai-report-btn-reports" class="btn btn-primary">
+                            <span>🤖</span>
+                            Generar Reporte
+                        </button>
+                    </div>
+                    <div class="ai-reports-content">
+                        <p>Genera reportes personalizados con análisis inteligente de tus finanzas.</p>
+                    </div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div id="achievements-tab" class="reports-tab">
+                    <div class="tab-header">
+                        <h3>Logros y Reconocimientos</h3>
+                    </div>
+                    <div id="achievements-list" class="achievements-list">
+                        <!-- Achievements will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Configuración</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Categories Management -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>🏷️ Gestión de Categorías</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Personaliza las categorías de gastos según tus necesidades.</p>
+                            <button id="manage-categories-btn" class="btn btn-primary">
+                                Gestionar Categorías
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>📊 Gestión de Datos</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Exporta o importa tus datos financieros.</p>
+                            <div class="settings-actions">
+                                <button id="export-data-btn" class="btn btn-secondary">
+                                    📤 Exportar Datos
+                                </button>
+                                <button id="import-data-btn" class="btn btn-secondary">
+                                    📥 Importar Datos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theme Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>🎨 Apariencia</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Personaliza la apariencia de la aplicación.</p>
+                            <button class="btn btn-secondary" onclick="window.app.theme.toggle()">
+                                <span class="theme-icon">🌙</span>
+                                Cambiar Tema
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Account Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>👤 Cuenta</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Gestiona tu cuenta y preferencias.</p>
+                            <div class="account-info">
+                                <p><strong>Usuario:</strong> <span id="settings-user-email">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Chat System - Global -->
+    <div id="chat-window" class="chat-window hidden">
+      <div class="chat-header">
+        <div class="chat-info">
+          <img src="/robot-chat.png" alt="FINZN Assistant" class="chat-avatar-header" />
+          <div class="chat-title">
+            <span class="chat-name">FINZN Assistant</span>
+            <span id="chat-status" class="chat-status">En línea</span>
+          </div>
+        </div>
+        <div class="chat-controls">
+          <button id="chat-minimize" class="chat-control-btn" title="Minimizar">−</button>
+          <button id="chat-close" class="chat-control-btn" title="Cerrar">×</button>
+        </div>
+      </div>
+      
+      <div class="chat-body">
+        <div id="chat-messages" class="chat-messages"></div>
+        
+        <div id="chat-suggestions" class="chat-suggestions">
+          <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">💰 ¿Cómo ahorrar más?</button>
+          <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">📊 Analizar gastos</button>
+          <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">📋 Organizar presupuesto</button>
+          <button class="suggestion-btn" data-suggestion="¿Qué inversiones me recomiendas?">📈 Inversiones</button>
+        </div>
+      </div>
+      
+      <form id="chat-form" class="chat-form">
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
+          <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
+          <button type="submit" class="chat-send-btn" title="Enviar">➤</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Chat Minimized State -->
+    <div id="chat-minimized" class="chat-minimized hidden">
+      <button id="chat-restore" class="chat-restore-btn">
+        <img src="/robot-chat.png" alt="FINZN Assistant" class="chat-avatar-mini" />
+        <span>FINZN Assistant</span>
+      </button>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button id="chat-toggle" class="chat-toggle">
+      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-avatar" />
+      <div id="chat-notification" class="chat-notification" style="display: none;">💬</div>
+    </button>
+
+    <!-- Mascot System -->
+    <div id="mascot-system" class="mascot-system">
+        <div id="mascot-avatar" class="mascot-avatar" title="Haz clic para abrir el chat">
+            <img src="public/mascota-finzn.png" alt="Mascota FINZN" class="mascot-image">
+        </div>
+        <div id="mascot-bubble" class="mascot-bubble hidden">
+            <div id="mascot-message" class="mascot-message"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Expense Modal -->
+    <div id="add-expense-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Gasto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-expense-form" class="modal-form">
+                <div class="form-group">
+                    <label for="expense-description">Descripción *</label>
+                    <input type="text" id="expense-description" name="description" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-amount">Monto *</label>
+                    <input type="number" id="expense-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-category">Categoría *</label>
+                    <select id="expense-category" name="category" required>
+                        <option value="">Selecciona una categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-date">Fecha *</label>
+                    <input type="date" id="expense-date" name="transactionDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="expense-installments" name="hasInstallments">
+                        <span class="checkmark"></span>
+                        Pagar en cuotas
+                    </label>
+                </div>
+                
+                <div id="installments-group" class="form-group hidden">
+                    <label for="expense-installments-count">Número de cuotas</label>
+                    <input type="number" id="expense-installments-count" name="installmentsCount" min="2" max="60" value="2">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Gasto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Income Modal -->
+    <div id="add-income-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Ingreso</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-income-form" class="modal-form">
+                <div class="form-group">
+                    <label for="income-type">Tipo de Ingreso *</label>
+                    <select id="income-type" name="type" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="fixed">Ingreso Fijo (Sueldo)</option>
+                        <option value="extra">Ingreso Extra</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="income-amount">Monto *</label>
+                    <input type="number" id="income-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                
+                <div id="extra-income-group" class="form-group hidden">
+                    <label for="income-description">Descripción</label>
+                    <input type="text" id="income-description" name="description" placeholder="Ej: Freelance, venta, etc.">
+                </div>
+                
+                <div id="extra-income-category" class="form-group hidden">
+                    <label for="income-category">Categoría</label>
+                    <select id="income-category" name="category">
+                        <option value="freelance">Freelance</option>
+                        <option value="sales">Ventas</option>
+                        <option value="investment">Inversiones</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Ingreso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Spending Limit Modal -->
+    <div id="add-spending-limit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Límite de Gasto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-spending-limit-form" class="modal-form">
+                <div class="form-group">
+                    <label for="limit-category">Categoría *</label>
+                    <select id="limit-category" name="category" required>
+                        <option value="">Selecciona una categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="limit-amount">Límite Mensual *</label>
+                    <input type="number" id="limit-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="limit-warning">Alerta al (%) *</label>
+                    <input type="number" id="limit-warning" name="warningPercentage" min="1" max="100" value="80" required>
+                    <small>Recibirás una alerta cuando alcances este porcentaje del límite</small>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Límite</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Goal Modal -->
+    <div id="add-goal-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Objetivo de Ahorro</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-goal-form" class="modal-form">
+                <div class="form-group">
+                    <label for="goal-name">Nombre del Objetivo *</label>
+                    <input type="text" id="goal-name" name="name" required placeholder="Ej: Vacaciones, Auto nuevo, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="goal-target">Monto Objetivo *</label>
+                    <input type="number" id="goal-target" name="targetAmount" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="goal-current">Monto Actual</label>
+                    <input type="number" id="goal-current" name="currentAmount" step="0.01" min="0" value="0">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Objetivo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="manage-categories-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gestión de Categorías</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="categories-section">
+                    <h4>Categorías Existentes</h4>
+                    <div id="categories-management-list" class="categories-list">
+                        <!-- Categories will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="add-category-section">
+                    <h4>Agregar Nueva Categoría</h4>
+                    <form id="add-category-form" class="category-form">
+                        <div class="form-group">
+                            <label for="category-name">Nombre *</label>
+                            <input type="text" id="category-name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category-icon">Icono *</label>
+                            <input type="text" id="category-icon" name="icon" required placeholder="🏷️" maxlength="2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category-color">Color</label>
+                            <input type="color" id="category-color" name="color" value="#B7A6FF">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Agregar Categoría</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Data Modal -->
+    <div id="import-data-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Importar Datos</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-section">
+                    <div class="form-group">
+                        <label for="import-file">Archivo CSV *</label>
+                        <input type="file" id="import-file" accept=".csv" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tipo de Datos</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="import-type" value="auto" checked>
+                                <span class="radio-mark"></span>
+                                Detectar automáticamente
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="import-type" value="expenses">
+                                <span class="radio-mark"></span>
+                                Solo gastos
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="import-type" value="incomes">
+                                <span class="radio-mark"></span>
+                                Solo ingresos
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="import-info">
+                        <h4>Formato del CSV</h4>
+                        <p>El archivo debe contener las siguientes columnas:</p>
+                        <ul>
+                            <li><strong>Gastos:</strong> descripcion, monto, categoria, fecha</li>
+                            <li><strong>Ingresos:</strong> descripcion, monto, tipo, fecha</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                <button type="button" id="process-import-btn" class="btn btn-primary">Importar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Incomes Modal -->
+    <div id="view-incomes-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Todos los Ingresos</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="all-incomes-list" class="incomes-list">
+                    <!-- Incomes will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Installments Modal -->
+    <div id="view-installments-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cuotas Activas</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="installments-list" class="installments-list">
+                    <!-- Installments will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate AI Report Modal -->
+    <div id="generate-ai-report-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Generar Reporte con IA</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form class="modal-form">
+                <div class="form-group">
+                    <label for="report-period">Período de Análisis</label>
+                    <select id="report-period" name="period">
+                        <option value="current">Mes Actual</option>
+                        <option value="last3">Últimos 3 Meses</option>
+                        <option value="last6">Últimos 6 Meses</option>
+                        <option value="year">Año Completo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="report-focus">Enfoque del Análisis</label>
+                    <select id="report-focus" name="focus">
+                        <option value="general">Análisis General</option>
+                        <option value="savings">Estrategias de Ahorro</option>
+                        <option value="expenses">Optimización de Gastos</option>
+                        <option value="budget">Planificación de Presupuesto</option>
+                        <option value="goals">Objetivos Financieros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="report-questions">Preguntas Específicas (Opcional)</label>
+                    <textarea id="report-questions" name="questions" rows="3" placeholder="¿Tienes alguna pregunta específica sobre tus finanzas?"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="button" id="generate-report-btn" class="btn btn-primary">
+                        <span>🤖</span>
+                        Generar Reporte
+                    </button>
+                </div>
+            </form>
+            
+            <div id="ai-report-result" class="report-result hidden">
+                <div class="report-header">
+                    <h4>Tu Reporte Financiero</h4>
+                    <button id="download-report-btn" class="btn btn-secondary">
+                        <span>📄</span>
+                        Descargar PDF
+                    </button>
+                </div>
+                <div id="ai-report-content" class="report-content">
+                    <!-- AI report content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="add-event-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Evento</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-event-form" class="modal-form">
+                <div class="form-group">
+                    <label for="event-title">Título *</label>
+                    <input type="text" id="event-title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-type">Tipo *</label>
+                    <select id="event-type" name="type" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="payment">Pago</option>
+                        <option value="income">Ingreso</option>
+                        <option value="reminder">Recordatorio</option>
+                        <option value="meeting">Reunión</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-date">Fecha *</label>
+                    <input type="date" id="event-date" name="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-time">Hora</label>
+                    <input type="time" id="event-time" name="time" value="09:00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-duration">Duración (minutos)</label>
+                    <input type="number" id="event-duration" name="duration" min="15" max="480" value="60">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-amount">Monto (opcional)</label>
+                    <input type="number" id="event-amount" name="amount" step="0.01" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-category">Categoría</label>
+                    <select id="event-category" name="category">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-description">Descripción</label>
+                    <textarea id="event-description" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="event-recurring" name="recurring">
+                        <span class="checkmark"></span>
+                        Evento recurrente
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Calendar Settings Modal -->
+    <div id="calendar-settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración del Calendario</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Integración con Google Calendar</h4>
+                    <p>Conecta tu cuenta de Google para sincronizar eventos automáticamente.</p>
+                    <button class="btn btn-primary integration-btn google-calendar">
+                        <span>📅</span>
+                        Conectar Google Calendar
+                    </button>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Recordatorios</h4>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="email-reminders" checked>
+                            <span class="checkmark"></span>
+                            Recordatorios por email
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="push-reminders" checked>
+                            <span class="checkmark"></span>
+                            Notificaciones push
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Vista del Calendario</h4>
+                    <div class="form-group">
+                        <label for="calendar-start-day">Primer día de la semana</label>
+                        <select id="calendar-start-day">
+                            <option value="0">Domingo</option>
+                            <option value="1" selected>Lunes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Client Modal -->
+    <div id="add-client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Cliente</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-client-form" class="modal-form">
+                <div class="form-group">
+                    <label for="client-name">Nombre Completo *</label>
+                    <input type="text" id="client-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-email">Email</label>
+                    <input type="email" id="client-email" name="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-phone">Teléfono</label>
+                    <input type="tel" id="client-phone" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-address">Dirección</label>
+                    <textarea id="client-address" name="address" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-birth-date">Fecha de Nacimiento</label>
+                    <input type="date" id="client-birth-date" name="birthDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-type">Tipo de Cliente</label>
+                    <select id="client-type" name="clientType">
+                        <option value="individual">Individual</option>
+                        <option value="business">Empresa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-status">Estado</label>
+                    <select id="client-status" name="status">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-notes">Notas</label>
+                    <textarea id="client-notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Client Modal -->
+    <div id="edit-client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Cliente</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="edit-client-form" class="modal-form">
+                <input type="hidden" id="edit-client-id" name="clientId">
+                
+                <div class="form-group">
+                    <label for="edit-client-name">Nombre Completo *</label>
+                    <input type="text" id="edit-client-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-email">Email</label>
+                    <input type="email" id="edit-client-email" name="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-phone">Teléfono</label>
+                    <input type="tel" id="edit-client-phone" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-address">Dirección</label>
+                    <textarea id="edit-client-address" name="address" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-birth-date">Fecha de Nacimiento</label>
+                    <input type="date" id="edit-client-birth-date" name="birthDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-type">Tipo de Cliente</label>
+                    <select id="edit-client-type" name="clientType">
+                        <option value="individual">Individual</option>
+                        <option value="business">Empresa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-status">Estado</label>
+                    <select id="edit-client-status" name="status">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-notes">Notas</label>
+                    <textarea id="edit-client-notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div id="add-contact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Contacto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-contact-form" class="modal-form">
+                <div class="form-group">
+                    <label for="contact-name">Nombre *</label>
+                    <input type="text" id="contact-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-type">Tipo *</label>
+                    <select id="contact-type" name="type" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="persona">👤 Persona</option>
+                        <option value="empresa">🏢 Empresa</option>
+                        <option value="alquiler">🏠 Alquiler</option>
+                        <option value="otro">📋 Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-amount">Monto Relacionado</label>
+                    <input type="number" id="contact-amount" name="amount" step="0.01" min="0" placeholder="Opcional">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-notes">Notas</label>
+                    <textarea id="contact-notes" name="notes" rows="3" placeholder="Información adicional..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-reminder">Fecha de Recordatorio</label>
+                    <input type="date" id="contact-reminder" name="reminderDate">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Contacto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Contact Modal -->
+    <div id="edit-contact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Contacto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="edit-contact-form" class="modal-form">
+                <input type="hidden" id="edit-contact-id" name="contactId">
+                
+                <div class="form-group">
+                    <label for="edit-contact-name">Nombre *</label>
+                    <input type="text" id="edit-contact-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-type">Tipo *</label>
+                    <select id="edit-contact-type" name="type" required>
+                        <option value="persona">👤 Persona</option>
+                        <option value="empresa">🏢 Empresa</option>
+                        <option value="alquiler">🏠 Alquiler</option>
+                        <option value="otro">📋 Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-amount">Monto Relacionado</label>
+                    <input type="number" id="edit-contact-amount" name="amount" step="0.01" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-notes">Notas</label>
+                    <textarea id="edit-contact-notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-reminder">Fecha de Recordatorio</label>
+                    <input type="date" id="edit-contact-reminder" name="reminderDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-status">Estado</label>
+                    <select id="edit-contact-status" name="status">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Contacto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
