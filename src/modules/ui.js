@@ -8,7 +8,6 @@ export class UIManager {
     const balanceAmount = document.getElementById('balance-amount-new');
     const monthlyExpenses = document.getElementById('monthly-expenses-summary');
     const incomeAmount = document.getElementById('income-summary');
-    const installmentsCount = document.getElementById('installments-count');
     
     console.log('🔄 Updating balance UI with:', balance);
     
@@ -35,10 +34,12 @@ export class UIManager {
       incomeAmount.textContent = this.formatCurrency(balance.totalIncome);
       console.log('💵 Income amount updated:', balance.totalIncome);
     }
-    
-    if (installmentsCount) {
-      installmentsCount.textContent = balance.installments;
-      console.log('📊 Installments count updated:', balance.installments);
+  }
+
+  updateIncomeVsExpensesSummary(balance) {
+    const summaryElement = document.getElementById('income-vs-expenses-summary');
+    if (summaryElement) {
+      summaryElement.textContent = `Ingresos: ${this.formatCurrency(balance.totalIncome)} • Gastos: ${this.formatCurrency(balance.totalExpenses)}`;
     }
   }
 
@@ -99,50 +100,34 @@ export class UIManager {
     });
   }
 
-  updateGoalsList(goals) {
-    const container = document.getElementById('goals-list');
+  updateGoalsProgress(goals) {
+    const container = document.getElementById('dashboard-goals-progress');
     if (!container) return;
     
     container.innerHTML = '';
 
     if (goals.length === 0) {
       container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🎯</div>
-          <h3>No tienes objetivos de ahorro</h3>
-          <p>Establece metas para motivarte a ahorrar</p>
-          <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
-            <span>➕</span>
-            Crear Objetivo
-          </button>
+        <div class="empty-state-small">
+          <p>No hay objetivos configurados</p>
         </div>
       `;
       return;
     }
 
-    goals.forEach(goal => {
+    // Show only first 3 goals in dashboard
+    goals.slice(0, 3).forEach(goal => {
       const progress = (goal.current_amount / goal.target_amount) * 100;
       const item = document.createElement('div');
-      item.className = 'goal-item fade-in';
+      item.className = 'goal-progress-item';
       
       item.innerHTML = `
-        <div class="goal-header">
-          <div class="goal-name">${goal.name}</div>
-          <div class="goal-amount">${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}</div>
+        <div class="goal-info">
+          <span class="goal-name">${goal.name}</span>
+          <span class="goal-percentage">${progress.toFixed(1)}%</span>
         </div>
-        <div class="goal-progress">
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
-          </div>
-          <div class="progress-text">${progress.toFixed(1)}%</div>
-        </div>
-        <div class="goal-actions">
-          <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
-            💰 Agregar
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
-            ✏️ Editar
-          </button>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
         </div>
       `;
       
@@ -245,6 +230,95 @@ export class UIManager {
     });
     
     console.log('✅ Spending limits UI updated successfully');
+  }
+
+  updateLimitsAlerts(limits, expenses) {
+    const alertCard = document.getElementById('limits-alert-card');
+    const alertsList = document.getElementById('limits-alerts-list');
+    
+    if (!alertCard || !alertsList) return;
+
+    // Find limits that are close to or over the threshold
+    const alerts = [];
+    
+    limits.forEach(limit => {
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+      
+      if (percentage >= limit.warning_percentage) {
+        alerts.push({
+          category: limit.category,
+          percentage: percentage.toFixed(1),
+          status: percentage >= 100 ? 'danger' : 'warning',
+          current: currentSpent,
+          limit: limit.amount
+        });
+      }
+    });
+
+    if (alerts.length === 0) {
+      alertCard.classList.add('hidden');
+      return;
+    }
+
+    alertCard.classList.remove('hidden');
+    alertsList.innerHTML = '';
+
+    alerts.forEach(alert => {
+      const alertItem = document.createElement('div');
+      alertItem.className = `limit-alert ${alert.status}`;
+      
+      alertItem.innerHTML = `
+        <div class="alert-icon">${alert.status === 'danger' ? '🚨' : '⚠️'}</div>
+        <div class="alert-info">
+          <div class="alert-category">${alert.category}</div>
+          <div class="alert-details">${this.formatCurrency(alert.current)} / ${this.formatCurrency(alert.limit)} (${alert.percentage}%)</div>
+        </div>
+      `;
+      
+      alertsList.appendChild(alertItem);
+    });
+  }
+
+  updateTopCategories(expenses) {
+    const container = document.getElementById('top-categories-summary');
+    if (!container) return;
+
+    // Calculate category totals
+    const categoryTotals = {};
+    expenses.forEach(expense => {
+      const category = expense.category;
+      const amount = parseFloat(expense.amount) || 0;
+      categoryTotals[category] = (categoryTotals[category] || 0) + amount;
+    });
+
+    // Get top 3 categories
+    const topCategories = Object.entries(categoryTotals)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 3);
+
+    container.innerHTML = '';
+
+    if (topCategories.length === 0) {
+      container.innerHTML = '<p class="no-data">No hay gastos este mes</p>';
+      return;
+    }
+
+    topCategories.forEach(([category, amount], index) => {
+      const categoryInfo = this.getCategoryInfo(category);
+      const item = document.createElement('div');
+      item.className = 'top-category-item';
+      
+      item.innerHTML = `
+        <span class="category-rank">#${index + 1}</span>
+        <span class="category-icon">${categoryInfo.icon}</span>
+        <span class="category-name">${category}</span>
+        <span class="category-amount">${this.formatCurrency(amount)}</span>
+      `;
+      
+      container.appendChild(item);
+    });
   }
 
   updateCategoriesSelect(categories, selectId) {

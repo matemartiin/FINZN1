@@ -185,8 +185,8 @@ export class NavigationManager {
   initializeSection(sectionName) {
     // Initialize section-specific functionality
     switch (sectionName) {
-      case 'clients':
-        this.initializeClients();
+      case 'contacts':
+        this.initializeContacts();
         break;
       case 'calendar':
         this.initializeCalendar();
@@ -203,10 +203,10 @@ export class NavigationManager {
     }
   }
   
-  initializeClients() {
-    console.log('👥 Initializing clients section');
-    if (window.app && window.app.clients) {
-      // Clients manager handles its own initialization
+  initializeContacts() {
+    console.log('📇 Initializing contacts section');
+    if (window.app && window.app.contacts) {
+      // Contacts manager handles its own initialization
     }
   }
 
