@@ -8,7 +8,8 @@ import { ThemeManager } from './modules/theme.js';
 import { ChatManager } from './modules/chat.js';
 import { CalendarManager } from './modules/calendar.js';
 import { ReportManager } from './modules/reports.js';
-import { ClientsManager } from './modules/clients.js';
+import { ContactsManager } from './modules/contacts.js';
+import { MascotManager } from './modules/mascot.js';
 
 class FinznApp {
   constructor() {
@@ -25,7 +26,8 @@ class FinznApp {
     this.chat = new ChatManager();
     this.calendar = new CalendarManager();
     this.reports = new ReportManager();
-    this.clients = new ClientsManager();
+    this.contacts = new ContactsManager();
+    this.mascot = new MascotManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.isInitialized = false;
@@ -82,7 +84,8 @@ class FinznApp {
       // Initialize other managers
       this.navigation.init();
       this.chat.init();
-      this.clients.init();
+      this.contacts.init();
+      this.mascot.init();
       
       // Load current month data
       await this.loadCurrentMonthData();
@@ -144,6 +147,9 @@ class FinznApp {
     
     // Modal listeners
     this.setupModalListeners();
+    
+    // Dashboard interactions
+    this.setupDashboardListeners();
     
     // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
@@ -233,6 +239,20 @@ class FinznApp {
     if (importDataBtn) {
       importDataBtn.addEventListener('click', () => this.showImportDataModal());
     }
+  }
+
+  setupDashboardListeners() {
+    // Balance detail button
+    const balanceDetailBtn = document.querySelector('.balance-card .btn');
+    if (balanceDetailBtn) {
+      balanceDetailBtn.addEventListener('click', () => this.showBalanceDetail());
+    }
+
+    // Toggle expenses chart
+    const toggleChartBtn = document.getElementById('toggle-expenses-chart');
+    if (toggleChartBtn) {
+      toggleChartBtn.addEventListener('click', () => this.toggleExpensesChart());
+    }
     
     // Income indicator click
     const incomesIndicator = document.getElementById('incomes-indicator');
@@ -261,6 +281,12 @@ class FinznApp {
     const calendarSettingsBtn = document.getElementById('calendar-settings-btn');
     if (calendarSettingsBtn) {
       calendarSettingsBtn.addEventListener('click', () => this.showCalendarSettingsModal());
+    }
+
+    // Contact management
+    const addContactBtn = document.getElementById('add-contact-btn');
+    if (addContactBtn) {
+      addContactBtn.addEventListener('click', () => this.showAddContactModal());
     }
   }
 
@@ -313,7 +339,17 @@ class FinznApp {
       addEventForm.addEventListener('submit', (e) => this.handleAddEvent(e));
     }
     
-    // Client management is handled by ClientsManager
+    // Contact management
+    const addContactForm = document.getElementById('add-contact-form');
+    const editContactForm = document.getElementById('edit-contact-form');
+    
+    if (addContactForm) {
+      addContactForm.addEventListener('submit', (e) => this.handleAddContact(e));
+    }
+    
+    if (editContactForm) {
+      editContactForm.addEventListener('submit', (e) => this.handleEditContact(e));
+    }
     
     // Installments checkbox
     const installmentsCheckbox = document.getElementById('expense-installments');
@@ -512,6 +548,7 @@ class FinznApp {
     
     // Update UI components
     this.ui.updateBalance(balance);
+    this.ui.updateIncomeVsExpensesSummary(balance);
     
     const expenses = this.data.getExpenses(this.currentMonth);
     const income = this.data.getIncome(this.currentMonth);
@@ -521,10 +558,12 @@ class FinznApp {
     const categories = this.data.getCategories();
     
     this.ui.updateExpensesList(expenses, this);
-    this.ui.updateGoalsList(goals);
+    this.ui.updateGoalsProgress(goals);
     this.ui.updateSpendingLimitsList(spendingLimits, expenses);
+    this.ui.updateLimitsAlerts(spendingLimits, expenses);
     this.ui.updateIncomeDetails(income, extraIncomes);
     this.ui.updateInstallmentsList(expenses);
+    this.ui.updateTopCategories(expenses);
     this.ui.updateCategoriesSelect(categories, 'expense-category');
     this.ui.updateCategoriesSelect(categories, 'limit-category');
     this.ui.updateCategoriesSelect(categories, 'event-category');
@@ -538,6 +577,9 @@ class FinznApp {
     
     // Check spending limits
     this.checkSpendingLimits();
+    
+    // Check for savings suggestions
+    this.checkSavingsSuggestions(balance);
   }
 
   async updateTrendChart() {
@@ -555,10 +597,21 @@ class FinznApp {
     alerts.forEach(alert => {
       if (alert.type === 'danger') {
         this.ui.showAlert(`⚠️ Has superado el límite de ${alert.category} (${alert.percentage}%)`, 'error');
+        this.mascot.alertSpendingLimit(alert.category, alert.percentage);
       } else if (alert.type === 'warning') {
         this.ui.showAlert(`⚠️ Te acercas al límite de ${alert.category} (${alert.percentage}%)`, 'warning');
+        this.mascot.alertSpendingLimit(alert.category, alert.percentage);
       }
     });
+  }
+
+  checkSavingsSuggestions(balance) {
+    // Suggest savings if user has significant available balance
+    if (balance.available > 10000) {
+      setTimeout(() => {
+        this.mascot.suggestSavings(balance.available);
+      }, 3000);
+    }
   }
 
   // Modal methods
@@ -616,13 +669,28 @@ class FinznApp {
     this.modals.show('calendar-settings-modal');
   }
   
-  // Client management methods (delegated to ClientsManager)
-  showAddClientModal() {
-    this.clients.showAddClientModal();
+  // Contact management methods
+  showAddContactModal() {
+    this.contacts.showAddContactModal();
   }
   
-  showEditClientModal(clientId) {
-    this.clients.showEditClientModal(clientId);
+  showEditContactModal(contactId) {
+    this.contacts.showEditContactModal(contactId);
+  }
+
+  // Dashboard methods
+  showBalanceDetail() {
+    this.navigation.navigateTo('transactions');
+  }
+
+  toggleExpensesChart() {
+    const container = document.getElementById('expenses-chart-container');
+    const toggleBtn = document.getElementById('toggle-expenses-chart');
+    
+    if (container && toggleBtn) {
+      container.classList.toggle('collapsed');
+      toggleBtn.textContent = container.classList.contains('collapsed') ? '▶' : '▼';
+    }
   }
 
   // Form handlers
@@ -979,6 +1047,62 @@ class FinznApp {
     }
   }
 
+  // Contact form handlers
+  async handleAddContact(e) {
+    e.preventDefault();
+    
+    const formData = this.ui.getFormData('add-contact-form');
+    
+    if (!formData.name || !formData.type) {
+      this.ui.showAlert('El nombre y tipo son obligatorios', 'error');
+      return;
+    }
+    
+    try {
+      const success = await this.contacts.addContact(formData);
+      
+      if (success) {
+        this.ui.showAlert('Contacto agregado correctamente', 'success');
+        this.modals.hide('add-contact-modal');
+        this.mascot.celebrateNewContact();
+        this.updateDashboard(); // Refresh dashboard to show new contact
+      } else {
+        this.ui.showAlert('Error al agregar el contacto', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error adding contact:', error);
+      this.ui.showAlert('Error al agregar el contacto', 'error');
+    }
+  }
+
+  async handleEditContact(e) {
+    e.preventDefault();
+    
+    const formData = this.ui.getFormData('edit-contact-form');
+    const contactId = formData.contactId;
+    
+    if (!formData.name || !formData.type) {
+      this.ui.showAlert('El nombre y tipo son obligatorios', 'error');
+      return;
+    }
+    
+    try {
+      const success = await this.contacts.updateContact(contactId, formData);
+      
+      if (success) {
+        this.ui.showAlert('Contacto actualizado correctamente', 'success');
+        this.modals.hide('edit-contact-modal');
+        this.updateDashboard(); // Refresh dashboard
+      } else {
+        this.ui.showAlert('Error al actualizar el contacto', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error updating contact:', error);
+      this.ui.showAlert('Error al actualizar el contacto', 'error');
+    }
+  }
   // Export data
   exportData() {
     try {
