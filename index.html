@@ -1,1433 +1,1466 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FINZN - Tu Compañero Financiero Inteligente</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
-  <link rel="stylesheet" href="./src/styles/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINZN - Tu Compañero Financiero</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="icon" type="image/png" href="public/isotipo.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <!-- Alert System -->
-  <div id="alert-container" class="alert-container"></div>
-  
-  <!-- Login Container -->
-  <div id="login-container" class="auth-container">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="auth-logo">
-          <div class="finzn-logo-main">
-            <img src="/ChatGPT Image Jul 2, 2025, 10_45_30 PM.png" alt="FINZN Mascot" width="120" height="120" style="border-radius: 50%; box-shadow: 0 8px 32px rgba(183, 166, 255, 0.3);" />
-          </div>
-          <h1 class="auth-title">FINZN</h1>
-        </div>
-        <p class="auth-subtitle">Tu compañero financiero inteligente</p>
-        <p class="auth-description">Gestiona tus finanzas de manera simple y divertida</p>
-      </div>
-      
-      <form id="login-form" class="auth-form">
-        <div class="input-group">
-          <input type="email" id="login-user" name="username" placeholder="Email" required autocomplete="email" />
-        </div>
-        <div class="input-group">
-          <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" />
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">
-          <span>✨</span>
-          Iniciar Sesión
-        </button>
-        <div id="login-error" class="error-message"></div>
-      </form>
-      
-      <div class="auth-footer">
-        <p>¿No tienes cuenta? <button type="button" id="show-register" class="link-btn">Regístrate aquí</button></p>
-      </div>
-    </div>
-  </div>
+<body class="lightmode">
+    <!-- Alert Container -->
+    <div id="alert-container" class="alert-container"></div>
 
-  <!-- Register Container -->
-  <div id="register-container" class="auth-container hidden">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="auth-logo">
-          <div class="finzn-logo-main">
-            <img src="/ChatGPT Image Jul 2, 2025, 10_45_30 PM.png" alt="FINZN Mascot" width="120" height="120" style="border-radius: 50%; box-shadow: 0 8px 32px rgba(183, 166, 255, 0.3);" />
-          </div>
-          <h1 class="auth-title">¡Bienvenido!</h1>
-        </div>
-        <p class="auth-subtitle">Únete a FINZN</p>
-        <p class="auth-description">Comienza tu viaje hacia la libertad financiera</p>
-      </div>
-      
-      <form id="register-form" class="auth-form">
-        <div class="input-group">
-          <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" />
-          <small class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
-        </div>
-        <div class="input-group">
-          <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" />
-          <small class="input-hint">Mínimo 6 caracteres</small>
-        </div>
-        <div class="input-group">
-          <button type="button" id="generate-test-email" class="btn btn-secondary btn-sm">
-            🎲 Generar email de prueba
-          </button>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">
-          <span>🚀</span>
-          Crear Cuenta
-        </button>
-        <div id="register-error" class="error-message"></div>
-      </form>
-      
-      <div class="auth-footer">
-        <p>¿Ya tienes cuenta? <button type="button" id="show-login" class="link-btn">Inicia sesión</button></p>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Main Application -->
-  <div id="app" class="app hidden">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-content">
-        <div class="header-left">
-          <div class="logo-container">
-            <div class="finzn-logo-header">
-              <img src="/isotipo.png" alt="FINZN Logo" class="logo-icon" />
+    <!-- Login Container -->
+    <div id="login-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="public/isotipo.png" alt="FINZN" class="auth-logo">
+                <h1>FINZN</h1>
+                <p>Tu compañero financiero inteligente</p>
             </div>
-            <h1 class="logo">FINZN</h1>
-          </div>
+            
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-user">Email</label>
+                    <input type="email" id="login-user" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-pass">Contraseña</label>
+                    <input type="password" id="login-pass" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
+                
+                <div id="login-error" class="error-message"></div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>¿No tienes cuenta? <button type="button" id="show-register" class="link-btn">Regístrate</button></p>
+            </div>
         </div>
-        <div class="header-right">
-          <div class="month-selector">
-            <label for="month-select">Mes:</label>
-            <select id="month-select"></select>
-          </div>
-          <div class="user-info">
-            <span id="user-name"></span>
-          </div>
-          <button id="theme-toggle" class="btn btn-icon" title="Cambiar tema">
-            <span class="theme-icon">🌙</span>
-          </button>
-          <button id="logout-btn" class="btn btn-secondary logout-btn" title="Cerrar sesión">
-            <span>👋</span>
-            <span class="logout-text">Salir</span>
-          </button>
-        </div>
-      </div>
-    </header>
+    </div>
 
-    <!-- Dashboard with New Layout -->
-    <main class="dashboard-new">
-      <!-- Sidebar Navigation -->
-      <aside class="sidebar-nav">
-        <nav class="nav-menu">
-          <div class="nav-item active" data-section="dashboard">
-            <div class="nav-icon">📊</div>
-            <span class="nav-label">Dashboard</span>
-          </div>
-          <div class="nav-item" data-section="contacts">
-            <div class="nav-icon">📇</div>
-            <span class="nav-label">Contactos</span>
-          </div>
-          <div class="nav-item" data-section="expenses">
-            <div class="nav-icon">💳</div>
-            <span class="nav-label">Finanzas</span>
-          </div>
-          <div class="nav-item" data-section="reports">
-            <div class="nav-icon">🏆</div>
-            <span class="nav-label">Reportes</span>
-          </div>
-          <div class="nav-item" data-section="settings">
-            <div class="nav-icon">⚙️</div>
-            <span class="nav-label">Configuración</span>
-          </div>
+    <!-- Register Container -->
+    <div id="register-container" class="auth-container hidden">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="public/isotipo.png" alt="FINZN" class="auth-logo">
+                <h1>Crear Cuenta</h1>
+                <p>Únete a FINZN y toma control de tus finanzas</p>
+            </div>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-user">Email</label>
+                    <input type="email" id="register-user" required>
+                    <button type="button" id="generate-test-email" class="btn btn-secondary btn-small">Generar Email de Prueba</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-pass">Contraseña</label>
+                    <input type="password" id="register-pass" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Crear Cuenta</button>
+                
+                <div id="register-error" class="error-message"></div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>¿Ya tienes cuenta? <button type="button" id="show-login" class="link-btn">Inicia Sesión</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="public/isotipo.png" alt="FINZN" class="header-logo">
+                <h1 class="header-title">FINZN</h1>
+            </div>
+            
+            <div class="header-center">
+                <select id="month-select" class="month-selector">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-toggle" title="Cambiar tema">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <div class="user-info">
+                    <span id="user-name">Usuario</span>
+                    <button id="logout-btn" class="logout-btn" title="Cerrar sesión">🚪</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-navigation">
+            <div class="tab-item active" data-section="dashboard">
+                <span class="tab-icon">🏠</span>
+                <span class="tab-label">Dashboard</span>
+            </div>
+            <div class="tab-item" data-section="clients">
+                <span class="tab-icon">👥</span>
+                <span class="tab-label">Clientes</span>
+            </div>
+            <div class="tab-item" data-section="transactions">
+                <span class="tab-icon">💳</span>
+                <span class="tab-label">Transacciones</span>
+            </div>
+            <div class="tab-item" data-section="calendar">
+                <span class="tab-icon">📅</span>
+                <span class="tab-label">Calendario</span>
+            </div>
+            <div class="tab-item" data-section="planning">
+                <span class="tab-icon">🎯</span>
+                <span class="tab-label">Planificación</span>
+            </div>
+            <div class="tab-item" data-section="reports">
+                <span class="tab-icon">📊</span>
+                <span class="tab-label">Reportes</span>
+            </div>
+            <div class="tab-item" data-section="settings">
+                <span class="tab-icon">⚙️</span>
+                <span class="tab-label">Configuración</span>
+            </div>
         </nav>
-      </aside>
 
-      <!-- Main Content Area -->
-      <div class="main-dashboard">
-        <!-- Tab Navigation -->
-        <div class="main-tabs">
-          <div class="tab-item active" data-section="dashboard">
-            <div class="tab-icon">📊</div>
-            <span class="tab-label">Dashboard</span>
-          </div>
-          <div class="tab-item" data-section="contacts">
-            <div class="tab-icon">📇</div>
-            <span class="tab-label">Contactos</span>
-          </div>
-          <div class="tab-item" data-section="transactions">
-            <div class="tab-icon">💳</div>
-            <span class="tab-label">Finanzas</span>
-          </div>
-          <div class="tab-item" data-section="calendar">
-            <div class="tab-icon">📅</div>
-            <span class="tab-label">Calendario</span>
-          </div>
-          <div class="tab-item" data-section="planning">
-            <div class="tab-icon">🎯</div>
-            <span class="tab-label">Objetivos</span>
-          </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="tab-section active">
+                <!-- Balance Card -->
+                <div class="balance-card">
+                    <div class="balance-header">
+                        <h2>Balance Disponible</h2>
+                        <button class="btn btn-secondary">Ver Detalle</button>
+                    </div>
+                    <div class="balance-amount" id="balance-amount-new">$0</div>
+                    <div class="balance-summary" id="income-vs-expenses-summary">
+                        Ingresos: $0 • Gastos: $0
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button id="add-expense-btn-dashboard" class="quick-action-btn expense">
+                        <span class="action-icon">💳</span>
+                        <span class="action-label">Agregar Gasto</span>
+                    </button>
+                    <button id="add-income-btn-dashboard" class="quick-action-btn income">
+                        <span class="action-icon">💰</span>
+                        <span class="action-label">Agregar Ingreso</span>
+                    </button>
+                    <button id="add-spending-limit-btn-card" class="quick-action-btn limit">
+                        <span class="action-icon">⚠️</span>
+                        <span class="action-label">Límite de Gasto</span>
+                    </button>
+                    <button id="generate-quick-report" class="quick-action-btn report">
+                        <span class="action-icon">📊</span>
+                        <span class="action-label">Generar Reporte</span>
+                    </button>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Expenses Chart -->
+                    <div class="dashboard-card chart-card">
+                        <div class="card-header">
+                            <h3>Gastos por Categoría</h3>
+                            <button id="toggle-expenses-chart" class="toggle-btn">▼</button>
+                        </div>
+                        <div id="expenses-chart-container" class="chart-container">
+                            <canvas id="expenses-chart"></canvas>
+                        </div>
+                        <div class="chart-mascot-container">
+                            <img src="public/mascota-finzn.png" alt="Mascota FINZN" class="chart-mascot">
+                        </div>
+                    </div>
+
+                    <!-- Recent Expenses -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Gastos Recientes</h3>
+                            <button id="add-expense-btn" class="btn btn-primary btn-small">
+                                <span>➕</span>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="expenses-list" class="expenses-list">
+                            <!-- Expenses will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Income Summary -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Resumen de Ingresos</h3>
+                            <div id="incomes-indicator" class="indicator-badge" style="display: flex;">
+                                <span class="indicator-count">0</span>
+                                <span class="indicator-label">ingresos</span>
+                            </div>
+                        </div>
+                        <div class="income-summary-content">
+                            <div class="income-total">
+                                <span class="income-label">Total del Mes:</span>
+                                <span id="income-summary" class="income-amount">$0</span>
+                            </div>
+                            <div id="income-details" class="income-details">
+                                <!-- Income details will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Goals Progress -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Progreso de Objetivos</h3>
+                            <button id="add-goal-btn" class="btn btn-primary btn-small">
+                                <span>🎯</span>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="dashboard-goals-progress" class="goals-progress">
+                            <!-- Goals will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Spending Limits -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Límites de Gasto</h3>
+                            <button id="add-spending-limit-btn-expenses" class="btn btn-primary btn-small">
+                                <span>⚠️</span>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="spending-limits-summary" class="spending-limits-summary">
+                            <!-- Spending limits will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Top Categories -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Categorías Principales</h3>
+                        </div>
+                        <div id="top-categories-summary" class="top-categories">
+                            <!-- Top categories will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Installments -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Cuotas Activas</h3>
+                            <button id="installments-btn" class="btn btn-secondary btn-small">
+                                <span>📊</span>
+                                Ver Todas
+                            </button>
+                        </div>
+                        <div id="installments-summary" class="installments-summary">
+                            <!-- Installments will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Trend Chart -->
+                    <div class="dashboard-card chart-card">
+                        <div class="card-header">
+                            <h3>Tendencia de Gastos</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clients Section -->
+            <section id="clients-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Gestión de Clientes</h2>
+                    <button id="add-client-btn" class="btn btn-primary">
+                        <span>👤</span>
+                        Agregar Cliente
+                    </button>
+                </div>
+
+                <!-- Client Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-clients">0</div>
+                            <div class="stat-label">Total Clientes</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="active-clients">0</div>
+                            <div class="stat-label">Activos</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="new-clients-month">0</div>
+                            <div class="stat-label">Nuevos este Mes</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="age-range-dominant">-</div>
+                            <div class="stat-label">Rango Dominante</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Filters -->
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <input type="text" id="client-search" placeholder="Buscar clientes..." class="search-input">
+                        <select id="client-status-filter" class="filter-select">
+                            <option value="">Todos los estados</option>
+                            <option value="active">Activos</option>
+                            <option value="inactive">Inactivos</option>
+                        </select>
+                        <select id="client-age-range-filter" class="filter-select">
+                            <option value="">Todos los rangos</option>
+                            <option value="menor_18">Menor de 18</option>
+                            <option value="18_25">18-25 años</option>
+                            <option value="26_35">26-35 años</option>
+                            <option value="36_50">36-50 años</option>
+                            <option value="51_mas">51+ años</option>
+                        </select>
+                        <select id="client-type-filter" class="filter-select">
+                            <option value="">Todos los tipos</option>
+                            <option value="individual">Individual</option>
+                            <option value="business">Empresa</option>
+                        </select>
+                        <button id="clear-client-filters" class="btn btn-secondary">Limpiar</button>
+                    </div>
+                    <div class="view-controls">
+                        <button id="grid-view-btn" class="view-btn active">📱</button>
+                        <button id="list-view-btn" class="view-btn">📋</button>
+                    </div>
+                </div>
+
+                <!-- Clients List -->
+                <div id="clients-list" class="clients-list grid-view">
+                    <!-- Clients will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Transactions Section -->
+            <section id="transactions-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Historial de Transacciones</h2>
+                    <div class="header-actions">
+                        <button id="add-income-btn-transactions" class="btn btn-success">
+                            <span>💰</span>
+                            Agregar Ingreso
+                        </button>
+                        <button class="btn btn-primary" onclick="window.app.showAddExpenseModal()">
+                            <span>💳</span>
+                            Agregar Gasto
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Transaction Timeline -->
+                <div class="transactions-timeline">
+                    <div class="timeline-header">
+                        <h3>Movimientos del Mes</h3>
+                    </div>
+                    <div id="transactions-timeline-content" class="timeline-content">
+                        <!-- Timeline will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Section -->
+            <section id="calendar-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Calendario Financiero</h2>
+                    <div class="header-actions">
+                        <button id="add-event-btn" class="btn btn-primary">
+                            <span>📅</span>
+                            Agregar Evento
+                        </button>
+                        <button id="calendar-settings-btn" class="btn btn-secondary">
+                            <span>⚙️</span>
+                            Configuración
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-grid">
+                    <!-- Calendar Widget -->
+                    <div class="calendar-widget">
+                        <div class="calendar-header">
+                            <button id="prev-month" class="calendar-nav-btn">‹</button>
+                            <h3 id="calendar-month-year">Enero 2024</h3>
+                            <button id="next-month" class="calendar-nav-btn">›</button>
+                        </div>
+                        <div id="calendar-grid" class="calendar-days">
+                            <!-- Calendar days will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Today's Events -->
+                    <div class="calendar-sidebar">
+                        <div class="sidebar-section">
+                            <h4>Eventos de Hoy</h4>
+                            <div id="today-events" class="today-events">
+                                <!-- Today's events will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h4>Próximos Pagos</h4>
+                            <div id="upcoming-payments" class="upcoming-payments">
+                                <!-- Upcoming payments will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Integration -->
+                <div class="calendar-integration">
+                    <h3>Integración con Calendarios</h3>
+                    <div class="integration-options">
+                        <button class="integration-btn google-calendar">
+                            <span class="integration-icon">📅</span>
+                            <div class="integration-info">
+                                <div class="integration-name">Google Calendar</div>
+                                <div class="integration-status" id="google-status">No conectado</div>
+                            </div>
+                        </button>
+                        <button class="integration-btn apple-calendar">
+                            <span class="integration-icon">🍎</span>
+                            <div class="integration-info">
+                                <div class="integration-name">Apple Calendar</div>
+                                <div class="integration-status">Próximamente</div>
+                            </div>
+                        </button>
+                    </div>
+                    <button id="sync-calendar-btn" class="btn btn-primary">
+                        <span>🔄</span>
+                        Sincronizar
+                    </button>
+                </div>
+
+                <!-- Calendar Help -->
+                <div id="calendar-help" class="calendar-help" style="display: none;">
+                    <!-- Help content will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Planning Section -->
+            <section id="planning-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Planificación Financiera</h2>
+                </div>
+
+                <!-- Planning Tabs -->
+                <div class="planning-tabs">
+                    <button class="planning-tab-btn active" data-tab="goals">🎯 Objetivos</button>
+                    <button class="planning-tab-btn" data-tab="limits">⚠️ Límites</button>
+                    <button class="planning-tab-btn" data-tab="contacts">📇 Contactos</button>
+                </div>
+
+                <!-- Goals Tab -->
+                <div id="goals-tab" class="planning-tab active">
+                    <div class="tab-header">
+                        <h3>Objetivos de Ahorro</h3>
+                        <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
+                            <span>🎯</span>
+                            Nuevo Objetivo
+                        </button>
+                    </div>
+                    <div id="goals-list" class="goals-list">
+                        <!-- Goals will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Limits Tab -->
+                <div id="limits-tab" class="planning-tab">
+                    <div class="tab-header">
+                        <h3>Límites de Gasto</h3>
+                        <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+                            <span>⚠️</span>
+                            Nuevo Límite
+                        </button>
+                    </div>
+                    <div id="limits-list" class="limits-list">
+                        <!-- Limits will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Contacts Tab -->
+                <div id="contacts-tab" class="planning-tab">
+                    <div class="tab-header">
+                        <h3>Gestión de Contactos</h3>
+                        <button id="add-contact-btn" class="btn btn-primary">
+                            <span>➕</span>
+                            Agregar Contacto
+                        </button>
+                    </div>
+
+                    <!-- Contact Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📇</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="total-contacts">0</div>
+                                <div class="stat-label">Total Contactos</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="contacts-with-amount">0</div>
+                                <div class="stat-label">Con Monto</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="pending-reminders">0</div>
+                                <div class="stat-label">Recordatorios</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="contacts-by-type">-</div>
+                                <div class="stat-label">Tipo Principal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Filters -->
+                    <div class="filters-section">
+                        <div class="filters-row">
+                            <input type="text" id="contact-search" placeholder="Buscar contactos..." class="search-input">
+                            <select id="contact-type-filter" class="filter-select">
+                                <option value="">Todos los tipos</option>
+                                <option value="persona">Persona</option>
+                                <option value="empresa">Empresa</option>
+                                <option value="alquiler">Alquiler</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                            <select id="contact-status-filter" class="filter-select">
+                                <option value="">Todos los estados</option>
+                                <option value="active">Activos</option>
+                                <option value="inactive">Inactivos</option>
+                            </select>
+                            <button id="clear-contact-filters" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </div>
+
+                    <!-- Contacts List -->
+                    <div id="contacts-list" class="contacts-list">
+                        <!-- Contacts will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Recent Contacts Widget -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h4>Contactos Recientes</h4>
+                        </div>
+                        <div id="recent-contacts-list" class="recent-contacts">
+                            <!-- Recent contacts will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Reportes y Análisis</h2>
+                </div>
+
+                <!-- Reports Tabs -->
+                <div class="reports-tabs">
+                    <button class="reports-tab-btn active" data-tab="ai-reports">🤖 Reportes IA</button>
+                    <button class="reports-tab-btn" data-tab="achievements">🏆 Logros</button>
+                </div>
+
+                <!-- AI Reports Tab -->
+                <div id="ai-reports-tab" class="reports-tab active">
+                    <div class="tab-header">
+                        <h3>Reportes con Inteligencia Artificial</h3>
+                        <button id="generate-ai-report-btn-reports" class="btn btn-primary">
+                            <span>🤖</span>
+                            Generar Reporte
+                        </button>
+                    </div>
+                    <div class="ai-reports-content">
+                        <p>Genera reportes personalizados con análisis inteligente de tus finanzas.</p>
+                    </div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div id="achievements-tab" class="reports-tab">
+                    <div class="tab-header">
+                        <h3>Logros y Reconocimientos</h3>
+                    </div>
+                    <div id="achievements-list" class="achievements-list">
+                        <!-- Achievements will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="tab-section">
+                <div class="section-header">
+                    <h2>Configuración</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Categories Management -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>🏷️ Gestión de Categorías</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Personaliza las categorías de gastos según tus necesidades.</p>
+                            <button id="manage-categories-btn" class="btn btn-primary">
+                                Gestionar Categorías
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>📊 Gestión de Datos</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Exporta o importa tus datos financieros.</p>
+                            <div class="settings-actions">
+                                <button id="export-data-btn" class="btn btn-secondary">
+                                    📤 Exportar Datos
+                                </button>
+                                <button id="import-data-btn" class="btn btn-secondary">
+                                    📥 Importar Datos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theme Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>🎨 Apariencia</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Personaliza la apariencia de la aplicación.</p>
+                            <button class="btn btn-secondary" onclick="window.app.theme.toggle()">
+                                <span class="theme-icon">🌙</span>
+                                Cambiar Tema
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Account Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>👤 Cuenta</h3>
+                        </div>
+                        <div class="settings-content">
+                            <p>Gestiona tu cuenta y preferencias.</p>
+                            <div class="account-info">
+                                <p><strong>Usuario:</strong> <span id="settings-user-email">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Chat System - MOVED TO GLOBAL POSITION -->
+    <div id="chat-system" class="chat-system">
+        <!-- Chat Toggle Button -->
+        <button id="chat-toggle" class="chat-toggle-btn" title="Abrir chat">
+            💬
+            <div id="chat-notification" class="chat-notification" style="display: none;">
+                ¡Nuevo mensaje!
+            </div>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="chat-window" class="chat-window hidden">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <img src="public/robot-chat.png" alt="Asistente" class="chat-avatar-header">
+                    <div class="chat-info">
+                        <div class="chat-name">Asistente FINZN</div>
+                        <div id="chat-status" class="chat-status">En línea</div>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button id="chat-minimize" class="chat-control-btn" title="Minimizar">−</button>
+                    <button id="chat-close" class="chat-control-btn" title="Cerrar">×</button>
+                </div>
+            </div>
+            
+            <div id="chat-messages" class="chat-messages">
+                <!-- Messages will be populated by JavaScript -->
+            </div>
+            
+            <div id="chat-suggestions" class="chat-suggestions">
+                <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">
+                    💰 ¿Cómo ahorrar más?
+                </button>
+                <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">
+                    📊 Analizar gastos
+                </button>
+                <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">
+                    📋 Organizar presupuesto
+                </button>
+                <button class="suggestion-btn" data-suggestion="¿Qué inversiones me recomiendas?">
+                    📈 Inversiones
+                </button>
+                <button class="suggestion-btn" data-suggestion="Ayúdame a establecer objetivos financieros">
+                    🎯 Objetivos financieros
+                </button>
+            </div>
+            
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." class="chat-input" autocomplete="off">
+                <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
+                <button type="submit" class="chat-send-btn" title="Enviar">📤</button>
+            </form>
         </div>
 
-        <!-- Dashboard Section -->
-        <section id="dashboard-section" class="tab-section active">
-          <div class="dashboard-grid">
-            <!-- Primera fila: Balance, Ingresos, Gastos -->
-            <div class="summary-cards">
-              <div class="summary-card balance-card-new">
-                <div class="card-header-simple">
-                  <div class="card-icon-simple">💰</div>
-                  <span class="card-title">Balance</span>
-                </div>
-                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
-                <div class="installments-info">
-                  <button id="installments-btn" class="installments-button" onclick="window.app.showInstallmentsModal()">
-                    <span id="installments-count">0</span> cuotas activas
-                  </button>
-                </div>
-              </div>
+        <!-- Chat Minimized -->
+        <div id="chat-minimized" class="chat-minimized hidden">
+            <button id="chat-restore" class="chat-restore-btn">
+                <img src="public/robot-chat.png" alt="Chat" class="chat-avatar-mini">
+                <span>Asistente FINZN</span>
+            </button>
+        </div>
+    </div>
 
-              <div class="summary-card income-card">
-                <div class="card-header-simple">
-                  <div class="card-icon-simple">💵</div>
-                  <span class="card-title">
-                    Ingresos
-                    <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
-                      <span class="indicator-count">0</span>
-                    </button>
-                  </span>
-                </div>
-                <div class="card-amount" id="income-summary">$3,500</div>
-                <div class="card-action">
-                  <button id="add-income-btn-dashboard" class="btn btn-primary">
-                    <span>➕</span>
-                    Agregar Ingreso
-                  </button>
-                </div>
-              </div>
+    <!-- Mascot System -->
+    <div id="mascot-system" class="mascot-system">
+        <div id="mascot-avatar" class="mascot-avatar" title="Haz clic para abrir el chat">
+            <img src="public/mascota-finzn.png" alt="Mascota FINZN" class="mascot-image">
+        </div>
+        <div id="mascot-bubble" class="mascot-bubble hidden">
+            <div id="mascot-message" class="mascot-message"></div>
+        </div>
+    </div>
 
-              <div class="summary-card expenses-card">
-                <div class="card-header-simple">
-                  <div class="card-icon-simple">💳</div>
-                  <span class="card-title">Gastos del Mes</span>
-                </div>
-                <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
-                <div class="card-action">
-                  <button id="add-expense-btn-dashboard" class="btn btn-primary">
-                    <span>➕</span>
-                    Agregar Gasto
-                  </button>
-                </div>
-              </div>
+    <!-- Modals -->
+    <!-- Add Expense Modal -->
+    <div id="add-expense-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Gasto</h3>
+                <button class="modal-close">&times;</button>
             </div>
+            <form id="add-expense-form" class="modal-form">
+                <div class="form-group">
+                    <label for="expense-description">Descripción *</label>
+                    <input type="text" id="expense-description" name="description" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-amount">Monto *</label>
+                    <input type="number" id="expense-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-category">Categoría *</label>
+                    <select id="expense-category" name="category" required>
+                        <option value="">Selecciona una categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-date">Fecha *</label>
+                    <input type="date" id="expense-date" name="transactionDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="expense-installments" name="hasInstallments">
+                        <span class="checkmark"></span>
+                        Pagar en cuotas
+                    </label>
+                </div>
+                
+                <div id="installments-group" class="form-group hidden">
+                    <label for="expense-installments-count">Número de cuotas</label>
+                    <input type="number" id="expense-installments-count" name="installmentsCount" min="2" max="60" value="2">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Gasto</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <!-- Segunda fila: Gráfico ocupando toda la horizontal -->
-            <div class="chart-section">
-              <div class="chart-card-new">
-                <h3>📊 Distribución de Gastos del Mes</h3>
-                <div class="chart-content-with-mascot">
-                  <div class="chart-container-new">
-                    <canvas id="expenses-chart"></canvas>
-                  </div>
-                  <div class="chart-mascot">
-                    <div class="chart-mascot-container">
-                      <img src="/mascota-finzn.png" alt="FINZN Mascota" class="chart-mascot-img" />
-                      <div class="chart-mascot-tooltip">¡Aquí tienes tu análisis financiero!</div>
+    <!-- Add Income Modal -->
+    <div id="add-income-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Ingreso</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-income-form" class="modal-form">
+                <div class="form-group">
+                    <label for="income-type">Tipo de Ingreso *</label>
+                    <select id="income-type" name="type" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="fixed">Ingreso Fijo (Sueldo)</option>
+                        <option value="extra">Ingreso Extra</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="income-amount">Monto *</label>
+                    <input type="number" id="income-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                
+                <div id="extra-income-group" class="form-group hidden">
+                    <label for="income-description">Descripción</label>
+                    <input type="text" id="income-description" name="description" placeholder="Ej: Freelance, venta, etc.">
+                </div>
+                
+                <div id="extra-income-category" class="form-group hidden">
+                    <label for="income-category">Categoría</label>
+                    <select id="income-category" name="category">
+                        <option value="freelance">Freelance</option>
+                        <option value="sales">Ventas</option>
+                        <option value="investment">Inversiones</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Ingreso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Spending Limit Modal -->
+    <div id="add-spending-limit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Límite de Gasto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-spending-limit-form" class="modal-form">
+                <div class="form-group">
+                    <label for="limit-category">Categoría *</label>
+                    <select id="limit-category" name="category" required>
+                        <option value="">Selecciona una categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="limit-amount">Límite Mensual *</label>
+                    <input type="number" id="limit-amount" name="amount" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="limit-warning">Alerta al (%) *</label>
+                    <input type="number" id="limit-warning" name="warningPercentage" min="1" max="100" value="80" required>
+                    <small>Recibirás una alerta cuando alcances este porcentaje del límite</small>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Límite</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Goal Modal -->
+    <div id="add-goal-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Objetivo de Ahorro</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-goal-form" class="modal-form">
+                <div class="form-group">
+                    <label for="goal-name">Nombre del Objetivo *</label>
+                    <input type="text" id="goal-name" name="name" required placeholder="Ej: Vacaciones, Auto nuevo, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="goal-target">Monto Objetivo *</label>
+                    <input type="number" id="goal-target" name="targetAmount" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="goal-current">Monto Actual</label>
+                    <input type="number" id="goal-current" name="currentAmount" step="0.01" min="0" value="0">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Objetivo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="manage-categories-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gestión de Categorías</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="categories-section">
+                    <h4>Categorías Existentes</h4>
+                    <div id="categories-management-list" class="categories-list">
+                        <!-- Categories will be populated by JavaScript -->
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Tercera fila: Widgets adicionales -->
-            <div class="dashboard-widgets">
-              <div class="widget-card">
-                <h4 data-icon="📅">Próximos Eventos</h4>
-                <div id="upcoming-events" class="upcoming-events">
-                  <!-- Eventos del calendario aparecerán aquí -->
-                </div>
-                <button class="btn btn-secondary btn-sm" onclick="window.app.navigation.showSection('calendar')">
-                  Ver Calendario Completo
-                </button>
-              </div>
-              
-              <div class="widget-card">
-                <h4 data-icon="🚦">Estado de Límites</h4>
-                <div id="limits-widget" class="limits-widget">
-                  <!-- Resumen de límites aparecerá aquí -->
-                </div>
-              </div>
-              
-              <div class="widget-card">
-                <h4 data-icon="🎯">Progreso de Objetivos</h4>
-                <div id="goals-widget" class="goals-widget">
-                  <!-- Resumen de objetivos aparecerá aquí -->
-                </div>
-              </div>
-            </div>
-            
-          </div>
-        </section>
-
-        <!-- Contacts Section (NUEVO) -->
-        <section id="contacts-section" class="tab-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Gestión de Contactos</h1>
-              <div class="section-actions">
-                <button id="export-clients-btn" class="btn btn-secondary">
-                  <span>📊</span>
-                  Exportar
-                </button>
-                <button id="import-clients-btn" class="btn btn-secondary">
-                  <span>📥</span>
-                  Importar
-                </button>
-                <button id="add-client-btn" class="btn btn-primary">
-                  <span>👤</span>
-                  Nuevo Cliente
-                </button>
-              </div>
-            </div>
-            
-            <div class="clients-container">
-              <!-- Filtros y Estadísticas -->
-              <div class="clients-stats-card">
-                <div class="card-header">
-                  <h3>📊 Estadísticas de Clientes</h3>
-                </div>
-                <div class="clients-stats-grid">
-                  <div class="stat-item">
-                    <div class="stat-number" id="total-clients">0</div>
-                    <div class="stat-label">Total Clientes</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-number" id="active-clients">0</div>
-                    <div class="stat-label">Activos</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-number" id="new-clients-month">0</div>
-                    <div class="stat-label">Nuevos este mes</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-number" id="age-range-dominant">-</div>
-                    <div class="stat-label">Rango etario principal</div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Filtros -->
-              <div class="clients-filters-card">
-                <div class="card-header">
-                  <h3>🔍 Filtros</h3>
-                </div>
-                <div class="clients-filters">
-                  <input type="text" id="client-search" placeholder="Buscar por nombre o email..." />
-                  <select id="client-status-filter">
-                    <option value="">Todos los estados</option>
-                    <option value="active">Activos</option>
-                    <option value="inactive">Inactivos</option>
-                  </select>
-                  <select id="client-age-range-filter">
-                    <option value="">Todos los rangos etarios</option>
-                    <option value="18_25">18-25 años</option>
-                    <option value="26_35">26-35 años</option>
-                    <option value="36_50">36-50 años</option>
-                    <option value="51_mas">51+ años</option>
-                  </select>
-                  <select id="client-type-filter">
-                    <option value="">Todos los tipos</option>
-                    <option value="individual">Individual</option>
-                    <option value="business">Empresa</option>
-                  </select>
-                  <button id="clear-client-filters" class="btn btn-secondary">Limpiar</button>
-                </div>
-              </div>
-              
-              <!-- Lista de Clientes -->
-              <div class="clients-list-card">
-                <div class="card-header">
-                  <h3>👥 Lista de Clientes</h3>
-                  <div class="view-toggle">
-                    <button id="grid-view-btn" class="view-btn active" title="Vista en cuadrícula">⊞</button>
-                    <button id="list-view-btn" class="view-btn" title="Vista en lista">☰</button>
-                  </div>
-                </div>
-                <div id="clients-list" class="clients-list grid-view">
-                  <!-- Los clientes se cargarán aquí -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Transactions Section (Finanzas) -->
-        <section id="transactions-section" class="tab-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Gestión Financiera</h1>
-              <div class="section-actions">
-                <button id="add-income-btn-transactions" class="btn btn-secondary">
-                  <span>💰</span>
-                  Agregar Ingreso
-                </button>
-                <button id="add-spending-limit-btn-expenses" class="btn btn-secondary">
-                  <span>⚠️</span>
-                  Agregar Límite
-                </button>
-                <button id="add-expense-btn" class="btn btn-primary">
-                  <span>➕</span>
-                  Agregar Gasto
-                </button>
-              </div>
-            </div>
-            
-            <div class="transactions-container">
-              <!-- Filtros y Vista Unificada -->
-              <div class="transactions-section-card transactions-filters-card">
-                <div class="card-header">
-                  <h3>🔍 Filtros y Vista</h3>
-                </div>
-                <div class="transactions-filters">
-                  <select id="transaction-type-filter">
-                    <option value="">Todos los tipos</option>
-                    <option value="expense">Solo Gastos</option>
-                    <option value="income">Solo Ingresos</option>
-                  </select>
-                  <select id="category-filter">
-                    <option value="">Todas las categorías</option>
-                  </select>
-                  <input type="date" id="date-filter" />
-                  <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
-                </div>
-              </div>
-              
-              <!-- Timeline de Transacciones -->
-              <div class="transactions-section-card transactions-timeline-card">
-                <div class="card-header">
-                  <h3>📋 Timeline de Transacciones</h3>
-                </div>
-                <div id="transactions-timeline" class="transactions-timeline">
-                  <!-- Timeline unificado aparecerá aquí -->
-                </div>
-              </div>
-              
-              <!-- Filtros Card -->
-              <div class="transactions-section-card expenses-filters-card">
-                <div class="card-header">
-                  <h3>🔍 Filtros de Gastos</h3>
-                </div>
-                <div class="expenses-filters">
-                  <select id="expense-category-filter">
-                    <option value="">Todas las categorías</option>
-                  </select>
-                  <input type="date" id="expense-date-filter" />
-                  <button id="clear-expense-filters" class="btn btn-secondary">Limpiar</button>
-                </div>
-              </div>
-              
-              <!-- Límites de Gastos Card -->
-              <div class="transactions-section-card spending-limits-card">
-                <div class="card-header">
-                  <h3>🚦 Límites de Gastos Configurados</h3>
-                  <button id="add-spending-limit-btn-card" class="btn btn-primary btn-sm">
-                    <span>➕</span>
-                    Agregar Límite
-                  </button>
-                </div>
-                <div id="spending-limits-summary" class="spending-limits-summary">
-                  <!-- Los límites se cargarán aquí -->
-                </div>
-              </div>
-              
-              <!-- Gráfico de Tendencia Mensual -->
-              <div class="transactions-section-card trend-chart-card">
-                <div class="card-header">
-                  <h3>📈 Tendencia de Gastos Mensual</h3>
-                </div>
-                <div class="trend-chart-container">
-                  <canvas id="trend-chart"></canvas>
-                </div>
-              </div>
-              
-              <!-- Lista de Gastos -->
-              <div class="transactions-section-card expenses-list-card">
-                <div class="card-header">
-                  <h3>📋 Lista de Gastos del Mes</h3>
-                </div>
-                <div id="expenses-list" class="expenses-list">
-                  <!-- Expenses will be loaded here -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Calendar Section (NUEVO) -->
-        <section id="calendar-section" class="tab-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Calendario Financiero</h1>
-              <div class="section-actions">
-                <button id="calendar-settings-btn" class="btn btn-secondary">
-                  <span>⚙️</span>
-                  Configurar
-                </button>
-                <button id="sync-calendar-btn" class="btn btn-secondary">
-                  <span>🔄</span>
-                  Sincronizar
-                </button>
-                <button id="add-event-btn" class="btn btn-primary">
-                  <span>📅</span>
-                  Nuevo Evento
-                </button>
-              </div>
-            </div>
-            
-            <div class="calendar-container">
-              <!-- Calendario Principal -->
-              <div class="calendar-main">
-                <div class="calendar-header">
-                  <button id="prev-month" class="calendar-nav-btn">‹</button>
-                  <h3 id="calendar-month-year">Enero 2025</h3>
-                  <button id="next-month" class="calendar-nav-btn">›</button>
-                </div>
-                <div id="calendar-grid" class="calendar-grid">
-                  <!-- El calendario se generará aquí -->
-                </div>
-              </div>
-              
-              <!-- Panel lateral del calendario -->
-              <div class="calendar-sidebar">
-                <div class="calendar-widget">
-                  <h4>📋 Eventos de Hoy</h4>
-                  <div id="today-events" class="today-events">
-                    <!-- Eventos del día actual -->
-                  </div>
                 </div>
                 
-                <div class="calendar-widget">
-                  <h4>⏰ Próximos Vencimientos</h4>
-                  <div id="upcoming-payments" class="upcoming-payments">
-                    <!-- Próximos pagos y cuotas -->
-                  </div>
+                <div class="add-category-section">
+                    <h4>Agregar Nueva Categoría</h4>
+                    <form id="add-category-form" class="category-form">
+                        <div class="form-group">
+                            <label for="category-name">Nombre *</label>
+                            <input type="text" id="category-name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category-icon">Icono *</label>
+                            <input type="text" id="category-icon" name="icon" required placeholder="🏷️" maxlength="2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category-color">Color</label>
+                            <input type="color" id="category-color" name="color" value="#B7A6FF">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Agregar Categoría</button>
+                    </form>
                 </div>
-                
-                <div class="calendar-widget">
-                  <h4>🔗 Integración</h4>
-                  <div class="calendar-integrations">
-                    <button class="integration-btn google-calendar">
-                      <span>📅</span>
-                      <div class="integration-info">
-                        <div class="integration-name">Google Calendar</div>
-                        <div class="integration-status" id="google-status">No conectado</div>
-                      </div>
-                    </button>
-                    <button class="integration-btn apple-calendar">
-                      <span>🍎</span>
-                      <div class="integration-info">
-                        <div class="integration-name">Apple Calendar</div>
-                        <div class="integration-status" id="apple-status">No conectado</div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- Planning Section (Objetivos y Planificación) -->
-        <section id="planning-section" class="tab-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Objetivos y Planificación</h1>
-              <div class="section-actions">
-                <button id="add-goal-btn" class="btn btn-primary">
-                  <span>🎯</span>
-                  Nuevo Objetivo
-                </button>
-              </div>
+    <!-- Import Data Modal -->
+    <div id="import-data-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Importar Datos</h3>
+                <button class="modal-close">&times;</button>
             </div>
-            
-            <div class="planning-tabs">
-              <div class="planning-tab-nav">
-                <button class="planning-tab-btn active" data-tab="goals">🎯 Objetivos</button>
-                <button class="planning-tab-btn" data-tab="limits">🚦 Límites</button>
-                <button class="planning-tab-btn" data-tab="budget">💰 Presupuesto</button>
-              </div>
-              
-              <div class="planning-tab-content">
-                <div id="goals-tab" class="planning-tab active">
-                  <div id="goals-list" class="goals-list">
-                    <!-- Goals will be loaded here -->
-                  </div>
-                </div>
-                
-                <div id="limits-tab" class="planning-tab">
-                  <div class="limits-management">
-                    <div id="spending-limits-management" class="spending-limits-management">
-                      <!-- Gestión completa de límites -->
-                    </div>
-                  </div>
-                </div>
-                
-                <div id="budget-tab" class="planning-tab">
-                  <div class="budget-planning">
-                    <h4>📊 Planificación de Presupuesto</h4>
-                    <div id="budget-planner" class="budget-planner">
-                      <!-- Herramientas de planificación presupuestaria -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Reports Section (antes Achievements + AI Reports) -->
-        <section id="reports-section" class="tab-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Reportes y Logros</h1>
-              <div class="section-actions">
-                <button id="generate-ai-report-btn-reports" class="btn btn-primary">
-                  <span>🤖</span>
-                  Generar Reporte IA
-                </button>
-              </div>
-            </div>
-            
-            <div class="reports-tabs">
-              <div class="reports-tab-nav">
-                <button class="reports-tab-btn active" data-tab="achievements">🏆 Logros</button>
-                <button class="reports-tab-btn" data-tab="ai-reports">🤖 Reportes IA</button>
-                <button class="reports-tab-btn" data-tab="statistics">📊 Estadísticas</button>
-              </div>
-              
-              <div class="reports-tab-content">
-                <div id="achievements-tab" class="reports-tab active">
-                  <div id="achievements-list" class="achievements-list">
-                    <!-- Achievements will be loaded here -->
-                  </div>
-                </div>
-                
-                <div id="ai-reports-tab" class="reports-tab">
-                  <div class="ai-reports-section">
-                    <div class="ai-reports-options">
-                      <div class="form-group">
-                        <label for="report-period-reports">Período del Informe</label>
-                        <select id="report-period-reports" name="period">
-                          <option value="current">Mes Actual</option>
-                          <option value="last3">Últimos 3 Meses</option>
-                          <option value="last6">Últimos 6 Meses</option>
-                          <option value="year">Año Completo</option>
-                        </select>
-                      </div>
-                      
-                      <div class="form-group">
-                        <label for="report-focus-reports">Enfoque del Informe</label>
-                        <select id="report-focus-reports" name="focus">
-                          <option value="general">Análisis General</option>
-                          <option value="savings">Enfoque en Ahorros</option>
-                          <option value="expenses">Análisis de Gastos</option>
-                          <option value="budget">Optimización de Presupuesto</option>
-                          <option value="goals">Progreso hacia Objetivos</option>
-                        </select>
-                      </div>
-                      
-                      <button id="generate-quick-report" class="btn btn-primary">
-                        <span>🤖</span>
-                        Generar Reporte Rápido
-                      </button>
+            <div class="modal-body">
+                <div class="import-section">
+                    <div class="form-group">
+                        <label for="import-file">Archivo CSV *</label>
+                        <input type="file" id="import-file" accept=".csv" required>
                     </div>
                     
-                    <div id="reports-history" class="reports-history">
-                      <h4>📋 Historial de Reportes</h4>
-                      <!-- Historial de reportes generados -->
+                    <div class="form-group">
+                        <label>Tipo de Datos</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="import-type" value="auto" checked>
+                                <span class="radio-mark"></span>
+                                Detectar automáticamente
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="import-type" value="expenses">
+                                <span class="radio-mark"></span>
+                                Solo gastos
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="import-type" value="incomes">
+                                <span class="radio-mark"></span>
+                                Solo ingresos
+                            </label>
+                        </div>
                     </div>
-                  </div>
+                    
+                    <div class="import-info">
+                        <h4>Formato del CSV</h4>
+                        <p>El archivo debe contener las siguientes columnas:</p>
+                        <ul>
+                            <li><strong>Gastos:</strong> descripcion, monto, categoria, fecha</li>
+                            <li><strong>Ingresos:</strong> descripcion, monto, tipo, fecha</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                <button type="button" id="process-import-btn" class="btn btn-primary">Importar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Incomes Modal -->
+    <div id="view-incomes-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Todos los Ingresos</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="all-incomes-list" class="incomes-list">
+                    <!-- Incomes will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Installments Modal -->
+    <div id="view-installments-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cuotas Activas</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="installments-list" class="installments-list">
+                    <!-- Installments will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate AI Report Modal -->
+    <div id="generate-ai-report-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Generar Reporte con IA</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form class="modal-form">
+                <div class="form-group">
+                    <label for="report-period">Período de Análisis</label>
+                    <select id="report-period" name="period">
+                        <option value="current">Mes Actual</option>
+                        <option value="last3">Últimos 3 Meses</option>
+                        <option value="last6">Últimos 6 Meses</option>
+                        <option value="year">Año Completo</option>
+                    </select>
                 </div>
                 
-                <div id="statistics-tab" class="reports-tab">
-                  <div class="statistics-section">
-                    <h4>📊 Estadísticas Avanzadas</h4>
-                    <div id="advanced-statistics" class="advanced-statistics">
-                      <!-- Estadísticas detalladas -->
-                    </div>
-                  </div>
+                <div class="form-group">
+                    <label for="report-focus">Enfoque del Análisis</label>
+                    <select id="report-focus" name="focus">
+                        <option value="general">Análisis General</option>
+                        <option value="savings">Estrategias de Ahorro</option>
+                        <option value="expenses">Optimización de Gastos</option>
+                        <option value="budget">Planificación de Presupuesto</option>
+                        <option value="goals">Objetivos Financieros</option>
+                    </select>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Settings Section -->
-        <section id="settings-section" class="tab-section">
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Configuración</h1>
-            </div>
-            
-            <div class="settings-grid">
-              <div class="settings-card">
-                <h3>Categorías</h3>
-                <p>Gestiona tus categorías de gastos</p>
-                <button id="manage-categories-btn" class="btn btn-secondary">
-                  <span>🏷️</span>
-                  Gestionar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h3>Exportar Datos</h3>
-                <p>Descarga tus datos financieros</p>
-                <button id="export-data-btn" class="btn btn-secondary">
-                  <span>📊</span>
-                  Exportar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h3>Importar Datos</h3>
-                <p>Carga tus datos desde archivo CSV</p>
-                <button id="import-data-btn" class="btn btn-secondary">
-                  <span>📥</span>
-                  Importar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h3>Respaldo de Datos</h3>
-                <p>Respalda y restaura tu información</p>
-                <button id="backup-data-btn" class="btn btn-secondary">
-                  <span>☁️</span>
-                  Respaldar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h3>Preferencias de Usuario</h3>
-                <p>Configura tu experiencia personalizada</p>
-                <button id="user-preferences-btn" class="btn btn-secondary">
-                  <span>👤</span>
-                  Configurar
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
-  </div>
-
-  <!-- Modals -->
-  
-  <!-- Add Client Modal -->
-  <div id="add-client-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>👤 Nuevo Cliente</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-client-form" class="modal-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="client-name">Nombre Completo *</label>
-            <input type="text" id="client-name" name="name" required />
-          </div>
-          <div class="form-group">
-            <label for="client-email">Email</label>
-            <input type="email" id="client-email" name="email" />
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="client-phone">Teléfono</label>
-            <input type="tel" id="client-phone" name="phone" />
-          </div>
-          <div class="form-group">
-            <label for="client-birth-date">Fecha de Nacimiento</label>
-            <input type="date" id="client-birth-date" name="birthDate" />
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="client-address">Dirección</label>
-          <textarea id="client-address" name="address" rows="2"></textarea>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="client-type">Tipo de Cliente</label>
-            <select id="client-type" name="clientType">
-              <option value="individual">Individual</option>
-              <option value="business">Empresa</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="client-status">Estado</label>
-            <select id="client-status" name="status">
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="client-notes">Notas</label>
-          <textarea id="client-notes" name="notes" rows="3" placeholder="Información adicional sobre el cliente..."></textarea>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Cliente</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Edit Client Modal -->
-  <div id="edit-client-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>✏️ Editar Cliente</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="edit-client-form" class="modal-form">
-        <input type="hidden" id="edit-client-id" name="clientId" />
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="edit-client-name">Nombre Completo *</label>
-            <input type="text" id="edit-client-name" name="name" required />
-          </div>
-          <div class="form-group">
-            <label for="edit-client-email">Email</label>
-            <input type="email" id="edit-client-email" name="email" />
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="edit-client-phone">Teléfono</label>
-            <input type="tel" id="edit-client-phone" name="phone" />
-          </div>
-          <div class="form-group">
-            <label for="edit-client-birth-date">Fecha de Nacimiento</label>
-            <input type="date" id="edit-client-birth-date" name="birthDate" />
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="edit-client-address">Dirección</label>
-          <textarea id="edit-client-address" name="address" rows="2"></textarea>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="edit-client-type">Tipo de Cliente</label>
-            <select id="edit-client-type" name="clientType">
-              <option value="individual">Individual</option>
-              <option value="business">Empresa</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="edit-client-status">Estado</label>
-            <select id="edit-client-status" name="status">
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="edit-client-notes">Notas</label>
-          <textarea id="edit-client-notes" name="notes" rows="3"></textarea>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- View Incomes Modal -->
-  <div id="view-incomes-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>💰 Ingresos del Mes</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div id="all-incomes-list" class="all-incomes-list">
-          <!-- Lista de todos los ingresos del mes -->
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- View Installments Modal -->
-  <div id="view-installments-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>📊 Cuotas Activas del Mes</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div id="installments-list" class="installments-list">
-          <!-- Lista de cuotas del mes -->
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Spending Limit Modal -->
-  <div id="add-spending-limit-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Agregar Límite de Gasto</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-spending-limit-form" class="modal-form">
-        <div class="form-group">
-          <label for="limit-category">Categoría</label>
-          <select id="limit-category" name="category" required>
-            <option value="">Selecciona una categoría</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="limit-amount">Límite Mensual</label>
-          <input type="number" id="limit-amount" name="amount" step="0.01" required />
-        </div>
-        <div class="form-group">
-          <label for="limit-warning">Porcentaje de Alerta (%)</label>
-          <input type="number" id="limit-warning" name="warningPercentage" min="50" max="100" value="80" />
-          <small class="input-hint">Te alertaremos cuando alcances este porcentaje del límite</small>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Límite</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Add Expense Modal -->
-  <div id="add-expense-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Agregar Gasto</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-expense-form" class="modal-form">
-        <div class="form-group">
-          <label for="expense-description">Descripción</label>
-          <input type="text" id="expense-description" name="description" required />
-        </div>
-        <div class="form-group">
-          <label for="expense-amount">Monto</label>
-          <input type="number" id="expense-amount" name="amount" step="0.01" required />
-        </div>
-        <div class="form-group">
-          <label for="expense-category">Categoría</label>
-          <select id="expense-category" name="category" required>
-            <option value="">Selecciona una categoría</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="expense-date">Fecha</label>
-          <input type="date" id="expense-date" name="transactionDate" required />
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="expense-installments" name="hasInstallments" />
-            Pagar en cuotas
-          </label>
-        </div>
-        <div id="installments-group" class="form-group hidden">
-          <label for="expense-installments-count">Número de cuotas</label>
-          <input type="number" id="expense-installments-count" name="installmentsCount" min="2" max="24" />
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Agregar Gasto</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Income Modal -->
-  <div id="add-income-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Agregar Ingreso</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-income-form" class="modal-form">
-        <div class="form-group">
-          <label for="income-type">Tipo de Ingreso</label>
-          <select id="income-type" name="type" required>
-            <option value="fixed">Ingreso Fijo (Sueldo)</option>
-            <option value="extra">Ingreso Extra</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="income-amount">Monto</label>
-          <input type="number" id="income-amount" name="amount" step="0.01" required />
-        </div>
-        <div id="extra-income-group" class="hidden">
-          <div class="form-group">
-            <label for="income-description">Descripción</label>
-            <input type="text" id="income-description" name="description" />
-          </div>
-          <div class="form-group">
-            <label for="income-category">Categoría</label>
-            <select id="income-category" name="category">
-              <option value="freelance">Freelance</option>
-              <option value="bonus">Bonus</option>
-              <option value="investment">Inversión</option>
-              <option value="other">Otro</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Agregar Ingreso</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Goal Modal -->
-  <div id="add-goal-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Nuevo Objetivo de Ahorro</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-goal-form" class="modal-form">
-        <div class="form-group">
-          <label for="goal-name">Nombre del Objetivo</label>
-          <input type="text" id="goal-name" name="name" required />
-        </div>
-        <div class="form-group">
-          <label for="goal-target">Monto Objetivo</label>
-          <input type="number" id="goal-target" name="targetAmount" step="0.01" required />
-        </div>
-        <div class="form-group">
-          <label for="goal-current">Monto Actual (opcional)</label>
-          <input type="number" id="goal-current" name="currentAmount" step="0.01" value="0" />
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Objetivo</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Manage Categories Modal -->
-  <div id="manage-categories-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🏷️ Gestionar Categorías</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="categories-management">
-          <div class="add-category-section">
-            <h3>Agregar Nueva Categoría</h3>
-            <form id="add-category-form" class="category-form">
-              <div class="form-group">
-                <label for="category-name">Nombre</label>
-                <input type="text" id="category-name" name="name" required />
-              </div>
-              <div class="form-group">
-                <label for="category-icon">Icono</label>
-                <input type="text" id="category-icon" name="icon" placeholder="🏷️" required />
-              </div>
-              <div class="form-group">
-                <label for="category-color">Color</label>
-                <input type="color" id="category-color" name="color" value="#B7A6FF" />
-              </div>
-              <button type="submit" class="btn btn-primary">
-                <span>➕</span>
-                Agregar Categoría
-              </button>
+                
+                <div class="form-group">
+                    <label for="report-questions">Preguntas Específicas (Opcional)</label>
+                    <textarea id="report-questions" name="questions" rows="3" placeholder="¿Tienes alguna pregunta específica sobre tus finanzas?"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="button" id="generate-report-btn" class="btn btn-primary">
+                        <span>🤖</span>
+                        Generar Reporte
+                    </button>
+                </div>
             </form>
-          </div>
-          
-          <div class="categories-list-section">
-            <h3>Categorías Existentes</h3>
-            <div id="categories-management-list" class="categories-management-list">
-              <!-- Categories will be loaded here -->
+            
+            <div id="ai-report-result" class="report-result hidden">
+                <div class="report-header">
+                    <h4>Tu Reporte Financiero</h4>
+                    <button id="download-report-btn" class="btn btn-secondary">
+                        <span>📄</span>
+                        Descargar PDF
+                    </button>
+                </div>
+                <div id="ai-report-content" class="report-content">
+                    <!-- AI report content will be populated here -->
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Import Data Modal -->
-  <div id="import-data-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>📥 Importar Datos</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="import-section">
-          <h3>Seleccionar Archivo CSV</h3>
-          <div class="file-upload-area">
-            <input type="file" id="import-file" accept=".csv" />
-            <div class="file-upload-info">
-              <p><strong>Formatos soportados automáticamente:</strong></p>
-              <ul>
-                <li><strong>FINZN Completo:</strong> tipo,descripcion,monto,categoria,fecha,mes,cuota_actual,total_cuotas,monto_original,es_recurrente</li>
-                <li><strong>Gastos:</strong> descripcion,monto,categoria,fecha,cuota_actual,total_cuotas</li>
-                <li><strong>Ingresos:</strong> tipo,monto,descripcion,fecha</li>
-                <li><strong>Banco:</strong> fecha,descripcion,monto (detecta automáticamente gastos/ingresos)</li>
-                <li><strong>Otros formatos:</strong> Se detectan automáticamente por contenido</li>
-              </ul>
-              <p><em>El sistema detecta automáticamente el formato y tipo de datos.</em></p>
+    <!-- Add Event Modal -->
+    <div id="add-event-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Evento</h3>
+                <button class="modal-close">&times;</button>
             </div>
-          </div>
-          <div class="import-options">
-            <label>
-              <input type="radio" name="import-type" value="auto" checked />
-              Detección Automática (Recomendado)
-            </label>
-            <label>
-              <input type="radio" name="import-type" value="expenses" />
-              Forzar como Gastos
-            </label>
-            <label>
-              <input type="radio" name="import-type" value="incomes" />
-              Forzar como Ingresos
-            </label>
-          </div>
+            <form id="add-event-form" class="modal-form">
+                <div class="form-group">
+                    <label for="event-title">Título *</label>
+                    <input type="text" id="event-title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-type">Tipo *</label>
+                    <select id="event-type" name="type" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="payment">Pago</option>
+                        <option value="income">Ingreso</option>
+                        <option value="reminder">Recordatorio</option>
+                        <option value="meeting">Reunión</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-date">Fecha *</label>
+                    <input type="date" id="event-date" name="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-time">Hora</label>
+                    <input type="time" id="event-time" name="time" value="09:00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-duration">Duración (minutos)</label>
+                    <input type="number" id="event-duration" name="duration" min="15" max="480" value="60">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-amount">Monto (opcional)</label>
+                    <input type="number" id="event-amount" name="amount" step="0.01" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-category">Categoría</label>
+                    <select id="event-category" name="category">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-description">Descripción</label>
+                    <textarea id="event-description" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="event-recurring" name="recurring">
+                        <span class="checkmark"></span>
+                        Evento recurrente
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Evento</button>
+                </div>
+            </form>
         </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-        <button type="button" id="process-import-btn" class="btn btn-primary">
-          <span>📥</span>
-          Importar Datos
-        </button>
-      </div>
     </div>
-  </div>
 
-  <!-- Generate AI Report Modal -->
-  <div id="generate-ai-report-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🤖 Generar Informe Financiero con IA</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="ai-report-options">
-          <div class="form-group">
-            <label for="report-period">Período del Informe</label>
-            <select id="report-period" name="period">
-              <option value="current">Mes Actual</option>
-              <option value="last3">Últimos 3 Meses</option>
-              <option value="last6">Últimos 6 Meses</option>
-              <option value="year">Año Completo</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="report-focus">Enfoque del Informe</label>
-            <select id="report-focus" name="focus">
-              <option value="general">Análisis General</option>
-              <option value="savings">Enfoque en Ahorros</option>
-              <option value="expenses">Análisis de Gastos</option>
-              <option value="budget">Optimización de Presupuesto</option>
-              <option value="goals">Progreso hacia Objetivos</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="report-questions">Preguntas Específicas (Opcional)</label>
-            <textarea id="report-questions" name="questions" rows="3" placeholder="¿Hay algo específico que te gustaría saber sobre tus finanzas?"></textarea>
-          </div>
+    <!-- Calendar Settings Modal -->
+    <div id="calendar-settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración del Calendario</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Integración con Google Calendar</h4>
+                    <p>Conecta tu cuenta de Google para sincronizar eventos automáticamente.</p>
+                    <button class="btn btn-primary integration-btn google-calendar">
+                        <span>📅</span>
+                        Conectar Google Calendar
+                    </button>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Recordatorios</h4>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="email-reminders" checked>
+                            <span class="checkmark"></span>
+                            Recordatorios por email
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="push-reminders" checked>
+                            <span class="checkmark"></span>
+                            Notificaciones push
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Vista del Calendario</h4>
+                    <div class="form-group">
+                        <label for="calendar-start-day">Primer día de la semana</label>
+                        <select id="calendar-start-day">
+                            <option value="0">Domingo</option>
+                            <option value="1" selected>Lunes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div id="ai-report-result" class="ai-report-result hidden">
-          <h3>📊 Tu Informe Financiero Personalizado</h3>
-          <div id="ai-report-content" class="ai-report-content">
-            <!-- El informe generado aparecerá aquí -->
-          </div>
-          <div class="ai-report-actions">
-            <button id="download-report-btn" class="btn btn-secondary">
-              <span>📄</span>
-              Descargar
-            </button>
-            <button id="share-report-btn" class="btn btn-secondary">
-              <span>📤</span>
-              Compartir
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-        <button type="button" id="generate-report-btn" class="btn btn-primary">
-          <span>🤖</span>
-          Generar Informe
-        </button>
-      </div>
     </div>
-  </div>
 
-  <!-- Add Calendar Event Modal -->
-  <div id="add-event-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>📅 Nuevo Evento Financiero</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-event-form" class="modal-form">
-        <div class="form-group">
-          <label for="event-title">Título del Evento</label>
-          <input type="text" id="event-title" name="title" required />
-        </div>
-        <div class="form-group">
-          <label for="event-type">Tipo de Evento</label>
-          <select id="event-type" name="type" required>
-            <option value="payment">Pago/Cuota</option>
-            <option value="income">Ingreso Esperado</option>
-            <option value="goal-deadline">Fecha Límite de Objetivo</option>
-            <option value="review">Revisión Financiera</option>
-            <option value="reminder">Recordatorio</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="event-date">Fecha</label>
-          <input type="date" id="event-date" name="date" required />
-        </div>
-        <div class="form-group">
-          <label for="event-time">Hora</label>
-          <input type="time" id="event-time" name="time" value="09:00" />
-        </div>
-        <div class="form-group">
-          <label for="event-duration">Duración (minutos)</label>
-          <input type="number" id="event-duration" name="duration" value="60" min="15" max="480" />
-        </div>
-        <div class="form-group">
-          <label for="event-amount">Monto (opcional)</label>
-          <input type="number" id="event-amount" name="amount" step="0.01" />
-        </div>
-        <div class="form-group">
-          <label for="event-description">Descripción</label>
-          <textarea id="event-description" name="description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="event-category">Categoría</label>
-          <select id="event-category" name="category">
-            <option value="">Selecciona una categoría</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="event-recurring" name="recurring" />
-            Evento recurrente
-          </label>
-        </div>
-        
-        <!-- Configuración de Recordatorios -->
-        <div class="form-section">
-          <h4>⏰ Configuración de Recordatorios</h4>
-          <div class="reminders-config">
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="reminder-1h" name="reminder1h" checked />
-                Recordar 1 hora antes
-              </label>
+    <!-- Add Client Modal -->
+    <div id="add-client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Cliente</h3>
+                <button class="modal-close">&times;</button>
             </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="reminder-15m" name="reminder15m" checked />
-                Recordar 15 minutos antes
-              </label>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="reminder-custom" name="reminderCustom" />
-                Recordatorio personalizado
-              </label>
-              <div id="custom-reminder-group" class="hidden">
-                <input type="number" id="custom-reminder-minutes" name="customReminderMinutes" min="1" max="10080" placeholder="Minutos antes" />
-              </div>
-            </div>
-          </div>
+            <form id="add-client-form" class="modal-form">
+                <div class="form-group">
+                    <label for="client-name">Nombre Completo *</label>
+                    <input type="text" id="client-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-email">Email</label>
+                    <input type="email" id="client-email" name="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-phone">Teléfono</label>
+                    <input type="tel" id="client-phone" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-address">Dirección</label>
+                    <textarea id="client-address" name="address" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-birth-date">Fecha de Nacimiento</label>
+                    <input type="date" id="client-birth-date" name="birthDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-type">Tipo de Cliente</label>
+                    <select id="client-type" name="clientType">
+                        <option value="individual">Individual</option>
+                        <option value="business">Empresa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-status">Estado</label>
+                    <select id="client-status" name="status">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-notes">Notas</label>
+                    <textarea id="client-notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Cliente</button>
+                </div>
+            </form>
         </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Evento</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- Calendar Settings Modal -->
-  <div id="calendar-settings-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>⚙️ Configuración de Recordatorios</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="settings-section">
-          <h4>🎨 Plantillas de Títulos</h4>
-          <div class="template-config">
-            <div class="form-group">
-              <label for="template-payment">Pagos/Cuotas</label>
-              <input type="text" id="template-payment" value="💰 {title}" />
-              <small>Usa {title} para el título del evento</small>
+    <!-- Edit Client Modal -->
+    <div id="edit-client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Cliente</h3>
+                <button class="modal-close">&times;</button>
             </div>
-            <div class="form-group">
-              <label for="template-income">Ingresos</label>
-              <input type="text" id="template-income" value="💵 {title}" />
-            </div>
-            <div class="form-group">
-              <label for="template-goal">Objetivos</label>
-              <input type="text" id="template-goal" value="🎯 {title}" />
-            </div>
-            <div class="form-group">
-              <label for="template-review">Revisiones</label>
-              <input type="text" id="template-review" value="📊 {title}" />
-            </div>
-            <div class="form-group">
-              <label for="template-reminder">Recordatorios</label>
-              <input type="text" id="template-reminder" value="⏰ {title}" />
-            </div>
-          </div>
+            <form id="edit-client-form" class="modal-form">
+                <input type="hidden" id="edit-client-id" name="clientId">
+                
+                <div class="form-group">
+                    <label for="edit-client-name">Nombre Completo *</label>
+                    <input type="text" id="edit-client-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-email">Email</label>
+                    <input type="email" id="edit-client-email" name="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-phone">Teléfono</label>
+                    <input type="tel" id="edit-client-phone" name="phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-address">Dirección</label>
+                    <textarea id="edit-client-address" name="address" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-birth-date">Fecha de Nacimiento</label>
+                    <input type="date" id="edit-client-birth-date" name="birthDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-type">Tipo de Cliente</label>
+                    <select id="edit-client-type" name="clientType">
+                        <option value="individual">Individual</option>
+                        <option value="business">Empresa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-status">Estado</label>
+                    <select id="edit-client-status" name="status">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-client-notes">Notas</label>
+                    <textarea id="edit-client-notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
+                </div>
+            </form>
         </div>
-        
-        <div class="settings-section">
-          <h4>📝 Plantilla de Descripción</h4>
-          <div class="form-group">
-            <textarea id="description-template" rows="8" placeholder="Usa {description}, {amount}, {category} como variables"></textarea>
-            <small>Variables disponibles: {description}, {amount}, {category}</small>
-          </div>
-        </div>
-        
-        <div class="settings-section">
-          <h4>⏰ Recordatorios por Defecto</h4>
-          <div class="default-reminders">
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="default-1h" checked />
-                1 hora antes
-              </label>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="default-15m" checked />
-                15 minutos antes
-              </label>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="default-1d" />
-                1 día antes
-              </label>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="default-1w" />
-                1 semana antes
-              </label>
-            </div>
-          </div>
-        </div>
-        
-        <div class="calendar-section">
-          <h3>📅 Integración de Calendarios</h3>
-          <p>Conecta tus calendarios para recibir recordatorios automáticos en tu celular</p>
-          
-          <div id="calendar-help" style="display: none;"></div>
-          
-          <div class="calendar-providers">
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" id="reset-settings">Restablecer</button>
-        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-        <button type="button" class="btn btn-primary" id="save-settings">Guardar Configuración</button>
-      </div>
     </div>
-  </div>
-  <!-- Chat Widget -->
-  <div id="chat-widget" class="chat-widget">
-    <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">
-      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-icon" />
-      <div class="chat-notification" id="chat-notification">💬</div>
-    </button>
-    
-    <div id="chat-window" class="chat-window hidden">
-      <div class="chat-header">
-        <div class="chat-header-info">
-          <img src="/robot-chat.png" alt="Asistente" class="chat-header-avatar" />
-          <div class="chat-header-text">
-            <h3>Asistente FINZN</h3>
-            <p id="chat-status">En línea</p>
-          </div>
-        </div>
-        <div class="chat-header-actions">
-          <button id="chat-minimize" class="chat-action-btn" title="Minimizar">−</button>
-          <button id="chat-close" class="chat-action-btn" title="Cerrar">&times;</button>
-        </div>
-      </div>
-      
-      <div id="chat-messages" class="chat-messages">
-        <!-- Messages will be added here -->
-      </div>
-      
-      <div class="chat-suggestions" id="chat-suggestions">
-        <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">💰 Consejos de ahorro</button>
-        <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">📊 Analizar gastos</button>
-        <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">📋 Organizar presupuesto</button>
-      </div>
-      
-      <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
-        <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
-        <button type="submit" class="chat-send">
-          <span>📤</span>
-        </button>
-      </form>
-    </div>
-    
-    <!-- Chat minimizado -->
-    <div id="chat-minimized" class="chat-minimized hidden">
-      <div class="minimized-content">
-        <img src="/robot-chat.png" alt="Chat" class="minimized-avatar" />
-        <span class="minimized-text">Chat minimizado</span>
-        <button id="chat-restore" class="chat-restore-btn">↗</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Load main application -->
-  <script type="module" src="/src/main.js"></script>
+    <!-- Add Contact Modal -->
+    <div id="add-contact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Contacto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-contact-form" class="modal-form">
+                <div class="form-group">
+                    <label for="contact-name">Nombre *</label>
+                    <input type="text" id="contact-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-type">Tipo *</label>
+                    <select id="contact-type" name="type" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="persona">👤 Persona</option>
+                        <option value="empresa">🏢 Empresa</option>
+                        <option value="alquiler">🏠 Alquiler</option>
+                        <option value="otro">📋 Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-amount">Monto Relacionado</label>
+                    <input type="number" id="contact-amount" name="amount" step="0.01" min="0" placeholder="Opcional">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-notes">Notas</label>
+                    <textarea id="contact-notes" name="notes" rows="3" placeholder="Información adicional..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-reminder">Fecha de Recordatorio</label>
+                    <input type="date" id="contact-reminder" name="reminderDate">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Contacto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Contact Modal -->
+    <div id="edit-contact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Contacto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="edit-contact-form" class="modal-form">
+                <input type="hidden" id="edit-contact-id" name="contactId">
+                
+                <div class="form-group">
+                    <label for="edit-contact-name">Nombre *</label>
+                    <input type="text" id="edit-contact-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-type">Tipo *</label>
+                    <select id="edit-contact-type" name="type" required>
+                        <option value="persona">👤 Persona</option>
+                        <option value="empresa">🏢 Empresa</option>
+                        <option value="alquiler">🏠 Alquiler</option>
+                        <option value="otro">📋 Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-amount">Monto Relacionado</label>
+                    <input type="number" id="edit-contact-amount" name="amount" step="0.01" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-notes">Notas</label>
+                    <textarea id="edit-contact-notes" name="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-reminder">Fecha de Recordatorio</label>
+                    <input type="date" id="edit-contact-reminder" name="reminderDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-contact-status">Estado</label>
+                    <select id="edit-contact-status" name="status">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Contacto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="src/main.js"></script>
 </body>
 </html>
