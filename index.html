@@ -743,8 +743,8 @@
             <input type="text" id="client-name" name="name" required />
           </div>
           <div class="form-group">
-            <label for="client-description">Descripción</label>
-            <textarea id="client-description" name="description" rows="3" placeholder="Breve descripción del cliente..."></textarea>
+            <label for="client-email">Email</label>
+            <input type="email" id="client-email" name="email" />
           </div>
         </div>
         
@@ -766,12 +766,35 @@
         
         <div class="form-row">
           <div class="form-group">
+            <label for="client-type">Tipo de Cliente</label>
+            <select id="client-type" name="clientType">
+              <option value="individual">Individual</option>
+              <option value="business">Empresa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="client-status">Estado</label>
+            <select id="client-status" name="status">
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="client-notes">Notas</label>
+          <textarea id="client-notes" name="notes" rows="3" placeholder="Información adicional sobre el cliente..."></textarea>
+        </div>
         
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Crear Cliente</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Edit Client Modal -->
   <div id="edit-client-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -794,8 +817,27 @@
         
         <div class="form-row">
           <div class="form-group">
-            <label for="edit-client-description">Descripción</label>
-            <textarea id="edit-client-description" name="description" rows="3" placeholder="Breve descripción del cliente..."></textarea>
+            <label for="edit-client-phone">Teléfono</label>
+            <input type="tel" id="edit-client-phone" name="phone" />
+          </div>
+          <div class="form-group">
+            <label for="edit-client-birth-date">Fecha de Nacimiento</label>
+            <input type="date" id="edit-client-birth-date" name="birthDate" />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-client-address">Dirección</label>
+          <textarea id="edit-client-address" name="address" rows="2"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-client-type">Tipo de Cliente</label>
+            <select id="edit-client-type" name="clientType">
+              <option value="individual">Individual</option>
+              <option value="business">Empresa</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="edit-client-status">Estado</label>
@@ -804,6 +846,10 @@
               <option value="inactive">Inactivo</option>
             </select>
           </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-client-notes">Notas</label>
           <textarea id="edit-client-notes" name="notes" rows="3"></textarea>
         </div>
         
@@ -1211,6 +1257,13 @@
         <div class="form-group">
           <label for="event-title">Título del Evento</label>
           <input type="text" id="event-title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="event-client">Cliente (opcional)</label>
+          <select id="event-client" name="client">
+            <option value="">Sin cliente asociado</option>
+            <!-- Clients will be populated here -->
+          </select>
         </div>
         <div class="form-group">
           <label for="event-type">Tipo de Evento</label>

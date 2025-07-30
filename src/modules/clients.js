@@ -621,47 +621,6 @@ export class ClientsManager {
   }
 
   // Export/Import methods
-  exportClients() {
-    try {
-      const csvData = this.clients.map(client => ({
-        nombre: client.name,
-        email: client.email || '',
-        telefono: client.phone || '',
-        direccion: client.address || '',
-        fecha_nacimiento: client.birth_date || '',
-        rango_etario: this.getAgeRangeLabel(client.age_range),
-        tipo_cliente: client.client_type === 'individual' ? 'Individual' : 'Empresa',
-        estado: client.status === 'active' ? 'Activo' : 'Inactivo',
-        notas: client.notes || '',
-        fecha_creacion: new Date(client.created_at).toLocaleDateString('es-ES')
-      }));
-
-      const headers = Object.keys(csvData[0] || {});
-      const csvContent = [
-        headers.join(','),
-        ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
-      ].join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `clientes_finzn_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Clientes exportados correctamente', 'success');
-      }
-    } catch (error) {
-      console.error('Error exporting clients:', error);
-      if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al exportar clientes', 'error');
-      }
-    }
-  }
 
   getCurrentUserId() {
     return window.app?.auth?.getCurrentUserId() || null;
@@ -671,7 +630,4 @@ export class ClientsManager {
     return this.clients;
   }
 
-  getFilteredClients() {
-    return this.filteredClients;
-  }
 }
