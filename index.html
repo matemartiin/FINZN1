@@ -743,8 +743,8 @@
             <input type="text" id="client-name" name="name" required />
           </div>
           <div class="form-group">
-            <label for="client-email">Email</label>
-            <input type="email" id="client-email" name="email" />
+            <label for="client-description">Descripción</label>
+            <textarea id="client-description" name="description" rows="3" placeholder="Breve descripción del cliente..."></textarea>
           </div>
         </div>
         
@@ -766,35 +766,12 @@
         
         <div class="form-row">
           <div class="form-group">
-            <label for="client-type">Tipo de Cliente</label>
-            <select id="client-type" name="clientType">
-              <option value="individual">Individual</option>
-              <option value="business">Empresa</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="client-status">Estado</label>
-            <select id="client-status" name="status">
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="client-notes">Notas</label>
-          <textarea id="client-notes" name="notes" rows="3" placeholder="Información adicional sobre el cliente..."></textarea>
-        </div>
         
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Crear Cliente</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- Edit Client Modal -->
   <div id="edit-client-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -817,27 +794,8 @@
         
         <div class="form-row">
           <div class="form-group">
-            <label for="edit-client-phone">Teléfono</label>
-            <input type="tel" id="edit-client-phone" name="phone" />
-          </div>
-          <div class="form-group">
-            <label for="edit-client-birth-date">Fecha de Nacimiento</label>
-            <input type="date" id="edit-client-birth-date" name="birthDate" />
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="edit-client-address">Dirección</label>
-          <textarea id="edit-client-address" name="address" rows="2"></textarea>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="edit-client-type">Tipo de Cliente</label>
-            <select id="edit-client-type" name="clientType">
-              <option value="individual">Individual</option>
-              <option value="business">Empresa</option>
-            </select>
+            <label for="edit-client-description">Descripción</label>
+            <textarea id="edit-client-description" name="description" rows="3" placeholder="Breve descripción del cliente..."></textarea>
           </div>
           <div class="form-group">
             <label for="edit-client-status">Estado</label>
@@ -846,10 +804,6 @@
               <option value="inactive">Inactivo</option>
             </select>
           </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="edit-client-notes">Notas</label>
           <textarea id="edit-client-notes" name="notes" rows="3"></textarea>
         </div>
         
@@ -1065,19 +1019,68 @@
               <div class="form-group">
                 <label for="category-color">Color</label>
                 <input type="color" id="category-color" name="color" value="#B7A6FF" />
-              </div>
-              <button type="submit" class="btn btn-primary">
-                <span>➕</span>
-                Agregar Categoría
-              </button>
-            </form>
-          </div>
-          
-          <div class="categories-list-section">
-            <h3>Categorías Existentes</h3>
+            <button id="add-client-btn" class="btn btn-primary">
+              <span>👤</span>
+              Agregar Cliente
+            </button>
             <div id="categories-management-list" class="categories-management-list">
               <!-- Categories will be loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat IA Widget -->
+      <div id="chat-widget" class="chat-widget">
+        <div id="chat-toggle" class="chat-toggle">
+          <div class="chat-robot">🤖</div>
+          <div class="chat-pulse"></div>
+        </div>
+        
+        <div id="chat-window" class="chat-window hidden">
+          <div class="chat-header">
+            <div class="chat-title">
+              <img src="/robot-chat.png" alt="FINZN AI" class="chat-avatar-img" />
+              <div>
+                <div class="chat-name">FINZN AI</div>
+                <div id="chat-status" class="chat-status">En línea</div>
+              </div>
             </div>
+            <div class="chat-controls">
+              <button id="chat-minimize" class="chat-control-btn" title="Minimizar">−</button>
+              <button id="chat-close" class="chat-control-btn" title="Cerrar">×</button>
+            </div>
+          </div>
+          
+          <div id="chat-messages" class="chat-messages">
+            <!-- Messages will be added here -->
+          </div>
+          
+          <div id="chat-suggestions" class="chat-suggestions">
+            <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">💰 Consejos de ahorro</button>
+            <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">📊 Analizar gastos</button>
+            <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">📋 Organizar presupuesto</button>
+          </div>
+          
+          <form id="chat-form" class="chat-form">
+            <div class="chat-input-container">
+              <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
+              <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
+              <button type="submit" class="chat-send-btn">➤</button>
+            </div>
+          </form>
+        </div>
+        
+        <div id="chat-minimized" class="chat-minimized hidden">
+          <div id="chat-restore" class="chat-restore">
+            <img src="/robot-chat.png" alt="FINZN AI" class="chat-avatar-img" />
+            <div class="chat-minimized-text">FINZN AI</div>
+          </div>
+        </div>
+        
+        <div id="chat-notification" class="chat-notification" style="display: none;">
+          <div class="notification-content">
+            <img src="/robot-chat.png" alt="FINZN AI" class="chat-avatar-img" />
+            <div class="notification-text">Nuevo mensaje</div>
           </div>
         </div>
       </div>
@@ -1248,63 +1251,16 @@
         <div class="form-group">
           <label>
             <input type="checkbox" id="event-recurring" name="recurring" />
-            Evento recurrente
-          </label>
-        </div>
-        
-        <!-- Configuración de Recordatorios -->
-        <div class="form-section">
-          <h4>⏰ Configuración de Recordatorios</h4>
-          <div class="reminders-config">
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="reminder-1h" name="reminder1h" checked />
-                Recordar 1 hora antes
-              </label>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="reminder-15m" name="reminder15m" checked />
-                Recordar 15 minutos antes
-              </label>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="reminder-custom" name="reminderCustom" />
-                Recordatorio personalizado
-              </label>
-              <div id="custom-reminder-group" class="hidden">
-                <input type="number" id="custom-reminder-minutes" name="customReminderMinutes" min="1" max="10080" placeholder="Minutos antes" />
-              </div>
-            </div>
+          <!-- Client Search and Filters -->
+          <div class="clients-controls">
+            <input type="text" id="client-search" placeholder="🔍 Buscar cliente..." class="search-input" />
+            <select id="client-status-filter" class="filter-select">
+              <option value="">Todos los estados</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+            </select>
           </div>
         </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Evento</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Calendar Settings Modal -->
-  <div id="calendar-settings-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>⚙️ Configuración de Recordatorios</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="settings-section">
-          <h4>🎨 Plantillas de Títulos</h4>
-          <div class="template-config">
-            <div class="form-group">
-              <label for="template-payment">Pagos/Cuotas</label>
-              <input type="text" id="template-payment" value="💰 {title}" />
-              <small>Usa {title} para el título del evento</small>
-            </div>
-            <div class="form-group">
               <label for="template-income">Ingresos</label>
               <input type="text" id="template-income" value="💵 {title}" />
             </div>
@@ -1423,11 +1379,7 @@
         <img src="/robot-chat.png" alt="Chat" class="minimized-avatar" />
         <span class="minimized-text">Chat minimizado</span>
         <button id="chat-restore" class="chat-restore-btn">↗</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Load main application -->
-  <script type="module" src="/src/main.js"></script>
+          <!-- Simple Clients List -->
+          <div id="clients-list" class="simple-clients-list">
 </body>
 </html>
