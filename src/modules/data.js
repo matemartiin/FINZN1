@@ -2,6 +2,7 @@ import { supabase } from '../config/supabase.js';
 
 export class DataManager {
   constructor() {
+    this.supabase = supabase; // Expose supabase for other modules
     this.data = {
       expenses: {},
       income: {},

@@ -130,17 +130,17 @@
             <div class="nav-icon">📊</div>
             <span class="nav-label">Dashboard</span>
           </div>
+          <div class="nav-item" data-section="clients">
+            <div class="nav-icon">👥</div>
+            <span class="nav-label">Clientes</span>
+          </div>
           <div class="nav-item" data-section="expenses">
             <div class="nav-icon">💳</div>
-            <span class="nav-label">Gastos</span>
+            <span class="nav-label">Finanzas</span>
           </div>
-          <div class="nav-item" data-section="savings">
-            <div class="nav-icon">🎯</div>
-            <span class="nav-label">Ahorros</span>
-          </div>
-          <div class="nav-item" data-section="achievements">
+          <div class="nav-item" data-section="reports">
             <div class="nav-icon">🏆</div>
-            <span class="nav-label">Logros</span>
+            <span class="nav-label">Reportes</span>
           </div>
           <div class="nav-item" data-section="settings">
             <div class="nav-icon">⚙️</div>
@@ -157,9 +157,13 @@
             <div class="tab-icon">📊</div>
             <span class="tab-label">Dashboard</span>
           </div>
+          <div class="tab-item" data-section="clients">
+            <div class="tab-icon">👥</div>
+            <span class="tab-label">Clientes</span>
+          </div>
           <div class="tab-item" data-section="transactions">
             <div class="tab-icon">💳</div>
-            <span class="tab-label">Transacciones</span>
+            <span class="tab-label">Finanzas</span>
           </div>
           <div class="tab-item" data-section="calendar">
             <div class="tab-icon">📅</div>
@@ -167,11 +171,7 @@
           </div>
           <div class="tab-item" data-section="planning">
             <div class="tab-icon">🎯</div>
-            <span class="tab-label">Planificación</span>
-          </div>
-          <div class="tab-item" data-section="reports">
-            <div class="tab-icon">📊</div>
-            <span class="tab-label">Reportes</span>
+            <span class="tab-label">Objetivos</span>
           </div>
         </div>
 
@@ -275,11 +275,103 @@
           </div>
         </section>
 
-        <!-- Transactions Section (antes Expenses) -->
+        <!-- Clients Section (NUEVO) -->
+        <section id="clients-section" class="tab-section">
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Gestión de Clientes</h1>
+              <div class="section-actions">
+                <button id="export-clients-btn" class="btn btn-secondary">
+                  <span>📊</span>
+                  Exportar
+                </button>
+                <button id="import-clients-btn" class="btn btn-secondary">
+                  <span>📥</span>
+                  Importar
+                </button>
+                <button id="add-client-btn" class="btn btn-primary">
+                  <span>👤</span>
+                  Nuevo Cliente
+                </button>
+              </div>
+            </div>
+            
+            <div class="clients-container">
+              <!-- Filtros y Estadísticas -->
+              <div class="clients-stats-card">
+                <div class="card-header">
+                  <h3>📊 Estadísticas de Clientes</h3>
+                </div>
+                <div class="clients-stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-number" id="total-clients">0</div>
+                    <div class="stat-label">Total Clientes</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-number" id="active-clients">0</div>
+                    <div class="stat-label">Activos</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-number" id="new-clients-month">0</div>
+                    <div class="stat-label">Nuevos este mes</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-number" id="age-range-dominant">-</div>
+                    <div class="stat-label">Rango etario principal</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Filtros -->
+              <div class="clients-filters-card">
+                <div class="card-header">
+                  <h3>🔍 Filtros</h3>
+                </div>
+                <div class="clients-filters">
+                  <input type="text" id="client-search" placeholder="Buscar por nombre o email..." />
+                  <select id="client-status-filter">
+                    <option value="">Todos los estados</option>
+                    <option value="active">Activos</option>
+                    <option value="inactive">Inactivos</option>
+                  </select>
+                  <select id="client-age-range-filter">
+                    <option value="">Todos los rangos etarios</option>
+                    <option value="18_25">18-25 años</option>
+                    <option value="26_35">26-35 años</option>
+                    <option value="36_50">36-50 años</option>
+                    <option value="51_mas">51+ años</option>
+                  </select>
+                  <select id="client-type-filter">
+                    <option value="">Todos los tipos</option>
+                    <option value="individual">Individual</option>
+                    <option value="business">Empresa</option>
+                  </select>
+                  <button id="clear-client-filters" class="btn btn-secondary">Limpiar</button>
+                </div>
+              </div>
+              
+              <!-- Lista de Clientes -->
+              <div class="clients-list-card">
+                <div class="card-header">
+                  <h3>👥 Lista de Clientes</h3>
+                  <div class="view-toggle">
+                    <button id="grid-view-btn" class="view-btn active" title="Vista en cuadrícula">⊞</button>
+                    <button id="list-view-btn" class="view-btn" title="Vista en lista">☰</button>
+                  </div>
+                </div>
+                <div id="clients-list" class="clients-list grid-view">
+                  <!-- Los clientes se cargarán aquí -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Transactions Section (Finanzas) -->
         <section id="transactions-section" class="tab-section">
           <div class="section-content">
             <div class="section-header">
-              <h1>Gestión de Transacciones</h1>
+              <h1>Gestión Financiera</h1>
               <div class="section-actions">
                 <button id="add-income-btn-transactions" class="btn btn-secondary">
                   <span>💰</span>
@@ -451,11 +543,11 @@
           </div>
         </section>
 
-        <!-- Planning Section (antes Savings + nuevas funciones) -->
+        <!-- Planning Section (Objetivos y Planificación) -->
         <section id="planning-section" class="tab-section">
           <div class="section-content">
             <div class="section-header">
-              <h1>Planificación Financiera</h1>
+              <h1>Objetivos y Planificación</h1>
               <div class="section-actions">
                 <button id="add-goal-btn" class="btn btn-primary">
                   <span>🎯</span>
@@ -637,6 +729,138 @@
 
   <!-- Modals -->
   
+  <!-- Add Client Modal -->
+  <div id="add-client-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👤 Nuevo Cliente</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-client-form" class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="client-name">Nombre Completo *</label>
+            <input type="text" id="client-name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="client-email">Email</label>
+            <input type="email" id="client-email" name="email" />
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="client-phone">Teléfono</label>
+            <input type="tel" id="client-phone" name="phone" />
+          </div>
+          <div class="form-group">
+            <label for="client-birth-date">Fecha de Nacimiento</label>
+            <input type="date" id="client-birth-date" name="birthDate" />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="client-address">Dirección</label>
+          <textarea id="client-address" name="address" rows="2"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="client-type">Tipo de Cliente</label>
+            <select id="client-type" name="clientType">
+              <option value="individual">Individual</option>
+              <option value="business">Empresa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="client-status">Estado</label>
+            <select id="client-status" name="status">
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="client-notes">Notas</label>
+          <textarea id="client-notes" name="notes" rows="3" placeholder="Información adicional sobre el cliente..."></textarea>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Client Modal -->
+  <div id="edit-client-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Editar Cliente</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-client-form" class="modal-form">
+        <input type="hidden" id="edit-client-id" name="clientId" />
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-client-name">Nombre Completo *</label>
+            <input type="text" id="edit-client-name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="edit-client-email">Email</label>
+            <input type="email" id="edit-client-email" name="email" />
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-client-phone">Teléfono</label>
+            <input type="tel" id="edit-client-phone" name="phone" />
+          </div>
+          <div class="form-group">
+            <label for="edit-client-birth-date">Fecha de Nacimiento</label>
+            <input type="date" id="edit-client-birth-date" name="birthDate" />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-client-address">Dirección</label>
+          <textarea id="edit-client-address" name="address" rows="2"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-client-type">Tipo de Cliente</label>
+            <select id="edit-client-type" name="clientType">
+              <option value="individual">Individual</option>
+              <option value="business">Empresa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-client-status">Estado</label>
+            <select id="edit-client-status" name="status">
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-client-notes">Notas</label>
+          <textarea id="edit-client-notes" name="notes" rows="3"></textarea>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- View Incomes Modal -->
   <div id="view-incomes-modal" class="modal">
     <div class="modal-content">
@@ -1156,6 +1380,7 @@
   <div id="chat-widget" class="chat-widget">
     <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">
       <img src="/robot-chat.png" alt="Chat" class="chat-toggle-icon" />
+      <div class="chat-notification" id="chat-notification">💬</div>
     </button>
     
     <div id="chat-window" class="chat-window hidden">
@@ -1164,22 +1389,41 @@
           <img src="/robot-chat.png" alt="Asistente" class="chat-header-avatar" />
           <div class="chat-header-text">
             <h3>Asistente FINZN</h3>
-            <p>Tu consejero financiero</p>
+            <p id="chat-status">En línea</p>
           </div>
         </div>
-        <button id="chat-close" class="chat-close">&times;</button>
+        <div class="chat-header-actions">
+          <button id="chat-minimize" class="chat-action-btn" title="Minimizar">−</button>
+          <button id="chat-close" class="chat-action-btn" title="Cerrar">&times;</button>
+        </div>
       </div>
       
       <div id="chat-messages" class="chat-messages">
         <!-- Messages will be added here -->
       </div>
       
+      <div class="chat-suggestions" id="chat-suggestions">
+        <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">💰 Consejos de ahorro</button>
+        <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">📊 Analizar gastos</button>
+        <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">📋 Organizar presupuesto</button>
+      </div>
+      
       <form id="chat-form" class="chat-form">
         <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
+        <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
         <button type="submit" class="chat-send">
           <span>📤</span>
         </button>
       </form>
+    </div>
+    
+    <!-- Chat minimizado -->
+    <div id="chat-minimized" class="chat-minimized hidden">
+      <div class="minimized-content">
+        <img src="/robot-chat.png" alt="Chat" class="minimized-avatar" />
+        <span class="minimized-text">Chat minimizado</span>
+        <button id="chat-restore" class="chat-restore-btn">↗</button>
+      </div>
     </div>
   </div>
 

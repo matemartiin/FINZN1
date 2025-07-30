@@ -1,7 +1,15 @@
 export class ChatManager {
   constructor() {
     this.isOpen = false;
+    this.isMinimized = false;
     this.messages = [];
+    this.suggestions = [
+      "¿Cómo puedo ahorrar más dinero?",
+      "Analiza mis gastos del mes",
+      "¿Cómo organizo mi presupuesto?",
+      "¿Qué inversiones me recomiendas?",
+      "Ayúdame a establecer objetivos financieros"
+    ];
   }
 
   init() {
@@ -13,7 +21,10 @@ export class ChatManager {
   setupEventListeners() {
     const chatToggle = document.getElementById('chat-toggle');
     const chatClose = document.getElementById('chat-close');
+    const chatMinimize = document.getElementById('chat-minimize');
+    const chatRestore = document.getElementById('chat-restore');
     const chatForm = document.getElementById('chat-form');
+    const voiceBtn = document.getElementById('chat-voice-btn');
 
     if (chatToggle) {
       chatToggle.addEventListener('click', () => this.toggleChat());
@@ -22,16 +33,45 @@ export class ChatManager {
     if (chatClose) {
       chatClose.addEventListener('click', () => this.closeChat());
     }
+    
+    if (chatMinimize) {
+      chatMinimize.addEventListener('click', () => this.minimizeChat());
+    }
+    
+    if (chatRestore) {
+      chatRestore.addEventListener('click', () => this.restoreChat());
+    }
 
     if (chatForm) {
       chatForm.addEventListener('submit', (e) => this.handleSubmit(e));
     }
+    
+    if (voiceBtn) {
+      voiceBtn.addEventListener('click', () => this.handleVoiceInput());
+    }
+    
+    // Suggestion buttons
+    this.setupSuggestionButtons();
+  }
+  
+  setupSuggestionButtons() {
+    const suggestionBtns = document.querySelectorAll('.suggestion-btn');
+    suggestionBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const suggestion = e.target.getAttribute('data-suggestion');
+        if (suggestion) {
+          this.sendSuggestion(suggestion);
+        }
+      });
+    });
   }
 
   toggleChat() {
     const chatWindow = document.getElementById('chat-window');
+    const chatMinimized = document.getElementById('chat-minimized');
+    
     if (chatWindow) {
-      if (this.isOpen) {
+      if (this.isOpen || this.isMinimized) {
         this.closeChat();
       } else {
         this.openChat();
@@ -41,22 +81,84 @@ export class ChatManager {
 
   openChat() {
     const chatWindow = document.getElementById('chat-window');
+    const chatMinimized = document.getElementById('chat-minimized');
+    const notification = document.getElementById('chat-notification');
+    
     if (chatWindow) {
       chatWindow.classList.remove('hidden');
       this.isOpen = true;
+      this.isMinimized = false;
+    }
+    
+    if (chatMinimized) {
+      chatMinimized.classList.add('hidden');
+    }
+    
+    if (notification) {
+      notification.style.display = 'none';
     }
   }
 
   closeChat() {
     const chatWindow = document.getElementById('chat-window');
+    const chatMinimized = document.getElementById('chat-minimized');
+    
     if (chatWindow) {
       chatWindow.classList.add('hidden');
       this.isOpen = false;
+      this.isMinimized = false;
+    }
+    
+    if (chatMinimized) {
+      chatMinimized.classList.add('hidden');
+    }
+  }
+  
+  minimizeChat() {
+    const chatWindow = document.getElementById('chat-window');
+    const chatMinimized = document.getElementById('chat-minimized');
+    
+    if (chatWindow) {
+      chatWindow.classList.add('hidden');
+      this.isOpen = false;
+      this.isMinimized = true;
+    }
+    
+    if (chatMinimized) {
+      chatMinimized.classList.remove('hidden');
+    }
+  }
+  
+  restoreChat() {
+    this.openChat();
+  }
+  
+  showNotification() {
+    const notification = document.getElementById('chat-notification');
+    if (notification && !this.isOpen && !this.isMinimized) {
+      notification.style.display = 'block';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        if (notification) {
+          notification.style.display = 'none';
+        }
+      }, 5000);
     }
   }
 
   addWelcomeMessage() {
-    this.addMessage('¡Hola! Soy tu asistente financiero. ¿En qué puedo ayudarte hoy?', 'bot');
+    const welcomeMessages = [
+      '¡Hola! Soy tu asistente financiero personal. ¿En qué puedo ayudarte hoy?',
+      'Puedo ayudarte con análisis de gastos, consejos de ahorro, planificación financiera y mucho más.',
+      'También puedes usar las sugerencias rápidas de abajo para comenzar. 👇'
+    ];
+    
+    welcomeMessages.forEach((message, index) => {
+      setTimeout(() => {
+        this.addMessage(message, 'bot');
+      }, index * 1000);
+    });
   }
 
   addMessage(text, sender) {
@@ -81,6 +183,64 @@ export class ChatManager {
 
     // Add fade-in animation
     setTimeout(() => messageDiv.classList.add('fade-in'), 100);
+    
+    // Show notification if chat is closed
+    if (sender === 'bot' && !this.isOpen && !this.isMinimized) {
+      this.showNotification();
+    }
+  }
+  
+  sendSuggestion(suggestion) {
+    const input = document.getElementById('chat-input');
+    if (input) {
+      input.value = suggestion;
+      // Trigger form submission
+      const form = document.getElementById('chat-form');
+      if (form) {
+        form.dispatchEvent(new Event('submit'));
+      }
+    }
+  }
+  
+  handleVoiceInput() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.lang = 'es-ES';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      
+      const voiceBtn = document.getElementById('chat-voice-btn');
+      const input = document.getElementById('chat-input');
+      
+      recognition.onstart = () => {
+        if (voiceBtn) voiceBtn.textContent = '🔴';
+        if (input) input.placeholder = 'Escuchando...';
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (input) {
+          input.value = transcript;
+        }
+      };
+      
+      recognition.onend = () => {
+        if (voiceBtn) voiceBtn.textContent = '🎤';
+        if (input) input.placeholder = 'Escribe tu pregunta...';
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (voiceBtn) voiceBtn.textContent = '🎤';
+        if (input) input.placeholder = 'Error en reconocimiento de voz';
+      };
+      
+      recognition.start();
+    } else {
+      this.addMessage('Lo siento, tu navegador no soporta reconocimiento de voz.', 'bot');
+    }
   }
 
   async handleSubmit(e) {
@@ -95,6 +255,12 @@ export class ChatManager {
     // Add user message
     this.addMessage(message, 'user');
     input.value = '';
+    
+    // Hide suggestions after first message
+    const suggestions = document.getElementById('chat-suggestions');
+    if (suggestions && this.messages.length === 0) {
+      suggestions.style.display = 'none';
+    }
 
     // Show typing indicator
     this.showTypingIndicator();
@@ -105,12 +271,23 @@ export class ChatManager {
       
       this.hideTypingIndicator();
       this.addMessage(response, 'bot');
+      
+      // Update chat status
+      this.updateChatStatus('En línea');
 
     } catch (error) {
       console.error('Chat error:', error);
       this.hideTypingIndicator();
       const fallbackResponse = this.getFallbackResponse(message);
       this.addMessage(fallbackResponse, 'bot');
+      this.updateChatStatus('Error de conexión');
+    }
+  }
+  
+  updateChatStatus(status) {
+    const statusElement = document.getElementById('chat-status');
+    if (statusElement) {
+      statusElement.textContent = status;
     }
   }
 
@@ -125,6 +302,9 @@ export class ChatManager {
       console.log('⚠️ No API key found, using fallback responses');
       return this.getFallbackResponse(message);
     }
+    
+    // Update status
+    this.updateChatStatus('Pensando...');
 
     try {
       const response = await fetch(
@@ -140,7 +320,11 @@ export class ChatManager {
               {
                 parts: [
                   {
-                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
+                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 200 palabras. 
+
+Contexto del usuario: Tienes acceso a información sobre sus finanzas personales, gastos, ingresos, objetivos de ahorro y clientes (si es un profesional).
+
+Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros. Siempre sé útil, motivador y ofrece consejos prácticos.
 
 Pregunta del usuario: ${message}`
                   }
@@ -151,7 +335,7 @@ Pregunta del usuario: ${message}`
               temperature: 0.7,
               topK: 40,
               topP: 0.95,
-              maxOutputTokens: 200,
+              maxOutputTokens: 300,
             },
             safetySettings: [
               {
@@ -238,6 +422,11 @@ Pregunta del usuario: ${message}`
   getFallbackResponse(message) {
     const lowerMessage = message.toLowerCase();
     
+    // Client management responses
+    if (lowerMessage.includes('cliente') || lowerMessage.includes('customer')) {
+      return "👥 Para gestionar tus clientes, ve a la sección 'Clientes' en el menú. Allí puedes agregar nuevos clientes, organizarlos por rango etario y llevar un registro completo de su información.";
+    }
+    
     if (lowerMessage.includes('ahorro') || lowerMessage.includes('ahorrar')) {
       return "💰 Para ahorrar efectivamente, te recomiendo la regla 50/30/20: 50% gastos necesarios, 30% gastos personales, 20% ahorros. ¡Empieza poco a poco!";
     }
@@ -264,6 +453,14 @@ Pregunta del usuario: ${message}`
     
     if (lowerMessage.includes('meta') || lowerMessage.includes('objetivo')) {
       return "🎯 Para lograr tus metas financieras: 1) Define objetivos específicos y medibles, 2) Establece plazos realistas, 3) Crea un plan de ahorro, 4) Revisa tu progreso regularmente.";
+    }
+    
+    if (lowerMessage.includes('reporte') || lowerMessage.includes('análisis')) {
+      return "📊 Puedes generar reportes detallados con IA en la sección 'Reportes'. Te ayudo a analizar tus patrones de gasto, identificar oportunidades de ahorro y optimizar tu presupuesto.";
+    }
+    
+    if (lowerMessage.includes('calendario') || lowerMessage.includes('recordatorio')) {
+      return "📅 Usa el calendario financiero para programar pagos, recordatorios de cuotas y eventos importantes. Puedes sincronizarlo con Google Calendar para recibir notificaciones.";
     }
     
     return "🤖 Hola! Soy tu asistente financiero. Puedo ayudarte con presupuestos, ahorros, inversiones y planificación financiera. ¿En qué tema específico te gustaría que te ayude?";

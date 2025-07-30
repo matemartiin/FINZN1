@@ -8,6 +8,7 @@ import { ThemeManager } from './modules/theme.js';
 import { ChatManager } from './modules/chat.js';
 import { CalendarManager } from './modules/calendar.js';
 import { ReportManager } from './modules/reports.js';
+import { ClientsManager } from './modules/clients.js';
 
 class FinznApp {
   constructor() {
@@ -24,6 +25,7 @@ class FinznApp {
     this.chat = new ChatManager();
     this.calendar = new CalendarManager();
     this.reports = new ReportManager();
+    this.clients = new ClientsManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.isInitialized = false;
@@ -80,6 +82,7 @@ class FinznApp {
       // Initialize other managers
       this.navigation.init();
       this.chat.init();
+      this.clients.init();
       
       // Load current month data
       await this.loadCurrentMonthData();
@@ -309,6 +312,8 @@ class FinznApp {
     if (addEventForm) {
       addEventForm.addEventListener('submit', (e) => this.handleAddEvent(e));
     }
+    
+    // Client management is handled by ClientsManager
     
     // Installments checkbox
     const installmentsCheckbox = document.getElementById('expense-installments');
@@ -609,6 +614,15 @@ class FinznApp {
 
   showCalendarSettingsModal() {
     this.modals.show('calendar-settings-modal');
+  }
+  
+  // Client management methods (delegated to ClientsManager)
+  showAddClientModal() {
+    this.clients.showAddClientModal();
+  }
+  
+  showEditClientModal(clientId) {
+    this.clients.showEditClientModal(clientId);
   }
 
   // Form handlers

@@ -171,6 +171,7 @@ export class NavigationManager {
   updatePageTitle(sectionName) {
     const titles = {
       'dashboard': 'Dashboard - FINZN',
+      'clients': 'Gestión de Clientes - FINZN',
       'transactions': 'Transacciones - FINZN',
       'calendar': 'Calendario Financiero - FINZN',
       'planning': 'Planificación - FINZN',
@@ -184,6 +185,9 @@ export class NavigationManager {
   initializeSection(sectionName) {
     // Initialize section-specific functionality
     switch (sectionName) {
+      case 'clients':
+        this.initializeClients();
+        break;
       case 'calendar':
         this.initializeCalendar();
         break;
@@ -196,6 +200,13 @@ export class NavigationManager {
       case 'reports':
         this.initializeReports();
         break;
+    }
+  }
+  
+  initializeClients() {
+    console.log('👥 Initializing clients section');
+    if (window.app && window.app.clients) {
+      // Clients manager handles its own initialization
     }
   }
 
