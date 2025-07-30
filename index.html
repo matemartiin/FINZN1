@@ -693,6 +693,56 @@
         </main>
     </div>
 
+    <!-- Chat System - Global -->
+    <div id="chat-window" class="chat-window hidden">
+      <div class="chat-header">
+        <div class="chat-info">
+          <img src="/robot-chat.png" alt="FINZN Assistant" class="chat-avatar-header" />
+          <div class="chat-title">
+            <span class="chat-name">FINZN Assistant</span>
+            <span id="chat-status" class="chat-status">En línea</span>
+          </div>
+        </div>
+        <div class="chat-controls">
+          <button id="chat-minimize" class="chat-control-btn" title="Minimizar">−</button>
+          <button id="chat-close" class="chat-control-btn" title="Cerrar">×</button>
+        </div>
+      </div>
+      
+      <div class="chat-body">
+        <div id="chat-messages" class="chat-messages"></div>
+        
+        <div id="chat-suggestions" class="chat-suggestions">
+          <button class="suggestion-btn" data-suggestion="¿Cómo puedo ahorrar más dinero?">💰 ¿Cómo ahorrar más?</button>
+          <button class="suggestion-btn" data-suggestion="Analiza mis gastos del mes">📊 Analizar gastos</button>
+          <button class="suggestion-btn" data-suggestion="¿Cómo organizo mi presupuesto?">📋 Organizar presupuesto</button>
+          <button class="suggestion-btn" data-suggestion="¿Qué inversiones me recomiendas?">📈 Inversiones</button>
+        </div>
+      </div>
+      
+      <form id="chat-form" class="chat-form">
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
+          <button type="button" id="chat-voice-btn" class="chat-voice-btn" title="Mensaje de voz">🎤</button>
+          <button type="submit" class="chat-send-btn" title="Enviar">➤</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Chat Minimized State -->
+    <div id="chat-minimized" class="chat-minimized hidden">
+      <button id="chat-restore" class="chat-restore-btn">
+        <img src="/robot-chat.png" alt="FINZN Assistant" class="chat-avatar-mini" />
+        <span>FINZN Assistant</span>
+      </button>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button id="chat-toggle" class="chat-toggle">
+      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-avatar" />
+      <div id="chat-notification" class="chat-notification" style="display: none;">💬</div>
+    </button>
+
     <!-- Chat System - MOVED TO GLOBAL POSITION -->
     <div id="chat-system" class="chat-system">
         <!-- Chat Toggle Button -->
