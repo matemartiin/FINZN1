@@ -123,10 +123,76 @@
 
     <!-- Dashboard with New Layout -->
     <main class="dashboard-new">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar-nav">
+        <nav class="nav-menu">
+          <!-- Primary Navigation -->
+          <div class="nav-group primary-nav">
+            <div class="nav-item active" data-section="dashboard">
+              <div class="nav-icon">📊</div>
+              <span class="nav-label">Resumen</span>
+            </div>
+            <div class="nav-item" data-section="transactions">
+              <div class="nav-icon">💳</div>
+              <span class="nav-label">Transacciones</span>
+              <div class="nav-badge" id="pending-transactions">0</div>
+            </div>
+            <div class="nav-item" data-section="budget">
+              <div class="nav-icon">📋</div>
+              <span class="nav-label">Presupuesto</span>
+            </div>
+            <div class="nav-item" data-section="goals">
+              <div class="nav-icon">🎯</div>
+              <span class="nav-label">Objetivos</span>
+            </div>
+          </div>
+          
+          <!-- Secondary Navigation -->
+          <div class="nav-divider"></div>
+          <div class="nav-group secondary-nav">
+            <div class="nav-item" data-section="reports">
+              <div class="nav-icon">📈</div>
+              <span class="nav-label">Reportes</span>
+            </div>
+            <div class="nav-item" data-section="settings">
+              <div class="nav-icon">⚙️</div>
+              <span class="nav-label">Configuración</span>
+            </div>
+          </div>
+          
+          <!-- Mobile Menu Toggle -->
+          <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <div class="nav-icon">📊</div>
+            <span class="nav-label">Menú</span>
+          </button>
+        </nav>
+        
+        <!-- Quick Actions Bar -->
+        <div class="quick-actions-bar">
+          <button class="quick-action-btn" id="quick-add-expense" title="Agregar Gasto Rápido">
+            <span class="quick-icon">➕</span>
+            <span class="quick-label">Gasto</span>
+          </button>
+          <button class="quick-action-btn" id="quick-add-income" title="Agregar Ingreso Rápido">
+            <span class="quick-icon">💰</span>
+            <span class="quick-label">Ingreso</span>
+          </button>
+          <button class="quick-action-btn" id="quick-view-balance" title="Ver Balance Rápido">
+            <span class="quick-icon">📊</span>
+            <span class="quick-label">Balance</span>
+          </button>
+        </div>
+      </aside>
+
       <!-- Main Content Area -->
       <div class="main-dashboard">
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="dashboard-section active">
+          <!-- Breadcrumb Navigation -->
+          <nav class="breadcrumb-nav">
+            <span class="breadcrumb-item active">📊 Resumen General</span>
+          </nav>
+          
           <div class="dashboard-grid">
             <!-- Primera fila: Balance, Ingresos, Gastos -->
             <div class="summary-cards">
@@ -197,24 +263,100 @@
           </div>
         </section>
 
-        <!-- Expenses Section -->
-        <section id="expenses-section" class="dashboard-section">
+        <!-- Transactions Section (Renamed from Expenses) -->
+        <section id="transactions-section" class="dashboard-section">
+          <nav class="breadcrumb-nav">
+            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">💳 Transacciones</span>
+          </nav>
           
           <div class="section-content">
             <div class="section-header">
-              <h1>Límites de Gastos por Categoría</h1>
+              <h1>Gestión de Transacciones</h1>
               <div class="section-actions">
-                <button id="add-spending-limit-btn-expenses" class="btn btn-primary">
-                  <span>🚦</span>
-                  Nuevo Límite
+                <button id="add-expense-btn-transactions" class="btn btn-primary">
+                  <span>➕</span>
+                  Nuevo Gasto
+                </button>
+                <button id="add-income-btn-transactions" class="btn btn-secondary">
+                  <span>💰</span>
+                  Nuevo Ingreso
                 </button>
               </div>
             </div>
             
-            <div class="expenses-container">
+            <!-- Transaction Tabs -->
+            <div class="transaction-tabs">
+              <button class="tab-btn active" data-tab="expenses">Gastos</button>
+              <button class="tab-btn" data-tab="income">Ingresos</button>
+              <button class="tab-btn" data-tab="limits">Límites</button>
+            </div>
+            
+            <div class="transactions-container">
+              <div class="tab-content active" id="expenses-tab">
+                <div class="expenses-section-card">
+                  <div class="card-header">
+                    <h3>💳 Gastos del Mes</h3>
+                  </div>
+                  <div id="expenses-list" class="expenses-list">
+                    <!-- Expenses will be loaded here -->
+                  </div>
+                </div>
+              </div>
+              
+              <div class="tab-content" id="income-tab">
+                <div class="income-section-card">
+                  <div class="card-header">
+                    <h3>💰 Ingresos del Mes</h3>
+                  </div>
+                  <div id="income-list" class="income-list">
+                    <!-- Income will be loaded here -->
+                  </div>
+                </div>
+              </div>
+              
+              <div class="tab-content" id="limits-tab">
+                <div class="expenses-section-card spending-limits-main-card">
+                  <div class="card-header">
+                    <h3>🚦 Límites Presupuestarios</h3>
+                    <button id="add-spending-limit-btn-transactions" class="btn btn-primary btn-sm">
+                      <span>➕</span>
+                      Nuevo Límite
+                    </button>
+                  </div>
+                  <div id="category-limits-display" class="category-limits-display">
+                    <!-- Spending limits will be loaded here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Budget Section (New) -->
+        <section id="budget-section" class="dashboard-section">
+          <nav class="breadcrumb-nav">
+            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">📋 Presupuesto</span>
+          </nav>
+          
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Planificación Presupuestaria</h1>
+              <div class="section-actions">
+                <button id="create-budget-btn" class="btn btn-primary">
+                  <span>📋</span>
+                  Crear Presupuesto
+                </button>
+              </div>
+            </div>
+            
+            <div class="budget-container">
               <div class="expenses-section-card spending-limits-main-card">
                 <div class="card-header">
-                  <h3>🚦 Límites Presupuestarios por Categoría</h3>
+                  <h3>💰 Límites Presupuestarios por Categoría</h3>
                   <div class="limits-summary-info">
                     <span id="total-limits-count">0</span> categorías con límites configurados
                   </div>
@@ -227,8 +369,13 @@
           </div>
         </section>
 
-        <!-- Savings Section -->
-        <section id="savings-section" class="dashboard-section">
+        <!-- Goals Section (Renamed from Savings) -->
+        <section id="goals-section" class="dashboard-section">
+          <nav class="breadcrumb-nav">
+            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">🎯 Objetivos</span>
+          </nav>
           
           <div class="section-content">
             <div class="section-header">
@@ -247,8 +394,13 @@
           </div>
         </section>
 
-        <!-- Achievements Section -->
-        <section id="achievements-section" class="dashboard-section">
+        <!-- Reports Section (Renamed from Achievements) -->
+        <section id="reports-section" class="dashboard-section">
+          <nav class="breadcrumb-nav">
+            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">📈 Reportes</span>
+          </nav>
           
           <div class="section-content">
             <div class="section-header">
@@ -291,6 +443,11 @@
 
         <!-- Settings Section -->
         <section id="settings-section" class="dashboard-section">
+          <nav class="breadcrumb-nav">
+            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">⚙️ Configuración</span>
+          </nav>
           
           <div class="section-content">
             <div class="section-header">
@@ -298,81 +455,21 @@
             </div>
             
             <!-- Settings Categories -->
-            <div class="settings-grid">
-              <div class="settings-card">
-                <h4>Categorías</h4>
-                <p>Gestiona tus categorías de gastos</p>
-                <button id="manage-categories-btn" class="btn btn-secondary btn-sm">
-                  <span>🏷️</span>
-                  Gestionar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h4>Exportar Datos</h4>
-                <p>Descarga tus datos financieros</p>
-                <button id="export-data-btn" class="btn btn-secondary btn-sm">
-                  <span>📊</span>
-                  Exportar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h4>Importar Datos</h4>
-                <p>Carga tus datos desde archivo CSV</p>
-                <button id="import-data-btn" class="btn btn-secondary btn-sm">
-                  <span>📥</span>
-                  Importar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h4>Respaldo de Datos</h4>
-                <p>Respalda y restaura tu información</p>
-                <button id="backup-data-btn" class="btn btn-secondary btn-sm">
-                  <span>☁️</span>
-                  Respaldar
-                </button>
-              </div>
-              
-              <div class="settings-card">
-                <h4>Reporte IA</h4>
-                <p>Análisis inteligente de tus finanzas</p>
-                <button id="generate-ai-report-btn" class="btn btn-secondary btn-sm">
-                  <span>🤖</span>
-                  Generar
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-      
-      <!-- Navigation -->
-      <nav class="bottom-nav">
-        <div class="nav-item active" data-section="dashboard">
-          <div class="nav-icon">📊</div>
-          <span class="nav-label">Resumen</span>
-        </div>
-        <div class="nav-item" data-section="expenses">
-          <div class="nav-icon">💳</div>
-          <span class="nav-label">Gastos</span>
-        </div>
-        <div class="nav-item" data-section="savings">
-          <div class="nav-icon">🎯</div>
-          <span class="nav-label">Ahorros</span>
-        </div>
-        <div class="nav-item" data-section="achievements">
-          <div class="nav-icon">🏆</div>
-          <span class="nav-label">Logros</span>
-        </div>
-        <div class="nav-item" data-section="settings">
-          <div class="nav-icon">⚙️</div>
-          <span class="nav-label">Ajustes</span>
-        </div>
-      </nav>
-    </main>
-  </div>
+            <div class="settings-categories">
+              <div class="settings-category">
+                <h3>👤 Cuenta y Perfil</h3>
+                <div class="settings-grid">
+                  <div class="settings-card">
+                    <h4>Información Personal</h4>
+                    <p>Actualiza tu información de perfil</p>
+                    <button class="btn btn-secondary btn-sm">Editar Perfil</button>
+                  </div>
+                  
+                  <div class="settings-card">
+                    <h4>Seguridad</h4>
+                    <p>Cambiar contraseña y configuración de seguridad</p>
+                    <button class="btn btn-secondary btn-sm">Configurar</button>
+                  </div>
                 </div>
               </div>
               
