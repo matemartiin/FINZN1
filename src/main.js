@@ -152,45 +152,16 @@ class FinznApp {
   setupDashboardEvents() {
     // Add expense buttons
     const addExpenseBtn = document.getElementById('add-expense-btn-dashboard');
-    const addExpenseBtnTransactions = document.getElementById('add-expense-btn-transactions');
-    const quickAddExpense = document.getElementById('quick-add-expense');
     
     if (addExpenseBtn) {
       addExpenseBtn.addEventListener('click', () => this.showAddExpenseModal());
     }
     
-    if (addExpenseBtnTransactions) {
-      addExpenseBtnTransactions.addEventListener('click', () => this.showAddExpenseModal());
-    }
-    
-    if (quickAddExpense) {
-      quickAddExpense.addEventListener('click', () => this.showAddExpenseModal());
-    }
-    
     // Add income button
     const addIncomeBtn = document.getElementById('add-income-btn-dashboard');
-    const addIncomeBtnTransactions = document.getElementById('add-income-btn-transactions');
-    const quickAddIncome = document.getElementById('quick-add-income');
     
     if (addIncomeBtn) {
       addIncomeBtn.addEventListener('click', () => this.showAddIncomeModal());
-    }
-    
-    if (addIncomeBtnTransactions) {
-      addIncomeBtnTransactions.addEventListener('click', () => this.showAddIncomeModal());
-    }
-    
-    if (quickAddIncome) {
-      quickAddIncome.addEventListener('click', () => this.showAddIncomeModal());
-    }
-    
-    // Quick view balance
-    const quickViewBalance = document.getElementById('quick-view-balance');
-    if (quickViewBalance) {
-      quickViewBalance.addEventListener('click', () => {
-        this.navigation.showSection('dashboard');
-        this.ui.showAlert('Mostrando resumen de balance', 'info');
-      });
     }
     
     // View incomes button
@@ -212,9 +183,9 @@ class FinznApp {
     }
     
     // Add spending limit button
-    const addSpendingLimitBtnTransactions = document.getElementById('add-spending-limit-btn-transactions');
-    if (addSpendingLimitBtnTransactions) {
-      addSpendingLimitBtnTransactions.addEventListener('click', () => this.showAddSpendingLimitModal());
+    const addSpendingLimitBtnExpenses = document.getElementById('add-spending-limit-btn-expenses');
+    if (addSpendingLimitBtnExpenses) {
+      addSpendingLimitBtnExpenses.addEventListener('click', () => this.showAddSpendingLimitModal());
     }
     
     // Settings buttons
@@ -222,7 +193,6 @@ class FinznApp {
     const exportDataBtn = document.getElementById('export-data-btn');
     const importDataBtn = document.getElementById('import-data-btn');
     const generateAiReportBtn = document.getElementById('generate-ai-report-btn');
-    const generateReportBtnSection = document.getElementById('generate-report-btn-section');
     const backupDataBtn = document.getElementById('backup-data-btn');
     
     if (manageCategoriesBtn) {
@@ -239,10 +209,6 @@ class FinznApp {
     
     if (generateAiReportBtn) {
       generateAiReportBtn.addEventListener('click', () => this.showGenerateAiReportModal());
-    }
-    
-    if (generateReportBtnSection) {
-      generateReportBtnSection.addEventListener('click', () => this.showGenerateAiReportModal());
     }
     
     if (backupDataBtn) {
