@@ -7,6 +7,7 @@ import { ChatManager } from './modules/chat.js';
 import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
+import { CalendarManager } from './modules/calendar.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -24,6 +25,7 @@ class FinznApp {
     this.reports = new ReportManager();
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
+    this.calendar = new CalendarManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -47,6 +49,9 @@ class FinznApp {
       
       // Initialize chat
       this.chat.init();
+      
+      // Initialize calendar
+      this.calendar.init();
       
       // Setup month selector
       this.setupMonthSelector();

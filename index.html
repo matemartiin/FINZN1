@@ -145,6 +145,11 @@
               <div class="nav-icon">🎯</div>
               <span class="nav-label">Objetivos</span>
             </div>
+            <div class="nav-item" data-section="calendar">
+              <div class="nav-icon">📅</div>
+              <span class="nav-label">Calendario</span>
+              <div class="nav-badge" id="upcoming-events">0</div>
+            </div>
           </div>
           
           <!-- Secondary Navigation -->
@@ -529,6 +534,83 @@
           </div>
         </section>
       </div>
+        <!-- Calendar Section (New) -->
+        <section id="calendar-section" class="dashboard-section">
+          <nav class="breadcrumb-nav">
+            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-item active">📅 Calendario</span>
+          </nav>
+          
+          <div class="section-content">
+            <div class="section-header">
+              <h1>Calendario Financiero</h1>
+              <div class="section-actions">
+                <button id="add-event-btn" class="btn btn-primary">
+                  <span>➕</span>
+                  Nuevo Evento
+                </button>
+                <button id="sync-google-calendar-btn" class="btn btn-secondary">
+                  <span>🔄</span>
+                  Sincronizar Google
+                </button>
+              </div>
+            </div>
+            
+            <div class="calendar-container">
+              <!-- Calendar Navigation -->
+              <div class="calendar-nav">
+                <button id="prev-month" class="calendar-nav-btn">‹</button>
+                <h3 id="current-month-year">Enero 2025</h3>
+                <button id="next-month" class="calendar-nav-btn">›</button>
+                <div class="calendar-view-toggle">
+                  <button class="view-btn active" data-view="month">Mes</button>
+                  <button class="view-btn" data-view="week">Semana</button>
+                  <button class="view-btn" data-view="agenda">Agenda</button>
+                </div>
+              </div>
+              
+              <!-- Calendar Grid -->
+              <div class="calendar-grid" id="calendar-grid">
+                <!-- Calendar will be generated here -->
+              </div>
+              
+              <!-- Events List (Agenda View) -->
+              <div class="calendar-agenda hidden" id="calendar-agenda">
+                <div class="agenda-events" id="agenda-events">
+                  <!-- Events will be loaded here -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Event Types Legend -->
+            <div class="event-legend">
+              <h4>Tipos de Eventos</h4>
+              <div class="legend-items">
+                <div class="legend-item">
+                  <div class="legend-color payment"></div>
+                  <span>Pagos de Cuotas</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color income"></div>
+                  <span>Cobros</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color card-close"></div>
+                  <span>Cierre de Tarjetas</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color reminder"></div>
+                  <span>Recordatorios</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color deadline"></div>
+                  <span>Vencimientos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
     </main>
   </div>
 
@@ -954,6 +1036,139 @@
           <span>📤</span>
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- Add Calendar Event Modal -->
+  <div id="add-event-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Evento Financiero</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-event-form" class="modal-form">
+        <div class="form-group">
+          <label for="event-title">Título del Evento</label>
+          <input type="text" id="event-title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="event-type">Tipo de Evento</label>
+          <select id="event-type" name="type" required>
+            <option value="">Selecciona un tipo</option>
+            <option value="payment">💳 Pago de Cuota</option>
+            <option value="income">💰 Cobro</option>
+            <option value="card-close">🏦 Cierre de Tarjeta</option>
+            <option value="reminder">⏰ Recordatorio</option>
+            <option value="deadline">📅 Vencimiento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="event-date">Fecha</label>
+          <input type="date" id="event-date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label for="event-time">Hora (opcional)</label>
+          <input type="time" id="event-time" name="time" />
+        </div>
+        <div class="form-group">
+          <label for="event-amount">Monto (opcional)</label>
+          <input type="number" id="event-amount" name="amount" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="event-description">Descripción</label>
+          <textarea id="event-description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="event-recurring" name="recurring" />
+            Evento recurrente
+          </label>
+        </div>
+        <div id="recurring-options" class="form-group hidden">
+          <label for="recurring-frequency">Frecuencia</label>
+          <select id="recurring-frequency" name="frequency">
+            <option value="weekly">Semanal</option>
+            <option value="monthly">Mensual</option>
+            <option value="yearly">Anual</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="event-notification" name="notification" checked />
+            Recordatorio por notificación
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Calendar Event Modal -->
+  <div id="edit-event-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Evento</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-event-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-event-title">Título del Evento</label>
+          <input type="text" id="edit-event-title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-type">Tipo de Evento</label>
+          <select id="edit-event-type" name="type" required>
+            <option value="payment">💳 Pago de Cuota</option>
+            <option value="income">💰 Cobro</option>
+            <option value="card-close">🏦 Cierre de Tarjeta</option>
+            <option value="reminder">⏰ Recordatorio</option>
+            <option value="deadline">📅 Vencimiento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-event-date">Fecha</label>
+          <input type="date" id="edit-event-date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-time">Hora</label>
+          <input type="time" id="edit-event-time" name="time" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-amount">Monto</label>
+          <input type="number" id="edit-event-amount" name="amount" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-description">Descripción</label>
+          <textarea id="edit-event-description" name="description" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" id="delete-event-btn" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Event Details Modal -->
+  <div id="event-details-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="event-details-title">Detalles del Evento</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="event-details-content">
+          <!-- Event details will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
+        <button type="button" id="edit-event-from-details" class="btn btn-primary">Editar</button>
+      </div>
     </div>
   </div>
 
