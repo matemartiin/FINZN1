@@ -2851,26 +2851,27 @@ body {
   .calendar-nav {
     flex-direction: column;
     gap: 15px;
-    padding: 15px;
+    padding: 10px 15px;
   }
   
   .calendar-nav h3 {
-    font-size: 1.2em;
+    margin-bottom: 10px;
   }
   
   .calendar-view-toggle {
-    order: -1;
+    margin: 0;
+    padding: 0;
   }
   
   .calendar-day {
-    min-height: 80px;
+    margin-bottom: 15px;
     padding: 4px;
   }
   
   .day-number {
     font-size: 12px;
   }
-  
+    margin-top: 10px;
   .day-event {
     font-size: 10px;
     padding: 1px 4px;
@@ -3050,7 +3051,7 @@ body {
   }
   
   .section-header {
-    flex-direction: column;
+    margin-bottom: 15px;
     align-items: flex-start;
     gap: var(--spacing-lg);
   }
