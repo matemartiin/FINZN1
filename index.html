@@ -227,65 +227,26 @@
         <section id="expenses-section" class="dashboard-section">
           <div class="section-content">
             <div class="section-header">
-              <h1>Gestión de Gastos</h1>
+              <h1>Límites de Gastos por Categoría</h1>
               <div class="section-actions">
-                <button id="add-spending-limit-btn-expenses" class="btn btn-secondary">
-                  <span>⚠️</span>
-                  Agregar Límite
-                </button>
-                <button id="add-expense-btn" class="btn btn-primary">
+                <button id="add-spending-limit-btn-expenses" class="btn btn-primary">
                   <span>➕</span>
-                  Agregar Gasto
+                  Configurar Nuevo Límite
                 </button>
               </div>
             </div>
             
             <div class="expenses-container">
-              <!-- Filtros Card -->
-              <div class="expenses-section-card expenses-filters-card">
+              <!-- Límites de Gastos por Categoría -->
+              <div class="expenses-section-card spending-limits-main-card">
                 <div class="card-header">
-                  <h3>🔍 Filtros de Búsqueda</h3>
+                  <h3>💰 Límites Presupuestarios por Categoría</h3>
+                  <div class="limits-summary-info">
+                    <span id="total-limits-count">0</span> categorías con límites configurados
+                  </div>
                 </div>
-                <div class="expenses-filters">
-                  <select id="category-filter">
-                    <option value="">Todas las categorías</option>
-                  </select>
-                  <input type="date" id="date-filter" />
-                  <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
-                </div>
-              </div>
-              
-              <!-- Límites de Gastos Card -->
-              <div class="expenses-section-card spending-limits-card">
-                <div class="card-header">
-                  <h3>🚦 Límites de Gastos Configurados</h3>
-                  <button id="add-spending-limit-btn-card" class="btn btn-primary btn-sm">
-                    <span>➕</span>
-                    Agregar Límite
-                  </button>
-                </div>
-                <div id="spending-limits-summary" class="spending-limits-summary">
-                  <!-- Los límites se cargarán aquí -->
-                </div>
-              </div>
-              
-              <!-- Gráfico de Tendencia Mensual -->
-              <div class="expenses-section-card trend-chart-card">
-                <div class="card-header">
-                  <h3>📈 Tendencia de Gastos Mensual</h3>
-                </div>
-                <div class="trend-chart-container">
-                  <canvas id="trend-chart"></canvas>
-                </div>
-              </div>
-              
-              <!-- Lista de Gastos -->
-              <div class="expenses-section-card expenses-list-card">
-                <div class="card-header">
-                  <h3>📋 Lista de Gastos del Mes</h3>
-                </div>
-                <div id="expenses-list" class="expenses-list">
-                  <!-- Expenses will be loaded here -->
+                <div id="category-limits-display" class="category-limits-display">
+                  <!-- Los límites por categoría se cargarán aquí -->
                 </div>
               </div>
             </div>
