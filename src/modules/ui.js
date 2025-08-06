@@ -1,7 +1,9 @@
 export class UIManager {
   constructor() {
     this.alertContainer = document.getElementById('alert-container');
-    this.mascotAlertTimeout = null;
+    this.mascotMessageQueue = [];
+    this.isShowingMascotMessage = false;
+    this.currentMascotTimeout = null;
     this.setupMascotHoverBehavior();
   }
 
@@ -45,13 +47,21 @@ export class UIManager {
   showHoverMessage(messageElement) {
     if (!messageElement) return;
 
+    // Clear any existing message first
+    this.clearMascotMessage(messageElement);
+
     // Get current financial context for personalized message
     const messages = this.getContextualMascotMessages();
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     
+    // Set flag to prevent overlapping
+    this.isShowingMascotMessage = true;
+    
     messageElement.textContent = randomMessage.text;
     messageElement.className = `mascot-alert mascot-alert-${randomMessage.type}`;
     messageElement.style.opacity = '1';
+    messageElement.style.visibility = 'visible';
+    messageElement.style.pointerEvents = 'none';
     
     console.log('🐾 Mascot speaking on hover:', randomMessage.text);
   }
@@ -59,8 +69,27 @@ export class UIManager {
   hideHoverMessage(messageElement) {
     if (!messageElement) return;
     
-    messageElement.style.opacity = '0';
+    this.clearMascotMessage(messageElement);
     console.log('🐾 Mascot returning to silent state');
+  }
+
+  clearMascotMessage(messageElement) {
+    if (!messageElement) return;
+    
+    // Clear any existing timeout
+    if (this.currentMascotTimeout) {
+      clearTimeout(this.currentMascotTimeout);
+      this.currentMascotTimeout = null;
+    }
+    
+    // Hide message immediately
+    messageElement.style.opacity = '0';
+    messageElement.style.visibility = 'hidden';
+    messageElement.textContent = '';
+    messageElement.className = 'mascot-alert';
+    
+    // Reset flag
+    this.isShowingMascotMessage = false;
   }
 
   getContextualMascotMessages() {

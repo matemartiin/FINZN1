@@ -801,13 +801,17 @@ body {
   font-weight: 600;
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   transition: opacity var(--transition-fast);
   z-index: 1000;
   pointer-events: none;
+  /* Ensure tooltip doesn't conflict with alert */
+  z-index: 999;
 }
 
 .chart-mascot-container:hover .chart-mascot-tooltip {
   opacity: 1;
+  visibility: visible;
 }
 
 /* Mascot Alert - Now only shows on hover */
@@ -824,16 +828,20 @@ body {
   font-weight: 600;
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   transition: opacity var(--transition-normal);
   z-index: 1000;
   max-width: 200px;
   text-align: center;
   pointer-events: none;
+  /* Ensure only one message shows at a time */
+  display: block;
 }
 
 /* Remove auto-show behavior - only hover activation */
 .chart-mascot-container:hover .mascot-alert {
   opacity: 1;
+  visibility: visible;
 }
 
 .mascot-alert-success {
