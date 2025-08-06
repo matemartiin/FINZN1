@@ -495,6 +495,128 @@ export class DataManager {
     return this.data.goals;
   }
 
+  async updateGoal(goalId, updates) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      console.log('🎯 Updating goal:', goalId, updates);
+      
+      const { data, error } = await supabase
+        .from('goals')
+        .update(updates)
+        .eq('id', goalId)
+        .eq('user_id', userId)
+        .select();
+
+      if (error) {
+        console.error('Error updating goal:', error);
+        return false;
+      }
+
+      // Update local data
+      const goalIndex = this.data.goals.findIndex(goal => goal.id === goalId);
+      if (goalIndex !== -1) {
+        this.data.goals[goalIndex] = { ...this.data.goals[goalIndex], ...data[0] };
+      }
+
+      console.log('✅ Goal updated successfully');
+      return true;
+    } catch (error) {
+      console.error('Error in updateGoal:', error);
+      return false;
+    }
+  }
+
+  async addMoneyToGoal(goalId, amount) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      console.log('💰 Adding money to goal:', goalId, amount);
+      
+      // Validate amount
+      const numericAmount = parseFloat(amount);
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        throw new Error('El monto debe ser un número positivo');
+      }
+
+      // Get current goal
+      const goal = this.data.goals.find(g => g.id === goalId);
+      if (!goal) {
+        throw new Error('Objetivo no encontrado');
+      }
+
+      // Calculate new current amount
+      const currentAmount = parseFloat(goal.current_amount) || 0;
+      const newCurrentAmount = currentAmount + numericAmount;
+      
+      // Prevent exceeding target (optional - you can remove this if you want to allow over-funding)
+      const targetAmount = parseFloat(goal.target_amount);
+      if (newCurrentAmount > targetAmount) {
+        const maxAddition = targetAmount - currentAmount;
+        throw new Error(`Solo puedes agregar $${maxAddition.toFixed(2)} más para completar este objetivo`);
+      }
+
+      // Update goal in database
+      const { data, error } = await supabase
+        .from('goals')
+        .update({ current_amount: newCurrentAmount })
+        .eq('id', goalId)
+        .eq('user_id', userId)
+        .select();
+
+      if (error) {
+        console.error('Error adding money to goal:', error);
+        throw new Error('Error al actualizar el objetivo');
+      }
+
+      // Update local data
+      const goalIndex = this.data.goals.findIndex(g => g.id === goalId);
+      if (goalIndex !== -1) {
+        this.data.goals[goalIndex] = data[0];
+      }
+
+      console.log('✅ Money added to goal successfully');
+      
+      // Check if goal is completed
+      if (newCurrentAmount >= targetAmount) {
+        console.log('🎉 Goal completed!');
+        // You could add an achievement here
+        return { success: true, completed: true, goal: data[0] };
+      }
+      
+      return { success: true, completed: false, goal: data[0] };
+    } catch (error) {
+      console.error('Error in addMoneyToGoal:', error);
+      throw error;
+    }
+  }
+
+  async deleteGoal(goalId) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const { error } = await supabase
+        .from('goals')
+        .delete()
+        .eq('id', goalId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error deleting goal:', error);
+        return false;
+      }
+
+      this.data.goals = this.data.goals.filter(goal => goal.id !== goalId);
+      return true;
+    } catch (error) {
+      console.error('Error in deleteGoal:', error);
+      return false;
+    }
+  }
+
   // Spending Limits - FIXED
   async loadSpendingLimits() {
     const userId = this.getCurrentUserId();
