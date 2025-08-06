@@ -260,8 +260,11 @@ export class UIManager {
           <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
             💰 Agregar
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}', '${goal.name}', ${goal.target_amount}, ${goal.current_amount})">
             ✏️ Editar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
+            🗑️ Eliminar
           </button>
         </div>
       `;

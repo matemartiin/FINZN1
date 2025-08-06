@@ -1043,12 +1043,126 @@ class FinznApp {
   // Goal management methods
   addToGoal(goalId) {
     console.log('💰 Add to goal:', goalId);
-    this.ui.showAlert('Función de agregar a objetivo próximamente', 'info');
+    
+    const goal = this.data.getGoals().find(g => g.id === goalId);
+    if (!goal) {
+      this.ui.showAlert('Objetivo no encontrado', 'error');
+      return;
+    }
+    
+    this.ui.showAddMoneyModal(goal);
   }
 
-  editGoal(goalId) {
+  editGoal(goalId, name, targetAmount, currentAmount) {
     console.log('✏️ Edit goal:', goalId);
-    this.ui.showAlert('Función de editar objetivo próximamente', 'info');
+    
+    const goal = {
+      id: goalId,
+      name: name,
+      target_amount: targetAmount,
+      current_amount: currentAmount
+    };
+    
+    this.ui.showEditGoalModal(goal);
+  }
+
+  async deleteGoal(goalId, goalName) {
+    if (confirm(`¿Estás seguro de que quieres eliminar el objetivo "${goalName}"?`)) {
+      try {
+        const success = await this.data.deleteGoal(goalId);
+        if (success) {
+          this.ui.showAlert('Objetivo eliminado exitosamente', 'success');
+          this.updateDashboard();
+        } else {
+          this.ui.showAlert('Error al eliminar el objetivo', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting goal:', error);
+        this.ui.showAlert('Error al eliminar el objetivo', 'error');
+      }
+    }
+  }
+
+  async handleEditGoal(e) {
+    e.preventDefault();
+    console.log('✏️ Handling edit goal...');
+    
+    const modal = document.getElementById('edit-goal-modal');
+    const goalId = modal.dataset.goalId;
+    
+    if (!goalId) {
+      this.ui.showAlert('Error: ID de objetivo no encontrado', 'error');
+      return;
+    }
+    
+    const formData = this.ui.getFormData('edit-goal-form');
+    
+    if (!formData.name || !formData.targetAmount) {
+      this.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+    
+    try {
+      const updates = {
+        name: formData.name,
+        target_amount: parseFloat(formData.targetAmount),
+        current_amount: parseFloat(formData.currentAmount) || 0
+      };
+      
+      const success = await this.data.updateGoal(goalId, updates);
+      
+      if (success) {
+        this.modals.hide('edit-goal-modal');
+        this.ui.showAlert('Objetivo actualizado exitosamente', 'success');
+        this.updateDashboard();
+      } else {
+        this.ui.showAlert('Error al actualizar el objetivo', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error editing goal:', error);
+      this.ui.showAlert('Error al actualizar el objetivo', 'error');
+    }
+  }
+
+  async handleAddMoney(e) {
+    e.preventDefault();
+    console.log('💰 Handling add money to goal...');
+    
+    const modal = document.getElementById('add-money-modal');
+    const goalId = modal.dataset.goalId;
+    
+    if (!goalId) {
+      this.ui.showAlert('Error: ID de objetivo no encontrado', 'error');
+      return;
+    }
+    
+    const formData = this.ui.getFormData('add-money-form');
+    
+    if (!formData.amount) {
+      this.ui.showAlert('Por favor ingresa un monto', 'error');
+      return;
+    }
+    
+    try {
+      const result = await this.data.addMoneyToGoal(goalId, formData.amount);
+      
+      if (result.success) {
+        this.modals.hide('add-money-modal');
+        
+        if (result.completed) {
+          this.ui.showAlert('¡Felicitaciones! Has completado tu objetivo de ahorro 🎉', 'success');
+        } else {
+          this.ui.showAlert(`Dinero agregado exitosamente. Nuevo total: ${this.ui.formatCurrency(result.goal.current_amount)}`, 'success');
+        }
+        
+        this.updateDashboard();
+      }
+      
+    } catch (error) {
+      console.error('Error adding money to goal:', error);
+      this.ui.showAlert(error.message || 'Error al agregar dinero al objetivo', 'error');
+    }
   }
 
   // Category management methods

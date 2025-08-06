@@ -527,6 +527,62 @@
     </div>
   </div>
 
+  <!-- Edit Goal Modal -->
+  <div id="edit-goal-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Objetivo de Ahorro</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-goal-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-goal-name">Nombre del Objetivo</label>
+          <input type="text" id="edit-goal-name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-goal-target">Monto Objetivo</label>
+          <input type="number" id="edit-goal-target" name="targetAmount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-goal-current">Monto Actual</label>
+          <input type="number" id="edit-goal-current" name="currentAmount" step="0.01" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Money to Goal Modal -->
+  <div id="add-money-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Dinero al Objetivo</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="goal-info">
+          <h3 id="add-money-goal-name">Objetivo</h3>
+          <p id="add-money-goal-progress">Progreso actual</p>
+          <p id="add-money-max-amount" class="text-muted">Máximo disponible</p>
+        </div>
+        <form id="add-money-form" class="modal-form">
+          <div class="form-group">
+            <label for="add-money-amount">Monto a Agregar</label>
+            <input type="number" id="add-money-amount" name="amount" step="0.01" min="0.01" required />
+            <small class="input-hint">Ingresa el monto que quieres agregar a este objetivo</small>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Agregar Dinero</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Manage Categories Modal -->
   <div id="manage-categories-modal" class="modal">
     <div class="modal-content">
