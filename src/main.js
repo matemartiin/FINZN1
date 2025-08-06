@@ -203,6 +203,12 @@ class FinznApp {
       addSpendingLimitBtnCard.addEventListener('click', () => this.showAddSpendingLimitModal());
     }
     
+    // Add spending limit button in expenses section
+    const addSpendingLimitBtnExpensesSection = document.getElementById('add-spending-limit-btn-expenses');
+    if (addSpendingLimitBtnExpensesSection) {
+      addSpendingLimitBtnExpensesSection.addEventListener('click', () => this.showAddSpendingLimitModal());
+    }
+    
     // Settings buttons
     const manageLimitsBtn = document.getElementById('manage-limits-btn');
     if (manageLimitsBtn) {
@@ -567,6 +573,16 @@ class FinznApp {
 
   showAddSpendingLimitModal() {
     console.log('⚠️ Show add spending limit modal');
+    
+    // Pre-select category if provided
+    const categorySelect = document.getElementById('limit-category');
+    if (arguments.length > 0 && categorySelect) {
+      const preSelectedCategory = arguments[0];
+      setTimeout(() => {
+        categorySelect.value = preSelectedCategory;
+      }, 100);
+    }
+    
     this.modals.show('add-spending-limit-modal');
   }
   
