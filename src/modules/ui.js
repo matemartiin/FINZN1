@@ -260,7 +260,7 @@ export class UIManager {
           <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
             💰 Agregar
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}', '${goal.name}', ${goal.target_amount}, ${goal.current_amount})">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
             ✏️ Editar
           </button>
           <button class="btn btn-secondary btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
@@ -838,6 +838,57 @@ export class UIManager {
     }
     
     return data;
+  }
+
+  showEditGoalModal(goal) {
+    console.log('✏️ Showing edit goal modal for:', goal);
+    
+    // Populate form with current goal data
+    const nameInput = document.getElementById('edit-goal-name');
+    const targetInput = document.getElementById('edit-goal-target');
+    const currentInput = document.getElementById('edit-goal-current');
+    const modal = document.getElementById('edit-goal-modal');
+    
+    if (nameInput) nameInput.value = goal.name;
+    if (targetInput) targetInput.value = goal.target_amount;
+    if (currentInput) currentInput.value = goal.current_amount;
+    if (modal) modal.dataset.goalId = goal.id;
+    
+    // Show modal using modal manager
+    if (window.app && window.app.modals) {
+      window.app.modals.show('edit-goal-modal');
+    }
+  }
+  
+  showAddMoneyModal(goal) {
+    console.log('💰 Showing add money modal for:', goal);
+    
+    const goalNameElement = document.getElementById('add-money-goal-name');
+    const goalProgressElement = document.getElementById('add-money-goal-progress');
+    const maxAmountElement = document.getElementById('add-money-max-amount');
+    const amountInput = document.getElementById('add-money-amount');
+    const modal = document.getElementById('add-money-modal');
+    
+    const progress = (goal.current_amount / goal.target_amount) * 100;
+    const remaining = goal.target_amount - goal.current_amount;
+    
+    if (goalNameElement) goalNameElement.textContent = goal.name;
+    if (goalProgressElement) {
+      goalProgressElement.textContent = `${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)} (${progress.toFixed(1)}%)`;
+    }
+    if (maxAmountElement) {
+      maxAmountElement.textContent = `Máximo disponible: ${this.formatCurrency(remaining)}`;
+    }
+    if (amountInput) {
+      amountInput.max = remaining;
+      amountInput.value = '';
+    }
+    if (modal) modal.dataset.goalId = goal.id;
+    
+    // Show modal using modal manager
+    if (window.app && window.app.modals) {
+      window.app.modals.show('add-money-modal');
+    }
   }
 
   showLoading(elementId) {

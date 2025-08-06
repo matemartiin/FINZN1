@@ -262,6 +262,18 @@ class FinznApp {
       addGoalForm.addEventListener('submit', (e) => this.handleAddGoal(e));
     }
     
+    // Edit goal form
+    const editGoalForm = document.getElementById('edit-goal-form');
+    if (editGoalForm) {
+      editGoalForm.addEventListener('submit', (e) => this.handleEditGoal(e));
+    }
+    
+    // Add money to goal form
+    const addMoneyForm = document.getElementById('add-money-form');
+    if (addMoneyForm) {
+      addMoneyForm.addEventListener('submit', (e) => this.handleAddMoney(e));
+    }
+    
     // Add spending limit form
     const addSpendingLimitForm = document.getElementById('add-spending-limit-form');
     if (addSpendingLimitForm) {
@@ -1053,15 +1065,14 @@ class FinznApp {
     this.ui.showAddMoneyModal(goal);
   }
 
-  editGoal(goalId, name, targetAmount, currentAmount) {
+  editGoal(goalId) {
     console.log('✏️ Edit goal:', goalId);
     
-    const goal = {
-      id: goalId,
-      name: name,
-      target_amount: targetAmount,
-      current_amount: currentAmount
-    };
+    const goal = this.data.getGoals().find(g => g.id === goalId);
+    if (!goal) {
+      this.ui.showAlert('Objetivo no encontrado', 'error');
+      return;
+    }
     
     this.ui.showEditGoalModal(goal);
   }
