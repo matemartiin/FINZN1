@@ -518,6 +518,7 @@ class FinznApp {
       
       // Check spending limit alerts
       const limitAlerts = this.data.checkSpendingLimits(this.currentMonth);
+      // Show system alerts but not mascot alerts
       limitAlerts.forEach(alert => {
         this.ui.showAlert(alert.message, alert.type);
       });
@@ -530,12 +531,7 @@ class FinznApp {
       const trendData = await this.data.getTrendData();
       this.charts.updateTrendChart(trendData);
       
-      // Show mascot message based on balance
-      if (balance.available < 0) {
-        this.ui.showMascotAlert('¡Cuidado! Estás gastando más de lo que ingresas', 'warning');
-      } else if (balance.available > balance.totalIncome * 0.2) {
-        this.ui.showMascotAlert('¡Excelente! Tienes un buen balance este mes', 'success');
-      }
+      // Mascot messages disabled - pet only speaks on hover
       
       console.log('✅ Dashboard updated successfully');
       

@@ -2,6 +2,97 @@ export class UIManager {
   constructor() {
     this.alertContainer = document.getElementById('alert-container');
     this.mascotAlertTimeout = null;
+    this.setupMascotHoverBehavior();
+  }
+
+  setupMascotHoverBehavior() {
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+      this.initializeMascotHover();
+    });
+    
+    // Also try to initialize immediately in case DOM is already ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        this.initializeMascotHover();
+      });
+    } else {
+      this.initializeMascotHover();
+    }
+  }
+
+  initializeMascotHover() {
+    const mascotContainer = document.querySelector('.chart-mascot-container');
+    const dynamicMessage = document.getElementById('mascot-dynamic-message');
+    
+    if (!mascotContainer || !dynamicMessage) {
+      // Retry after a short delay if elements aren't ready
+      setTimeout(() => this.initializeMascotHover(), 500);
+      return;
+    }
+
+    console.log('🐾 Initializing mascot hover behavior');
+
+    mascotContainer.addEventListener('mouseenter', () => {
+      this.showHoverMessage(dynamicMessage);
+    });
+
+    mascotContainer.addEventListener('mouseleave', () => {
+      this.hideHoverMessage(dynamicMessage);
+    });
+  }
+
+  showHoverMessage(messageElement) {
+    if (!messageElement) return;
+
+    // Get current financial context for personalized message
+    const messages = this.getContextualMascotMessages();
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    
+    messageElement.textContent = randomMessage.text;
+    messageElement.className = `mascot-alert mascot-alert-${randomMessage.type}`;
+    messageElement.style.opacity = '1';
+    
+    console.log('🐾 Mascot speaking on hover:', randomMessage.text);
+  }
+
+  hideHoverMessage(messageElement) {
+    if (!messageElement) return;
+    
+    messageElement.style.opacity = '0';
+    console.log('🐾 Mascot returning to silent state');
+  }
+
+  getContextualMascotMessages() {
+    // Get current balance if available
+    const balanceElement = document.getElementById('balance-amount-new');
+    const balanceText = balanceElement ? balanceElement.textContent : '';
+    
+    // Parse balance (remove currency symbols and convert to number)
+    const balanceValue = parseFloat(balanceText.replace(/[^0-9.-]/g, '')) || 0;
+    
+    const messages = [
+      { text: '¡Hola! Soy tu asistente financiero personal', type: 'info' },
+      { text: '¿Sabías que ahorrar el 20% de tus ingresos es ideal?', type: 'info' },
+      { text: 'Revisa tus gastos regularmente para mantener el control', type: 'info' },
+      { text: '¡Cada peso ahorrado es un paso hacia tus metas!', type: 'success' },
+      { text: 'Planifica tus compras para evitar gastos impulsivos', type: 'info' }
+    ];
+
+    // Add contextual messages based on balance
+    if (balanceValue < 0) {
+      messages.push(
+        { text: '¡Cuidado! Estás gastando más de lo que ingresas', type: 'warning' },
+        { text: 'Considera revisar tus gastos no esenciales', type: 'warning' }
+      );
+    } else if (balanceValue > 1000) {
+      messages.push(
+        { text: '¡Excelente! Tienes un buen balance este mes', type: 'success' },
+        { text: '¡Buen trabajo! Considera invertir tus ahorros', type: 'success' }
+      );
+    }
+
+    return messages;
   }
 
   updateBalance(balance) {
@@ -281,26 +372,8 @@ export class UIManager {
   }
 
   showMascotAlert(message, type = 'info') {
-    if (this.mascotAlertTimeout) {
-      clearTimeout(this.mascotAlertTimeout);
-    }
-
-    const mascotContainer = document.querySelector('.chart-mascot-container');
-    if (!mascotContainer) return;
-
-    let tooltip = mascotContainer.querySelector('.mascot-alert');
-    if (!tooltip) {
-      tooltip = document.createElement('div');
-      tooltip.className = 'mascot-alert';
-      mascotContainer.appendChild(tooltip);
-    }
-
-    tooltip.textContent = message;
-    tooltip.className = `mascot-alert mascot-alert-${type} show`;
-
-    this.mascotAlertTimeout = setTimeout(() => {
-      tooltip.classList.remove('show');
-    }, 3000);
+    // Mascot alerts are now disabled - pet only speaks on hover
+    console.log('Mascot alert suppressed (hover-only mode):', message);
   }
 
   formatCurrency(amount) {

@@ -768,6 +768,7 @@ body {
 
 .chart-mascot-container {
   position: relative;
+  cursor: pointer;
 }
 
 /* MASCOTA - TAMAÑO CORREGIDO */
@@ -780,6 +781,11 @@ body {
   background: white;
   padding: 4px;
   object-fit: cover;
+  transition: transform var(--transition-normal);
+}
+
+.chart-mascot-img:hover {
+  transform: scale(1.1);
 }
 
 .chart-mascot-tooltip {
@@ -797,13 +803,14 @@ body {
   opacity: 0;
   transition: opacity var(--transition-fast);
   z-index: 1000;
+  pointer-events: none;
 }
 
 .chart-mascot-container:hover .chart-mascot-tooltip {
   opacity: 1;
 }
 
-/* Mascot Alert */
+/* Mascot Alert - Now only shows on hover */
 .mascot-alert {
   position: absolute;
   top: -50px;
@@ -821,9 +828,11 @@ body {
   z-index: 1000;
   max-width: 200px;
   text-align: center;
+  pointer-events: none;
 }
 
-.mascot-alert.show {
+/* Remove auto-show behavior - only hover activation */
+.chart-mascot-container:hover .mascot-alert {
   opacity: 1;
 }
 
