@@ -273,9 +273,22 @@ export class UIManager {
   // FIXED: Spending limits with REAL functional semaphore
   updateSpendingLimitsList(limits, expenses) {
     const summaryContainer = document.getElementById('spending-limits-summary');
+    const categoryLimitsContainer = document.getElementById('category-limits-display');
+    const totalLimitsCount = document.getElementById('total-limits-count');
     
     console.log('🚦 Updating spending limits UI:', { limits: limits.length, expenses: expenses.length });
     
+    // Update total count
+    if (totalLimitsCount) {
+      totalLimitsCount.textContent = limits.length;
+    }
+    
+    // Update category limits display (new main view)
+    if (categoryLimitsContainer) {
+      this.updateCategoryLimitsDisplay(limits, expenses);
+    }
+    
+    // Keep existing summary container for dashboard
     if (summaryContainer) {
       summaryContainer.innerHTML = '';
     }
@@ -365,6 +378,160 @@ export class UIManager {
     });
     
     console.log('✅ Spending limits UI updated successfully');
+  }
+
+  // NEW: Update category limits display for expenses section
+  updateCategoryLimitsDisplay(limits, expenses) {
+    const container = document.getElementById('category-limits-display');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (limits.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">💰</div>
+          <h3>No hay límites de gasto configurados</h3>
+          <p>Establece límites presupuestarios para controlar mejor tus gastos por categoría</p>
+          <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+            <span>➕</span>
+            Configurar Primer Límite
+          </button>
+        </div>
+      `;
+      return;
+    }
+    
+    // Get all categories to show both with and without limits
+    const categories = window.app?.data?.getCategories() || [];
+    const categoriesWithLimits = new Set(limits.map(limit => limit.category));
+    
+    // Show categories with limits first
+    limits.forEach(limit => {
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+      const remaining = limit.amount - currentSpent;
+      
+      let statusClass = 'safe';
+      let statusIcon = '🟢';
+      let statusText = 'Dentro del límite';
+      
+      if (percentage >= 100) {
+        statusClass = 'danger';
+        statusIcon = '🔴';
+        statusText = 'Límite superado';
+      } else if (percentage >= limit.warning_percentage) {
+        statusClass = 'warning';
+        statusIcon = '🟡';
+        statusText = 'Cerca del límite';
+      }
+      
+      const categoryInfo = this.getCategoryInfo(limit.category);
+      
+      const limitItem = document.createElement('div');
+      limitItem.className = `category-limit-item ${statusClass}`;
+      
+      limitItem.innerHTML = `
+        <div class="category-limit-header">
+          <div class="category-info-display">
+            <div class="category-icon-large">${categoryInfo.icon}</div>
+            <div class="category-details">
+              <h4 class="category-name">${limit.category}</h4>
+              <div class="category-status">
+                ${statusIcon} ${statusText}
+              </div>
+            </div>
+          </div>
+          <div class="limit-actions">
+            <button class="expense-action-btn edit-btn" onclick="window.app.editSpendingLimit('${limit.id}')" title="Editar límite">
+              ✏️
+            </button>
+            <button class="expense-action-btn delete-btn" onclick="window.app.deleteSpendingLimit('${limit.id}')" title="Eliminar límite">
+              🗑️
+            </button>
+          </div>
+        </div>
+        
+        <div class="limit-details">
+          <div class="limit-amounts">
+            <div class="limit-amount-row">
+              <span class="limit-label">Límite Mensual:</span>
+              <span class="limit-value primary">${this.formatCurrency(limit.amount)}</span>
+            </div>
+            <div class="limit-amount-row">
+              <span class="limit-label">Gastado:</span>
+              <span class="limit-value ${statusClass}">${this.formatCurrency(currentSpent)}</span>
+            </div>
+            <div class="limit-amount-row">
+              <span class="limit-label">Disponible:</span>
+              <span class="limit-value ${remaining >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(remaining)}</span>
+            </div>
+          </div>
+          
+          <div class="limit-progress">
+            <div class="progress-bar-limit">
+              <div class="progress-fill-limit ${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+            </div>
+            <div class="progress-text-limit">${percentage.toFixed(1)}% utilizado</div>
+          </div>
+          
+          <div class="limit-config">
+            <div class="config-item">
+              <span class="config-label">Período:</span>
+              <span class="config-value">Mensual</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Alerta al:</span>
+              <span class="config-value">${limit.warning_percentage}%</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(limitItem);
+    });
+    
+    // Show categories without limits
+    const categoriesWithoutLimits = categories.filter(cat => !categoriesWithLimits.has(cat.name));
+    
+    if (categoriesWithoutLimits.length > 0) {
+      const noLimitsSection = document.createElement('div');
+      noLimitsSection.className = 'no-limits-section';
+      
+      noLimitsSection.innerHTML = `
+        <div class="section-divider">
+          <h4>📋 Categorías sin límites configurados</h4>
+        </div>
+      `;
+      
+      categoriesWithoutLimits.forEach(category => {
+        const noLimitItem = document.createElement('div');
+        noLimitItem.className = 'category-no-limit-item';
+        
+        noLimitItem.innerHTML = `
+          <div class="category-info-display">
+            <div class="category-icon-large">${category.icon}</div>
+            <div class="category-details">
+              <h4 class="category-name">${category.name}</h4>
+              <div class="category-status no-limit">
+                ⚪ Sin límite establecido
+              </div>
+            </div>
+          </div>
+          <div class="no-limit-actions">
+            <button class="btn btn-secondary btn-sm" onclick="window.app.showAddSpendingLimitModal('${category.name}')">
+              <span>➕</span>
+              Configurar Límite
+            </button>
+          </div>
+        `;
+        
+        noLimitsSection.appendChild(noLimitItem);
+      });
+      
+      container.appendChild(noLimitsSection);
+    }
   }
 
   updateCategoriesSelect(categories, selectId) {
