@@ -158,7 +158,6 @@ class FinznApp {
     // Add expense buttons
     const addExpenseBtn = document.getElementById('add-expense-btn-dashboard');
     const addExpenseBtnTransactions = document.getElementById('add-expense-btn-transactions');
-    const quickAddExpense = document.getElementById('quick-add-expense');
     
     if (addExpenseBtn) {
       addExpenseBtn.addEventListener('click', () => this.showAddExpenseModal());
@@ -168,14 +167,9 @@ class FinznApp {
       addExpenseBtnTransactions.addEventListener('click', () => this.showAddExpenseModal());
     }
     
-    if (quickAddExpense) {
-      quickAddExpense.addEventListener('click', () => this.showAddExpenseModal());
-    }
-    
     // Add income button
     const addIncomeBtn = document.getElementById('add-income-btn-dashboard');
     const addIncomeBtnTransactions = document.getElementById('add-income-btn-transactions');
-    const quickAddIncome = document.getElementById('quick-add-income');
     
     if (addIncomeBtn) {
       addIncomeBtn.addEventListener('click', () => this.showAddIncomeModal());
@@ -183,19 +177,6 @@ class FinznApp {
     
     if (addIncomeBtnTransactions) {
       addIncomeBtnTransactions.addEventListener('click', () => this.showAddIncomeModal());
-    }
-    
-    if (quickAddIncome) {
-      quickAddIncome.addEventListener('click', () => this.showAddIncomeModal());
-    }
-    
-    // Quick view balance
-    const quickViewBalance = document.getElementById('quick-view-balance');
-    if (quickViewBalance) {
-      quickViewBalance.addEventListener('click', () => {
-        this.navigation.showSection('dashboard');
-        this.ui.showAlert('Mostrando resumen de balance', 'info');
-      });
     }
     
     // View incomes button
