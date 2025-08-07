@@ -555,6 +555,19 @@ class FinznApp {
       const trendData = await this.data.getTrendData();
       this.charts.updateTrendChart(trendData);
       
+      // Update budgets with AI insights
+      const budgets = await this.budget.loadBudgets();
+      this.ui.updateBudgetsList(budgets, expenses);
+      
+      // Train AI model periodically (non-blocking)
+      if (expenses.length > 10) {
+        setTimeout(() => {
+          this.aiBudget.trainModel().catch(error => {
+            console.log('AI model training skipped:', error.message);
+          });
+        }, 1000);
+      }
+      
       // Mascot messages disabled - pet only speaks on hover
       
       console.log('✅ Dashboard updated successfully');
