@@ -573,11 +573,6 @@ class FinznApp {
     this.modals.show('add-goal-modal');
   }
 
-  showAddBudgetModal() {
-    console.log('💰 Show add budget modal');
-    this.ui.showAddBudgetModal();
-  }
-
   showAddSpendingLimitModal() {
     console.log('⚠️ Show add spending limit modal');
     
@@ -696,6 +691,147 @@ class FinznApp {
       console.error('Error adding expense:', error);
       this.ui.showAlert('Error al agregar el gasto', 'error');
     }
+  }
+
+  async handleAddBudget(e) {
+    e.preventDefault();
+    console.log('💰 Adding budget...');
+    
+    const formData = this.ui.getBudgetFormData('add-budget-form');
+    
+    if (!formData.name || !formData.category || !formData.amount || !formData['start-date'] || !formData['end-date']) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    // Validate dates
+    const startDate = new Date(formData['start-date']);
+    const endDate = new Date(formData['end-date']);
+    
+    if (endDate <= startDate) {
+      this.ui.showAlert('La fecha de fin debe ser posterior a la fecha de inicio', 'error');
+      return;
+    }
+    
+    try {
+      const budgetData = {
+        name: formData.name,
+        category: formData.category,
+        amount: parseFloat(formData.amount),
+        start_date: formData['start-date'],
+        end_date: formData['end-date'],
+        ai_recommended: formData['ai-recommendations'] || false
+      };
+      
+      const success = await this.budget.addBudget(budgetData);
+      
+      if (success) {
+        this.modals.hide('add-budget-modal');
+        this.ui.showAlert('Presupuesto creado exitosamente', 'success');
+        this.updateDashboard();
+        
+        // Generate AI insights if requested
+        if (budgetData.ai_recommended) {
+          this.generateBudgetInsights(budgetData.category);
+        }
+      } else {
+        this.ui.showAlert('Error al crear el presupuesto', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error adding budget:', error);
+      this.ui.showAlert('Error al crear el presupuesto', 'error');
+    }
+  }
+
+  async handleEditBudget(e) {
+    e.preventDefault();
+    console.log('✏️ Editing budget...');
+    
+    const modal = document.getElementById('edit-budget-modal');
+    const budgetId = modal?.dataset.budgetId;
+    
+    if (!budgetId) {
+      this.ui.showAlert('Error: ID de presupuesto no encontrado', 'error');
+      return;
+    }
+    
+    const formData = this.ui.getBudgetFormData('edit-budget-form');
+    
+    if (!formData.name || !formData.category || !formData.amount || !formData['start-date'] || !formData['end-date']) {
+      this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+    
+    // Validate dates
+    const startDate = new Date(formData['start-date']);
+    const endDate = new Date(formData['end-date']);
+    
+    if (endDate <= startDate) {
+      this.ui.showAlert('La fecha de fin debe ser posterior a la fecha de inicio', 'error');
+      return;
+    }
+    
+    try {
+      const updates = {
+        name: formData.name,
+        category: formData.category,
+        amount: parseFloat(formData.amount),
+        start_date: formData['start-date'],
+        end_date: formData['end-date']
+      };
+      
+      const success = await this.budget.updateBudget(budgetId, updates);
+      
+      if (success) {
+        this.modals.hide('edit-budget-modal');
+        this.ui.showAlert('Presupuesto actualizado exitosamente', 'success');
+        this.updateDashboard();
+      } else {
+        this.ui.showAlert('Error al actualizar el presupuesto', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error editing budget:', error);
+      this.ui.showAlert('Error al actualizar el presupuesto', 'error');
+    }
+  }
+
+  showEditBudgetModal(budgetId) {
+    console.log('✏️ Show edit budget modal for:', budgetId);
+    this.ui.showEditBudgetModal(budgetId);
+  }
+
+  async deleteBudget(budgetId, budgetName) {
+    if (confirm(`¿Estás seguro de que quieres eliminar el presupuesto "${budgetName}"?`)) {
+      try {
+        const success = await this.budget.deleteBudget(budgetId);
+        if (success) {
+          this.ui.showAlert('Presupuesto eliminado exitosamente', 'success');
+          this.updateDashboard();
+        } else {
+          this.ui.showAlert('Error al eliminar el presupuesto', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting budget:', error);
+        this.ui.showAlert('Error al eliminar el presupuesto', 'error');
+      }
+    }
+  }
+
+  async generateBudgetInsights(budgetId = null) {
+    console.log('🤖 Generating budget insights for:', budgetId || 'all budgets');
+    this.ui.showAlert('Generando análisis inteligente...', 'info');
+    
+    // This will be implemented in Phase 3 with AI integration
+    setTimeout(() => {
+      this.ui.showAlert('Análisis de IA próximamente disponible', 'info');
+    }, 2000);
+  }
+
+  async generateAllBudgetInsights() {
+    console.log('🤖 Generating insights for all budgets');
+    await this.generateBudgetInsights();
   }
 
   async handleAddIncome(e) {
