@@ -620,6 +620,12 @@ export class BudgetManager {
     });
   }
 
+  updatePredictionsInForm() {
+    // This method is called when showing the create budget modal
+    // Predictions are already handled in updateBudgetCategoriesForm
+    console.log('🔮 Predictions updated in form');
+  }
+
   getTrendText(trend) {
     const texts = {
       'increasing': '📈 Creciente',
@@ -1040,7 +1046,23 @@ export class BudgetManager {
   }
 
   updateBudgetDisplay() {
-    // Update the budget display in the UI
+    // Update the main budget display
     console.log('🔄 Updating budget display...');
+    
+    // Update spending limits display with current budget data
+    if (window.app && window.app.data) {
+      const currentMonth = this.getCurrentMonth();
+      window.app.data.loadExpenses(currentMonth).then(expenses => {
+        const limits = window.app.data.getSpendingLimits();
+        if (window.app.ui) {
+          window.app.ui.updateSpendingLimitsList(limits, expenses);
+        }
+      });
+    }
+  }
+
+  getCurrentMonth() {
+    const now = new Date();
+    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
   }
 }
