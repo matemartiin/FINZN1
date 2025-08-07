@@ -602,6 +602,11 @@ class FinznApp {
     this.modals.show('add-spending-limit-modal');
   }
   
+  showAddBudgetModal() {
+    console.log('💰 Show add budget modal');
+    this.ui.showAddBudgetModal();
+  }
+  
   showManageCategoriesModal() {
     console.log('🏷️ Show manage categories modal');
     
