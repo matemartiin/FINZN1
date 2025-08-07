@@ -862,6 +862,12 @@ class FinznApp {
       // Generar análisis completo con IA
       const recommendations = await this.aiBudget.generateAllRecommendations();
       
+      // Verificar si hay datos suficientes
+      if (recommendations.error === 'insufficient_data') {
+        this.ui.showInsufficientDataMessage(recommendations);
+        return null;
+      }
+      
       // Mostrar recomendaciones en la UI
       this.ui.displayAIBudgetInsights(recommendations.aiRecommendations);
       

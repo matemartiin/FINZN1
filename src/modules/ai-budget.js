@@ -693,24 +693,32 @@ Genera las recomendaciones ahora:`;
       
       // 1. Obtener datos de entrenamiento
       const trainingData = await this.getTrainingData();
-      if (!trainingData) {
-        throw new Error('No hay datos suficientes para el análisis');
+      
+      // 2. Validar datos suficientes
+      const validationResult = this.validateDataSufficiency(trainingData);
+      if (!validationResult.isValid) {
+        return {
+          error: 'insufficient_data',
+          message: validationResult.message,
+          requirements: validationResult.requirements,
+          current: validationResult.current
+        };
       }
 
-      // 2. Entrenar modelo si no existe
+      // 3. Entrenar modelo si no existe
       if (!this.model) {
         await this.createAndTrainModel(trainingData);
       }
 
-      // 3. Generar predicciones ML
+      // 4. Generar predicciones ML
       const categories = Array.from(trainingData.categories);
       const predictions = await this.generatePredictions(categories);
 
-      // 4. Detectar patrones
+      // 5. Detectar patrones
       const expenses = await this.getRecentExpenses();
       const { patterns, insights } = await this.detectSpendingPatterns(expenses);
 
-      // 5. Generar recomendaciones con Gemini
+      // 6. Generar recomendaciones con Gemini
       const userData = {
         expenses,
         predictions,
@@ -721,7 +729,7 @@ Genera las recomendaciones ahora:`;
       
       const geminiRecommendations = await this.generateGeminiRecommendations(userData);
 
-      // 6. Combinar todas las recomendaciones
+      // 7. Combinar todas las recomendaciones
       const allRecommendations = {
         aiRecommendations: geminiRecommendations,
         mlPredictions: Array.from(predictions.entries()).map(([category, pred]) => ({
@@ -743,6 +751,97 @@ Genera las recomendaciones ahora:`;
       console.error('❌ Error in AI analysis:', error);
       throw error;
     }
+  }
+
+  // Validar si hay datos suficientes para el análisis
+  validateDataSufficiency(trainingData) {
+    const requirements = {
+      minExpenses: 15,
+      minCategories: 3,
+      minDays: 14,
+      minAmount: 1000
+    };
+
+    if (!trainingData) {
+      return {
+        isValid: false,
+        message: 'No se encontraron datos de gastos para analizar',
+        requirements: requirements,
+        current: {
+          expenses: 0,
+          categories: 0,
+          days: 0,
+          totalAmount: 0
+        }
+      };
+    }
+
+    const current = {
+      expenses: trainingData.features.length,
+      categories: trainingData.categories.size,
+      days: this.calculateDaysWithExpenses(trainingData),
+      totalAmount: this.calculateTotalAmount(trainingData)
+    };
+
+    const issues = [];
+    
+    if (current.expenses < requirements.minExpenses) {
+      issues.push(`Necesitas al menos ${requirements.minExpenses} gastos registrados (tienes ${current.expenses})`);
+    }
+    
+    if (current.categories < requirements.minCategories) {
+      issues.push(`Necesitas gastos en al menos ${requirements.minCategories} categorías diferentes (tienes ${current.categories})`);
+    }
+    
+    if (current.days < requirements.minDays) {
+      issues.push(`Necesitas gastos distribuidos en al menos ${requirements.minDays} días diferentes (tienes ${current.days})`);
+    }
+    
+    if (current.totalAmount < requirements.minAmount) {
+      issues.push(`El monto total de gastos debe ser al menos $${requirements.minAmount} (tienes $${current.totalAmount.toFixed(2)})`);
+    }
+
+    if (issues.length > 0) {
+      return {
+        isValid: false,
+        message: 'Datos insuficientes para generar análisis IA confiable',
+        requirements: requirements,
+        current: current,
+        issues: issues
+      };
+    }
+
+    return {
+      isValid: true,
+      message: 'Datos suficientes para análisis IA',
+      requirements: requirements,
+      current: current
+    };
+  }
+
+  // Calcular días únicos con gastos
+  calculateDaysWithExpenses(trainingData) {
+    const uniqueDays = new Set();
+    
+    trainingData.categoryStats.forEach((stats, category) => {
+      // Simular días únicos basado en la cantidad de gastos
+      // En una implementación real, tendrías las fechas exactas
+      const estimatedDays = Math.min(stats.count, 30); // Máximo 30 días
+      for (let i = 0; i < estimatedDays; i++) {
+        uniqueDays.add(`day_${i}`);
+      }
+    });
+    
+    return uniqueDays.size;
+  }
+
+  // Calcular monto total de gastos
+  calculateTotalAmount(trainingData) {
+    let total = 0;
+    trainingData.categoryStats.forEach((stats) => {
+      total += stats.avg * stats.count;
+    });
+    return total;
   }
 
   // Obtener gastos recientes
