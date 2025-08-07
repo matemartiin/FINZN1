@@ -6,7 +6,10 @@ export class ChartManager {
 
   updateExpensesChart(data) {
     const ctx = document.getElementById('expenses-chart');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Expenses chart canvas not found');
+      return;
+    }
 
     if (this.expensesChart) {
       this.expensesChart.destroy();
@@ -14,6 +17,18 @@ export class ChartManager {
 
     const labels = Object.keys(data);
     const values = Object.values(data);
+    
+    // If no data, show empty state
+    if (labels.length === 0 || values.every(v => v === 0)) {
+      ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+      const context = ctx.getContext('2d');
+      context.fillStyle = '#666';
+      context.font = '14px Arial';
+      context.textAlign = 'center';
+      context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
+      return;
+    }
+    
     const colors = this.generateColors(labels.length);
 
     this.expensesChart = new Chart(ctx, {
@@ -30,6 +45,7 @@ export class ChartManager {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        devicePixelRatio: window.devicePixelRatio || 1,
         plugins: {
           legend: {
             position: 'bottom',
@@ -37,7 +53,7 @@ export class ChartManager {
               padding: 20,
               usePointStyle: true,
               font: {
-                size: 12
+                size: window.innerWidth < 768 ? 11 : 12
               }
             }
           },
@@ -53,14 +69,17 @@ export class ChartManager {
             }
           }
         },
-        cutout: '60%'
+        cutout: window.innerWidth < 768 ? '50%' : '60%'
       }
     });
   }
 
   updateTrendChart(data) {
     const ctx = document.getElementById('trend-chart');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Trend chart canvas not found');
+      return;
+    }
 
     if (this.trendChart) {
       this.trendChart.destroy();
@@ -68,6 +87,17 @@ export class ChartManager {
 
     const labels = data.map(item => item.month);
     const values = data.map(item => item.amount);
+    
+    // If no data, show empty state
+    if (labels.length === 0 || values.every(v => v === 0)) {
+      ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+      const context = ctx.getContext('2d');
+      context.fillStyle = '#666';
+      context.font = '14px Arial';
+      context.textAlign = 'center';
+      context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
+      return;
+    }
 
     this.trendChart = new Chart(ctx, {
       type: 'line',
@@ -84,13 +114,14 @@ export class ChartManager {
           pointBackgroundColor: '#C8B6FF',
           pointBorderColor: '#A7C7E7',
           pointBorderWidth: 2,
-          pointRadius: 6,
-          pointHoverRadius: 8
+          pointRadius: window.innerWidth < 768 ? 4 : 6,
+          pointHoverRadius: window.innerWidth < 768 ? 6 : 8
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        devicePixelRatio: window.devicePixelRatio || 1,
         plugins: {
           legend: {
             display: false
@@ -104,9 +135,19 @@ export class ChartManager {
           }
         },
         scales: {
+          x: {
+            ticks: {
+              font: {
+                size: window.innerWidth < 768 ? 10 : 12
+              }
+            }
+          },
           y: {
             beginAtZero: true,
             ticks: {
+              font: {
+                size: window.innerWidth < 768 ? 10 : 12
+              },
               callback: function(value) {
                 return '$' + value.toLocaleString();
               }

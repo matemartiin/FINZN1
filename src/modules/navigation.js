@@ -14,6 +14,7 @@ export class NavigationManager {
 
   setupNavigationEvents() {
     const navItems = document.querySelectorAll('.nav-item');
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
     
     navItems.forEach(item => {
       item.addEventListener('click', () => {
@@ -22,6 +23,18 @@ export class NavigationManager {
           this.showSection(section);
           this.setActiveNavItem(item);
           this.closeMobileMenu();
+        }
+      });
+    });
+    
+    // Mobile navigation events
+    mobileNavItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = item.getAttribute('data-section');
+        if (section) {
+          this.showSection(section);
+          this.setActiveMobileNavItem(item);
         }
       });
     });
@@ -171,11 +184,52 @@ export class NavigationManager {
   setActiveNavItem(activeItem) {
     // Remove active class from all nav items
     const navItems = document.querySelectorAll('.nav-item');
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    
+    navItems.forEach(item => {
+      item.classList.remove('active');
+    });
+    
+    mobileNavItems.forEach(item => {
+      item.classList.remove('active');
+    });
+
+    // Add active class to clicked item
+    activeItem.classList.add('active');
+    
+    // Also activate corresponding mobile nav item
+    const section = activeItem.getAttribute('data-section');
+    if (section) {
+      const mobileItem = document.querySelector(`.mobile-nav-item[data-section="${section}"]`);
+      if (mobileItem) {
+        mobileItem.classList.add('active');
+      }
+    }
+  }
+  
+  setActiveMobileNavItem(activeItem) {
+    // Remove active class from all mobile nav items
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    mobileNavItems.forEach(item => {
+      item.classList.remove('active');
+    });
+    
     navItems.forEach(item => {
       item.classList.remove('active');
     });
 
     // Add active class to clicked item
     activeItem.classList.add('active');
+    
+    // Also activate corresponding desktop nav item
+    const section = activeItem.getAttribute('data-section');
+    if (section) {
+      const desktopItem = document.querySelector(`.nav-item[data-section="${section}"]`);
+      if (desktopItem) {
+        desktopItem.classList.add('active');
+      }
+    }
   }
 }
