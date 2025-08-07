@@ -435,299 +435,13 @@ class FinznApp {
     }
   }
 
-  async handleLogout() {
+  handleLogout() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-      // Generate ML predictions and patterns
-      const expenses = await this.data.loadExpenses(this.currentMonth);
-      const budgets = await this.budget.loadBudgets();
-      
-      const mlPredictions = await this.budget.generateMLPredictions(expenses);
-      const spendingPatterns = await this.budget.analyzeSpendingPatterns(expenses);
-      
-      // Prepare data for AI analysis
-      const analysisData = {
-        budgets: budgets,
-        expenses: expenses,
-        predictions: mlPredictions,
-        patterns: spendingPatterns,
-        currentMonth: this.currentMonth,
-        totalBudgetAmount: budgets.reduce((sum, budget) => sum + budget.amount, 0),
-        totalSpent: expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0)
-      };
-      
-      // Generate AI insights
-      const insights = await this.generateAIBudgetAnalysis(analysisData);
-      
-      // Display insights
-      this.ui.displayAIBudgetInsights(insights);
-      
-      // Save insights to database
-      for (const insight of insights) {
-        await this.data.saveBudgetInsight(insight);
-      }
-      
-      this.ui.showAlert('Análisis inteligente generado exitosamente', 'success');
+      this.ui.showAlert('Cerrando sesión...', 'info');
+      setTimeout(() => {
+        this.auth.logout();
+      }, 1000);
     }
-  }
-
-  async generateAIBudgetAnalysis(data) {
-    try {
-      console.log('🤖 Generating AI budget analysis...');
-      
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        console.warn('⚠️ No Gemini API key found, using ML-only analysis');
-        return this.generateMLOnlyBudgetAnalysis(data);
-      }
-
-      // Build comprehensive prompt for budget analysis
-      const prompt = this.buildBudgetAnalysisPrompt(data);
-      
-      console.log('🤖 Sending budget analysis request to Gemini API...');
-      
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: prompt
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 2048,
-            },
-            safetySettings: [
-              {
-                category: "HARM_CATEGORY_HARASSMENT",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              },
-              {
-                category: "HARM_CATEGORY_HATE_SPEECH",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error('❌ Gemini API error:', response.status, response.statusText);
-        return this.generateMLOnlyBudgetAnalysis(data);
-      }
-
-      const result = await response.json();
-      console.log('✅ Gemini API response received for budget analysis');
-
-      if (!result.candidates || result.candidates.length === 0) {
-        console.warn('⚠️ No candidates in Gemini response, using ML-only analysis');
-        return this.generateMLOnlyBudgetAnalysis(data);
-      }
-
-      const aiContent = result.candidates[0]?.content?.parts?.[0]?.text || '';
-      
-      if (!aiContent.trim()) {
-        console.warn('⚠️ Empty AI response, using ML-only analysis');
-        return this.generateMLOnlyBudgetAnalysis(data);
-      }
-
-      // Parse AI response and combine with ML data
-      return this.parseAIBudgetResponse(aiContent, data);
-
-    } catch (error) {
-      console.error('❌ Error in AI budget analysis:', error);
-      return this.generateMLOnlyBudgetAnalysis(data);
-    }
-  }
-
-  buildBudgetAnalysisPrompt(data) {
-    const { budgets, expenses, predictions, patterns, totalBudgetAmount, totalSpent } = data;
-    
-    let prompt = `Eres un experto en finanzas personales y análisis de presupuestos. Analiza los siguientes datos y genera insights específicos y actionables.
-
-DATOS DE PRESUPUESTOS:
-- Total presupuestado: $${totalBudgetAmount.toLocaleString()}
-- Total gastado: $${totalSpent.toLocaleString()}
-- Número de presupuestos: ${budgets.length}
-
-PRESUPUESTOS DETALLADOS:`;
-
-    budgets.forEach((budget, index) => {
-      const budgetExpenses = expenses.filter(exp => exp.category === budget.category);
-      const spent = budgetExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-      const percentage = ((spent / budget.amount) * 100).toFixed(1);
-      
-      prompt += `
-${index + 1}. ${budget.category}: $${spent.toLocaleString()} / $${budget.amount.toLocaleString()} (${percentage}%)`;
-    });
-
-    prompt += `\n\nPREDICCIONES DE MACHINE LEARNING:`;
-    predictions.forEach(pred => {
-      prompt += `
-- ${pred.category}: Predicción $${pred.predictedTotal.toLocaleString()} (Confianza: ${(pred.confidence * 100).toFixed(0)}%, Riesgo: ${pred.riskLevel})`;
-    });
-
-    prompt += `\n\nPATRONES IDENTIFICADOS:`;
-    patterns.forEach(pattern => {
-      prompt += `
-- ${pattern.type}: ${pattern.description} (Confianza: ${(pattern.confidence * 100).toFixed(0)}%)`;
-    });
-
-    prompt += `\n\nGenera exactamente 4 insights en formato JSON con esta estructura:
-[
-  {
-    "insight_type": "alert|recommendation|pattern|prediction",
-    "title": "Título específico y claro",
-    "description": "Descripción detallada y actionable",
-    "confidence_score": 0.85,
-    "data": {
-      "category": "categoría si aplica",
-      "amount": monto si aplica,
-      "percentage": porcentaje si aplica
-    }
-  }
-]
-
-IMPORTANTE: 
-- Responde SOLO con el JSON válido, sin texto adicional
-- Incluye al menos 1 alerta, 1 recomendación, 1 patrón y 1 predicción
-- Sé específico con números y porcentajes
-- Las recomendaciones deben ser actionables`;
-
-    return prompt;
-  }
-
-  parseAIBudgetResponse(aiContent, data) {
-    try {
-      // Try to extract JSON from AI response
-      const jsonMatch = aiContent.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const insights = JSON.parse(jsonMatch[0]);
-        
-        // Validate and enhance insights
-        return insights.map(insight => ({
-          id: this.generateId(),
-          budget_id: null,
-          insight_type: insight.insight_type || 'recommendation',
-          title: insight.title || 'Insight sin título',
-          description: insight.description || 'Sin descripción',
-          confidence_score: insight.confidence_score || 0.7,
-          data: insight.data || {},
-          status: 'active'
-        }));
-      }
-    } catch (error) {
-      console.error('Error parsing AI response:', error);
-    }
-    
-    // Fallback to ML-only analysis
-    return this.generateMLOnlyBudgetAnalysis(data);
-  }
-
-  generateMLOnlyBudgetAnalysis(data) {
-    console.log('🔄 Generating ML-only budget analysis');
-    
-    const { budgets, expenses, predictions, patterns } = data;
-    const insights = [];
-    
-    // Generate alert based on highest risk prediction
-    const highRiskPrediction = predictions.find(pred => pred.riskLevel === 'high') || 
-                              predictions.sort((a, b) => b.confidence - a.confidence)[0];
-    
-    if (highRiskPrediction) {
-      insights.push({
-        id: this.generateId(),
-        budget_id: highRiskPrediction.budgetId,
-        insight_type: 'alert',
-        title: `⚠️ Riesgo Alto en ${highRiskPrediction.category}`,
-        description: `Nuestro modelo ML predice que gastarás $${highRiskPrediction.predictedTotal.toLocaleString()} en ${highRiskPrediction.category}, superando significativamente tu presupuesto actual.`,
-        confidence_score: highRiskPrediction.confidence,
-        data: {
-          category: highRiskPrediction.category,
-          predicted_amount: highRiskPrediction.predictedTotal,
-          current_spent: highRiskPrediction.currentSpent,
-          risk_level: highRiskPrediction.riskLevel
-        },
-        status: 'active'
-      });
-    }
-    
-    // Generate recommendation based on best performing budget
-    const bestBudget = budgets.map(budget => {
-      const spent = expenses.filter(exp => exp.category === budget.category)
-                           .reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-      return { ...budget, spent, percentage: (spent / budget.amount) * 100 };
-    }).sort((a, b) => a.percentage - b.percentage)[0];
-    
-    if (bestBudget) {
-      insights.push({
-        id: this.generateId(),
-        budget_id: bestBudget.id,
-        insight_type: 'recommendation',
-        title: `💡 Optimiza tu Estrategia de ${bestBudget.category}`,
-        description: `Tu presupuesto de ${bestBudget.category} está funcionando bien (${bestBudget.percentage.toFixed(1)}% utilizado). Considera aplicar la misma disciplina a otras categorías.`,
-        confidence_score: 0.8,
-        data: {
-          category: bestBudget.category,
-          percentage: bestBudget.percentage,
-          amount: bestBudget.spent
-        },
-        status: 'active'
-      });
-    }
-    
-    // Generate pattern insight
-    const strongestPattern = patterns.sort((a, b) => b.confidence - a.confidence)[0];
-    if (strongestPattern) {
-      insights.push({
-        id: this.generateId(),
-        budget_id: null,
-        insight_type: 'pattern',
-        title: `📊 Patrón Detectado: ${strongestPattern.type}`,
-        description: strongestPattern.description,
-        confidence_score: strongestPattern.confidence,
-        data: strongestPattern.data,
-        status: 'active'
-      });
-    }
-    
-    // Generate prediction insight
-    const bestPrediction = predictions.sort((a, b) => b.confidence - a.confidence)[0];
-    if (bestPrediction) {
-      insights.push({
-        id: this.generateId(),
-        budget_id: bestPrediction.budgetId,
-        insight_type: 'prediction',
-        title: `🔮 Predicción para ${bestPrediction.category}`,
-        description: `Basado en tus patrones de gasto, predecimos que gastarás $${bestPrediction.predictedTotal.toLocaleString()} en ${bestPrediction.category} este mes.`,
-        confidence_score: bestPrediction.confidence,
-        data: {
-          category: bestPrediction.category,
-          predicted_amount: bestPrediction.predictedTotal,
-          factors: bestPrediction.factors
-        },
-        status: 'active'
-      });
-    }
-    
-    return insights;
-  }
-
-  generateId() {
-    return 'insight_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
   showAuth() {
@@ -1549,6 +1263,85 @@ IMPORTANTE:
       totalBudgets: targetBudgets.length,
       currentMonth
     };
+  }
+
+  async generateAIBudgetAnalysis(budgetData) {
+    console.log('🤖 Generating AI budget analysis');
+    
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn('⚠️ No Gemini API key found, using fallback insights');
+      return this.generateFallbackBudgetInsights(budgetData);
+    }
+
+    try {
+      const prompt = this.buildBudgetAIPrompt(budgetData);
+      
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1500,
+            },
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_HARASSMENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              },
+              {
+                category: "HARM_CATEGORY_HATE_SPEECH",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error('❌ Gemini API error:', response.status);
+        return this.generateFallbackBudgetInsights(budgetData);
+      }
+
+      const result = await response.json();
+      
+      if (!result.candidates || result.candidates.length === 0) {
+        console.warn('⚠️ No AI response, using fallback');
+        return this.generateFallbackBudgetInsights(budgetData);
+      }
+
+      const aiContent = result.candidates[0]?.content?.parts?.[0]?.text || '';
+      
+      if (!aiContent.trim()) {
+        console.warn('⚠️ Empty AI response, using fallback');
+        return this.generateFallbackBudgetInsights(budgetData);
+      }
+
+      // Parse AI response into structured insights
+      return this.parseAIBudgetResponse(aiContent, budgetData);
+
+    } catch (error) {
+      console.error('❌ Error calling AI API:', error);
+      return this.generateFallbackBudgetInsights(budgetData);
+    }
   }
 
   buildBudgetAIPrompt(budgetData) {
