@@ -1201,6 +1201,83 @@ export class UIManager {
     container.classList.remove('hidden');
   }
 
+  // Mostrar mensaje de datos insuficientes
+  showInsufficientDataMessage(validationResult) {
+    const insightsContainer = document.getElementById('budget-ai-insights');
+    if (!insightsContainer) return;
+
+    insightsContainer.innerHTML = `
+      <div class="insufficient-data-message">
+        <div class="insufficient-data-header">
+          <div class="insufficient-data-icon">📊</div>
+          <h3>Datos Insuficientes para Análisis IA</h3>
+        </div>
+        
+        <div class="insufficient-data-content">
+          <p class="insufficient-data-description">
+            ${validationResult.message}. Para generar recomendaciones precisas, necesitas:
+          </p>
+          
+          <div class="data-requirements">
+            <h4>📋 Requisitos Mínimos:</h4>
+            <div class="requirements-grid">
+              <div class="requirement-item ${validationResult.current.expenses >= validationResult.requirements.minExpenses ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.expenses >= validationResult.requirements.minExpenses ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Gastos registrados:</strong> ${validationResult.current.expenses}/${validationResult.requirements.minExpenses}
+                </div>
+              </div>
+              
+              <div class="requirement-item ${validationResult.current.categories >= validationResult.requirements.minCategories ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.categories >= validationResult.requirements.minCategories ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Categorías diferentes:</strong> ${validationResult.current.categories}/${validationResult.requirements.minCategories}
+                </div>
+              </div>
+              
+              <div class="requirement-item ${validationResult.current.days >= validationResult.requirements.minDays ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.days >= validationResult.requirements.minDays ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Días con gastos:</strong> ${validationResult.current.days}/${validationResult.requirements.minDays}
+                </div>
+              </div>
+              
+              <div class="requirement-item ${validationResult.current.totalAmount >= validationResult.requirements.minAmount ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.totalAmount >= validationResult.requirements.minAmount ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Monto total:</strong> $${validationResult.current.totalAmount.toFixed(2)}/$${validationResult.requirements.minAmount}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          ${validationResult.issues ? `
+            <div class="missing-requirements">
+              <h4>⚠️ Qué necesitas hacer:</h4>
+              <ul class="issues-list">
+                ${validationResult.issues.map(issue => `<li>${issue}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          <div class="insufficient-data-actions">
+            <button class="btn btn-primary" onclick="window.app.navigation.showSection('transactions')">
+              <span>➕</span>
+              Registrar Más Gastos
+            </button>
+            <button class="btn btn-secondary" onclick="window.app.generateBudgetInsights()">
+              <span>🔄</span>
+              Verificar Nuevamente
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Mostrar el contenedor
+    insightsContainer.style.display = 'block';
+  }
+
   // Mostrar predicciones de Machine Learning
   displayMLPredictions(predictions) {
     const container = document.getElementById('ml-predictions-container');
