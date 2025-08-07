@@ -8,6 +8,7 @@ import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
+import { BudgetIntegrationManager } from './modules/budget-integration.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -26,6 +27,7 @@ class FinznApp {
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
     this.calendar = new CalendarManager();
+    this.budgetSystem = new BudgetIntegrationManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -53,6 +55,9 @@ class FinznApp {
       // Initialize calendar
       this.calendar.init();
       
+      // Initialize smart budget system
+      await this.budgetSystem.initializeBudgetSystem();
+      
       // Setup month selector
       this.setupMonthSelector();
       
@@ -73,7 +78,10 @@ class FinznApp {
       console.log('✅ FINZN App initialized successfully');
     } catch (error) {
       console.error('❌ Error initializing app:', error);
-      this.showAuth();
+      // Don't show auth on budget system errors, just log and continue
+      if (!error.message?.includes('budget')) {
+        this.showAuth();
+      }
       this.setupEventListeners();
     }
   }
