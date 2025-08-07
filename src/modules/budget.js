@@ -546,6 +546,97 @@ export class BudgetManager {
     }
   }
 
+  createAIBudgetModal() {
+    // Create AI budget modal if it doesn't exist
+    const modalHTML = `
+      <div id="ai-budget-modal" class="modal">
+        <div class="modal-content modal-large">
+          <div class="modal-header">
+            <h3>🤖 Presupuesto Generado por IA</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="ai-budget-content"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button class="btn btn-primary" onclick="window.app.budget.applyAIBudget()">Aplicar Presupuesto</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Register with modal manager
+    if (window.app && window.app.modals) {
+      window.app.modals.init();
+    }
+  }
+
+  populateAIBudgetModal(suggestedBudget) {
+    const content = document.getElementById('ai-budget-content');
+    if (!content) return;
+    
+    content.innerHTML = `
+      <div class="ai-budget-summary">
+        <h3>📊 Resumen del Presupuesto IA</h3>
+        <div class="budget-metrics">
+          <div class="metric">
+            <div class="metric-label">Ingresos Mensuales</div>
+            <div class="metric-value">${this.formatCurrency(suggestedBudget.totalIncome)}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Presupuesto Total</div>
+            <div class="metric-value">${this.formatCurrency(suggestedBudget.totalSuggested)}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Ahorro Proyectado</div>
+            <div class="metric-value positive">${this.formatCurrency(suggestedBudget.suggestedSavings)}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ai-budget-categories">
+        <h4>💰 Presupuesto por Categoría</h4>
+        ${Object.entries(suggestedBudget.categories).map(([category, data]) => `
+          <div class="ai-category-item">
+            <div class="ai-category-info">
+              <div class="ai-category-name">${category}</div>
+              <div class="ai-category-reasoning">${data.reasoning}</div>
+            </div>
+            <div class="ai-category-amount">${this.formatCurrency(data.amount)}</div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="ai-insights">
+        <h4>💡 Insights del Presupuesto</h4>
+        <div class="insight-list">
+          ${suggestedBudget.insights.map(insight => `
+            <div class="insight-item-modal ${insight.type}">
+              <div class="insight-title">${insight.title}</div>
+              <div class="insight-message">${insight.message}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div class="ai-optimizations">
+        <h4>🔧 Oportunidades de Optimización</h4>
+        <div class="optimization-list">
+          ${suggestedBudget.optimizations.slice(0, 3).map(opt => `
+            <div class="optimization-item">
+              <div class="optimization-title">${opt.title}</div>
+              <div class="optimization-description">${opt.description}</div>
+              <div class="optimization-saving">Ahorro potencial: ${this.formatCurrency(opt.potentialSaving)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
   updateBudgetCategoriesForm() {
     const container = document.getElementById('budget-categories-container');
     if (!container) return;
@@ -906,6 +997,72 @@ export class BudgetManager {
     });
     
     return optimizations.sort((a, b) => b.potentialSaving - a.potentialSaving);
+  }
+
+  showOptimizationsModal(optimizations) {
+    // Create and show optimizations modal
+    const modalHTML = `
+      <div id="optimizations-modal" class="modal">
+        <div class="modal-content modal-large">
+          <div class="modal-header">
+            <h3>🔧 Optimizaciones de Presupuesto</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="optimization-summary">
+              <h3>💰 Ahorro Potencial Total</h3>
+              <div class="total-savings">
+                <span class="savings-label">Podrías ahorrar hasta:</span>
+                <span class="savings-amount">${this.formatCurrency(optimizations.reduce((sum, opt) => sum + opt.potentialSaving, 0))}</span>
+              </div>
+            </div>
+            
+            <div class="optimizations-list">
+              ${optimizations.map(opt => `
+                <div class="optimization-item">
+                  <div class="optimization-content">
+                    <div class="optimization-title">${opt.title}</div>
+                    <div class="optimization-description">${opt.description}</div>
+                    <div class="optimization-meta">
+                      <div class="optimization-impact">
+                        <span>Impacto: </span>
+                        <span class="impact-${opt.impact}">${opt.impact}</span>
+                      </div>
+                      <div class="optimization-effort">
+                        <span>Esfuerzo: </span>
+                        <span class="effort-${opt.effort}">${opt.effort}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="optimization-actions">
+                    <div class="optimization-saving">${this.formatCurrency(opt.potentialSaving)}</div>
+                    <input type="checkbox" class="optimization-checkbox" data-optimization="${opt.category}-${opt.type}">
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button class="btn btn-primary" onclick="window.app.budget.applyOptimizations()">Aplicar Seleccionadas</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('optimizations-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Register with modal manager and show
+    if (window.app && window.app.modals) {
+      window.app.modals.init();
+      window.app.modals.show('optimizations-modal');
+    }
   }
 
   updateAIInsights() {
