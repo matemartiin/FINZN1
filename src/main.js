@@ -437,10 +437,33 @@ class FinznApp {
 
   handleLogout() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-      this.ui.showAlert('Cerrando sesión...', 'info');
-      setTimeout(() => {
-        this.auth.logout();
-      }, 1000);
+      // Generate ML predictions and patterns
+      const mlPredictions = await this.budget.generateMLPredictions(expenses);
+      const spendingPatterns = await this.budget.analyzeSpendingPatterns(expenses);
+      
+      // Prepare data for AI analysis
+      const analysisData = {
+        budgets: budgets,
+        expenses: expenses,
+        predictions: mlPredictions,
+        patterns: spendingPatterns,
+        currentMonth: this.currentMonth,
+        totalBudgetAmount: budgets.reduce((sum, budget) => sum + budget.amount, 0),
+        totalSpent: expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0)
+      };
+      
+      // Generate AI insights
+      const insights = await this.generateAIBudgetAnalysis(analysisData);
+      
+      // Display insights
+      this.ui.displayAIBudgetInsights(insights);
+      
+      // Save insights to database
+      for (const insight of insights) {
+        await this.data.saveBudgetInsight(insight);
+      }
+      
+      this.ui.showAlert('Análisis inteligente generado exitosamente', 'success');
     }
   }
 
