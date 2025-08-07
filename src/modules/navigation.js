@@ -22,11 +22,6 @@ export class NavigationManager {
           this.showSection(section);
           this.setActiveNavItem(item);
           this.closeMobileMenu();
-          
-          // Trigger section change event for budget analytics
-          document.dispatchEvent(new CustomEvent('sectionChanged', {
-            detail: { section }
-          }));
         }
       });
     });
