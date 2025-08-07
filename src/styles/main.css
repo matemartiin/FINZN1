@@ -1,5 +1,12 @@
 /* FINZN - Estilos con paleta de colores personalizada */
 
+/* Import all component styles */
+@import url('./components.css');
+@import url('./dashboard.css');
+@import url('./modals.css');
+@import url('./responsive.css');
+@import url('./ai-components.css');
+
 /* Variables CSS con tu paleta de colores */
 :root {
   /* Tu paleta de colores */
@@ -2775,7 +2782,7 @@ body {
 }
 
 /* Event Legend */
-  margin-top: 20px;
+.event-legend {
   margin-top: 10px;
   padding: 20px;
   background: #f8f9fa;
@@ -3128,4 +3135,3 @@ select:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
-  margin-top: 10px;
