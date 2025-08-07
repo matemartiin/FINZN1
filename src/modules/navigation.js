@@ -160,8 +160,7 @@ export class NavigationManager {
       'goals': 'Objetivos de Ahorro',
       'reports': 'Reportes y Análisis',
       'settings': 'Configuración',
-      'calendar': 'Calendario Financiero',
-      'budgets': 'Gestión de Presupuestos'
+      'calendar': 'Calendario Financiero'
     };
     
     const title = titles[sectionName] || 'FINZN';

@@ -146,11 +146,6 @@
               <span class="nav-label">Calendario</span>
               <div class="nav-badge" id="upcoming-events">0</div>
             </div>
-            <div class="nav-item" data-section="budgets">
-              <div class="nav-icon">💰</div>
-              <span class="nav-label">Presupuestos</span>
-              <div class="nav-badge" id="budget-alerts-count">0</div>
-            </div>
           </div>
           
           <!-- Secondary Navigation -->
@@ -485,7 +480,7 @@
             </div>
           </div>
         </section>
-
+      </div>
         <!-- Calendar Section (New) -->
         <section id="calendar-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
@@ -563,79 +558,6 @@
             </div>
           </div>
         </section>
-
-        <!-- Budgets Section -->
-        <section id="budgets-section" class="dashboard-section">
-          <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">💰 Presupuestos</span>
-          </nav>
-          
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Gestión de Presupuestos</h1>
-              <div class="section-actions">
-                <button id="add-budget-btn" class="btn btn-primary">
-                  <span>➕</span>
-                  Nuevo Presupuesto
-                </button>
-                <button id="generate-ai-insights-btn" class="btn btn-secondary">
-                  <span>🤖</span>
-                  Generar Insights IA
-                </button>
-              </div>
-            </div>
-            
-            <!-- Budget Tabs -->
-            <div class="budget-tabs">
-              <button class="tab-btn active" data-tab="budgets">Mis Presupuestos</button>
-              <button class="tab-btn" data-tab="insights">Insights IA</button>
-              <button class="tab-btn" data-tab="alerts">Alertas</button>
-            </div>
-            
-            <div class="budgets-container">
-              <!-- Budgets Tab -->
-              <div class="tab-content active" id="budgets-tab">
-                <div class="budgets-section-card">
-                  <div class="card-header">
-                    <h3>💰 Presupuestos Activos</h3>
-                  </div>
-                  <div id="budgets-list" class="budgets-list">
-                    <!-- Budgets will be loaded here -->
-                  </div>
-                </div>
-              </div>
-              
-              <!-- AI Insights Tab -->
-              <div class="tab-content" id="insights-tab">
-                <div class="insights-section-card">
-                  <div class="card-header">
-                    <h3>🤖 Insights de Inteligencia Artificial</h3>
-                    <p class="card-subtitle">Recomendaciones personalizadas basadas en tus patrones de gasto</p>
-                  </div>
-                  <div id="ai-insights-list" class="insights-list">
-                    <!-- AI insights will be loaded here -->
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Alerts Tab -->
-              <div class="tab-content" id="alerts-tab">
-                <div class="alerts-section-card">
-                  <div class="card-header">
-                    <h3>⚠️ Alertas de Presupuesto</h3>
-                    <p class="card-subtitle">Notificaciones sobre el estado de tus presupuestos</p>
-                  </div>
-                  <div id="budget-alerts-list" class="alerts-list">
-                    <!-- Budget alerts will be loaded here -->
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
     </main>
   </div>
 
@@ -1194,87 +1116,6 @@
         <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
         <button type="button" id="edit-event-from-details" class="btn btn-primary">Editar</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Add Budget Modal -->
-  <div id="add-budget-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Crear Nuevo Presupuesto</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-budget-form" class="modal-form">
-        <div class="form-group">
-          <label for="budget-name">Nombre del Presupuesto</label>
-          <input type="text" id="budget-name" name="name" required placeholder="Ej: Presupuesto Comida Enero" />
-        </div>
-        <div class="form-group">
-          <label for="budget-category">Categoría</label>
-          <select id="budget-category" name="category" required>
-            <option value="">Selecciona una categoría</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="budget-amount">Monto Límite</label>
-          <input type="number" id="budget-amount" name="amount" step="0.01" required placeholder="0.00" />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="budget-start-date">Fecha de Inicio</label>
-            <input type="date" id="budget-start-date" name="start_date" required />
-          </div>
-          <div class="form-group">
-            <label for="budget-end-date">Fecha de Finalización</label>
-            <input type="date" id="budget-end-date" name="end_date" required />
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Presupuesto</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Edit Budget Modal -->
-  <div id="edit-budget-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Editar Presupuesto</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="edit-budget-form" class="modal-form">
-        <div class="form-group">
-          <label for="edit-budget-name">Nombre del Presupuesto</label>
-          <input type="text" id="edit-budget-name" name="name" required />
-        </div>
-        <div class="form-group">
-          <label for="edit-budget-category">Categoría</label>
-          <select id="edit-budget-category" name="category" required>
-            <option value="">Selecciona una categoría</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="edit-budget-amount">Monto Límite</label>
-          <input type="number" id="edit-budget-amount" name="amount" step="0.01" required />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="edit-budget-start-date">Fecha de Inicio</label>
-            <input type="date" id="edit-budget-start-date" name="start_date" required />
-          </div>
-          <div class="form-group">
-            <label for="edit-budget-end-date">Fecha de Finalización</label>
-            <input type="date" id="edit-budget-end-date" name="end_date" required />
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-          <button type="button" id="delete-budget-btn" class="btn btn-danger">Eliminar</button>
-        </div>
-      </form>
     </div>
   </div>
 

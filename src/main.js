@@ -8,7 +8,6 @@ import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
-import { BudgetManager } from './modules/budget.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -27,7 +26,6 @@ class FinznApp {
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
     this.calendar = new CalendarManager();
-    this.budget = new BudgetManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -54,9 +52,6 @@ class FinznApp {
       
       // Initialize calendar
       this.calendar.init();
-      
-      // Initialize budget manager
-      this.budget.init();
       
       // Setup month selector
       this.setupMonthSelector();
@@ -237,12 +232,6 @@ class FinznApp {
       backupDataBtn.addEventListener('click', () => this.handleBackupData());
     }
     
-    // Budget buttons
-    const addBudgetBtn = document.getElementById('add-budget-btn');
-    if (addBudgetBtn) {
-      addBudgetBtn.addEventListener('click', () => this.showAddBudgetModal());
-    }
-    
     // Add expense form
     const addExpenseForm = document.getElementById('add-expense-form');
     if (addExpenseForm) {
@@ -295,17 +284,6 @@ class FinznApp {
     const generateReportBtn = document.getElementById('generate-report-btn');
     if (generateReportBtn) {
       generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
-    }
-    
-    // Budget forms
-    const addBudgetForm = document.getElementById('add-budget-form');
-    if (addBudgetForm) {
-      addBudgetForm.addEventListener('submit', (e) => this.budget.handleAddBudget(e));
-    }
-    
-    const editBudgetForm = document.getElementById('edit-budget-form');
-    if (editBudgetForm) {
-      editBudgetForm.addEventListener('submit', (e) => this.budget.handleEditBudget(e));
     }
   }
 
@@ -630,11 +608,6 @@ class FinznApp {
     this.modals.show('generate-ai-report-modal');
   }
   
-  showAddBudgetModal() {
-    console.log('💰 Show add budget modal');
-    this.budget.showAddBudgetModal();
-  }
-  
   showViewIncomesModal() {
     console.log('👁️ Show view incomes modal');
     
@@ -844,8 +817,6 @@ class FinznApp {
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'category-filter');
       this.ui.updateCategoriesSelect(categories, 'limit-category');
-      this.ui.updateCategoriesSelect(categories, 'budget-category');
-      this.ui.updateCategoriesSelect(categories, 'edit-budget-category');
       
       // Clear form
       this.ui.clearForm('add-category-form');
