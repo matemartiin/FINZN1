@@ -891,6 +891,353 @@ export class UIManager {
     }
   }
 
+  // Budget UI Methods
+  updateBudgetsList(budgets, expenses = []) {
+    const container = document.getElementById('budgets-list');
+    const countElement = document.getElementById('budgets-count');
+    
+    if (!container) return;
+    
+    console.log('💰 Updating budgets list:', budgets.length, 'budgets');
+    
+    // Update count
+    if (countElement) {
+      countElement.textContent = budgets.length;
+    }
+    
+    container.innerHTML = '';
+
+    if (budgets.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">💰</div>
+          <h3>No tienes presupuestos configurados</h3>
+          <p>Crea tu primer presupuesto para controlar mejor tus gastos</p>
+          <button class="btn btn-primary" onclick="window.app.showAddBudgetModal()">
+            <span>➕</span>
+            Crear Presupuesto
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    budgets.forEach(budget => {
+      const progress = window.app.budget.calculateBudgetProgress(budget, expenses);
+      const item = document.createElement('div');
+      item.className = 'budget-card fade-in';
+      
+      const category = this.getCategoryInfo(budget.category);
+      const startDate = new Date(budget.start_date).toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+      const endDate = new Date(budget.end_date).toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+      
+      let statusClass = 'safe';
+      let statusIcon = '🟢';
+      let statusText = 'En control';
+      
+      if (progress.status === 'exceeded') {
+        statusClass = 'exceeded';
+        statusIcon = '🔴';
+        statusText = 'Superado';
+      } else if (progress.status === 'warning') {
+        statusClass = 'warning';
+        statusIcon = '🟡';
+        statusText = 'Cerca del límite';
+      } else if (progress.status === 'caution') {
+        statusClass = 'caution';
+        statusIcon = '🟠';
+        statusText = 'Precaución';
+      }
+      
+      item.innerHTML = `
+        <div class="budget-card-header">
+          <div class="budget-info">
+            <div class="budget-category">
+              <span class="category-icon">${category.icon}</span>
+              <span class="category-name">${budget.category}</span>
+            </div>
+            <div class="budget-name">${budget.name}</div>
+            <div class="budget-period">${startDate} - ${endDate}</div>
+          </div>
+          <div class="budget-status ${statusClass}">
+            <span class="status-icon">${statusIcon}</span>
+            <span class="status-text">${statusText}</span>
+          </div>
+        </div>
+        
+        <div class="budget-progress-section">
+          <div class="budget-amounts">
+            <div class="amount-spent">
+              <span class="amount-label">Gastado:</span>
+              <span class="amount-value ${statusClass}">${this.formatCurrency(progress.spent)}</span>
+            </div>
+            <div class="amount-limit">
+              <span class="amount-label">Límite:</span>
+              <span class="amount-value">${this.formatCurrency(budget.amount)}</span>
+            </div>
+            <div class="amount-remaining">
+              <span class="amount-label">Disponible:</span>
+              <span class="amount-value ${progress.remaining >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(progress.remaining)}</span>
+            </div>
+          </div>
+          
+          <div class="budget-progress-bar">
+            <div class="progress-bar-budget">
+              <div class="progress-fill-budget ${statusClass}" style="width: ${progress.percentage}%"></div>
+            </div>
+            <div class="progress-text-budget">${progress.percentage.toFixed(1)}% utilizado</div>
+          </div>
+          
+          <div class="budget-details">
+            <div class="detail-item">
+              <span class="detail-label">Transacciones:</span>
+              <span class="detail-value">${progress.expenseCount}</span>
+            </div>
+            ${budget.ai_recommended ? '<div class="ai-badge">🤖 Recomendado por IA</div>' : ''}
+          </div>
+        </div>
+        
+        <div class="budget-actions">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.showEditBudgetModal('${budget.id}')">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteBudget('${budget.id}', '${budget.name}')">
+            🗑️ Eliminar
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="window.app.generateBudgetInsights('${budget.id}')">
+            🤖 Analizar
+          </button>
+        </div>
+      `;
+      
+      item.style.borderLeftColor = category.color;
+      container.appendChild(item);
+    });
+  }
+
+  showAddBudgetModal() {
+    console.log('💰 Show add budget modal');
+    
+    // Set default dates
+    const today = new Date();
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const startDateInput = document.getElementById('budget-start-date');
+    const endDateInput = document.getElementById('budget-end-date');
+    
+    if (startDateInput) {
+      startDateInput.value = today.toISOString().split('T')[0];
+    }
+    if (endDateInput) {
+      endDateInput.value = nextMonth.toISOString().split('T')[0];
+    }
+    
+    // Update categories in select
+    if (window.app && window.app.data) {
+      const categories = window.app.data.getCategories();
+      this.updateCategoriesSelect(categories, 'budget-category');
+    }
+    
+    if (window.app && window.app.modals) {
+      window.app.modals.show('add-budget-modal');
+    }
+  }
+
+  showEditBudgetModal(budgetId) {
+    console.log('✏️ Show edit budget modal for:', budgetId);
+    
+    if (!window.app || !window.app.budget) return;
+    
+    const budget = window.app.budget.getBudgets().find(b => b.id === budgetId);
+    if (!budget) {
+      this.showAlert('Presupuesto no encontrado', 'error');
+      return;
+    }
+    
+    // Populate form with current budget data
+    const nameInput = document.getElementById('edit-budget-name');
+    const categorySelect = document.getElementById('edit-budget-category');
+    const amountInput = document.getElementById('edit-budget-amount');
+    const startDateInput = document.getElementById('edit-budget-start-date');
+    const endDateInput = document.getElementById('edit-budget-end-date');
+    const modal = document.getElementById('edit-budget-modal');
+    
+    if (nameInput) nameInput.value = budget.name;
+    if (amountInput) amountInput.value = budget.amount;
+    if (startDateInput) startDateInput.value = budget.start_date;
+    if (endDateInput) endDateInput.value = budget.end_date;
+    if (modal) modal.dataset.budgetId = budget.id;
+    
+    // Update categories and select current one
+    if (window.app && window.app.data) {
+      const categories = window.app.data.getCategories();
+      this.updateCategoriesSelect(categories, 'edit-budget-category');
+      if (categorySelect) {
+        setTimeout(() => {
+          categorySelect.value = budget.category;
+        }, 100);
+      }
+    }
+    
+    if (window.app && window.app.modals) {
+      window.app.modals.show('edit-budget-modal');
+    }
+  }
+
+  getBudgetFormData(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return {};
+
+    const formData = new FormData(form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+      if (key === 'ai-recommendations') {
+        data[key] = value === 'on';
+      } else {
+        data[key] = value;
+      }
+    }
+    
+    return data;
+  }
+
+  displayAIBudgetInsights(insights) {
+    const container = document.getElementById('budget-ai-insights');
+    if (!container || !insights || insights.length === 0) return;
+    
+    console.log('🤖 Displaying AI budget insights:', insights.length);
+    
+    container.innerHTML = `
+      <div class="ai-insights-header">
+        <h4>🤖 Análisis Inteligente de Presupuestos</h4>
+        <p>Recomendaciones personalizadas basadas en tu comportamiento financiero</p>
+      </div>
+    `;
+    
+    const insightsGrid = document.createElement('div');
+    insightsGrid.className = 'ai-insights-grid';
+    
+    insights.forEach(insight => {
+      const insightCard = document.createElement('div');
+      insightCard.className = `ai-insight-card ${insight.insight_type}`;
+      
+      let iconMap = {
+        'recommendation': '💡',
+        'pattern': '📊',
+        'prediction': '🔮',
+        'alert': '⚠️'
+      };
+      
+      insightCard.innerHTML = `
+        <div class="insight-header">
+          <span class="insight-icon">${iconMap[insight.insight_type] || '🤖'}</span>
+          <span class="insight-title">${insight.title}</span>
+          ${insight.confidence_score ? `<span class="confidence-score">${Math.round(insight.confidence_score * 100)}%</span>` : ''}
+        </div>
+        <div class="insight-description">${insight.description}</div>
+        ${insight.data && Object.keys(insight.data).length > 0 ? `
+          <div class="insight-data">
+            ${this.formatInsightData(insight.data)}
+          </div>
+        ` : ''}
+        <div class="insight-actions">
+          <button class="btn btn-sm btn-secondary" onclick="window.app.dismissInsight('${insight.id}')">
+            Descartar
+          </button>
+          ${insight.insight_type === 'recommendation' ? `
+            <button class="btn btn-sm btn-primary" onclick="window.app.applyInsightRecommendation('${insight.id}')">
+              Aplicar
+            </button>
+          ` : ''}
+        </div>
+      `;
+      
+      insightsGrid.appendChild(insightCard);
+    });
+    
+    container.appendChild(insightsGrid);
+    container.classList.remove('hidden');
+  }
+
+  formatInsightData(data) {
+    if (!data || typeof data !== 'object') return '';
+    
+    let html = '<div class="insight-data-items">';
+    
+    Object.entries(data).forEach(([key, value]) => {
+      if (typeof value === 'number' && key.includes('amount')) {
+        html += `<div class="data-item"><strong>${key}:</strong> ${this.formatCurrency(value)}</div>`;
+      } else {
+        html += `<div class="data-item"><strong>${key}:</strong> ${value}</div>`;
+      }
+    });
+    
+    html += '</div>';
+    return html;
+  }
+
+  displayBudgetAlert(alert) {
+    // Use existing alert system but with budget-specific styling
+    const alertElement = document.createElement('div');
+    alertElement.className = `alert alert-${alert.severity} budget-alert`;
+    
+    alertElement.innerHTML = `
+      <div class="alert-content">
+        <div class="alert-title">${alert.title}</div>
+        <div class="alert-message">${alert.message}</div>
+        ${alert.category ? `<div class="alert-category">Categoría: ${alert.category}</div>` : ''}
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-sm btn-secondary" onclick="this.parentElement.parentElement.remove()">
+          Cerrar
+        </button>
+      </div>
+    `;
+    
+    this.alertContainer.appendChild(alertElement);
+    
+    setTimeout(() => alertElement.classList.add('show'), 100);
+    
+    // Auto-remove after 10 seconds for budget alerts
+    setTimeout(() => {
+      if (alertElement.parentNode) {
+        alertElement.classList.remove('show');
+        setTimeout(() => {
+          if (alertElement.parentNode) {
+            alertElement.parentNode.removeChild(alertElement);
+          }
+        }, 300);
+      }
+    }, 10000);
+  }
+
+  updateBudgetSummary(summary) {
+    const totalBudgetsElement = document.getElementById('total-budgets-count');
+    const activeBudgetsElement = document.getElementById('active-budgets-count');
+    
+    if (totalBudgetsElement) {
+      totalBudgetsElement.textContent = summary.totalBudgets;
+    }
+    
+    if (activeBudgetsElement) {
+      activeBudgetsElement.textContent = summary.activeBudgets;
+    }
+    
+    // Update navigation badge
+    const budgetNavBadge = document.querySelector('[data-section="budgets"] .nav-badge');
+    if (budgetNavBadge) {
+      budgetNavBadge.textContent = summary.activeBudgets;
+      budgetNavBadge.style.display = summary.activeBudgets > 0 ? 'flex' : 'none';
+    }
+  }
+
   showLoading(elementId) {
     const element = document.getElementById(elementId);
     if (element) {
