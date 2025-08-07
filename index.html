@@ -340,6 +340,22 @@
                   <span>📋</span>
                   Crear Presupuesto
                 </button>
+                <button id="generate-ai-budget-btn" class="btn btn-secondary">
+                  <span>🤖</span>
+                  Generar con IA
+                </button>
+                <button id="optimize-budget-btn" class="btn btn-secondary">
+                  <span>🔧</span>
+                  Optimizar
+                </button>
+              </div>
+            </div>
+            
+            <!-- AI Insights Section -->
+            <div class="ai-insights-section">
+              <h3>🤖 Insights Inteligentes</h3>
+              <div id="ai-insights-container" class="ai-insights-container">
+                <!-- AI insights will be loaded here -->
               </div>
             </div>
             
@@ -1157,6 +1173,127 @@
     </div>
   </div>
 
+  <!-- Create Budget Modal -->
+  <div id="create-budget-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>📋 Crear Presupuesto Inteligente</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="create-budget-form" class="modal-form">
+        <div class="form-group">
+          <label for="budget-name">Nombre del Presupuesto</label>
+          <input type="text" id="budget-name" name="budget-name" placeholder="Ej: Presupuesto Enero 2025" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="budget-period">Período</label>
+          <select id="budget-period" name="budget-period">
+            <option value="monthly">Mensual</option>
+            <option value="weekly">Semanal</option>
+            <option value="yearly">Anual</option>
+          </select>
+        </div>
+        
+        <div class="budget-categories-section">
+          <h3>💰 Límites por Categoría</h3>
+          <p class="section-description">Establece límites de gasto para cada categoría. La IA te sugiere montos basados en tu historial.</p>
+          <div id="budget-categories-container" class="budget-categories-container">
+            <!-- Categories will be loaded here -->
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <span>📋</span>
+            Crear Presupuesto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- AI Budget Modal -->
+  <div id="ai-budget-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>🤖 Presupuesto Generado con IA</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-budget-summary">
+          <div class="budget-metrics">
+            <div class="metric">
+              <span class="metric-label">Presupuesto Total:</span>
+              <span class="metric-value" id="ai-total-budget">$0</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Ingresos Estimados:</span>
+              <span class="metric-value" id="ai-total-income">$0</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Ahorro Proyectado:</span>
+              <span class="metric-value positive" id="ai-projected-savings">$0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="ai-budget-categories" id="ai-budget-categories">
+          <!-- AI suggested categories will be loaded here -->
+        </div>
+        
+        <div class="ai-insights" id="ai-budget-insights">
+          <!-- AI insights will be loaded here -->
+        </div>
+        
+        <div class="ai-optimizations" id="ai-budget-optimizations">
+          <!-- AI optimizations will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="button" id="apply-ai-budget-btn" class="btn btn-primary">
+          <span>✨</span>
+          Aplicar Presupuesto IA
+        </button>
+        <button type="button" id="customize-ai-budget-btn" class="btn btn-secondary">
+          <span>🔧</span>
+          Personalizar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Optimization Modal -->
+  <div id="budget-optimization-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>🔧 Optimizaciones Inteligentes</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="optimization-summary">
+          <h3>💡 Oportunidades de Ahorro Detectadas</h3>
+          <div class="total-savings">
+            <span class="savings-label">Ahorro Potencial Total:</span>
+            <span class="savings-amount" id="total-potential-savings">$0</span>
+          </div>
+        </div>
+        
+        <div class="optimizations-list" id="optimizations-list">
+          <!-- Optimizations will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
+        <button type="button" id="apply-optimizations-btn" class="btn btn-primary">
+          <span>✨</span>
+          Aplicar Seleccionadas
+        </button>
+      </div>
+    </div>
+  </div>
   <!-- Load main application -->
   <script type="module" src="/src/main.js"></script>
 </body>

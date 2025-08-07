@@ -8,6 +8,7 @@ import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
+import { BudgetManager } from './modules/budget.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -26,6 +27,7 @@ class FinznApp {
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
     this.calendar = new CalendarManager();
+    this.budget = new BudgetManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -52,6 +54,9 @@ class FinznApp {
       
       // Initialize calendar
       this.calendar.init();
+      
+      // Initialize budget manager
+      this.budget.init();
       
       // Setup month selector
       this.setupMonthSelector();
