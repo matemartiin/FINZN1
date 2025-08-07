@@ -905,6 +905,9 @@ export class UIManager {
       countElement.textContent = budgets.length;
     }
     
+    // Load AI budget insights if available
+    this.loadAIBudgetInsights();
+    
     container.innerHTML = '';
 
     if (budgets.length === 0) {
@@ -1110,14 +1113,26 @@ export class UIManager {
 
   displayAIBudgetInsights(insights) {
     const container = document.getElementById('budget-ai-insights');
-    if (!container || !insights || insights.length === 0) return;
+    if (!container) return;
+    
+    if (!insights || insights.length === 0) {
+      container.innerHTML = `
+        <div class="ai-insights-empty">
+          <div class="empty-icon">🤖</div>
+          <h4>No hay recomendaciones disponibles</h4>
+          <p>Registra más gastos para obtener recomendaciones personalizadas</p>
+        </div>
+      `;
+      container.classList.remove('hidden');
+      return;
+    }
     
     console.log('🤖 Displaying AI budget insights:', insights.length);
     
     container.innerHTML = `
       <div class="ai-insights-header">
-        <h4>🤖 Análisis Inteligente de Presupuestos</h4>
-        <p>Recomendaciones personalizadas basadas en tu comportamiento financiero</p>
+        <h4>🤖 Recomendaciones Inteligentes</h4>
+        <p>Análisis personalizado basado en tus patrones de gasto y machine learning</p>
       </div>
     `;
     
@@ -1126,34 +1141,54 @@ export class UIManager {
     
     insights.forEach(insight => {
       const insightCard = document.createElement('div');
-      insightCard.className = `ai-insight-card ${insight.insight_type}`;
+      insightCard.className = `ai-insight-card ${insight.type || 'ai_recommendation'}`;
+      insightCard.dataset.recommendationId = insight.id;
+      insightCard.dataset.category = insight.category;
+      insightCard.dataset.suggestedBudget = insight.suggestedBudget;
+      insightCard.dataset.action = insight.action;
       
-      let iconMap = {
-        'recommendation': '💡',
+      const iconMap = {
+        'ai_recommendation': '🤖',
+        'ml_recommendation': '🧠',
         'pattern': '📊',
         'prediction': '🔮',
-        'alert': '⚠️'
+        'warning': '⚠️',
+        'opportunity': '💡'
+      };
+      
+      const priorityColors = {
+        'high': '#ef4444',
+        'medium': '#f59e0b',
+        'low': '#10b981'
       };
       
       insightCard.innerHTML = `
         <div class="insight-header">
-          <span class="insight-icon">${iconMap[insight.insight_type] || '🤖'}</span>
-          <span class="insight-title">${insight.title}</span>
-          ${insight.confidence_score ? `<span class="confidence-score">${Math.round(insight.confidence_score * 100)}%</span>` : ''}
-        </div>
-        <div class="insight-description">${insight.description}</div>
-        ${insight.data && Object.keys(insight.data).length > 0 ? `
-          <div class="insight-data">
-            ${this.formatInsightData(insight.data)}
+          <div class="insight-title-section">
+            <span class="insight-icon">${iconMap[insight.type] || '🤖'}</span>
+            <span class="insight-category">${insight.category}</span>
+            <span class="insight-priority" style="background-color: ${priorityColors[insight.priority] || '#6b7280'}">${insight.priority || 'medium'}</span>
           </div>
-        ` : ''}
+          ${insight.confidence ? `<span class="confidence-score">${Math.round(insight.confidence * 100)}%</span>` : ''}
+        </div>
+        
+        <div class="insight-content">
+          <div class="insight-action">${insight.action}</div>
+          <div class="insight-justification">${insight.justification}</div>
+          
+          <div class="insight-budget-suggestion">
+            <span class="budget-label">Presupuesto sugerido:</span>
+            <span class="budget-amount">${this.formatCurrency(insight.suggestedBudget)}</span>
+          </div>
+        </div>
+        
         <div class="insight-actions">
-          <button class="btn btn-sm btn-secondary" onclick="window.app.dismissInsight('${insight.id}')">
+          <button class="btn btn-sm btn-secondary dismiss-recommendation-btn" onclick="window.app.dismissAIRecommendation('${insight.id}')">
             Descartar
           </button>
-          ${insight.insight_type === 'recommendation' ? `
-            <button class="btn btn-sm btn-primary" onclick="window.app.applyInsightRecommendation('${insight.id}')">
-              Aplicar
+          ${insight.applicable ? `
+            <button class="btn btn-sm btn-primary apply-recommendation-btn" onclick="window.app.applyAIRecommendation('${insight.id}')">
+              ✨ Aplicar al Presupuesto
             </button>
           ` : ''}
         </div>
@@ -1163,6 +1198,126 @@ export class UIManager {
     });
     
     container.appendChild(insightsGrid);
+    container.classList.remove('hidden');
+  }
+
+  // Mostrar predicciones de Machine Learning
+  displayMLPredictions(predictions) {
+    const container = document.getElementById('ml-predictions-container');
+    if (!container || !predictions || predictions.length === 0) return;
+    
+    console.log('🧠 Displaying ML predictions:', predictions.length);
+    
+    container.innerHTML = `
+      <div class="ml-predictions-header">
+        <h4>🧠 Predicciones de Machine Learning</h4>
+        <p>Análisis predictivo basado en tus patrones históricos de gasto</p>
+      </div>
+    `;
+    
+    const predictionsGrid = document.createElement('div');
+    predictionsGrid.className = 'ml-predictions-grid';
+    
+    predictions.forEach(prediction => {
+      const predictionCard = document.createElement('div');
+      predictionCard.className = `ml-prediction-card trend-${prediction.trend}`;
+      
+      const trendIcons = {
+        'increasing': '📈',
+        'decreasing': '📉',
+        'stable': '➡️',
+        'volatile': '📊'
+      };
+      
+      const trendColors = {
+        'increasing': '#ef4444',
+        'decreasing': '#10b981',
+        'stable': '#6b7280',
+        'volatile': '#f59e0b'
+      };
+      
+      predictionCard.innerHTML = `
+        <div class="prediction-header">
+          <div class="prediction-category">
+            <span class="category-name">${prediction.category}</span>
+            <span class="trend-indicator" style="color: ${trendColors[prediction.trend]}">
+              ${trendIcons[prediction.trend]} ${prediction.trend}
+            </span>
+          </div>
+          <div class="confidence-badge">${Math.round(prediction.confidence * 100)}% confianza</div>
+        </div>
+        
+        <div class="prediction-content">
+          <div class="predicted-amount">
+            <span class="amount-label">Gasto predicho:</span>
+            <span class="amount-value">${this.formatCurrency(prediction.predicted)}</span>
+          </div>
+          
+          <div class="recommendation-preview">
+            <div class="rec-type ${prediction.recommendation.type}">
+              ${prediction.recommendation.type === 'warning' ? '⚠️' : 
+                prediction.recommendation.type === 'opportunity' ? '💡' : '✅'}
+              ${prediction.recommendation.message}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      predictionsGrid.appendChild(predictionCard);
+    });
+    
+    container.appendChild(predictionsGrid);
+    container.classList.remove('hidden');
+  }
+
+  // Mostrar patrones de gasto detectados
+  displaySpendingPatterns(patterns) {
+    const container = document.getElementById('spending-patterns-container');
+    if (!container || !patterns || patterns.length === 0) return;
+    
+    console.log('📊 Displaying spending patterns:', patterns.length);
+    
+    container.innerHTML = `
+      <div class="patterns-header">
+        <h4>📊 Patrones de Gasto Detectados</h4>
+        <p>Insights automáticos sobre tu comportamiento financiero</p>
+      </div>
+    `;
+    
+    const patternsGrid = document.createElement('div');
+    patternsGrid.className = 'patterns-grid';
+    
+    patterns.forEach(pattern => {
+      const patternCard = document.createElement('div');
+      patternCard.className = `pattern-card pattern-${pattern.type}`;
+      
+      const typeIcons = {
+        'day_pattern': '📅',
+        'category_pattern': '🏷️',
+        'time_pattern': '⏰',
+        'amount_pattern': '💰'
+      };
+      
+      patternCard.innerHTML = `
+        <div class="pattern-header">
+          <span class="pattern-icon">${typeIcons[pattern.type] || '📊'}</span>
+          <span class="pattern-title">${pattern.title}</span>
+        </div>
+        
+        <div class="pattern-content">
+          <div class="pattern-description">${pattern.description}</div>
+          ${pattern.actionable ? `
+            <div class="pattern-suggestion">
+              💡 <strong>Sugerencia:</strong> ${pattern.suggestion}
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      patternsGrid.appendChild(patternCard);
+    });
+    
+    container.appendChild(patternsGrid);
     container.classList.remove('hidden');
   }
 
@@ -1252,5 +1407,20 @@ export class UIManager {
       element.classList.remove('loading');
       element.disabled = false;
     }
+  }
+
+  // Cargar insights de IA para presupuestos
+  async loadAIBudgetInsights() {
+    const container = document.getElementById('budget-ai-insights');
+    if (!container) return;
+    
+    // Mostrar estado de carga
+    container.innerHTML = `
+      <div class="ai-insights-loading">
+        <div class="loading-spinner"></div>
+        <p>Cargando análisis inteligente...</p>
+      </div>
+    `;
+    container.classList.remove('hidden');
   }
 }

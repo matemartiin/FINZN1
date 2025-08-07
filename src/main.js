@@ -9,6 +9,7 @@ import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
+import { AIBudgetManager } from './modules/ai-budget.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -28,6 +29,7 @@ class FinznApp {
     this.navigation = new NavigationManager();
     this.calendar = new CalendarManager();
     this.budget = new BudgetManager();
+    this.aiBudget = new AIBudgetManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -840,12 +842,106 @@ class FinznApp {
 
   async generateBudgetInsights(budgetId = null) {
     console.log('🤖 Generating budget insights for:', budgetId || 'all budgets');
-    this.ui.showAlert('Generando análisis inteligente...', 'info');
     
-    // This will be implemented in Phase 3 with AI integration
-    setTimeout(() => {
-      this.ui.showAlert('Análisis de IA próximamente disponible', 'info');
-    }, 2000);
+    try {
+      this.ui.showAlert('Generando análisis inteligente con IA...', 'info');
+      
+      // Generar análisis completo con IA
+      const recommendations = await this.aiBudget.generateAllRecommendations();
+      
+      // Mostrar recomendaciones en la UI
+      this.ui.displayAIBudgetInsights(recommendations.aiRecommendations);
+      
+      // Mostrar predicciones ML
+      this.ui.displayMLPredictions(recommendations.mlPredictions);
+      
+      // Mostrar patrones detectados
+      this.ui.displaySpendingPatterns(recommendations.patterns);
+      
+      this.ui.showAlert('¡Análisis IA completado! Revisa las recomendaciones.', 'success');
+      
+      return recommendations;
+    } catch (error) {
+      console.error('Error generating AI insights:', error);
+      this.ui.showAlert('Error al generar análisis IA. Intenta nuevamente.', 'error');
+      return null;
+    }
+  }
+
+  // Aplicar recomendación de IA
+  async applyAIRecommendation(recommendationId) {
+    try {
+      console.log('✅ Applying AI recommendation:', recommendationId);
+      
+      // Buscar la recomendación
+      const recommendations = document.querySelectorAll('.ai-insight-card');
+      let targetRecommendation = null;
+      
+      recommendations.forEach(card => {
+        if (card.dataset.recommendationId === recommendationId) {
+          const recommendation = {
+            id: recommendationId,
+            category: card.dataset.category,
+            suggestedBudget: parseFloat(card.dataset.suggestedBudget),
+            action: card.dataset.action
+          };
+          targetRecommendation = recommendation;
+        }
+      });
+      
+      if (!targetRecommendation) {
+        this.ui.showAlert('Recomendación no encontrada', 'error');
+        return;
+      }
+      
+      // Aplicar la recomendación
+      const success = await this.aiBudget.applyRecommendation(targetRecommendation);
+      
+      if (success) {
+        this.ui.showAlert('¡Recomendación aplicada exitosamente!', 'success');
+        
+        // Actualizar la UI
+        const card = document.querySelector(`[data-recommendation-id="${recommendationId}"]`);
+        if (card) {
+          card.classList.add('applied');
+          const applyBtn = card.querySelector('.apply-recommendation-btn');
+          if (applyBtn) {
+            applyBtn.textContent = '✅ Aplicada';
+            applyBtn.disabled = true;
+          }
+        }
+        
+        // Actualizar dashboard
+        this.updateDashboard();
+      } else {
+        this.ui.showAlert('Error al aplicar la recomendación', 'error');
+      }
+    } catch (error) {
+      console.error('Error applying AI recommendation:', error);
+      this.ui.showAlert('Error al aplicar la recomendación', 'error');
+    }
+  }
+
+  // Descartar recomendación
+  dismissAIRecommendation(recommendationId) {
+    const card = document.querySelector(`[data-recommendation-id="${recommendationId}"]`);
+    if (card) {
+      card.style.opacity = '0.5';
+      card.classList.add('dismissed');
+      
+      const dismissBtn = card.querySelector('.dismiss-recommendation-btn');
+      if (dismissBtn) {
+        dismissBtn.textContent = '❌ Descartada';
+        dismissBtn.disabled = true;
+      }
+      
+      const applyBtn = card.querySelector('.apply-recommendation-btn');
+      if (applyBtn) {
+        applyBtn.disabled = true;
+      }
+    }
+    
+    this.ui.showAlert('Recomendación descartada', 'info');
   }
 
   async generateAllBudgetInsights() {
