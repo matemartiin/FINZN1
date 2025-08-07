@@ -248,8 +248,6 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
       report += this.getSavingsRecommendations(data, savingsRate);
     } else if (focus === 'expenses') {
       report += this.getExpenseRecommendations(data, topCategories);
-    } else if (focus === 'budget') {
-      report += this.getBudgetRecommendations(data, balance);
     } else if (focus === 'goals') {
       report += this.getGoalsRecommendations(data);
     } else {

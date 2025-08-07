@@ -88,9 +88,6 @@ class FinznApp {
       // Dashboard events
       this.setupDashboardEvents();
       
-      // Modal events
-      this.setupModalEvents();
-      
       // Theme toggle
       const themeToggle = document.getElementById('theme-toggle');
       if (themeToggle) {
@@ -234,9 +231,7 @@ class FinznApp {
     if (backupDataBtn) {
       backupDataBtn.addEventListener('click', () => this.handleBackupData());
     }
-  }
-
-  setupModalEvents() {
+    
     // Add expense form
     const addExpenseForm = document.getElementById('add-expense-form');
     if (addExpenseForm) {
@@ -290,7 +285,9 @@ class FinznApp {
     if (generateReportBtn) {
       generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
     }
-    
+  }
+
+  setupModalEvents() {
     // Installments checkbox
     const installmentsCheckbox = document.getElementById('expense-installments');
     const installmentsGroup = document.getElementById('installments-group');
