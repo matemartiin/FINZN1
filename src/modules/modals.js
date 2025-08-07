@@ -35,6 +35,9 @@ export class ModalManager {
         this.hideAll();
       }
     });
+    
+    // Setup budget modal specific events
+    this.setupBudgetModalEvents();
   }
 
   setupBudgetModalEvents() {

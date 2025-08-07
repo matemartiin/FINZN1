@@ -610,6 +610,113 @@
 
   <!-- Modals -->
   
+  <!-- Add Budget Modal -->
+  <div id="add-budget-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💰 Crear Nuevo Presupuesto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-budget-form" class="modal-form">
+        <div class="form-group">
+          <label for="budget-name">Nombre del Presupuesto</label>
+          <input type="text" id="budget-name" name="name" placeholder="Ej: Presupuesto Mensual Comida" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="budget-category">Categoría</label>
+          <select id="budget-category" name="category" required>
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="budget-amount">Monto Límite</label>
+          <input type="number" id="budget-amount" name="amount" step="0.01" min="0" placeholder="0.00" required>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="budget-start-date">Fecha de Inicio</label>
+            <input type="date" id="budget-start-date" name="start-date" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="budget-end-date">Fecha de Fin</label>
+            <input type="date" id="budget-end-date" name="end-date" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="budget-ai-recommendations" name="ai-recommendations">
+            <span class="checkmark"></span>
+            Habilitar recomendaciones de IA
+          </label>
+          <div id="ai-recommendations-info" class="form-hint hidden">
+            La IA analizará tus patrones de gasto y te dará recomendaciones personalizadas para este presupuesto.
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <span>💰</span>
+            Crear Presupuesto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Edit Budget Modal -->
+  <div id="edit-budget-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Editar Presupuesto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-budget-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-budget-name">Nombre del Presupuesto</label>
+          <input type="text" id="edit-budget-name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-budget-category">Categoría</label>
+          <select id="edit-budget-category" name="category" required>
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-budget-amount">Monto Límite</label>
+          <input type="number" id="edit-budget-amount" name="amount" step="0.01" min="0" required>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-budget-start-date">Fecha de Inicio</label>
+            <input type="date" id="edit-budget-start-date" name="start-date" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-budget-end-date">Fecha de Fin</label>
+            <input type="date" id="edit-budget-end-date" name="end-date" required>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <span>✏️</span>
+            Actualizar Presupuesto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
   <!-- View Incomes Modal -->
   <div id="view-incomes-modal" class="modal">
     <div class="modal-content">

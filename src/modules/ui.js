@@ -1023,30 +1023,7 @@ export class UIManager {
 
   showAddBudgetModal() {
     console.log('💰 Show add budget modal');
-    
-    // Set default dates
-    const today = new Date();
-    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    
-    const startDateInput = document.getElementById('budget-start-date');
-    const endDateInput = document.getElementById('budget-end-date');
-    
-    if (startDateInput) {
-      startDateInput.value = today.toISOString().split('T')[0];
-    }
-    if (endDateInput) {
-      endDateInput.value = nextMonth.toISOString().split('T')[0];
-    }
-    
-    // Update categories in select
-    if (window.app && window.app.data) {
-      const categories = window.app.data.getCategories();
-      this.updateCategoriesSelect(categories, 'budget-category');
-    }
-    
-    if (window.app && window.app.modals) {
-      window.app.modals.show('add-budget-modal');
-    }
+    this.ui.showAddBudgetModal();
   }
 
   showEditBudgetModal(budgetId) {

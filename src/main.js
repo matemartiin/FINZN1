@@ -8,6 +8,7 @@ import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
+import { BudgetManager } from './modules/budget.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -26,6 +27,7 @@ class FinznApp {
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
     this.calendar = new CalendarManager();
+    this.budget = new BudgetManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -200,6 +202,18 @@ class FinznApp {
       addSpendingLimitBtnTransactions.addEventListener('click', () => this.showAddSpendingLimitModal());
     }
     
+    // Add budget button
+    const addBudgetBtn = document.getElementById('add-budget-btn');
+    const generateBudgetInsightsBtn = document.getElementById('generate-budget-insights-btn');
+    
+    if (addBudgetBtn) {
+      addBudgetBtn.addEventListener('click', () => this.showAddBudgetModal());
+    }
+    
+    if (generateBudgetInsightsBtn) {
+      generateBudgetInsightsBtn.addEventListener('click', () => this.generateAllBudgetInsights());
+    }
+    
     // Settings buttons
     const manageCategoriesBtn = document.getElementById('manage-categories-btn');
     const exportDataBtn = document.getElementById('export-data-btn');
@@ -284,6 +298,18 @@ class FinznApp {
     const generateReportBtn = document.getElementById('generate-report-btn');
     if (generateReportBtn) {
       generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
+    }
+    
+    // Add budget form
+    const addBudgetForm = document.getElementById('add-budget-form');
+    if (addBudgetForm) {
+      addBudgetForm.addEventListener('submit', (e) => this.handleAddBudget(e));
+    }
+    
+    // Edit budget form
+    const editBudgetForm = document.getElementById('edit-budget-form');
+    if (editBudgetForm) {
+      editBudgetForm.addEventListener('submit', (e) => this.handleEditBudget(e));
     }
   }
 
@@ -474,11 +500,16 @@ class FinznApp {
       
       await this.data.loadUserData();
       
+      // Load budget data
+      await this.budget.loadBudgets();
+      
       // Update categories in selects
       const categories = this.data.getCategories();
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'category-filter');
       this.ui.updateCategoriesSelect(categories, 'limit-category');
+      this.ui.updateCategoriesSelect(categories, 'budget-category');
+      this.ui.updateCategoriesSelect(categories, 'edit-budget-category');
       
       console.log('✅ User data loaded successfully');
     } catch (error) {
@@ -524,11 +555,25 @@ class FinznApp {
       const spendingLimits = this.data.getSpendingLimits();
       this.ui.updateSpendingLimitsList(spendingLimits, expenses);
       
+      // Update budgets
+      const budgets = this.budget.getBudgets();
+      this.ui.updateBudgetsList(budgets, expenses);
+      
+      // Update budget summary
+      const budgetSummary = this.budget.getBudgetSummary(expenses);
+      this.ui.updateBudgetSummary(budgetSummary);
+      
       // Check spending limit alerts
       const limitAlerts = this.data.checkSpendingLimits(this.currentMonth);
       // Show system alerts but not mascot alerts
       limitAlerts.forEach(alert => {
         this.ui.showAlert(alert.message, alert.type);
+      });
+      
+      // Check budget alerts
+      const budgetAlerts = this.budget.getBudgetAlerts(expenses);
+      budgetAlerts.forEach(alert => {
+        this.ui.displayBudgetAlert(alert);
       });
       
       // Update charts
@@ -623,6 +668,11 @@ class FinznApp {
     console.log('📊 Show installments modal');
     
     this.modals.show('view-installments-modal');
+  }
+
+  showAddBudgetModal() {
+    console.log('💰 Show add budget modal');
+    this.ui.showAddBudgetModal();
   }
 
   async handleAddExpense(e) {
@@ -821,17 +871,356 @@ class FinznApp {
 
   async generateBudgetInsights(budgetId = null) {
     console.log('🤖 Generating budget insights for:', budgetId || 'all budgets');
-    this.ui.showAlert('Generando análisis inteligente...', 'info');
     
-    // This will be implemented in Phase 3 with AI integration
-    setTimeout(() => {
-      this.ui.showAlert('Análisis de IA próximamente disponible', 'info');
-    }, 2000);
+    try {
+      this.ui.showAlert('Generando análisis inteligente...', 'info');
+      this.ui.showLoading('generate-budget-insights-btn');
+      
+      // Get user data for AI analysis
+      const expenses = await this.data.loadExpenses(this.currentMonth);
+      const income = await this.data.loadIncome(this.currentMonth);
+      const extraIncomes = await this.data.loadExtraIncomes(this.currentMonth);
+      const budgets = this.budget.getBudgets();
+      const categories = this.data.getCategories();
+      
+      // Prepare data for AI analysis
+      const analysisData = {
+        currentMonth: this.currentMonth,
+        expenses: expenses,
+        income: income,
+        extraIncomes: extraIncomes,
+        budgets: budgets,
+        categories: categories,
+        budgetId: budgetId
+      };
+      
+      // Generate AI insights
+      const insights = await this.generateAIBudgetAnalysis(analysisData);
+      
+      // Display insights
+      this.ui.displayAIBudgetInsights(insights);
+      
+      // Save insights to database
+      for (const insight of insights) {
+        await this.data.saveBudgetInsight(insight);
+      }
+      
+      this.ui.showAlert('Análisis completado exitosamente', 'success');
+      
+    } catch (error) {
+      console.error('Error generating budget insights:', error);
+      this.ui.showAlert('Error al generar el análisis. Intenta nuevamente.', 'error');
+    } finally {
+      this.ui.hideLoading('generate-budget-insights-btn');
+    }
+  }
+  
+  async generateAIBudgetAnalysis(data) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn('⚠️ No Gemini API key found, using fallback insights');
+      return this.generateFallbackBudgetInsights(data);
+    }
+    
+    try {
+      // Prepare comprehensive prompt for budget analysis
+      const prompt = this.buildBudgetAnalysisPrompt(data);
+      
+      console.log('🤖 Sending budget analysis request to Gemini API...');
+      
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1500,
+            },
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_HARASSMENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              },
+              {
+                category: "HARM_CATEGORY_HATE_SPEECH",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error('❌ Gemini API error:', response.status, response.statusText);
+        return this.generateFallbackBudgetInsights(data);
+      }
+
+      const result = await response.json();
+      console.log('✅ Gemini API response received for budget analysis');
+
+      if (!result.candidates || result.candidates.length === 0) {
+        console.warn('⚠️ No candidates in Gemini response, using fallback');
+        return this.generateFallbackBudgetInsights(data);
+      }
+
+      const aiContent = result.candidates[0]?.content?.parts?.[0]?.text || '';
+      
+      if (!aiContent.trim()) {
+        console.warn('⚠️ Empty AI response, using fallback');
+        return this.generateFallbackBudgetInsights(data);
+      }
+
+      // Parse AI response into structured insights
+      return this.parseAIBudgetInsights(aiContent, data);
+
+    } catch (error) {
+      console.error('❌ Error in AI budget analysis:', error);
+      return this.generateFallbackBudgetInsights(data);
+    }
+  }
+  
+  buildBudgetAnalysisPrompt(data) {
+    const totalExpenses = data.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const totalIncome = parseFloat(data.income.fixed) + parseFloat(data.income.extra) + 
+                       data.extraIncomes.reduce((sum, extra) => sum + parseFloat(extra.amount), 0);
+    const balance = totalIncome - totalExpenses;
+    
+    // Get expenses by category
+    const expensesByCategory = {};
+    data.expenses.forEach(expense => {
+      expensesByCategory[expense.category] = (expensesByCategory[expense.category] || 0) + parseFloat(expense.amount);
+    });
+    
+    // Get budget performance
+    const budgetPerformance = data.budgets.map(budget => {
+      const progress = this.budget.calculateBudgetProgress(budget, data.expenses);
+      return {
+        name: budget.name,
+        category: budget.category,
+        limit: budget.amount,
+        spent: progress.spent,
+        percentage: progress.percentage,
+        status: progress.status
+      };
+    });
+
+    let prompt = `Eres un experto asesor financiero especializado en análisis de presupuestos. Analiza los siguientes datos financieros y genera insights específicos sobre presupuestos en español.
+
+DATOS FINANCIEROS DEL MES (${data.currentMonth}):
+- Ingresos Totales: $${totalIncome.toLocaleString()}
+- Gastos Totales: $${totalExpenses.toLocaleString()}
+- Balance: $${balance.toLocaleString()}
+
+GASTOS POR CATEGORÍA:`;
+
+    Object.entries(expensesByCategory).forEach(([category, amount]) => {
+      const percentage = ((amount / totalExpenses) * 100).toFixed(1);
+      prompt += `\n- ${category}: $${amount.toLocaleString()} (${percentage}%)`;
+    });
+
+    prompt += `\n\nPRESUPUESTOS CONFIGURADOS: ${data.budgets.length}`;
+    
+    if (budgetPerformance.length > 0) {
+      prompt += `\n\nRENDIMIENTO DE PRESUPUESTOS:`;
+      budgetPerformance.forEach(budget => {
+        prompt += `\n- ${budget.name} (${budget.category}): ${budget.percentage.toFixed(1)}% utilizado ($${budget.spent.toLocaleString()}/$${budget.limit.toLocaleString()}) - Estado: ${budget.status}`;
+      });
+    }
+
+    prompt += `\n\nGenera un análisis estructurado que incluya EXACTAMENTE estos elementos separados por "---":
+
+1. INSIGHT_TYPE: recommendation
+   TITLE: [Título de la recomendación]
+   DESCRIPTION: [Descripción detallada de la recomendación]
+   CONFIDENCE: [high/medium/low]
+
+2. INSIGHT_TYPE: pattern
+   TITLE: [Título del patrón identificado]
+   DESCRIPTION: [Descripción del patrón de gasto detectado]
+   CONFIDENCE: [high/medium/low]
+
+3. INSIGHT_TYPE: prediction
+   TITLE: [Título de la predicción]
+   DESCRIPTION: [Predicción sobre gastos futuros]
+   CONFIDENCE: [high/medium/low]
+
+4. INSIGHT_TYPE: alert
+   TITLE: [Título de la alerta]
+   DESCRIPTION: [Alerta sobre presupuestos en riesgo]
+   CONFIDENCE: [high/medium/low]
+
+Cada insight debe ser específico, accionable y basado en los datos proporcionados. Usa números concretos y porcentajes. Máximo 100 palabras por descripción.`;
+
+    return prompt;
+  }
+  
+  parseAIBudgetInsights(aiContent, data) {
+    const insights = [];
+    const sections = aiContent.split('---').filter(section => section.trim());
+    
+    sections.forEach((section, index) => {
+      const lines = section.trim().split('\n').filter(line => line.trim());
+      
+      let insightType = 'recommendation';
+      let title = `Insight ${index + 1}`;
+      let description = 'Análisis generado por IA';
+      let confidence = 0.8;
+      
+      lines.forEach(line => {
+        if (line.includes('INSIGHT_TYPE:')) {
+          insightType = line.split(':')[1].trim();
+        } else if (line.includes('TITLE:')) {
+          title = line.split(':')[1].trim();
+        } else if (line.includes('DESCRIPTION:')) {
+          description = line.split(':')[1].trim();
+        } else if (line.includes('CONFIDENCE:')) {
+          const confidenceStr = line.split(':')[1].trim().toLowerCase();
+          confidence = confidenceStr === 'high' ? 0.9 : confidenceStr === 'medium' ? 0.7 : 0.5;
+        }
+      });
+      
+      insights.push({
+        insight_type: insightType,
+        title: title,
+        description: description,
+        confidence_score: confidence,
+        data: {
+          month: data.currentMonth,
+          total_expenses: data.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0),
+          budget_count: data.budgets.length
+        }
+      });
+    });
+    
+    // If no insights were parsed, create fallback
+    if (insights.length === 0) {
+      return this.generateFallbackBudgetInsights(data);
+    }
+    
+    return insights;
+  }
+  
+  generateFallbackBudgetInsights(data) {
+    const insights = [];
+    const totalExpenses = data.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const totalIncome = parseFloat(data.income.fixed) + parseFloat(data.income.extra) + 
+                       data.extraIncomes.reduce((sum, extra) => sum + parseFloat(extra.amount), 0);
+    
+    // Get top spending category
+    const expensesByCategory = {};
+    data.expenses.forEach(expense => {
+      expensesByCategory[expense.category] = (expensesByCategory[expense.category] || 0) + parseFloat(expense.amount);
+    });
+    
+    const topCategory = Object.entries(expensesByCategory)
+      .sort(([,a], [,b]) => b - a)[0];
+    
+    // Budget performance analysis
+    const budgetsWithProgress = data.budgets.map(budget => ({
+      ...budget,
+      progress: this.budget.calculateBudgetProgress(budget, data.expenses)
+    }));
+    
+    const exceededBudgets = budgetsWithProgress.filter(b => b.progress.status === 'exceeded');
+    const warningBudgets = budgetsWithProgress.filter(b => b.progress.status === 'warning');
+    
+    // Generate recommendation
+    if (topCategory) {
+      const [categoryName, categoryAmount] = topCategory;
+      const percentage = ((categoryAmount / totalExpenses) * 100).toFixed(1);
+      
+      insights.push({
+        insight_type: 'recommendation',
+        title: `Optimizar gastos en ${categoryName}`,
+        description: `${categoryName} representa el ${percentage}% de tus gastos ($${categoryAmount.toLocaleString()}). Considera establecer un presupuesto específico para esta categoría y buscar alternativas más económicas.`,
+        confidence_score: 0.8,
+        data: {
+          category: categoryName,
+          amount: categoryAmount,
+          percentage: percentage
+        }
+      });
+    }
+    
+    // Generate pattern insight
+    const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome * 100).toFixed(1) : 0;
+    insights.push({
+      insight_type: 'pattern',
+      title: `Patrón de ahorro del ${savingsRate}%`,
+      description: `Tu tasa de ahorro actual es del ${savingsRate}%. ${savingsRate >= 20 ? 'Excelente disciplina financiera.' : savingsRate >= 10 ? 'Buen progreso, intenta llegar al 20%.' : 'Considera reducir gastos no esenciales para mejorar tu capacidad de ahorro.'}`,
+      confidence_score: 0.9,
+      data: {
+        savings_rate: parseFloat(savingsRate),
+        total_income: totalIncome,
+        total_expenses: totalExpenses
+      }
+    });
+    
+    // Generate alert if budgets are exceeded
+    if (exceededBudgets.length > 0) {
+      insights.push({
+        insight_type: 'alert',
+        title: `${exceededBudgets.length} presupuesto(s) superado(s)`,
+        description: `Has superado el límite en: ${exceededBudgets.map(b => b.category).join(', ')}. Revisa estos gastos y ajusta tus hábitos de consumo para el próximo mes.`,
+        confidence_score: 1.0,
+        data: {
+          exceeded_budgets: exceededBudgets.length,
+          categories: exceededBudgets.map(b => b.category)
+        }
+      });
+    } else if (warningBudgets.length > 0) {
+      insights.push({
+        insight_type: 'alert',
+        title: `${warningBudgets.length} presupuesto(s) cerca del límite`,
+        description: `Estás cerca del límite en: ${warningBudgets.map(b => b.category).join(', ')}. Modera tus gastos en estas categorías para no superar el presupuesto.`,
+        confidence_score: 0.8,
+        data: {
+          warning_budgets: warningBudgets.length,
+          categories: warningBudgets.map(b => b.category)
+        }
+      });
+    }
+    
+    // Generate prediction
+    const avgDailyExpense = totalExpenses / new Date().getDate();
+    const daysRemaining = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate();
+    const projectedExpenses = totalExpenses + (avgDailyExpense * daysRemaining);
+    
+    insights.push({
+      insight_type: 'prediction',
+      title: `Proyección de gastos del mes`,
+      description: `Basándome en tu patrón actual, proyecto gastos totales de $${projectedExpenses.toLocaleString()} para este mes. ${projectedExpenses > totalIncome ? 'Esto superaría tus ingresos.' : 'Esto está dentro de tus posibilidades.'}`,
+      confidence_score: 0.7,
+      data: {
+        projected_expenses: projectedExpenses,
+        current_expenses: totalExpenses,
+        days_remaining: daysRemaining
+      }
+    });
+    
+    return insights;
   }
 
   async generateAllBudgetInsights() {
     console.log('🤖 Generating insights for all budgets');
-    await this.generateBudgetInsights();
+    await this.generateBudgetInsights(null);
   }
 
   async handleAddIncome(e) {
