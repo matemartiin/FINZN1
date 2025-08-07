@@ -1213,6 +1213,225 @@ class FinznApp {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
   }
+
+  // Budget Analytics Methods
+  toggleBudgetAnalytics() {
+    console.log('🤖 Toggling budget analytics...');
+    
+    const container = document.getElementById('budget-analytics-container');
+    const toggleBtn = document.getElementById('toggle-budget-analytics');
+    
+    if (!container || !toggleBtn) return;
+    
+    const isVisible = container.style.display !== 'none';
+    
+    if (isVisible) {
+      // Hide analytics
+      container.style.display = 'none';
+      toggleBtn.innerHTML = `
+        <span>🧠</span>
+        Activar Análisis con IA
+        <span class="ai-indicator">AI</span>
+      `;
+      toggleBtn.classList.remove('active');
+    } else {
+      // Show analytics
+      container.style.display = 'block';
+      toggleBtn.innerHTML = `
+        <span>📊</span>
+        Ocultar Análisis IA
+        <span class="ai-indicator">AI</span>
+      `;
+      toggleBtn.classList.add('active');
+      
+      // Initialize budget analytics if not already done
+      this.initializeBudgetAnalytics();
+    }
+  }
+
+  async initializeBudgetAnalytics() {
+    console.log('🚀 Initializing budget analytics system...');
+    
+    try {
+      // Check if budget integration is available
+      if (window.budgetIntegration && window.budgetIntegration.isReady()) {
+        console.log('✅ Budget integration already ready');
+        return;
+      }
+      
+      // Wait for budget integration to be available
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (!window.budgetIntegration && attempts < maxAttempts) {
+        console.log(`⏳ Waiting for budget integration... (${attempts + 1}/${maxAttempts})`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        attempts++;
+      }
+      
+      if (window.budgetIntegration) {
+        console.log('✅ Budget analytics system initialized successfully');
+        this.ui.showAlert('🚀 Sistema de Análisis con IA activado exitosamente', 'success');
+      } else {
+        console.warn('⚠️ Budget integration not available, loading manually...');
+        await this.loadBudgetAnalyticsManually();
+      }
+      
+    } catch (error) {
+      console.error('❌ Error initializing budget analytics:', error);
+      this.ui.showAlert('Error al inicializar el sistema de análisis', 'error');
+    }
+  }
+
+  async loadBudgetAnalyticsManually() {
+    try {
+      console.log('🔧 Loading budget analytics manually...');
+      
+      // Import and initialize budget integration
+      const { BudgetIntegration } = await import('./modules/budget-integration.js');
+      const budgetIntegration = new BudgetIntegration();
+      await budgetIntegration.integrate();
+      
+      // Make available globally
+      window.budgetIntegration = budgetIntegration;
+      
+      console.log('✅ Budget analytics loaded manually');
+      this.ui.showAlert('🚀 Sistema de Análisis con IA cargado exitosamente', 'success');
+      
+    } catch (error) {
+      console.error('❌ Error loading budget analytics manually:', error);
+      this.ui.showAlert('Error al cargar el sistema de análisis', 'error');
+    }
+  }
+
+  async generateBudgetAnalysis() {
+    console.log('🧠 Generating budget analysis...');
+    
+    if (!window.budgetIntegration || !window.budgetIntegration.isReady()) {
+      this.ui.showAlert('Sistema de análisis no disponible. Activa primero el análisis con IA.', 'warning');
+      return;
+    }
+    
+    const generateBtn = document.getElementById('generate-budget-analysis');
+    const originalText = generateBtn?.innerHTML;
+    
+    try {
+      // Show loading state
+      if (generateBtn) {
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<div class="budget-loading-spinner"></div> Analizando...';
+      }
+      
+      this.showBudgetLoadingState();
+      
+      // Get selected period
+      const period = document.getElementById('budget-analysis-period')?.value || 'current';
+      
+      // Generate comprehensive report
+      const report = await window.budgetIntegration.generateFullReport({
+        period,
+        includeIntelligence: true,
+        includeRecommendations: true,
+        includeForecasting: true
+      });
+      
+      if (report) {
+        // Display results using the budget UI system
+        await this.displayBudgetAnalysisResults(report);
+        
+        // Show export button
+        const exportBtn = document.getElementById('export-budget-report');
+        if (exportBtn) {
+          exportBtn.style.display = 'inline-flex';
+        }
+        
+        this.ui.showAlert('🧠 Análisis presupuestario generado exitosamente', 'success');
+      } else {
+        this.ui.showAlert('No se pudo generar el análisis. Intenta nuevamente.', 'error');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error generating budget analysis:', error);
+      this.ui.showAlert('Error al generar el análisis presupuestario', 'error');
+    } finally {
+      // Restore button state
+      if (generateBtn) {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = originalText;
+      }
+      this.hideBudgetLoadingState();
+    }
+  }
+
+  showBudgetLoadingState() {
+    const resultsContainer = document.getElementById('budget-analysis-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = `
+        <div class="budget-loading-state">
+          <div class="budget-loading-spinner"></div>
+          <div class="budget-loading-text">Analizando tus datos financieros...</div>
+          <div class="budget-loading-subtitle">Nuestro sistema de IA está procesando tu información para generar insights personalizados.</div>
+        </div>
+      `;
+      resultsContainer.classList.remove('hidden');
+    }
+  }
+
+  hideBudgetLoadingState() {
+    // Loading state will be replaced by results
+  }
+
+  async displayBudgetAnalysisResults(report) {
+    console.log('📊 Displaying budget analysis results...');
+    
+    // Use the budget UI system if available
+    if (window.budgetIntegration && window.budgetIntegration.budgetSection && 
+        window.budgetIntegration.budgetSection.budgetUI) {
+      await window.budgetIntegration.budgetSection.budgetUI.displayBudgetAnalysis(report);
+    } else {
+      // Fallback: simple display
+      this.displaySimpleBudgetResults(report);
+    }
+  }
+
+  displaySimpleBudgetResults(report) {
+    const resultsContainer = document.getElementById('budget-analysis-results');
+    if (!resultsContainer) return;
+    
+    resultsContainer.innerHTML = `
+      <div class="analysis-section">
+        <h3>📊 Análisis Completado</h3>
+        <p>Tu análisis presupuestario ha sido generado exitosamente.</p>
+        <div class="simple-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Período Analizado:</span>
+            <span class="metric-value">${report.metadata?.period || 'Mes Actual'}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Generado:</span>
+            <span class="metric-value">${new Date().toLocaleDateString('es-ES')}</span>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); margin-top: 15px;">
+          El sistema de análisis avanzado está procesando tus datos. 
+          Los insights detallados estarán disponibles próximamente.
+        </p>
+      </div>
+    `;
+    
+    resultsContainer.classList.remove('hidden');
+  }
+
+  async exportBudgetReport() {
+    console.log('📄 Exporting budget report...');
+    
+    if (window.budgetIntegration && window.budgetIntegration.budgetSection && 
+        window.budgetIntegration.budgetSection.budgetUI) {
+      await window.budgetIntegration.budgetSection.budgetUI.exportBudgetReport();
+    } else {
+      this.ui.showAlert('Función de exportación próximamente disponible', 'info');
+    }
+  }
 }
 
 // Initialize the app when DOM is loaded
