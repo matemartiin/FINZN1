@@ -2110,6 +2110,146 @@ body {
   font-weight: 700;
 }
 
+/* Insufficient Data Message Styles */
+.insufficient-data-message {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.insufficient-data-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.insufficient-data-icon {
+  font-size: 2rem;
+  background: #ffc107;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insufficient-data-header h3 {
+  color: #856404;
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.insufficient-data-description {
+  color: #856404;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.data-requirements {
+  margin: 20px 0;
+}
+
+.data-requirements h4 {
+  color: #856404;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.requirement-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border: 1px solid #f0c14b;
+}
+
+.requirement-item.completed {
+  background: rgba(212, 237, 218, 0.7);
+  border-color: #28a745;
+}
+
+.requirement-item.pending {
+  background: rgba(255, 243, 205, 0.7);
+  border-color: #ffc107;
+}
+
+.requirement-icon {
+  font-size: 1.2rem;
+  min-width: 24px;
+}
+
+.requirement-text {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.missing-requirements {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(248, 215, 218, 0.7);
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+}
+
+.missing-requirements h4 {
+  color: #721c24;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.issues-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #721c24;
+}
+
+.issues-list li {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.insufficient-data-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.insufficient-data-actions .btn {
+  flex: 1;
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .requirements-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .insufficient-data-actions {
+    flex-direction: column;
+  }
+  
+  .insufficient-data-actions .btn {
+    width: 100%;
+  }
+}
+
 /* Budget AI Insights Styles */
 .budget-ai-insights {
   margin-bottom: 2rem;
