@@ -75,7 +75,6 @@
   --border-color: #4A5568;
 }
 
-@import url('./budget.css');
 /* Reset y base */
 * {
   margin: 0;
@@ -2776,7 +2775,7 @@ body {
 }
 
 /* Event Legend */
-.event-legend {
+  margin-top: 20px;
   margin-top: 10px;
   padding: 20px;
   background: #f8f9fa;
@@ -3129,3 +3128,4 @@ select:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
+  margin-top: 10px;
