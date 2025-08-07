@@ -1244,6 +1244,196 @@ export class DataManager {
     return 'Otros';
   }
 
+  // Budget Insights and Alerts
+  async loadBudgetInsights() {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('budget_insights')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading budget insights:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in loadBudgetInsights:', error);
+      return [];
+    }
+  }
+
+  async saveBudgetInsight(insightData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const insight = {
+        user_id: userId,
+        budget_id: insightData.budget_id || null,
+        insight_type: insightData.insight_type,
+        title: insightData.title,
+        description: insightData.description,
+        data: insightData.data || {},
+        confidence_score: insightData.confidence_score || null,
+        status: 'active'
+      };
+
+      const { error } = await supabase
+        .from('budget_insights')
+        .insert([insight]);
+
+      if (error) {
+        console.error('Error saving budget insight:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in saveBudgetInsight:', error);
+      return false;
+    }
+  }
+
+  async loadBudgetAlerts() {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('budget_alerts')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading budget alerts:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in loadBudgetAlerts:', error);
+      return [];
+    }
+  }
+
+  async saveBudgetAlert(alertData) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return false;
+
+    try {
+      const alert = {
+        user_id: userId,
+        budget_id: alertData.budget_id,
+        alert_type: alertData.alert_type,
+        severity: alertData.severity,
+        title: alertData.title,
+        message: alertData.message,
+        category: alertData.category || null,
+        data: alertData.data || {},
+        status: 'active'
+      };
+
+      const { error } = await supabase
+        .from('budget_alerts')
+        .insert([alert]);
+
+      if (error) {
+        console.error('Error saving budget alert:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in saveBudgetAlert:', error);
+      return false;
+    }
+  }
+
+  // Load expenses by period for AI analysis
+  async loadExpensesByPeriod(startDate, endDate) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('transaction_date', startDate)
+        .lte('transaction_date', endDate)
+        .order('transaction_date', { ascending: false });
+
+      if (error) {
+        console.error('Error loading expenses by period:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in loadExpensesByPeriod:', error);
+      return [];
+    }
+  }
+
+  // Load incomes by period for AI analysis
+  async loadIncomesByPeriod(startDate, endDate) {
+    const userId = this.getCurrentUserId();
+    if (!userId) return [];
+
+    try {
+      // Get months in the period
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const months = [];
+      
+      const current = new Date(start.getFullYear(), start.getMonth(), 1);
+      while (current <= end) {
+        const monthKey = `${current.getFullYear()}-${(current.getMonth() + 1).toString().padStart(2, '0')}`;
+        months.push(monthKey);
+        current.setMonth(current.getMonth() + 1);
+      }
+
+      // Load fixed incomes
+      const { data: incomes, error: incomesError } = await supabase
+        .from('incomes')
+        .select('*')
+        .eq('user_id', userId)
+        .in('month', months);
+
+      if (incomesError) {
+        console.error('Error loading incomes by period:', incomesError);
+      }
+
+      // Load extra incomes
+      const { data: extraIncomes, error: extraError } = await supabase
+        .from('extra_incomes')
+        .select('*')
+        .eq('user_id', userId)
+        .in('month', months);
+
+      if (extraError) {
+        console.error('Error loading extra incomes by period:', extraError);
+      }
+
+      return {
+        fixedIncomes: incomes || [],
+        extraIncomes: extraIncomes || []
+      };
+    } catch (error) {
+      console.error('Error in loadIncomesByPeriod:', error);
+      return { fixedIncomes: [], extraIncomes: [] };
+    }
+  }
+
   // Balance calculations - FIXED
   calculateBalance(month) {
     console.log('💰 Calculating balance for month:', month);
