@@ -157,7 +157,6 @@ export class NavigationManager {
     const titles = {
       'dashboard': 'Resumen General',
       'transactions': 'Transacciones',
-      'budget': 'Presupuesto',
       'goals': 'Objetivos de Ahorro',
       'reports': 'Reportes y Análisis',
       'settings': 'Configuración',
