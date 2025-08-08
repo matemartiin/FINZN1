@@ -3,9 +3,13 @@ import { supabase } from '../config/supabase.js';
 export class AuthManager {
   constructor() {
     this.currentUser = null;
+    this.profileManager = null;
     this.initializeAuth();
   }
 
+  setProfileManager(profileManager) {
+    this.profileManager = profileManager;
+  }
   async initializeAuth() {
     console.log('🔐 Initializing authentication...');
     
@@ -39,10 +43,21 @@ export class AuthManager {
       if (event === 'SIGNED_OUT') {
         // Clear any cached data
         this.clearUserData();
+        // Clear profile data
+        if (this.profileManager) {
+          this.profileManager.clearProfile();
+        }
         // Reload the page to reset application state
         window.location.reload();
       } else if (event === 'SIGNED_IN') {
         console.log('✅ User successfully signed in:', session.user.email);
+        // Load user profile after sign in
+        if (this.profileManager) {
+          setTimeout(async () => {
+            await this.profileManager.loadProfile();
+            this.profileManager.updateHeaderDisplay();
+          }, 500);
+        }
       }
     });
   }
@@ -166,6 +181,27 @@ export class AuthManager {
     }
   }
 
+  // Register with profile data
+  async registerWithProfile(email, password, profileData) {
+    try {
+      console.log('📝 Attempting to register user with profile:', email);
+      
+      // First register the user
+      const registrationResult = await this.register(email, password);
+      
+      if (registrationResult.success && !registrationResult.needsConfirmation) {
+        // Create profile if user is immediately available
+        if (this.profileManager && this.currentUser) {
+          await this.profileManager.createProfileOnRegistration(profileData);
+        }
+      }
+      
+      return registrationResult;
+    } catch (error) {
+      console.error('Registration with profile error:', error);
+      throw error;
+    }
+  }
   async logout() {
     try {
       console.log('👋 Logging out...');
@@ -175,6 +211,9 @@ export class AuthManager {
       }
       
       this.clearUserData();
+      if (this.profileManager) {
+        this.profileManager.clearProfile();
+      }
       this.currentUser = null;
     } catch (error) {
       console.error('Logout error:', error);
