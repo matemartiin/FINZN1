@@ -11,7 +11,6 @@ import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
-import { ContextualBarManager } from './modules/contextual-bar.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -33,7 +32,6 @@ class FinznApp {
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
-    this.contextualBar = new ContextualBarManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -63,9 +61,6 @@ class FinznApp {
       
       // Initialize user profile
       this.userProfile.init();
-      
-      // Initialize contextual bar
-      this.contextualBar.init();
       
       // Setup month selector
       this.setupMonthSelector();
@@ -129,9 +124,30 @@ class FinznApp {
       if (monthSelect) {
         monthSelect.addEventListener('change', (e) => {
           this.currentMonth = e.target.value;
+          
+          // Sync with contextual bar
+          if (this.contextualBar) {
+            this.contextualBar.syncMonth(this.currentMonth);
+          }
+          
           this.updateDashboard();
         });
       }
+      
+      // Listen for month changes from contextual bar
+      document.addEventListener('monthChanged', (e) => {
+        if (e.detail.source !== 'main' && e.detail.month !== this.currentMonth) {
+          this.currentMonth = e.detail.month;
+          
+          // Update main month selector
+          const monthSelect = document.getElementById('month-select');
+          if (monthSelect) {
+            monthSelect.value = this.currentMonth;
+          }
+          
+          this.updateDashboard();
+        }
+      });
       
       console.log('✅ All event listeners set up successfully');
     } catch (error) {
