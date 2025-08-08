@@ -167,7 +167,7 @@ export class UserProfileManager {
         .from('user_profiles')
         .update(updates)
         .eq('user_id', userId)
-        .select();
+        .select()
         .single();
 
       if (error) {
