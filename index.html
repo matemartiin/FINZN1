@@ -108,7 +108,7 @@
             <select id="month-select"></select>
           </div>
           <div class="user-info">
-            <span id="user-name"></span>
+            <span id="user-name">¡Bienvenido!</span>
           </div>
           <button id="theme-toggle" class="btn btn-icon" title="Cambiar tema">
             <span class="theme-icon">🌙</span>
@@ -422,7 +422,7 @@
                     </div>
                     <div class="settings-card-content">
                       <p>Administra tu información personal y preferencias de cuenta.</p>
-                      <button id="edit-profile-btn" class="btn btn-secondary">
+                      <button id="edit-profile-btn" class="btn btn-secondary">Editar Perfil</button>
                         <span>✏️</span> Editar Perfil
                       </button>
                     </div>
@@ -977,6 +977,50 @@
             <h3>Categorías Existentes</h3>
             <div id="categories-management-list" class="categories-management-list">
               <!-- Categories will be loaded here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Edit Profile Modal -->
+        <div id="edit-profile-modal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Editar Perfil</h3>
+              <button type="button" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-profile-form">
+                <div class="form-group">
+                  <label for="edit-first-name">Nombre *</label>
+                  <input 
+                    type="text" 
+                    id="edit-first-name" 
+                    name="firstName" 
+                    required 
+                    placeholder="Tu nombre"
+                    maxlength="50"
+                  >
+                </div>
+                <div class="form-group">
+                  <label for="edit-last-name">Apellido *</label>
+                  <input 
+                    type="text" 
+                    id="edit-last-name" 
+                    name="lastName" 
+                    required 
+                    placeholder="Tu apellido"
+                    maxlength="50"
+                  >
+                </div>
+                <div class="modal-actions">
+                  <button type="button" class="btn btn-secondary modal-cancel">
+                    Cancelar
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    Guardar Cambios
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
