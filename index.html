@@ -115,6 +115,39 @@
       </div>
     </header>
 
+    <!-- Chat Toggle Button -->
+    <button id="chat-toggle" class="chat-toggle-btn" title="Chat con IA">
+      <div class="chat-icon">🤖</div>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chat-window" class="chat-window hidden">
+      <div class="chat-header">
+        <div class="chat-title">
+          <img src="/robot-chat.png" alt="FINZN AI" class="chat-logo" />
+          <span>FINZN AI Assistant</span>
+        </div>
+        <button id="chat-close" class="chat-close-btn">✕</button>
+      </div>
+      
+      <div id="chat-messages" class="chat-messages">
+        <!-- Messages will be added here dynamically -->
+      </div>
+      
+      <form id="chat-form" class="chat-form">
+        <input 
+          type="text" 
+          id="chat-input" 
+          class="chat-input" 
+          placeholder="Pregúntame sobre finanzas..."
+          autocomplete="off"
+        />
+        <button type="submit" class="chat-send-btn">
+          <span class="send-icon">➤</span>
+        </button>
+      </form>
+    </div>
+
     <!-- Dashboard with New Layout -->
     <main class="dashboard-new">
       <!-- Sidebar Navigation -->
