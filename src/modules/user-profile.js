@@ -31,6 +31,7 @@ export class UserProfileManager {
 
   async loadUserProfile() {
     const userId = this.getCurrentUserId();
+    console.log('👤 loadUserProfile - userId:', userId);
     if (!userId) return null;
 
     try {
@@ -47,7 +48,16 @@ export class UserProfileManager {
         .eq('user_id', userId)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
+        console.log('👤 Profile load error:', error);
+        
+        // If no profile found, that's expected for new users
+        if (error.code === 'PGRST116') {
+          console.log('👤 No profile found for user, will need to create one');
+          this.currentProfile = null;
+          return null;
+        }
+        
         console.error('Error loading user profile:', error);
         
         // If table doesn't exist, show helpful message
@@ -75,7 +85,7 @@ export class UserProfileManager {
 
   async createUserProfile(profileData) {
     const userId = this.getCurrentUserId();
-    console.log('👤 Creating profile for user ID:', userId);
+    console.log('👤 createUserProfile - userId:', userId, 'profileData:', profileData);
     
     if (!userId) return false;
 
@@ -98,16 +108,20 @@ export class UserProfileManager {
       
       const { data, error } = await supabase
         .from('user_profiles')
-        .upsert([profile], {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        })
+        .insert([profile])
         .select()
         .single();
 
       if (error) {
         console.error('Error creating user profile:', error);
         console.error('Full error details:', JSON.stringify(error, null, 2));
+        
+        // If profile already exists, try updating instead
+        if (error.code === '23505') {
+          console.log('👤 Profile exists, trying to update instead');
+          return await this.updateUserProfile(profileData);
+        }
+        
         return false;
       }
 
@@ -126,6 +140,7 @@ export class UserProfileManager {
 
   async updateUserProfile(profileData) {
     const userId = this.getCurrentUserId();
+    console.log('👤 updateUserProfile - userId:', userId, 'profileData:', profileData);
     if (!userId) return false;
 
     try {
@@ -137,25 +152,30 @@ export class UserProfileManager {
       await this.ensureUserProfilesTableExists();
       
       const updates = {
-        user_id: userId,
         display_name: `${profileData.first_name} ${profileData.last_name}`.trim(),
         first_name: profileData.first_name,
         last_name: profileData.last_name,
         updated_at: new Date().toISOString()
       };
 
-      // Use upsert to handle both update and insert cases
+      console.log('👤 Update data:', updates);
+      
       const { data, error } = await supabase
         .from('user_profiles')
-        .upsert([updates], {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        })
+        .update(updates)
+        .eq('user_id', userId)
         .select()
         .single();
 
       if (error) {
         console.error('Error updating user profile:', error);
+        
+        // If no profile exists to update, create one instead
+        if (error.code === 'PGRST116') {
+          console.log('👤 No profile to update, creating new one');
+          return await this.createUserProfile(profileData);
+        }
+        
         return false;
       }
 
@@ -363,6 +383,7 @@ export class UserProfileManager {
 
   updateHeaderDisplay() {
     const userNameElement = document.getElementById('user-name');
+    console.log('👤 updateHeaderDisplay - element found:', !!userNameElement, 'currentProfile:', this.currentProfile);
     if (!userNameElement) return;
 
     let displayText = '¡Bienvenido!';
@@ -375,6 +396,7 @@ export class UserProfileManager {
       displayText = '👤 Usuario sin nombre';
     }
     
+    console.log('👤 Setting header text to:', displayText);
     userNameElement.textContent = displayText;
   }
 
@@ -397,12 +419,14 @@ export class UserProfileManager {
     const hasComplete = this.currentProfile && 
            this.currentProfile.first_name && 
            this.currentProfile.last_name;
+            
     console.log('👤 Profile completeness check:', {
       currentProfile: !!this.currentProfile,
       firstName: this.currentProfile?.first_name,
       lastName: this.currentProfile?.last_name,
       hasComplete
     });
+    
     return hasComplete;
   }
 

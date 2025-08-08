@@ -46,6 +46,14 @@ export class AuthManager {
       } else if (event === 'SIGNED_IN') {
         console.log('✅ User successfully signed in:', session.user.email);
         console.log('✅ User ID:', session.user.id);
+        
+        // Load user profile after successful sign in
+        setTimeout(async () => {
+          if (window.app && window.app.userProfile) {
+            console.log('🔐 Loading user profile after sign in...');
+            await window.app.userProfile.loadUserProfile();
+          }
+        }, 500);
       }
     });
   }
