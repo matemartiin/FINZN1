@@ -32,7 +32,6 @@ class FinznApp {
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
-    this.contextualBar = new ContextualBarManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -62,9 +61,6 @@ class FinznApp {
       
       // Initialize user profile
       this.userProfile.init();
-      
-      // Initialize contextual bar
-      this.contextualBar.init();
       
       // Setup month selector
       this.setupMonthSelector();
@@ -128,26 +124,9 @@ class FinznApp {
       if (monthSelect) {
         monthSelect.addEventListener('change', (e) => {
           this.currentMonth = e.target.value;
-          // Sincronizar con la barra contextual
-          this.contextualBar.syncMonth(this.currentMonth);
           this.updateDashboard();
         });
       }
-      
-      // Listener para cambios de mes desde la barra contextual
-      document.addEventListener('monthChanged', (e) => {
-        if (e.detail.source !== 'contextual-bar') return;
-        
-        this.currentMonth = e.detail.month;
-        
-        // Sincronizar selector principal
-        const mainMonthSelect = document.getElementById('month-select');
-        if (mainMonthSelect && mainMonthSelect.value !== this.currentMonth) {
-          mainMonthSelect.value = this.currentMonth;
-        }
-        
-        this.updateDashboard();
-      });
       
       console.log('✅ All event listeners set up successfully');
     } catch (error) {

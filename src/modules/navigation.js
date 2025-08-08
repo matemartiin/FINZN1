@@ -163,16 +163,6 @@ export class NavigationManager {
       
       // Update page title
       this.updatePageTitle(sectionName);
-      
-      // Notificar cambio de sección a la barra contextual
-      if (window.app && window.app.contextualBar) {
-        window.app.contextualBar.setCurrentSection(sectionName);
-      }
-      
-      // Disparar evento personalizado
-      document.dispatchEvent(new CustomEvent('sectionChanged', {
-        detail: { section: sectionName }
-      }));
     }
   }
   
