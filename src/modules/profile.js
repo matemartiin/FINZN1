@@ -139,22 +139,24 @@ export class ProfileManager {
   validateProfileData(data) {
     const errors = [];
 
-    if (!data.display_name || typeof data.display_name !== 'string' || data.display_name.trim().length === 0) {
+    // Check if display_name exists and is not empty after trimming
+    const displayName = data.display_name;
+    if (!displayName || typeof displayName !== 'string' || displayName.trim().length === 0) {
       errors.push('El nombre es obligatorio');
-    }
-
-    if (data.display_name && typeof data.display_name === 'string' && data.display_name.trim().length > 50) {
+    } else if (displayName.trim().length > 50) {
       errors.push('El nombre no puede tener más de 50 caracteres');
     }
 
-    if (data.phone && typeof data.phone === 'string' && data.phone.length > 0) {
+    // Validate phone if provided
+    if (data.phone && typeof data.phone === 'string' && data.phone.trim().length > 0) {
       const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-      if (!phoneRegex.test(data.phone)) {
+      if (!phoneRegex.test(data.phone.trim())) {
         errors.push('El teléfono no tiene un formato válido');
       }
     }
 
-    if (data.bio && typeof data.bio === 'string' && data.bio.length > 500) {
+    // Validate bio if provided
+    if (data.bio && typeof data.bio === 'string' && data.bio.trim().length > 500) {
       errors.push('La biografía no puede tener más de 500 caracteres');
     }
 
@@ -166,7 +168,7 @@ export class ProfileManager {
 
   // Create profile during registration
   async createProfileOnRegistration(userData) {
-    const userId = this.getCurrentUserId();
+    const userId = userData.user_id || this.getCurrentUserId();
     if (!userId) return false;
 
     try {

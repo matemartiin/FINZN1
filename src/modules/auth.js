@@ -106,6 +106,7 @@ export class AuthManager {
   }
 
   async register(email, password) {
+  async register(email, password, displayName) {
     try {
       console.log('📝 Attempting to register user:', email);
       
@@ -128,6 +129,11 @@ export class AuthManager {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password: password,
+        options: {
+          data: {
+            display_name: displayName
+          }
+        }
       });
 
       if (error) {
@@ -164,6 +170,18 @@ export class AuthManager {
       // Check if user was created successfully
       if (data.user) {
         console.log('User created successfully, ID:', data.user.id);
+        
+        // Create user profile with the provided name
+        if (this.profileManager && displayName) {
+          try {
+            await this.profileManager.createProfileOnRegistration({
+              display_name: displayName,
+              user_id: data.user.id
+            });
+          } catch (profileError) {
+            console.error('Error creating profile:', profileError);
+          }
+        }
         
         // If email confirmation is disabled, user should be able to login immediately
         if (data.user.email_confirmed_at || data.session) {
