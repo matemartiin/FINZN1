@@ -1,1203 +1,581 @@
 export class UIManager {
   constructor() {
-    this.currentMonth = this.getCurrentMonth();
-    this.alertTimeout = null;
+    this.alertContainer = document.getElementById('alert-container');
+    this.mascotMessageQueue = [];
+    this.isShowingMascotMessage = false;
+    this.currentMascotTimeout = null;
+    this.setupMascotHoverBehavior();
   }
 
-  init() {
-    console.log('🎨 Initializing UI Manager...');
-    this.setupFormEvents();
-    this.setupInstallmentToggle();
-    this.setupModalEvents();
-    this.updateCurrentDate();
-  }
-
-  getCurrentMonth() {
-    const now = new Date();
-    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-  }
-
-  getCurrentUserId() {
-    return window.app?.auth?.getCurrentUserId() || null;
-  }
-
-  setupFormEvents() {
-    // Add Expense Form
-    const addExpenseForm = document.getElementById('add-expense-form');
-    if (addExpenseForm) {
-      addExpenseForm.addEventListener('submit', (e) => this.handleAddExpense(e));
-    }
-
-    // Add Fixed Income Form
-    const addFixedIncomeForm = document.getElementById('add-fixed-income-form');
-    if (addFixedIncomeForm) {
-      addFixedIncomeForm.addEventListener('submit', (e) => this.handleAddFixedIncome(e));
-    }
-
-    // Add Extra Income Form
-    const addExtraIncomeForm = document.getElementById('add-extra-income-form');
-    if (addExtraIncomeForm) {
-      addExtraIncomeForm.addEventListener('submit', (e) => this.handleAddExtraIncome(e));
-    }
-
-    // Add Goal Form
-    const addGoalForm = document.getElementById('add-goal-form');
-    if (addGoalForm) {
-      addGoalForm.addEventListener('submit', (e) => this.handleAddGoal(e));
-    }
-
-    // Add Money to Goal Form
-    const addMoneyGoalForm = document.getElementById('add-money-goal-form');
-    if (addMoneyGoalForm) {
-      addMoneyGoalForm.addEventListener('submit', (e) => this.handleAddMoneyToGoal(e));
-    }
-
-    // Add Budget Form
-    const addBudgetForm = document.getElementById('add-budget-form');
-    if (addBudgetForm) {
-      addBudgetForm.addEventListener('submit', (e) => this.handleAddBudget(e));
-    }
-
-    // Add Category Form
-    const addCategoryForm = document.getElementById('add-category-form');
-    if (addCategoryForm) {
-      addCategoryForm.addEventListener('submit', (e) => this.handleAddCategory(e));
-    }
-
-    // Add Spending Limit Form
-    const addLimitForm = document.getElementById('add-limit-form');
-    if (addLimitForm) {
-      addLimitForm.addEventListener('submit', (e) => this.handleAddSpendingLimit(e));
-    }
-  }
-
-  setupInstallmentToggle() {
-    const installmentsCheckbox = document.getElementById('expense-installments');
-    const installmentsOptions = document.getElementById('installments-options');
+  setupMascotHoverBehavior() {
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+      this.initializeMascotHover();
+    });
     
-    if (installmentsCheckbox && installmentsOptions) {
-      installmentsCheckbox.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          installmentsOptions.classList.remove('hidden');
-        } else {
-          installmentsOptions.classList.add('hidden');
-        }
+    // Also try to initialize immediately in case DOM is already ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        this.initializeMascotHover();
       });
+    } else {
+      this.initializeMascotHover();
     }
   }
 
-  setupModalEvents() {
-    // Setup budget modal events if modals manager exists
-    if (window.app && window.app.modals && window.app.modals.setupBudgetModalEvents) {
-      window.app.modals.setupBudgetModalEvents();
-    }
-  }
-
-  updateCurrentDate() {
-    // Set current date as default for date inputs
-    const today = new Date().toISOString().split('T')[0];
+  initializeMascotHover() {
+    const mascotContainer = document.querySelector('.chart-mascot-container');
+    const dynamicMessage = document.getElementById('mascot-dynamic-message');
     
-    const expenseDateInput = document.getElementById('expense-date');
-    if (expenseDateInput && !expenseDateInput.value) {
-      expenseDateInput.value = today;
+    if (!mascotContainer || !dynamicMessage) {
+      // Retry after a short delay if elements aren't ready
+      setTimeout(() => this.initializeMascotHover(), 500);
+      return;
     }
 
-    const budgetStartDate = document.getElementById('budget-start-date');
-    if (budgetStartDate && !budgetStartDate.value) {
-      budgetStartDate.value = today;
-    }
+    console.log('🐾 Initializing mascot hover behavior');
 
-    // Set end date to end of current month
-    const budgetEndDate = document.getElementById('budget-end-date');
-    if (budgetEndDate && !budgetEndDate.value) {
-      const endOfMonth = new Date();
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(0);
-      budgetEndDate.value = endOfMonth.toISOString().split('T')[0];
-    }
+    mascotContainer.addEventListener('mouseenter', () => {
+      this.showHoverMessage(dynamicMessage);
+    });
+
+    mascotContainer.addEventListener('mouseleave', () => {
+      this.hideHoverMessage(dynamicMessage);
+    });
   }
 
-  // Form Handlers
+  showHoverMessage(messageElement) {
+    if (!messageElement) return;
 
-  async handleAddExpense(e) {
-    e.preventDefault();
+    // Clear any existing message first
+    this.clearMascotMessage(messageElement);
+
+    // Get current financial context for personalized message
+    const messages = this.getContextualMascotMessages();
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     
-    const formData = new FormData(e.target);
-    const expenseData = {
-      description: formData.get('description')?.trim(),
-      amount: formData.get('amount'),
-      category: formData.get('category'),
-      transactionDate: formData.get('date'),
-      month: this.currentMonth,
-      installments: formData.get('installments') === 'on',
-      totalInstallments: parseInt(formData.get('total_installments')) || 1
-    };
-
-    // Validation
-    if (!expenseData.description || !expenseData.amount || !expenseData.category || !expenseData.transactionDate) {
-      this.showAlert('Por favor completa todos los campos obligatorios', 'error');
-      return;
-    }
-
-    if (parseFloat(expenseData.amount) <= 0) {
-      this.showAlert('El monto debe ser mayor a 0', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.addExpense(expenseData);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-expense-modal');
-          }
-          
-          this.showAlert('Gasto agregado exitosamente', 'success');
-          this.updateBalance();
-          this.updateExpensesList();
-        } else {
-          this.showAlert('Error al agregar el gasto', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding expense:', error);
-      this.showAlert('Error al agregar el gasto', 'error');
-    }
-  }
-
-  async handleAddFixedIncome(e) {
-    e.preventDefault();
+    // Set flag to prevent overlapping
+    this.isShowingMascotMessage = true;
     
-    const formData = new FormData(e.target);
-    const amount = formData.get('amount');
-
-    if (!amount || parseFloat(amount) <= 0) {
-      this.showAlert('Por favor ingresa un monto válido', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.addFixedIncome(this.currentMonth, amount);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-fixed-income-modal');
-          }
-          
-          this.showAlert('Ingreso fijo configurado exitosamente', 'success');
-          this.updateBalance();
-          this.updateIncomeDisplay();
-        } else {
-          this.showAlert('Error al configurar el ingreso fijo', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding fixed income:', error);
-      this.showAlert('Error al configurar el ingreso fijo', 'error');
-    }
-  }
-
-  async handleAddExtraIncome(e) {
-    e.preventDefault();
+    messageElement.textContent = randomMessage.text;
+    messageElement.className = `mascot-alert mascot-alert-${randomMessage.type}`;
+    messageElement.style.opacity = '1';
+    messageElement.style.visibility = 'visible';
+    messageElement.style.pointerEvents = 'none';
     
-    const formData = new FormData(e.target);
-    const incomeData = {
-      description: formData.get('description')?.trim(),
-      amount: formData.get('amount'),
-      category: formData.get('category')
-    };
-
-    if (!incomeData.description || !incomeData.amount || !incomeData.category) {
-      this.showAlert('Por favor completa todos los campos', 'error');
-      return;
-    }
-
-    if (parseFloat(incomeData.amount) <= 0) {
-      this.showAlert('El monto debe ser mayor a 0', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.addExtraIncome(this.currentMonth, incomeData);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-extra-income-modal');
-          }
-          
-          this.showAlert('Ingreso extra agregado exitosamente', 'success');
-          this.updateBalance();
-          this.updateIncomeDisplay();
-          this.updateExtraIncomesList();
-        } else {
-          this.showAlert('Error al agregar el ingreso extra', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding extra income:', error);
-      this.showAlert('Error al agregar el ingreso extra', 'error');
-    }
+    console.log('🐾 Mascot speaking on hover:', randomMessage.text);
   }
 
-  async handleAddGoal(e) {
-    e.preventDefault();
+  hideHoverMessage(messageElement) {
+    if (!messageElement) return;
     
-    const formData = new FormData(e.target);
-    const goalData = {
-      name: formData.get('name')?.trim(),
-      targetAmount: formData.get('target_amount'),
-      currentAmount: formData.get('current_amount') || 0
-    };
-
-    if (!goalData.name || !goalData.targetAmount) {
-      this.showAlert('Por favor completa todos los campos obligatorios', 'error');
-      return;
-    }
-
-    if (parseFloat(goalData.targetAmount) <= 0) {
-      this.showAlert('El monto objetivo debe ser mayor a 0', 'error');
-      return;
-    }
-
-    if (parseFloat(goalData.currentAmount) < 0) {
-      this.showAlert('El monto actual no puede ser negativo', 'error');
-      return;
-    }
-
-    if (parseFloat(goalData.currentAmount) > parseFloat(goalData.targetAmount)) {
-      this.showAlert('El monto actual no puede ser mayor al objetivo', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.addGoal(goalData);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-goal-modal');
-          }
-          
-          this.showAlert('Objetivo creado exitosamente', 'success');
-          this.updateGoalsList();
-        } else {
-          this.showAlert('Error al crear el objetivo', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding goal:', error);
-      this.showAlert('Error al crear el objetivo', 'error');
-    }
+    this.clearMascotMessage(messageElement);
+    console.log('🐾 Mascot returning to silent state');
   }
 
-  async handleAddMoneyToGoal(e) {
-    e.preventDefault();
+  clearMascotMessage(messageElement) {
+    if (!messageElement) return;
     
-    const modal = document.getElementById('add-money-goal-modal');
-    const goalId = modal?.dataset.goalId;
+    // Clear any existing timeout
+    if (this.currentMascotTimeout) {
+      clearTimeout(this.currentMascotTimeout);
+      this.currentMascotTimeout = null;
+    }
     
-    if (!goalId) {
-      this.showAlert('Error: Objetivo no identificado', 'error');
-      return;
-    }
-
-    const formData = new FormData(e.target);
-    const amount = formData.get('amount');
-
-    if (!amount || parseFloat(amount) <= 0) {
-      this.showAlert('Por favor ingresa un monto válido', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const result = await window.app.data.addMoneyToGoal(goalId, amount);
-        
-        if (result.success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-money-goal-modal');
-          }
-          
-          if (result.completed) {
-            this.showAlert('¡Felicitaciones! Has completado tu objetivo 🎉', 'success');
-          } else {
-            this.showAlert('Dinero agregado al objetivo exitosamente', 'success');
-          }
-          
-          this.updateGoalsList();
-        }
-      }
-    } catch (error) {
-      console.error('Error adding money to goal:', error);
-      this.showAlert(error.message || 'Error al agregar dinero al objetivo', 'error');
-    }
-  }
-
-  async handleAddBudget(e) {
-    e.preventDefault();
+    // Hide message immediately
+    messageElement.style.opacity = '0';
+    messageElement.style.visibility = 'hidden';
+    messageElement.textContent = '';
+    messageElement.className = 'mascot-alert';
     
-    const formData = new FormData(e.target);
-    const budgetData = {
-      name: formData.get('name')?.trim(),
-      category: formData.get('category'),
-      amount: formData.get('amount'),
-      start_date: formData.get('start_date'),
-      end_date: formData.get('end_date'),
-      ai_recommended: formData.get('ai_recommendations') === 'on'
-    };
+    // Reset flag
+    this.isShowingMascotMessage = false;
+  }
 
-    // Validation
-    if (!budgetData.name || !budgetData.category || !budgetData.amount || !budgetData.start_date || !budgetData.end_date) {
-      this.showAlert('Por favor completa todos los campos obligatorios', 'error');
-      return;
-    }
-
-    if (parseFloat(budgetData.amount) <= 0) {
-      this.showAlert('El monto del presupuesto debe ser mayor a 0', 'error');
-      return;
-    }
-
-    const startDate = new Date(budgetData.start_date);
-    const endDate = new Date(budgetData.end_date);
+  getContextualMascotMessages() {
+    // Get current balance if available
+    const balanceElement = document.getElementById('balance-amount-new');
+    const balanceText = balanceElement ? balanceElement.textContent : '';
     
-    if (endDate <= startDate) {
-      this.showAlert('La fecha de fin debe ser posterior a la fecha de inicio', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.budget) {
-        const success = await window.app.budget.addBudget(budgetData);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-budget-modal');
-          }
-          
-          this.showAlert('Presupuesto creado exitosamente', 'success');
-          this.updateBudgetsList();
-        } else {
-          this.showAlert('Error al crear el presupuesto', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding budget:', error);
-      this.showAlert('Error al crear el presupuesto', 'error');
-    }
-  }
-
-  async handleAddCategory(e) {
-    e.preventDefault();
+    // Parse balance (remove currency symbols and convert to number)
+    const balanceValue = parseFloat(balanceText.replace(/[^0-9.-]/g, '')) || 0;
     
-    const formData = new FormData(e.target);
-    const categoryData = {
-      name: formData.get('name')?.trim(),
-      icon: formData.get('icon')?.trim(),
-      color: formData.get('color')
-    };
+    const messages = [
+      { text: '¡Hola! Soy tu asistente financiero personal', type: 'info' },
+      { text: '¿Sabías que ahorrar el 20% de tus ingresos es ideal?', type: 'info' },
+      { text: 'Revisa tus gastos regularmente para mantener el control', type: 'info' },
+      { text: '¡Cada peso ahorrado es un paso hacia tus metas!', type: 'success' },
+      { text: 'Planifica tus compras para evitar gastos impulsivos', type: 'info' }
+    ];
 
-    if (!categoryData.name || !categoryData.icon || !categoryData.color) {
-      this.showAlert('Por favor completa todos los campos', 'error');
-      return;
+    // Add contextual messages based on balance
+    if (balanceValue < 0) {
+      messages.push(
+        { text: '¡Cuidado! Estás gastando más de lo que ingresas', type: 'warning' },
+        { text: 'Considera revisar tus gastos no esenciales', type: 'warning' }
+      );
+    } else if (balanceValue > 1000) {
+      messages.push(
+        { text: '¡Excelente! Tienes un buen balance este mes', type: 'success' },
+        { text: '¡Buen trabajo! Considera invertir tus ahorros', type: 'success' }
+      );
     }
 
-    // Validate icon (should be emoji or single character)
-    if (categoryData.icon.length > 2) {
-      this.showAlert('El icono debe ser un emoji o carácter único', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.addCategory(categoryData);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-category-modal');
-          }
-          
-          this.showAlert('Categoría creada exitosamente', 'success');
-          this.updateCategoriesList();
-          this.updateCategorySelects();
-        } else {
-          this.showAlert('Error al crear la categoría', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding category:', error);
-      this.showAlert('Error al crear la categoría', 'error');
-    }
+    return messages;
   }
 
-  async handleAddSpendingLimit(e) {
-    e.preventDefault();
+  updateBalance(balance) {
+    const balanceAmount = document.getElementById('balance-amount-new');
+    const monthlyExpenses = document.getElementById('monthly-expenses-summary');
+    const incomeAmount = document.getElementById('income-summary');
+    const installmentsCount = document.getElementById('installments-count');
     
-    const formData = new FormData(e.target);
-    const limitData = {
-      category: formData.get('category'),
-      amount: formData.get('amount'),
-      warningPercentage: formData.get('warning_percentage') || 80
-    };
-
-    if (!limitData.category || !limitData.amount) {
-      this.showAlert('Por favor completa todos los campos obligatorios', 'error');
-      return;
-    }
-
-    if (parseFloat(limitData.amount) <= 0) {
-      this.showAlert('El límite debe ser mayor a 0', 'error');
-      return;
-    }
-
-    const warningPercentage = parseInt(limitData.warningPercentage);
-    if (warningPercentage < 1 || warningPercentage > 100) {
-      this.showAlert('El porcentaje de alerta debe estar entre 1 y 100', 'error');
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.addSpendingLimit(limitData);
-        
-        if (success) {
-          if (window.app.modals) {
-            window.app.modals.hide('add-limit-modal');
-          }
-          
-          this.showAlert('Límite de gasto creado exitosamente', 'success');
-          this.updateSpendingLimitsList();
-        } else {
-          this.showAlert('Error al crear el límite de gasto', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error adding spending limit:', error);
-      this.showAlert('Error al crear el límite de gasto', 'error');
-    }
-  }
-
-  // Modal Helpers
-
-  showAddExpenseModal() {
-    this.updateCategorySelects();
-    if (window.app && window.app.modals) {
-      window.app.modals.show('add-expense-modal');
-    }
-  }
-
-  showAddBudgetModal() {
-    this.updateCategorySelects();
-    if (window.app && window.app.modals) {
-      window.app.modals.show('add-budget-modal');
-    }
-  }
-
-  showAddSpendingLimitModal() {
-    this.updateCategorySelects();
-    if (window.app && window.app.modals) {
-      window.app.modals.show('add-limit-modal');
-    }
-  }
-
-  showAddMoneyToGoalModal(goalId, goalName, currentAmount, targetAmount) {
-    const modal = document.getElementById('add-money-goal-modal');
-    const goalInfoName = document.getElementById('goal-info-name');
-    const goalInfoProgress = document.getElementById('goal-info-progress');
+    console.log('🔄 Updating balance UI with:', balance);
     
-    if (modal && goalInfoName && goalInfoProgress) {
-      modal.dataset.goalId = goalId;
-      goalInfoName.textContent = goalName;
+    if (balanceAmount) {
+      balanceAmount.textContent = this.formatCurrency(balance.available);
+      console.log('💰 Balance amount updated:', balance.available);
       
-      const percentage = ((currentAmount / targetAmount) * 100).toFixed(1);
-      goalInfoProgress.textContent = `${this.formatCurrency(currentAmount)} de ${this.formatCurrency(targetAmount)} (${percentage}%)`;
-      
-      if (window.app && window.app.modals) {
-        window.app.modals.show('add-money-goal-modal');
+      // Change color based on balance
+      if (balance.available < 0) {
+        balanceAmount.style.color = '#ef4444';
+      } else if (balance.available < 1000) {
+        balanceAmount.style.color = '#f59e0b';
+      } else {
+        balanceAmount.style.color = '#C8B6FF';
       }
     }
+    
+    if (monthlyExpenses) {
+      monthlyExpenses.textContent = this.formatCurrency(balance.totalExpenses);
+      console.log('💳 Monthly expenses updated:', balance.totalExpenses);
+    }
+    
+    if (incomeAmount) {
+      incomeAmount.textContent = this.formatCurrency(balance.totalIncome);
+      console.log('💵 Income amount updated:', balance.totalIncome);
+    }
+    
+    if (installmentsCount) {
+      installmentsCount.textContent = balance.installments;
+      console.log('📊 Installments count updated:', balance.installments);
+    }
   }
 
-  // UI Update Methods
-
-  updateBalance() {
-    if (!window.app || !window.app.data) return;
-
-    const balance = window.app.data.calculateBalance(this.currentMonth);
+  updateExpensesList(expenses, app) {
+    const container = document.getElementById('expenses-list');
+    if (!container) return;
     
-    const totalIncomeEl = document.getElementById('total-income');
-    const totalExpensesEl = document.getElementById('total-expenses');
-    const availableBalanceEl = document.getElementById('available-balance');
-    const activeInstallmentsEl = document.getElementById('active-installments');
-
-    if (totalIncomeEl) {
-      totalIncomeEl.textContent = this.formatCurrency(balance.totalIncome);
-    }
-    
-    if (totalExpensesEl) {
-      totalExpensesEl.textContent = this.formatCurrency(balance.totalExpenses);
-    }
-    
-    if (availableBalanceEl) {
-      availableBalanceEl.textContent = this.formatCurrency(balance.available);
-      availableBalanceEl.className = `balance-amount ${balance.available >= 0 ? 'positive' : 'negative'}`;
-    }
-    
-    if (activeInstallmentsEl) {
-      activeInstallmentsEl.textContent = balance.installments;
-    }
-
-    // Update spending limit alerts
-    this.updateSpendingAlerts();
-  }
-
-  updateExpensesList() {
-    if (!window.app || !window.app.data) return;
-
-    const expenses = window.app.data.getExpenses(this.currentMonth);
-    const expensesList = document.getElementById('expenses-list');
-    const recentTransactions = document.getElementById('recent-transactions');
-
-    if (!expensesList) return;
+    container.innerHTML = '';
 
     if (expenses.length === 0) {
-      expensesList.innerHTML = `
+      container.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">💳</div>
           <h3>No hay gastos registrados</h3>
-          <p>Comienza agregando tus primeros gastos para llevar un control de tus finanzas</p>
-          <button class="btn btn-primary" onclick="window.app.ui.showAddExpenseModal()">
-            <span class="btn-icon">➕</span>
-            Agregar Primer Gasto
+          <p>Comienza agregando tu primer gasto del mes</p>
+          <button class="btn btn-primary" onclick="window.app.showAddExpenseModal()">
+            <span>➕</span>
+            Agregar Gasto
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    expenses.forEach(expense => {
+      const item = document.createElement('div');
+      item.className = 'expense-item fade-in';
+      
+      const category = this.getCategoryInfo(expense.category);
+      
+      const transactionDate = expense.transaction_date 
+        ? new Date(expense.transaction_date).toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short' 
+          })
+        : 'Sin fecha';
+      
+      item.innerHTML = `
+        <div class="expense-icon">${category.icon}</div>
+        <div class="expense-details">
+          <div class="expense-description">${expense.description}</div>
+          <div class="expense-category">${category.name} • ${transactionDate}</div>
+          ${expense.total_installments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.total_installments}</div>` : ''}
+        </div>
+        <div class="expense-amount">${this.formatCurrency(expense.amount)}</div>
+        <div class="expense-actions">
+          <button class="expense-action-btn edit-btn" onclick="window.app.showEditExpenseModal('${expense.id}')" title="Editar">
+            ✏️
+          </button>
+          <button class="expense-action-btn delete-btn" onclick="window.app.showDeleteConfirmation('${expense.id}', '${expense.description}')" title="Eliminar">
+            🗑️
           </button>
         </div>
       `;
       
-      if (recentTransactions) {
-        recentTransactions.innerHTML = '<p class="no-data">No hay transacciones recientes</p>';
-      }
-      return;
-    }
-
-    // Sort expenses by date (newest first)
-    const sortedExpenses = [...expenses].sort((a, b) => 
-      new Date(b.transaction_date) - new Date(a.transaction_date)
-    );
-
-    // Update main expenses list
-    expensesList.innerHTML = sortedExpenses.map(expense => `
-      <div class="transaction-item expense">
-        <div class="transaction-icon">💳</div>
-        <div class="transaction-details">
-          <div class="transaction-description">${this.escapeHtml(expense.description)}</div>
-          <div class="transaction-meta">
-            <span class="transaction-category">${this.escapeHtml(expense.category)}</span>
-            <span class="transaction-date">${this.formatDate(expense.transaction_date)}</span>
-            ${expense.total_installments > 1 ? 
-              `<span class="transaction-installment">${expense.installment}/${expense.total_installments}</span>` : 
-              ''
-            }
-          </div>
-        </div>
-        <div class="transaction-amount expense-amount">
-          -${this.formatCurrency(expense.amount)}
-        </div>
-        <div class="transaction-actions">
-          <button class="action-btn delete" onclick="window.app.ui.deleteExpense('${expense.id}')" title="Eliminar">
-            🗑️
-          </button>
-        </div>
-      </div>
-    `).join('');
-
-    // Update recent transactions (show last 5)
-    if (recentTransactions) {
-      const recentExpenses = sortedExpenses.slice(0, 5);
-      recentTransactions.innerHTML = recentExpenses.map(expense => `
-        <div class="activity-item">
-          <div class="activity-icon">💳</div>
-          <div class="activity-details">
-            <div class="activity-description">${this.escapeHtml(expense.description)}</div>
-            <div class="activity-meta">${this.escapeHtml(expense.category)} • ${this.formatDate(expense.transaction_date)}</div>
-          </div>
-          <div class="activity-amount expense">-${this.formatCurrency(expense.amount)}</div>
-        </div>
-      `).join('');
-    }
+      item.style.borderLeftColor = category.color;
+      container.appendChild(item);
+    });
   }
 
-  updateIncomeDisplay() {
-    if (!window.app || !window.app.data) return;
-
-    const income = window.app.data.getIncome(this.currentMonth);
-    const extraIncomes = window.app.data.getExtraIncomes(this.currentMonth);
+  updateGoalsList(goals) {
+    const container = document.getElementById('goals-list');
+    if (!container) return;
     
-    const fixedIncomeEl = document.getElementById('fixed-income-amount');
-    const extraIncomeEl = document.getElementById('extra-income-amount');
-
-    if (fixedIncomeEl) {
-      fixedIncomeEl.textContent = this.formatCurrency(income.fixed);
-    }
-
-    if (extraIncomeEl) {
-      const totalExtra = extraIncomes.reduce((sum, extra) => sum + parseFloat(extra.amount), 0);
-      extraIncomeEl.textContent = this.formatCurrency(totalExtra);
-    }
-  }
-
-  updateExtraIncomesList() {
-    if (!window.app || !window.app.data) return;
-
-    const extraIncomes = window.app.data.getExtraIncomes(this.currentMonth);
-    const extraIncomesList = document.getElementById('extra-incomes-list');
-
-    if (!extraIncomesList) return;
-
-    if (extraIncomes.length === 0) {
-      extraIncomesList.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">💵</div>
-          <h3>No hay ingresos extra registrados</h3>
-          <p>Agrega ingresos adicionales como freelance, ventas, etc.</p>
-        </div>
-      `;
-      return;
-    }
-
-    extraIncomesList.innerHTML = extraIncomes.map(income => `
-      <div class="transaction-item income">
-        <div class="transaction-icon">💵</div>
-        <div class="transaction-details">
-          <div class="transaction-description">${this.escapeHtml(income.description)}</div>
-          <div class="transaction-meta">
-            <span class="transaction-category">${this.escapeHtml(income.category)}</span>
-            <span class="transaction-date">${this.formatDate(income.created_at)}</span>
-          </div>
-        </div>
-        <div class="transaction-amount income-amount">
-          +${this.formatCurrency(income.amount)}
-        </div>
-      </div>
-    `).join('');
-  }
-
-  updateGoalsList() {
-    if (!window.app || !window.app.data) return;
-
-    const goals = window.app.data.getGoals();
-    const goalsList = document.getElementById('goals-list');
-
-    if (!goalsList) return;
+    container.innerHTML = '';
 
     if (goals.length === 0) {
-      goalsList.innerHTML = `
+      container.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">🎯</div>
           <h3>No tienes objetivos de ahorro</h3>
-          <p>Define tus metas financieras y trabaja para alcanzarlas</p>
-          <button class="btn btn-primary" onclick="window.app.modals.show('add-goal-modal')">
-            <span class="btn-icon">🎯</span>
-            Crear Primer Objetivo
+          <p>Establece metas para motivarte a ahorrar</p>
+          <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
+            <span>➕</span>
+            Crear Objetivo
           </button>
         </div>
       `;
       return;
     }
 
-    goalsList.innerHTML = goals.map(goal => {
-      const currentAmount = parseFloat(goal.current_amount) || 0;
-      const targetAmount = parseFloat(goal.target_amount) || 1;
-      const percentage = Math.min((currentAmount / targetAmount) * 100, 100);
-      const isCompleted = percentage >= 100;
-
-      return `
-        <div class="goal-card ${isCompleted ? 'completed' : ''}">
-          <div class="goal-header">
-            <h4 class="goal-name">${this.escapeHtml(goal.name)}</h4>
-            <div class="goal-percentage">${percentage.toFixed(1)}%</div>
-          </div>
-          
-          <div class="goal-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${percentage}%"></div>
-            </div>
-            <div class="progress-text">
-              ${this.formatCurrency(currentAmount)} de ${this.formatCurrency(targetAmount)}
-            </div>
-          </div>
-          
-          <div class="goal-actions">
-            ${!isCompleted ? `
-              <button class="btn btn-primary btn-sm" onclick="window.app.ui.showAddMoneyToGoalModal('${goal.id}', '${this.escapeHtml(goal.name)}', ${currentAmount}, ${targetAmount})">
-                <span class="btn-icon">💰</span>
-                Agregar Dinero
-              </button>
-            ` : `
-              <div class="goal-completed">
-                <span class="completion-icon">🎉</span>
-                ¡Objetivo Completado!
-              </div>
-            `}
-            <button class="btn btn-danger btn-sm" onclick="window.app.ui.deleteGoal('${goal.id}')" title="Eliminar objetivo">
-              🗑️
-            </button>
-          </div>
+    goals.forEach(goal => {
+      const progress = (goal.current_amount / goal.target_amount) * 100;
+      const item = document.createElement('div');
+      item.className = 'goal-item fade-in';
+      
+      item.innerHTML = `
+        <div class="goal-header">
+          <div class="goal-name">${goal.name}</div>
+          <div class="goal-amount">${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}</div>
         </div>
-      `;
-    }).join('');
-  }
-
-  updateBudgetsList() {
-    if (!window.app || !window.app.budget || !window.app.data) return;
-
-    const budgets = window.app.budget.getBudgets();
-    const expenses = window.app.data.getExpenses(this.currentMonth);
-    const budgetsList = document.getElementById('budgets-list');
-
-    if (!budgetsList) return;
-
-    if (budgets.length === 0) {
-      budgetsList.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">💰</div>
-          <h3>No tienes presupuestos configurados</h3>
-          <p>Crea presupuestos para controlar mejor tus gastos por categoría</p>
-          <button class="btn btn-primary" onclick="window.app.ui.showAddBudgetModal()">
-            <span class="btn-icon">➕</span>
-            Crear Primer Presupuesto
+        <div class="goal-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+          </div>
+          <div class="progress-text">${progress.toFixed(1)}%</div>
+        </div>
+        <div class="goal-actions">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
+            💰 Agregar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
+            🗑️ Eliminar
           </button>
         </div>
       `;
-      return;
-    }
-
-    const budgetsWithProgress = window.app.budget.getBudgetsWithProgress(expenses);
-
-    budgetsList.innerHTML = budgetsWithProgress.map(budget => {
-      const progress = budget.progress;
-      const statusClass = progress.status;
-      const statusIcon = {
-        'safe': '✅',
-        'caution': '⚠️',
-        'warning': '🚨',
-        'exceeded': '🔴'
-      }[progress.status] || '📊';
-
-      return `
-        <div class="budget-card ${statusClass}">
-          <div class="budget-header">
-            <div class="budget-info">
-              <h4 class="budget-name">${this.escapeHtml(budget.name)}</h4>
-              <div class="budget-category">${this.escapeHtml(budget.category)}</div>
-            </div>
-            <div class="budget-status">
-              <span class="status-icon">${statusIcon}</span>
-            </div>
-          </div>
-          
-          <div class="budget-progress">
-            <div class="progress-bar">
-              <div class="progress-fill ${statusClass}" style="width: ${Math.min(progress.percentage, 100)}%"></div>
-            </div>
-            <div class="progress-text">
-              ${this.formatCurrency(progress.spent)} de ${this.formatCurrency(budget.amount)}
-              (${progress.percentage.toFixed(1)}%)
-            </div>
-          </div>
-          
-          <div class="budget-details">
-            <div class="budget-period">
-              ${this.formatDate(budget.start_date)} - ${this.formatDate(budget.end_date)}
-            </div>
-            <div class="budget-remaining ${progress.remaining >= 0 ? 'positive' : 'negative'}">
-              Restante: ${this.formatCurrency(progress.remaining)}
-            </div>
-          </div>
-          
-          <div class="budget-actions">
-            <button class="btn btn-danger btn-sm" onclick="window.app.ui.deleteBudget('${budget.id}')" title="Eliminar presupuesto">
-              🗑️
-            </button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Update budget summary
-    this.updateBudgetSummary(budgetsWithProgress);
+      
+      container.appendChild(item);
+    });
   }
 
-  updateBudgetSummary(budgetsWithProgress) {
-    const activeBudgetsCount = document.getElementById('active-budgets-count');
-    const totalBudgeted = document.getElementById('total-budgeted');
-    const totalSpent = document.getElementById('total-spent');
-
-    if (activeBudgetsCount) {
-      activeBudgetsCount.textContent = budgetsWithProgress.length;
+  // FIXED: Spending limits with REAL functional semaphore
+  updateSpendingLimitsList(limits, expenses) {
+    const summaryContainer = document.getElementById('spending-limits-summary');
+    const categoryLimitsContainer = document.getElementById('category-limits-display');
+    const totalLimitsCount = document.getElementById('total-limits-count');
+    
+    console.log('🚦 Updating spending limits UI:', { limits: limits.length, expenses: expenses.length });
+    
+    // Update total count
+    if (totalLimitsCount) {
+      totalLimitsCount.textContent = limits.length;
     }
-
-    if (totalBudgeted) {
-      const total = budgetsWithProgress.reduce((sum, budget) => sum + parseFloat(budget.amount), 0);
-      totalBudgeted.textContent = this.formatCurrency(total);
+    
+    // Update category limits display (new main view)
+    if (categoryLimitsContainer) {
+      this.updateCategoryLimitsDisplay(limits, expenses);
     }
-
-    if (totalSpent) {
-      const total = budgetsWithProgress.reduce((sum, budget) => sum + budget.progress.spent, 0);
-      totalSpent.textContent = this.formatCurrency(total);
+    
+    // Keep existing summary container for dashboard
+    if (summaryContainer) {
+      summaryContainer.innerHTML = '';
     }
-  }
-
-  updateCategoriesList() {
-    if (!window.app || !window.app.data) return;
-
-    const categories = window.app.data.getCategories();
-    const categoriesList = document.getElementById('categories-list');
-
-    if (!categoriesList) return;
-
-    if (categories.length === 0) {
-      categoriesList.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🏷️</div>
-          <h3>No hay categorías personalizadas</h3>
-          <p>Las categorías por defecto están disponibles. Puedes crear categorías adicionales.</p>
-        </div>
-      `;
-      return;
-    }
-
-    categoriesList.innerHTML = categories.map(category => `
-      <div class="category-card" style="border-left: 4px solid ${category.color}">
-        <div class="category-icon" style="background-color: ${category.color}20">
-          ${category.icon}
-        </div>
-        <div class="category-info">
-          <h4 class="category-name">${this.escapeHtml(category.name)}</h4>
-          <div class="category-color" style="background-color: ${category.color}"></div>
-        </div>
-        <div class="category-actions">
-          <button class="btn btn-danger btn-sm" onclick="window.app.ui.deleteCategory('${category.id}')" title="Eliminar categoría">
-            🗑️
-          </button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  updateSpendingLimitsList() {
-    if (!window.app || !window.app.data) return;
-
-    const limits = window.app.data.getSpendingLimits();
-    const limitsList = document.getElementById('limits-list');
-
-    if (!limitsList) return;
 
     if (limits.length === 0) {
-      limitsList.innerHTML = `
+      if (summaryContainer) {
+        summaryContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <h3>No tienes límites de gasto configurados</h3>
+            <p>Establece límites para controlar mejor tus gastos</p>
+            <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+              <span>➕</span>
+              Agregar Límite
+            </button>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    limits.forEach(limit => {
+      const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
+      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      const percentage = (currentSpent / limit.amount) * 100;
+      
+      let statusClass = 'safe';
+      let semaphoreHtml = '';
+      
+      if (percentage >= 100) {
+        statusClass = 'danger';
+        semaphoreHtml = `
+          <div class="functional-semaphore">
+            <div class="semaphore-light red active"></div>
+            <div class="semaphore-light yellow"></div>
+            <div class="semaphore-light green"></div>
+          </div>
+        `;
+      } else if (percentage >= limit.warning_percentage) {
+        statusClass = 'warning';
+        semaphoreHtml = `
+          <div class="functional-semaphore">
+            <div class="semaphore-light red"></div>
+            <div class="semaphore-light yellow active"></div>
+            <div class="semaphore-light green"></div>
+          </div>
+        `;
+      } else {
+        statusClass = 'safe';
+        semaphoreHtml = `
+          <div class="functional-semaphore">
+            <div class="semaphore-light red"></div>
+            <div class="semaphore-light yellow"></div>
+            <div class="semaphore-light green active"></div>
+          </div>
+        `;
+      }
+      
+      console.log('🚦 Creating limit item:', { category: limit.category, percentage, statusClass });
+      
+      // Add to summary card with FUNCTIONAL SEMAPHORE and actions
+      if (summaryContainer) {
+        const summaryItem = document.createElement('div');
+        summaryItem.className = `spending-limit-summary-item ${statusClass}`;
+        
+        summaryItem.innerHTML = `
+          ${semaphoreHtml}
+          <div class="limit-category-info">
+            <span class="limit-category-name">${limit.category}</span>
+          </div>
+          <div class="limit-progress-info">
+            <div class="limit-amount-info">${this.formatCurrency(currentSpent)} / ${this.formatCurrency(limit.amount)}</div>
+            <div class="limit-percentage">${percentage.toFixed(1)}%</div>
+          </div>
+          <div class="limit-actions">
+            <button class="expense-action-btn edit-btn" onclick="window.app.editSpendingLimit('${limit.id}')" title="Editar límite">
+              ✏️
+            </button>
+            <button class="expense-action-btn delete-btn" onclick="window.app.deleteSpendingLimit('${limit.id}')" title="Eliminar límite">
+              🗑️
+            </button>
+          </div>
+        `;
+        
+        summaryContainer.appendChild(summaryItem);
+      }
+    });
+    
+    console.log('✅ Spending limits UI updated successfully');
+  }
+
+  // NEW: Update category limits display for expenses section
+  updateCategoryLimitsDisplay(limits, expenses) {
+    const container = document.getElementById('category-limits-display');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (limits.length === 0) {
+      container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">🚦</div>
+          <div class="empty-icon">💰</div>
           <h3>No hay límites de gasto configurados</h3>
-          <p>Establece límites para controlar tus gastos por categoría</p>
-          <button class="btn btn-primary" onclick="window.app.ui.showAddSpendingLimitModal()">
-            <span class="btn-icon">🚦</span>
-            Crear Primer Límite
+          <p>Establece límites presupuestarios para controlar mejor tus gastos por categoría</p>
+          <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
+            <span>➕</span>
+            Configurar Primer Límite
           </button>
         </div>
       `;
       return;
     }
-
-    // Get current spending for each category
-    const expenses = window.app.data.getExpenses(this.currentMonth);
     
-    limitsList.innerHTML = limits.map(limit => {
+    // Get all categories to show both with and without limits
+    const categories = window.app?.data?.getCategories() || [];
+    const categoriesWithLimits = new Set(limits.map(limit => limit.category));
+    
+    // Show categories with limits first
+    limits.forEach(limit => {
       const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
       const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-      const percentage = (currentSpent / parseFloat(limit.amount)) * 100;
-      const warningPercentage = limit.warning_percentage || 80;
+      const percentage = (currentSpent / limit.amount) * 100;
+      const remaining = limit.amount - currentSpent;
       
       let statusClass = 'safe';
-      let statusIcon = '✅';
+      let statusIcon = '🟢';
+      let statusText = 'Dentro del límite';
       
       if (percentage >= 100) {
-        statusClass = 'exceeded';
+        statusClass = 'danger';
         statusIcon = '🔴';
-      } else if (percentage >= warningPercentage) {
+        statusText = 'Límite superado';
+      } else if (percentage >= limit.warning_percentage) {
         statusClass = 'warning';
-        statusIcon = '🚨';
-      } else if (percentage >= 60) {
-        statusClass = 'caution';
-        statusIcon = '⚠️';
+        statusIcon = '🟡';
+        statusText = 'Cerca del límite';
       }
-
-      return `
-        <div class="limit-card ${statusClass}">
-          <div class="limit-header">
-            <div class="limit-info">
-              <h4 class="limit-category">${this.escapeHtml(limit.category)}</h4>
-              <div class="limit-amount">Límite: ${this.formatCurrency(limit.amount)}</div>
+      
+      const categoryInfo = this.getCategoryInfo(limit.category);
+      
+      const limitItem = document.createElement('div');
+      limitItem.className = `category-limit-item ${statusClass}`;
+      
+      limitItem.innerHTML = `
+        <div class="category-limit-header">
+          <div class="category-info-display">
+            <div class="category-icon-large">${categoryInfo.icon}</div>
+            <div class="category-details">
+              <h4 class="category-name">${limit.category}</h4>
+              <div class="category-status">
+                ${statusIcon} ${statusText}
+              </div>
             </div>
-            <div class="limit-status">
-              <span class="status-icon">${statusIcon}</span>
+          </div>
+          <div class="limit-actions">
+            <button class="expense-action-btn edit-btn" onclick="window.app.editSpendingLimit('${limit.id}')" title="Editar límite">
+              ✏️
+            </button>
+            <button class="expense-action-btn delete-btn" onclick="window.app.deleteSpendingLimit('${limit.id}')" title="Eliminar límite">
+              🗑️
+            </button>
+          </div>
+        </div>
+        
+        <div class="limit-details">
+          <div class="limit-amounts">
+            <div class="limit-amount-row">
+              <span class="limit-label">Límite Mensual:</span>
+              <span class="limit-value primary">${this.formatCurrency(limit.amount)}</span>
+            </div>
+            <div class="limit-amount-row">
+              <span class="limit-label">Gastado:</span>
+              <span class="limit-value ${statusClass}">${this.formatCurrency(currentSpent)}</span>
+            </div>
+            <div class="limit-amount-row">
+              <span class="limit-label">Disponible:</span>
+              <span class="limit-value ${remaining >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(remaining)}</span>
             </div>
           </div>
           
           <div class="limit-progress">
-            <div class="progress-bar">
-              <div class="progress-fill ${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+            <div class="progress-bar-limit">
+              <div class="progress-fill-limit ${statusClass}" style="width: ${Math.min(percentage, 100)}%"></div>
             </div>
-            <div class="progress-text">
-              ${this.formatCurrency(currentSpent)} gastado (${percentage.toFixed(1)}%)
-            </div>
+            <div class="progress-text-limit">${percentage.toFixed(1)}% utilizado</div>
           </div>
           
-          <div class="limit-details">
-            <div class="limit-remaining ${currentSpent <= parseFloat(limit.amount) ? 'positive' : 'negative'}">
-              Restante: ${this.formatCurrency(parseFloat(limit.amount) - currentSpent)}
+          <div class="limit-config">
+            <div class="config-item">
+              <span class="config-label">Período:</span>
+              <span class="config-value">Mensual</span>
             </div>
-            <div class="limit-warning">
-              Alerta al ${warningPercentage}%
+            <div class="config-item">
+              <span class="config-label">Alerta al:</span>
+              <span class="config-value">${limit.warning_percentage}%</span>
             </div>
-          </div>
-          
-          <div class="limit-actions">
-            <button class="btn btn-danger btn-sm" onclick="window.app.ui.deleteSpendingLimit('${limit.id}')" title="Eliminar límite">
-              🗑️
-            </button>
           </div>
         </div>
       `;
-    }).join('');
+      
+      container.appendChild(limitItem);
+    });
+    
+    // Show categories without limits
+    const categoriesWithoutLimits = categories.filter(cat => !categoriesWithLimits.has(cat.name));
+    
+    if (categoriesWithoutLimits.length > 0) {
+      const noLimitsSection = document.createElement('div');
+      noLimitsSection.className = 'no-limits-section';
+      
+      noLimitsSection.innerHTML = `
+        <div class="section-divider">
+          <h4>📋 Categorías sin límites configurados</h4>
+        </div>
+      `;
+      
+      categoriesWithoutLimits.forEach(category => {
+        const noLimitItem = document.createElement('div');
+        noLimitItem.className = 'category-no-limit-item';
+        
+        noLimitItem.innerHTML = `
+          <div class="category-info-display">
+            <div class="category-icon-large">${category.icon}</div>
+            <div class="category-details">
+              <h4 class="category-name">${category.name}</h4>
+              <div class="category-status no-limit">
+                ⚪ Sin límite establecido
+              </div>
+            </div>
+          </div>
+          <div class="no-limit-actions">
+            <button class="btn btn-secondary btn-sm" onclick="window.app.showAddSpendingLimitModal('${category.name}')">
+              <span>➕</span>
+              Configurar Límite
+            </button>
+          </div>
+        `;
+        
+        noLimitsSection.appendChild(noLimitItem);
+      });
+      
+      container.appendChild(noLimitsSection);
+    }
   }
 
-  updateCategorySelects() {
-    if (!window.app || !window.app.data) return;
-
-    const categories = window.app.data.getCategories();
-    const selects = [
-      'expense-category',
-      'budget-category',
-      'limit-category'
-    ];
-
-    selects.forEach(selectId => {
-      const select = document.getElementById(selectId);
-      if (select) {
-        // Clear existing options
-        select.innerHTML = '';
-        
-        // Add categories
-        categories.forEach(category => {
-          const option = document.createElement('option');
-          option.value = category.name;
-          option.textContent = `${category.icon} ${category.name}`;
-          select.appendChild(option);
-        });
-      }
+  updateCategoriesSelect(categories, selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecciona una categoría</option>';
+    
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.name;
+      option.textContent = `${category.icon} ${category.name}`;
+      select.appendChild(option);
     });
   }
 
-  updateSpendingAlerts() {
-    if (!window.app || !window.app.data) return;
-
-    const alerts = window.app.data.checkSpendingLimits(this.currentMonth);
-    const alertsContainer = document.getElementById('dashboard-alerts');
-
-    if (!alertsContainer) return;
-
-    if (alerts.length === 0) {
-      alertsContainer.innerHTML = '';
-      return;
-    }
-
-    alertsContainer.innerHTML = alerts.map(alert => `
-      <div class="alert alert-${alert.type}">
-        <div class="alert-icon">
-          ${alert.type === 'danger' ? '🚨' : '⚠️'}
-        </div>
-        <div class="alert-content">
-          <div class="alert-message">${alert.message}</div>
-          <div class="alert-details">${alert.percentage}% del límite utilizado</div>
-        </div>
-        <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
-      </div>
-    `).join('');
-  }
-
-  // Delete Methods
-
-  async deleteExpense(expenseId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este gasto?')) {
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.deleteExpense(expenseId);
-        
-        if (success) {
-          this.showAlert('Gasto eliminado exitosamente', 'success');
-          this.updateBalance();
-          this.updateExpensesList();
-        } else {
-          this.showAlert('Error al eliminar el gasto', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-      this.showAlert('Error al eliminar el gasto', 'error');
-    }
-  }
-
-  async deleteGoal(goalId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este objetivo?')) {
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.deleteGoal(goalId);
-        
-        if (success) {
-          this.showAlert('Objetivo eliminado exitosamente', 'success');
-          this.updateGoalsList();
-        } else {
-          this.showAlert('Error al eliminar el objetivo', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting goal:', error);
-      this.showAlert('Error al eliminar el objetivo', 'error');
-    }
-  }
-
-  async deleteBudget(budgetId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este presupuesto?')) {
-      return;
-    }
-
-    try {
-      if (window.app && window.app.budget) {
-        const success = await window.app.budget.deleteBudget(budgetId);
-        
-        if (success) {
-          this.showAlert('Presupuesto eliminado exitosamente', 'success');
-          this.updateBudgetsList();
-        } else {
-          this.showAlert('Error al eliminar el presupuesto', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting budget:', error);
-      this.showAlert('Error al eliminar el presupuesto', 'error');
-    }
-  }
-
-  async deleteCategory(categoryId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.deleteCategory(categoryId);
-        
-        if (success) {
-          this.showAlert('Categoría eliminada exitosamente', 'success');
-          this.updateCategoriesList();
-          this.updateCategorySelects();
-        } else {
-          this.showAlert('Error al eliminar la categoría', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      this.showAlert('Error al eliminar la categoría', 'error');
-    }
-  }
-
-  async deleteSpendingLimit(limitId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este límite?')) {
-      return;
-    }
-
-    try {
-      if (window.app && window.app.data) {
-        const success = await window.app.data.deleteSpendingLimit(limitId);
-        
-        if (success) {
-          this.showAlert('Límite eliminado exitosamente', 'success');
-          this.updateSpendingLimitsList();
-        } else {
-          this.showAlert('Error al eliminar el límite', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting spending limit:', error);
-      this.showAlert('Error al eliminar el límite', 'error');
-    }
-  }
-
-  // Utility Methods
-
   showAlert(message, type = 'info') {
-    if (!message || typeof message !== 'string') {
-      console.warn('Invalid alert message:', message);
-      return;
-    }
-
-    if (!['info', 'success', 'warning', 'error'].includes(type)) {
-      console.warn('Invalid alert type:', type);
-      type = 'info';
-    }
-
-    const alertContainer = document.getElementById('alert-container');
-    if (!alertContainer) {
-      console.warn('Alert container not found');
-      return;
-    }
-
-    // Clear existing timeout
-    if (this.alertTimeout) {
-      clearTimeout(this.alertTimeout);
-    }
-
-    const alertId = 'alert-' + Date.now();
-    const alertElement = document.createElement('div');
-    alertElement.id = alertId;
-    alertElement.className = `alert alert-${type}`;
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.textContent = message;
     
-    const alertIcon = {
-      'info': 'ℹ️',
-      'success': '✅',
-      'warning': '⚠️',
-      'error': '❌'
-    }[type] || 'ℹ️';
-
-    alertElement.innerHTML = `
-      <div class="alert-icon">${alertIcon}</div>
-      <div class="alert-message">${this.escapeHtml(message)}</div>
-      <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
-    `;
-
-    alertContainer.appendChild(alertElement);
-
-    // Auto-remove after 5 seconds
-    this.alertTimeout = setTimeout(() => {
-      const alert = document.getElementById(alertId);
-      if (alert) {
-        alert.remove();
-      }
+    this.alertContainer.appendChild(alert);
+    
+    setTimeout(() => alert.classList.add('show'), 100);
+    
+    setTimeout(() => {
+      alert.classList.remove('show');
+      setTimeout(() => {
+        if (alert.parentNode) {
+          alert.parentNode.removeChild(alert);
+        }
+      }, 300);
     }, 5000);
   }
 
-  formatCurrency(amount) {
-    if (typeof amount !== 'number') {
-      amount = parseFloat(amount) || 0;
-    }
+  showMascotAlert(message, type = 'info') {
+    // Mascot alerts are now disabled - pet only speaks on hover
+    console.log('Mascot alert suppressed (hover-only mode):', message);
+  }
 
+  formatCurrency(amount) {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
@@ -1206,45 +584,941 @@ export class UIManager {
     }).format(amount);
   }
 
-  formatDate(dateString) {
-    if (!dateString) return '';
+  getCategoryInfo(categoryName) {
+    if (window.app && window.app.data) {
+      const categories = window.app.data.getCategories();
+      const category = categories.find(cat => cat.name === categoryName);
+      if (category) {
+        return {
+          name: category.name,
+          icon: category.icon,
+          color: category.color
+        };
+      }
+    }
+    
+    const defaultCategories = {
+      'Comida': { icon: '🍔', color: '#ef4444' },
+      'Transporte': { icon: '🚗', color: '#3b82f6' },
+      'Salud': { icon: '💊', color: '#8b5cf6' },
+      'Ocio': { icon: '🎉', color: '#f59e0b' },
+      'Supermercado': { icon: '🛒', color: '#10b981' },
+      'Servicios': { icon: '📱', color: '#6b7280' },
+      'Otros': { icon: '📦', color: '#9ca3af' }
+    };
+    
+    return defaultCategories[categoryName] || { 
+      name: categoryName, 
+      icon: '📦', 
+      color: '#9ca3af' 
+    };
+  }
+
+  // FIXED: Income details with proper counting and display
+  updateIncomeDetails(income, extraIncomes = []) {
+    const allIncomesList = document.getElementById('all-incomes-list');
+    const incomesIndicator = document.getElementById('incomes-indicator');
+    const incomeSummary = document.getElementById('income-summary');
+    
+    console.log('💰 Updating income details:', { income, extraIncomes: extraIncomes.length });
+    
+    // Count total incomes
+    let totalIncomes = 0;
+    if (income.fixed > 0) totalIncomes++;
+    if (extraIncomes.length > 0) totalIncomes += extraIncomes.length;
+    
+    // Calculate total income amount
+    const extraIncomesTotal = extraIncomes.reduce((sum, extra) => sum + parseFloat(extra.amount), 0);
+    const totalIncome = income.fixed + income.extra + extraIncomesTotal;
+    
+    console.log('💰 Income calculation:', {
+      fixed: income.fixed,
+      extraFromTable: income.extra,
+      extraFromIncomes: extraIncomesTotal,
+      total: totalIncome,
+      count: totalIncomes
+    });
+    
+    // Update income summary in dashboard
+    if (incomeSummary) {
+      incomeSummary.textContent = this.formatCurrency(totalIncome);
+      console.log('💰 Income summary updated:', totalIncome);
+    }
+    
+    // Update indicator count
+    if (incomesIndicator) {
+      const countElement = incomesIndicator.querySelector('.indicator-count');
+      if (countElement) {
+        countElement.textContent = totalIncomes;
+      }
+      
+      // SIEMPRE mostrar el indicador, incluso con 0 ingresos
+      incomesIndicator.classList.remove('hidden');
+      incomesIndicator.classList.add('visible');
+      incomesIndicator.style.display = 'flex';
+      incomesIndicator.style.visibility = 'visible';
+      incomesIndicator.style.opacity = '1';
+      
+      console.log('💰 Income indicator updated:', totalIncomes);
+    }
+    
+    // Update modal content
+    if (allIncomesList) {
+      allIncomesList.innerHTML = '';
+      
+      if (totalIncomes === 0) {
+        allIncomesList.innerHTML = `
+          <div class="empty-state">
+            <p>No hay ingresos registrados este mes</p>
+          </div>
+        `;
+      } else {
+        // Add fixed income if exists
+        if (income.fixed > 0) {
+          const fixedItem = document.createElement('div');
+          fixedItem.className = 'income-list-item fixed';
+          
+          fixedItem.innerHTML = `
+            <div class="income-item-details">
+              <div class="income-item-type">💰 Ingreso Fijo</div>
+              <div class="income-item-description">Sueldo mensual</div>
+            </div>
+            <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
+          `;
+          
+          allIncomesList.appendChild(fixedItem);
+        }
+        
+        // Add extra incomes from extra_incomes table
+        extraIncomes.forEach(extraIncome => {
+          const item = document.createElement('div');
+          item.className = 'income-list-item extra';
+          
+          item.innerHTML = `
+            <div class="income-item-details">
+              <div class="income-item-type">💵 ${extraIncome.category}</div>
+              <div class="income-item-description">${extraIncome.description}</div>
+              <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
+            </div>
+            <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
+          `;
+          
+          allIncomesList.appendChild(item);
+        });
+      }
+    }
+    
+    console.log('✅ Income details updated successfully');
+  }
+
+  // NUEVO: Update installments list
+  updateInstallmentsList(expenses) {
+    const installmentsList = document.getElementById('installments-list');
+    
+    if (!installmentsList) return;
+    
+    console.log('📊 Updating installments list with expenses:', expenses.length);
+    
+    // Filter installments (expenses with total_installments > 1)
+    const installments = expenses.filter(expense => expense.total_installments > 1);
+    
+    console.log('📊 Found installments:', installments.length);
+    
+    installmentsList.innerHTML = '';
+    
+    if (installments.length === 0) {
+      installmentsList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <h3>No hay cuotas activas este mes</h3>
+          <p>Los gastos en cuotas aparecerán aquí</p>
+        </div>
+      `;
+      return;
+    }
+    
+    installments.forEach(installment => {
+      const item = document.createElement('div');
+      item.className = 'installment-item fade-in';
+      
+      const category = this.getCategoryInfo(installment.category);
+      const transactionDate = installment.transaction_date 
+        ? new Date(installment.transaction_date).toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short' 
+          })
+        : 'Sin fecha';
+      
+      item.innerHTML = `
+        <div class="installment-details">
+          <div class="installment-description">${category.icon} ${installment.description}</div>
+          <div class="installment-info">${category.name} • ${transactionDate}</div>
+          <div class="installment-progress">Cuota ${installment.installment} de ${installment.total_installments}</div>
+        </div>
+        <div class="installment-amount">
+          ${this.formatCurrency(installment.amount)}
+          ${installment.original_amount ? `<div class="installment-original">Total: ${this.formatCurrency(installment.original_amount)}</div>` : ''}
+        </div>
+      `;
+      
+      item.style.borderLeftColor = category.color;
+      installmentsList.appendChild(item);
+    });
+    
+    console.log('✅ Installments list updated successfully');
+  }
+
+  // Categories Management UI
+  updateCategoriesManagementList(categories) {
+    const container = document.getElementById('categories-management-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (categories.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <p>No hay categorías personalizadas</p>
+        </div>
+      `;
+      return;
+    }
+
+    categories.forEach(category => {
+      const item = document.createElement('div');
+      item.className = 'category-management-item';
+      item.style.borderLeftColor = category.color;
+      
+      item.innerHTML = `
+        <div class="category-info">
+          <div class="category-icon-display" style="background-color: ${category.color}20;">
+            ${category.icon}
+          </div>
+          <div class="category-name-display">${category.name}</div>
+        </div>
+        <div class="category-actions">
+          <button class="expense-action-btn delete-btn" onclick="window.app.deleteCategory('${category.id}')" title="Eliminar">
+            🗑️
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
+  clearForm(formId) {
+    const form = document.getElementById(formId);
+    if (form) {
+      form.reset();
+    }
+  }
+
+  setFormData(formId, data) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    Object.keys(data).forEach(key => {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) {
+        input.value = data[key];
+      }
+    });
+  }
+
+  getFormData(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return {};
+
+    const formData = new FormData(form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+      data[key] = value;
+    }
+    
+    return data;
+  }
+
+  showEditGoalModal(goal) {
+    console.log('✏️ Showing edit goal modal for:', goal);
+    
+    // Populate form with current goal data
+    const nameInput = document.getElementById('edit-goal-name');
+    const targetInput = document.getElementById('edit-goal-target');
+    const currentInput = document.getElementById('edit-goal-current');
+    const modal = document.getElementById('edit-goal-modal');
+    
+    if (nameInput) nameInput.value = goal.name;
+    if (targetInput) targetInput.value = goal.target_amount;
+    if (currentInput) currentInput.value = goal.current_amount;
+    if (modal) modal.dataset.goalId = goal.id;
+    
+    // Show modal using modal manager
+    if (window.app && window.app.modals) {
+      window.app.modals.show('edit-goal-modal');
+    }
+  }
+  
+  showAddMoneyModal(goal) {
+    console.log('💰 Showing add money modal for:', goal);
+    
+    const goalNameElement = document.getElementById('add-money-goal-name');
+    const goalProgressElement = document.getElementById('add-money-goal-progress');
+    const maxAmountElement = document.getElementById('add-money-max-amount');
+    const amountInput = document.getElementById('add-money-amount');
+    const modal = document.getElementById('add-money-modal');
+    
+    const progress = (goal.current_amount / goal.target_amount) * 100;
+    const remaining = goal.target_amount - goal.current_amount;
+    
+    if (goalNameElement) goalNameElement.textContent = goal.name;
+    if (goalProgressElement) {
+      goalProgressElement.textContent = `${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)} (${progress.toFixed(1)}%)`;
+    }
+    if (maxAmountElement) {
+      maxAmountElement.textContent = `Máximo disponible: ${this.formatCurrency(remaining)}`;
+    }
+    if (amountInput) {
+      amountInput.max = remaining;
+      amountInput.value = '';
+    }
+    if (modal) modal.dataset.goalId = goal.id;
+    
+    // Show modal using modal manager
+    if (window.app && window.app.modals) {
+      window.app.modals.show('add-money-modal');
+    }
+  }
+
+  // Budget UI Methods
+  updateBudgetsList(budgets, expenses = []) {
+    const container = document.getElementById('budgets-list');
+    const countElement = document.getElementById('budgets-count');
+    
+    if (!container) return;
+    
+    console.log('💰 Updating budgets list:', budgets.length, 'budgets');
+    
+    // Update count
+    if (countElement) {
+      countElement.textContent = budgets.length;
+    }
+    
+    // Load AI budget insights if available
+    this.loadAIBudgetInsights();
+    
+    container.innerHTML = '';
+
+    if (budgets.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">💰</div>
+          <h3>No tienes presupuestos configurados</h3>
+          <p>Crea tu primer presupuesto para controlar mejor tus gastos</p>
+          <button class="btn btn-primary" onclick="window.app.showAddBudgetModal()">
+            <span>➕</span>
+            Crear Presupuesto
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    budgets.forEach(budget => {
+      const progress = window.app.budget.calculateBudgetProgress(budget, expenses);
+      const item = document.createElement('div');
+      item.className = 'budget-card fade-in';
+      
+      const category = this.getCategoryInfo(budget.category);
+      const startDate = new Date(budget.start_date).toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+      const endDate = new Date(budget.end_date).toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+      
+      let statusClass = 'safe';
+      let statusIcon = '🟢';
+      let statusText = 'En control';
+      
+      if (progress.status === 'exceeded') {
+        statusClass = 'exceeded';
+        statusIcon = '🔴';
+        statusText = 'Superado';
+      } else if (progress.status === 'warning') {
+        statusClass = 'warning';
+        statusIcon = '🟡';
+        statusText = 'Cerca del límite';
+      } else if (progress.status === 'caution') {
+        statusClass = 'caution';
+        statusIcon = '🟠';
+        statusText = 'Precaución';
+      }
+      
+      item.innerHTML = `
+        <div class="budget-card-header">
+          <div class="budget-info">
+            <div class="budget-category">
+              <span class="category-icon">${category.icon}</span>
+              <span class="category-name">${budget.category}</span>
+            </div>
+            <div class="budget-name">${budget.name}</div>
+            <div class="budget-period">${startDate} - ${endDate}</div>
+          </div>
+          <div class="budget-status ${statusClass}">
+            <span class="status-icon">${statusIcon}</span>
+            <span class="status-text">${statusText}</span>
+          </div>
+        </div>
+        
+        <div class="budget-progress-section">
+          <div class="budget-amounts">
+            <div class="amount-spent">
+              <span class="amount-label">Gastado:</span>
+              <span class="amount-value ${statusClass}">${this.formatCurrency(progress.spent)}</span>
+            </div>
+            <div class="amount-limit">
+              <span class="amount-label">Límite:</span>
+              <span class="amount-value">${this.formatCurrency(budget.amount)}</span>
+            </div>
+            <div class="amount-remaining">
+              <span class="amount-label">Disponible:</span>
+              <span class="amount-value ${progress.remaining >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(progress.remaining)}</span>
+            </div>
+          </div>
+          
+          <div class="budget-progress-bar">
+            <div class="progress-bar-budget">
+              <div class="progress-fill-budget ${statusClass}" style="width: ${progress.percentage}%"></div>
+            </div>
+            <div class="progress-text-budget">${progress.percentage.toFixed(1)}% utilizado</div>
+          </div>
+          
+          <div class="budget-details">
+            <div class="detail-item">
+              <span class="detail-label">Transacciones:</span>
+              <span class="detail-value">${progress.expenseCount}</span>
+            </div>
+            ${budget.ai_recommended ? '<div class="ai-badge">🤖 Recomendado por IA</div>' : ''}
+          </div>
+        </div>
+        
+        <div class="budget-actions">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.showEditBudgetModal('${budget.id}')">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteBudget('${budget.id}', '${budget.name}')">
+            🗑️ Eliminar
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="window.app.generateBudgetInsights('${budget.id}')">
+            🤖 Analizar
+          </button>
+        </div>
+      `;
+      
+      item.style.borderLeftColor = category.color;
+      container.appendChild(item);
+    });
+  }
+
+  showAddBudgetModal() {
+    console.log('💰 Show add budget modal');
+    
+    // Set default dates
+    const today = new Date();
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const startDateInput = document.getElementById('budget-start-date');
+    const endDateInput = document.getElementById('budget-end-date');
+    
+    if (startDateInput) {
+      startDateInput.value = today.toISOString().split('T')[0];
+    }
+    if (endDateInput) {
+      endDateInput.value = nextMonth.toISOString().split('T')[0];
+    }
+    
+    // Update categories in select
+    if (window.app && window.app.data) {
+      const categories = window.app.data.getCategories();
+      this.updateCategoriesSelect(categories, 'budget-category');
+    }
+    
+    if (window.app && window.app.modals) {
+      window.app.modals.show('add-budget-modal');
+    }
+  }
+
+  showEditBudgetModal(budgetId) {
+    console.log('✏️ Show edit budget modal for:', budgetId);
+    
+    if (!window.app || !window.app.budget) return;
+    
+    const budget = window.app.budget.getBudgets().find(b => b.id === budgetId);
+    if (!budget) {
+      this.showAlert('Presupuesto no encontrado', 'error');
+      return;
+    }
+    
+    // Populate form with current budget data
+    const nameInput = document.getElementById('edit-budget-name');
+    const categorySelect = document.getElementById('edit-budget-category');
+    const amountInput = document.getElementById('edit-budget-amount');
+    const startDateInput = document.getElementById('edit-budget-start-date');
+    const endDateInput = document.getElementById('edit-budget-end-date');
+    const modal = document.getElementById('edit-budget-modal');
+    
+    if (nameInput) nameInput.value = budget.name;
+    if (amountInput) amountInput.value = budget.amount;
+    if (startDateInput) startDateInput.value = budget.start_date;
+    if (endDateInput) endDateInput.value = budget.end_date;
+    if (modal) modal.dataset.budgetId = budget.id;
+    
+    // Update categories and select current one
+    if (window.app && window.app.data) {
+      const categories = window.app.data.getCategories();
+      this.updateCategoriesSelect(categories, 'edit-budget-category');
+      if (categorySelect) {
+        setTimeout(() => {
+          categorySelect.value = budget.category;
+        }, 100);
+      }
+    }
+    
+    if (window.app && window.app.modals) {
+      window.app.modals.show('edit-budget-modal');
+    }
+  }
+
+  getBudgetFormData(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return {};
+
+    const formData = new FormData(form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+      if (key === 'ai-recommendations') {
+        data[key] = value === 'on';
+      } else {
+        data[key] = value;
+      }
+    }
+    
+    return data;
+  }
+
+  displayAIBudgetInsights(insights) {
+    const container = document.getElementById('budget-ai-insights');
+    if (!container) return;
+    
+    if (!insights || insights.length === 0) {
+      container.innerHTML = `
+        <div class="ai-insights-empty">
+          <div class="empty-icon">🤖</div>
+          <h4>No hay recomendaciones disponibles</h4>
+          <p>Registra más gastos para obtener recomendaciones personalizadas</p>
+        </div>
+      `;
+      container.classList.remove('hidden');
+      return;
+    }
+    
+    console.log('🤖 Displaying AI budget insights:', insights.length);
+    
+    container.innerHTML = `
+      <div class="ai-insights-header">
+        <h4>🤖 Recomendaciones Inteligentes</h4>
+        <p>Análisis personalizado basado en tus patrones de gasto y machine learning</p>
+      </div>
+    `;
+    
+    const insightsGrid = document.createElement('div');
+    insightsGrid.className = 'ai-insights-grid';
+    
+    insights.forEach(insight => {
+      const insightCard = document.createElement('div');
+      insightCard.className = `ai-insight-card ${insight.type || 'ai_recommendation'}`;
+      insightCard.dataset.recommendationId = insight.id;
+      insightCard.dataset.category = insight.category;
+      insightCard.dataset.suggestedBudget = insight.suggestedBudget;
+      insightCard.dataset.action = insight.action;
+      
+      const iconMap = {
+        'ai_recommendation': '🤖',
+        'ml_recommendation': '🧠',
+        'pattern': '📊',
+        'prediction': '🔮',
+        'warning': '⚠️',
+        'opportunity': '💡'
+      };
+      
+      const priorityColors = {
+        'high': '#ef4444',
+        'medium': '#f59e0b',
+        'low': '#10b981'
+      };
+      
+      insightCard.innerHTML = `
+        <div class="insight-header">
+          <div class="insight-title-section">
+            <span class="insight-icon">${iconMap[insight.type] || '🤖'}</span>
+            <span class="insight-category">${insight.category}</span>
+            <span class="insight-priority" style="background-color: ${priorityColors[insight.priority] || '#6b7280'}">${insight.priority || 'medium'}</span>
+          </div>
+          ${insight.confidence ? `<span class="confidence-score">${Math.round(insight.confidence * 100)}%</span>` : ''}
+        </div>
+        
+        <div class="insight-content">
+          <div class="insight-action">${insight.action}</div>
+          <div class="insight-justification">${insight.justification}</div>
+          
+          <div class="insight-budget-suggestion">
+            <span class="budget-label">Presupuesto sugerido:</span>
+            <span class="budget-amount">${this.formatCurrency(insight.suggestedBudget)}</span>
+          </div>
+        </div>
+        
+        <div class="insight-actions">
+          <button class="btn btn-sm btn-secondary dismiss-recommendation-btn" onclick="window.app.dismissAIRecommendation('${insight.id}')">
+            Descartar
+          </button>
+          ${insight.applicable ? `
+            <button class="btn btn-sm btn-primary apply-recommendation-btn" onclick="window.app.applyAIRecommendation('${insight.id}')">
+              ✨ Aplicar al Presupuesto
+            </button>
+          ` : ''}
+        </div>
+      `;
+      
+      insightsGrid.appendChild(insightCard);
+    });
+    
+    container.appendChild(insightsGrid);
+    container.classList.remove('hidden');
+  }
+
+  // Mostrar mensaje de datos insuficientes
+  showInsufficientDataMessage(validationResult) {
+    const insightsContainer = document.getElementById('budget-ai-insights');
+    if (!insightsContainer) return;
+
+    insightsContainer.innerHTML = `
+      <div class="insufficient-data-message">
+        <div class="insufficient-data-header">
+          <div class="insufficient-data-icon">📊</div>
+          <h3>Datos Insuficientes para Análisis IA</h3>
+        </div>
+        
+        <div class="insufficient-data-content">
+          <p class="insufficient-data-description">
+            ${validationResult.message}. Para generar recomendaciones precisas, necesitas:
+          </p>
+          
+          <div class="data-requirements">
+            <h4>📋 Requisitos Mínimos:</h4>
+            <div class="requirements-grid">
+              <div class="requirement-item ${validationResult.current.expenses >= validationResult.requirements.minExpenses ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.expenses >= validationResult.requirements.minExpenses ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Gastos registrados:</strong> ${validationResult.current.expenses}/${validationResult.requirements.minExpenses}
+                </div>
+              </div>
+              
+              <div class="requirement-item ${validationResult.current.categories >= validationResult.requirements.minCategories ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.categories >= validationResult.requirements.minCategories ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Categorías diferentes:</strong> ${validationResult.current.categories}/${validationResult.requirements.minCategories}
+                </div>
+              </div>
+              
+              <div class="requirement-item ${validationResult.current.days >= validationResult.requirements.minDays ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.days >= validationResult.requirements.minDays ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Días con gastos:</strong> ${validationResult.current.days}/${validationResult.requirements.minDays}
+                </div>
+              </div>
+              
+              <div class="requirement-item ${validationResult.current.totalAmount >= validationResult.requirements.minAmount ? 'completed' : 'pending'}">
+                <div class="requirement-icon">${validationResult.current.totalAmount >= validationResult.requirements.minAmount ? '✅' : '⏳'}</div>
+                <div class="requirement-text">
+                  <strong>Monto total:</strong> $${validationResult.current.totalAmount.toFixed(2)}/$${validationResult.requirements.minAmount}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          ${validationResult.issues ? `
+            <div class="missing-requirements">
+              <h4>⚠️ Qué necesitas hacer:</h4>
+              <ul class="issues-list">
+                ${validationResult.issues.map(issue => `<li>${issue}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          <div class="insufficient-data-actions">
+            <button class="btn btn-primary" onclick="window.app.navigation.showSection('transactions')">
+              <span>➕</span>
+              Registrar Más Gastos
+            </button>
+            <button class="btn btn-secondary" onclick="window.app.generateBudgetInsights()">
+              <span>🔄</span>
+              Verificar Nuevamente
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Mostrar el contenedor
+    insightsContainer.style.display = 'block';
+  }
+
+  // Mostrar predicciones de Machine Learning
+  displayMLPredictions(predictions) {
+    const container = document.getElementById('ml-predictions-container');
+    if (!container || !predictions || predictions.length === 0) return;
+    
+    console.log('🧠 Displaying ML predictions:', predictions.length);
+    
+    container.innerHTML = `
+      <div class="ml-predictions-header">
+        <h4>🧠 Predicciones de Machine Learning</h4>
+        <p>Análisis predictivo basado en tus patrones históricos de gasto</p>
+      </div>
+    `;
+    
+    const predictionsGrid = document.createElement('div');
+    predictionsGrid.className = 'ml-predictions-grid';
+    
+    predictions.forEach(prediction => {
+      const predictionCard = document.createElement('div');
+      predictionCard.className = `ml-prediction-card trend-${prediction.trend}`;
+      
+      const trendIcons = {
+        'increasing': '📈',
+        'decreasing': '📉',
+        'stable': '➡️',
+        'volatile': '📊'
+      };
+      
+      const trendColors = {
+        'increasing': '#ef4444',
+        'decreasing': '#10b981',
+        'stable': '#6b7280',
+        'volatile': '#f59e0b'
+      };
+      
+      predictionCard.innerHTML = `
+        <div class="prediction-header">
+          <div class="prediction-category">
+            <span class="category-name">${prediction.category}</span>
+            <span class="trend-indicator" style="color: ${trendColors[prediction.trend]}">
+              ${trendIcons[prediction.trend]} ${prediction.trend}
+            </span>
+          </div>
+          <div class="confidence-badge">${Math.round(prediction.confidence * 100)}% confianza</div>
+        </div>
+        
+        <div class="prediction-content">
+          <div class="predicted-amount">
+            <span class="amount-label">Gasto predicho:</span>
+            <span class="amount-value">${this.formatCurrency(prediction.predicted)}</span>
+          </div>
+          
+          <div class="recommendation-preview">
+            <div class="rec-type ${prediction.recommendation.type}">
+              ${prediction.recommendation.type === 'warning' ? '⚠️' : 
+                prediction.recommendation.type === 'opportunity' ? '💡' : '✅'}
+              ${prediction.recommendation.message}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      predictionsGrid.appendChild(predictionCard);
+    });
+    
+    container.appendChild(predictionsGrid);
+    container.classList.remove('hidden');
+  }
+
+  // Mostrar patrones de gasto detectados
+  displaySpendingPatterns(patterns) {
+    const container = document.getElementById('spending-patterns-container');
+    if (!container || !patterns || patterns.length === 0) return;
+    
+    console.log('📊 Displaying spending patterns:', patterns.length);
+    
+    container.innerHTML = `
+      <div class="patterns-header">
+        <h4>📊 Patrones de Gasto Detectados</h4>
+        <p>Insights automáticos sobre tu comportamiento financiero</p>
+      </div>
+    `;
+    
+    const patternsGrid = document.createElement('div');
+    patternsGrid.className = 'patterns-grid';
+    
+    patterns.forEach(pattern => {
+      const patternCard = document.createElement('div');
+      patternCard.className = `pattern-card pattern-${pattern.type}`;
+      
+      const typeIcons = {
+        'day_pattern': '📅',
+        'category_pattern': '🏷️',
+        'time_pattern': '⏰',
+        'amount_pattern': '💰'
+      };
+      
+      patternCard.innerHTML = `
+        <div class="pattern-header">
+          <span class="pattern-icon">${typeIcons[pattern.type] || '📊'}</span>
+          <span class="pattern-title">${pattern.title}</span>
+        </div>
+        
+        <div class="pattern-content">
+          <div class="pattern-description">${pattern.description}</div>
+          ${pattern.actionable ? `
+            <div class="pattern-suggestion">
+              💡 <strong>Sugerencia:</strong> ${pattern.suggestion}
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      patternsGrid.appendChild(patternCard);
+    });
+    
+    container.appendChild(patternsGrid);
+    container.classList.remove('hidden');
+  }
+
+  formatInsightData(data) {
+    if (!data || typeof data !== 'object') return '';
+    
+    let html = '<div class="insight-data-items">';
+    
+    Object.entries(data).forEach(([key, value]) => {
+      if (typeof value === 'number' && key.includes('amount')) {
+        html += `<div class="data-item"><strong>${key}:</strong> ${this.formatCurrency(value)}</div>`;
+      } else {
+        html += `<div class="data-item"><strong>${key}:</strong> ${value}</div>`;
+      }
+    });
+    
+    html += '</div>';
+    return html;
+  }
+
+  displayBudgetAlert(alert) {
+    // Use existing alert system but with budget-specific styling
+    const alertElement = document.createElement('div');
+    alertElement.className = `alert alert-${alert.severity} budget-alert`;
+    
+    alertElement.innerHTML = `
+      <div class="alert-content">
+        <div class="alert-title">${alert.title}</div>
+        <div class="alert-message">${alert.message}</div>
+        ${alert.category ? `<div class="alert-category">Categoría: ${alert.category}</div>` : ''}
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-sm btn-secondary" onclick="this.parentElement.parentElement.remove()">
+          Cerrar
+        </button>
+      </div>
+    `;
+    
+    this.alertContainer.appendChild(alertElement);
+    
+    setTimeout(() => alertElement.classList.add('show'), 100);
+    
+    // Auto-remove after 10 seconds for budget alerts
+    setTimeout(() => {
+      if (alertElement.parentNode) {
+        alertElement.classList.remove('show');
+        setTimeout(() => {
+          if (alertElement.parentNode) {
+            alertElement.parentNode.removeChild(alertElement);
+          }
+        }, 300);
+      }
+    }, 10000);
+  }
+
+  updateBudgetSummary(summary) {
+    const totalBudgetsElement = document.getElementById('total-budgets-count');
+    const activeBudgetsElement = document.getElementById('active-budgets-count');
+    
+    if (totalBudgetsElement) {
+      totalBudgetsElement.textContent = summary.totalBudgets;
+    }
+    
+    if (activeBudgetsElement) {
+      activeBudgetsElement.textContent = summary.activeBudgets;
+    }
+    
+    // Update navigation badge
+    const budgetNavBadge = document.querySelector('[data-section="budgets"] .nav-badge');
+    if (budgetNavBadge) {
+      budgetNavBadge.textContent = summary.activeBudgets;
+      budgetNavBadge.style.display = summary.activeBudgets > 0 ? 'flex' : 'none';
+    }
+  }
+
+  showLoading(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.classList.add('loading');
+      element.disabled = true;
+    }
+  }
+
+  hideLoading(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.classList.remove('loading');
+      element.disabled = false;
+    }
+  }
+
+  // Cargar insights de IA para presupuestos
+  async loadAIBudgetInsights() {
+    const container = document.getElementById('budget-ai-insights');
+    if (!container) return;
+    
+    // Mostrar estado de carga
+    container.innerHTML = `
+      <div class="ai-insights-loading">
+        <div class="loading-spinner"></div>
+        <p>Cargando análisis inteligente...</p>
+      </div>
+    `;
+    container.classList.remove('hidden');
+  }
+
+  async handleLogout() {
+    console.log('🚪 Handling logout...');
     
     try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return dateString;
+      // Clear all data
+      if (window.app && window.app.data) {
+        await window.app.data.clearAllData();
+      }
       
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
+      // Clear localStorage
+      localStorage.clear();
+      
+      // Redirect to login
+      window.location.href = 'login.html';
+      
     } catch (error) {
-      console.warn('Error formatting date:', dateString, error);
-      return dateString;
-    }
-  }
-
-  escapeHtml(text) {
-    if (typeof text !== 'string') {
-      return String(text || '');
-    }
-    
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  // Reports Data Update
-  updateReportsData() {
-    // This method can be called by contextual bar to refresh reports
-    console.log('📊 Updating reports data...');
-    
-    // If we're in the reports section, we might want to regenerate the current report
-    const reportContent = document.getElementById('report-content');
-    if (reportContent && !reportContent.innerHTML.includes('report-placeholder')) {
-      // There's an existing report, we could offer to regenerate it
-      // For now, we'll just log that data has been updated
-      console.log('📊 Reports data context updated');
+      console.error('❌ Error during logout:', error);
+      this.showAlert('Error al cerrar sesión', 'error');
     }
   }
 }

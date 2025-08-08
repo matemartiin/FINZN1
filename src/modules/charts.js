@@ -17,12 +17,6 @@ export class ChartManager {
       return;
     }
     
-    // Validate data
-    if (!data || typeof data !== 'object') {
-      console.warn('Invalid data provided to updateExpensesChart:', data);
-      return;
-    }
-    
     // Apply category filter if available
     let filteredData = data;
     if (window.app?.contextualBar) {
@@ -37,7 +31,6 @@ export class ChartManager {
     
     if (this.expensesChart) {
       this.expensesChart.destroy();
-      this.expensesChart = null;
     }
 
     const labels = Object.keys(filteredData);
@@ -58,59 +51,49 @@ export class ChartManager {
       return;
     }
     
-    // Validate Chart.js is available
-    if (typeof Chart === 'undefined') {
-      console.error('Chart.js is not loaded');
-      return;
-    }
-    
     const colors = this.generateColors(labels.length);
 
-    try {
-      this.expensesChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels,
-          datasets: [{
-            data: values,
-            backgroundColor: colors,
-            borderWidth: 0,
-            hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          devicePixelRatio: window.devicePixelRatio || 1,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 20,
-                usePointStyle: true,
-                font: {
-                  size: window.innerWidth < 768 ? 11 : 12
-                }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const label = context.label || '';
-                  const value = context.raw || 0;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const percentage = ((value / total) * 100).toFixed(1);
-                  return `${label}: $${value.toLocaleString()} (${percentage}%)`;
-                }
+    this.expensesChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        devicePixelRatio: window.devicePixelRatio || 1,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: {
+                size: window.innerWidth < 768 ? 11 : 12
               }
             }
           },
-          cutout: window.innerWidth < 768 ? '50%' : '60%'
-        }
-      });
-    } catch (error) {
-      console.error('Error creating expenses chart:', error);
-    }
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: window.innerWidth < 768 ? '50%' : '60%'
+      }
+    });
   }
 
   updateTrendChart(data) {

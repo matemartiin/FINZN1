@@ -49,10 +49,7 @@ export class AIBudgetManager {
 
   // Preprocesar datos para el modelo
   preprocessData(expenses) {
-    if (!expenses || expenses.length === 0) {
-      console.warn('No expenses data available for preprocessing');
-      return null;
-    }
+    if (!expenses || expenses.length === 0) return null;
 
     const processedData = {
       features: [],
@@ -66,24 +63,9 @@ export class AIBudgetManager {
     const categoryData = new Map();
     
     expenses.forEach(expense => {
-      if (!expense || !expense.transaction_date || !expense.category || !expense.amount) {
-        console.warn('Invalid expense data:', expense);
-        return;
-      }
-      
       const date = new Date(expense.transaction_date);
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date in expense:', expense.transaction_date);
-        return;
-      }
-      
       const category = expense.category;
       const amount = parseFloat(expense.amount);
-      
-      if (isNaN(amount) || amount < 0) {
-        console.warn('Invalid amount in expense:', expense.amount);
-        return;
-      }
       
       processedData.categories.add(category);
       
@@ -101,10 +83,6 @@ export class AIBudgetManager {
       });
     });
 
-    if (categoryData.size === 0) {
-      console.warn('No valid expense data after preprocessing');
-      return null;
-    }
     // Crear features para cada categoría
     categoryData.forEach((data, category) => {
       const sortedData = data.sort((a, b) => a.date - b.date);

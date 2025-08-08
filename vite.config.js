@@ -1,17 +1,23 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  root: './',
   build: {
     outDir: 'dist',
-    sourcemap: false,
-    minify: 'esbuild',
-    target: 'es2015',
-    chunkSizeWarningLimit: 1000
+    rollupOptions: {
+      input: './index.html'
+    },
+    sourcemap: true
   },
   server: {
-    port: 3000
+    port: 3000,
+    host: true
   },
-  optimizeDeps: {
-    force: true
+  base: './',
+  publicDir: './public',
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
   }
 })

@@ -33,31 +33,29 @@ export class AuthManager {
     }
 
     // Listen for auth changes
-    if (supabase && typeof supabase.auth?.onAuthStateChange === 'function') {
-      supabase.auth.onAuthStateChange((event, session) => {
-        console.log('🔐 Auth state changed:', event, session?.user?.email, 'ID:', session?.user?.id);
-        this.currentUser = session?.user || null;
-        console.log('🔐 Updated currentUser:', this.currentUser);
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔐 Auth state changed:', event, session?.user?.email, 'ID:', session?.user?.id);
+      this.currentUser = session?.user || null;
+      console.log('🔐 Updated currentUser:', this.currentUser);
+      
+      if (event === 'SIGNED_OUT') {
+        // Clear any cached data
+        this.clearUserData();
+        // Reload the page to reset application state
+        window.location.reload();
+      } else if (event === 'SIGNED_IN') {
+        console.log('✅ User successfully signed in:', session.user.email);
+        console.log('✅ User ID:', session.user.id);
         
-        if (event === 'SIGNED_OUT') {
-          // Clear any cached data
-          this.clearUserData();
-          // Reload the page to reset application state
-          window.location.reload();
-        } else if (event === 'SIGNED_IN') {
-          console.log('✅ User successfully signed in:', session.user.email);
-          console.log('✅ User ID:', session.user.id);
-          
-          // Load user profile after successful sign in
-          setTimeout(async () => {
-            if (window.app && window.app.userProfile) {
-              console.log('🔐 Loading user profile after sign in...');
-              await window.app.userProfile.loadUserProfile();
-            }
-          }, 500);
-        }
-      });
-    }
+        // Load user profile after successful sign in
+        setTimeout(async () => {
+          if (window.app && window.app.userProfile) {
+            console.log('🔐 Loading user profile after sign in...');
+            await window.app.userProfile.loadUserProfile();
+          }
+        }, 500);
+      }
+    });
   }
 
   async handleAuthError(error) {

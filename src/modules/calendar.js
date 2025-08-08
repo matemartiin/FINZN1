@@ -378,9 +378,6 @@ export class CalendarManager {
         currentDate.setMonth(currentDate.getMonth() + 1);
       } else if (baseEvent.frequency === 'yearly') {
         currentDate.setFullYear(currentDate.getFullYear() + 1);
-      } else {
-        console.warn('Unknown frequency:', baseEvent.frequency);
-        break;
       }
 
       if (currentDate <= endDate) {
