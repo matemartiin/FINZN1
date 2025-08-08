@@ -11,6 +11,7 @@ import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
+import { ContextualBarManager } from './modules/contextual-bar.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -32,6 +33,7 @@ class FinznApp {
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
+    this.contextualBar = new ContextualBarManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -61,6 +63,9 @@ class FinznApp {
       
       // Initialize user profile
       this.userProfile.init();
+      
+      // Initialize contextual bar
+      this.contextualBar.init();
       
       // Setup month selector
       this.setupMonthSelector();
