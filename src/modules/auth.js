@@ -181,27 +181,6 @@ export class AuthManager {
     }
   }
 
-  // Register with profile data
-  async registerWithProfile(email, password, profileData) {
-    try {
-      console.log('📝 Attempting to register user with profile:', email);
-      
-      // First register the user
-      const registrationResult = await this.register(email, password);
-      
-      if (registrationResult.success && !registrationResult.needsConfirmation) {
-        // Create profile if user is immediately available
-        if (this.profileManager && this.currentUser) {
-          await this.profileManager.createProfileOnRegistration(profileData);
-        }
-      }
-      
-      return registrationResult;
-    } catch (error) {
-      console.error('Registration with profile error:', error);
-      throw error;
-    }
-  }
   async logout() {
     try {
       console.log('👋 Logging out...');

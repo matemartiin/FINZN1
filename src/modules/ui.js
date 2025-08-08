@@ -677,11 +677,11 @@ export class UIManager {
         if (income.fixed > 0) {
           const fixedItem = document.createElement('div');
           fixedItem.className = 'income-list-item fixed';
-          
-          fixedItem.innerHTML = `
-            <div class="income-item-details">
-              <div class="income-item-type">💰 Ingreso Fijo</div>
-              <div class="income-item-description">Sueldo mensual</div>
+        const displayName = formData.get('display_name')?.trim();
+        const firstName = formData.get('first_name')?.trim();
+        const lastName = formData.get('last_name')?.trim();
+        const phone = formData.get('phone')?.trim();
+        const bio = formData.get('bio')?.trim();
             </div>
             <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
           `;
@@ -1419,10 +1419,10 @@ export class UIManager {
     // Use existing alert system but with budget-specific styling
     const alertElement = document.createElement('div');
     alertElement.className = `alert alert-${alert.severity} budget-alert`;
-    
-    alertElement.innerHTML = `
-      <div class="alert-content">
-        <div class="alert-title">${alert.title}</div>
+          first_name: firstName || '',
+          last_name: lastName || '',
+          phone: phone || '',
+          bio: bio || ''
         <div class="alert-message">${alert.message}</div>
         ${alert.category ? `<div class="alert-category">Categoría: ${alert.category}</div>` : ''}
       </div>
