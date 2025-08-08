@@ -1,12 +1,24 @@
 export class ModalManager {
   constructor() {
     this.modals = new Map();
+    this.activeModal = null;
   }
 
   init() {
     // Register all modals
     const modalElements = document.querySelectorAll('.modal');
+    
+    if (modalElements.length === 0) {
+      console.warn('⚠️ No modal elements found in DOM');
+      return;
+    }
+    
     modalElements.forEach(modal => {
+      if (!modal.id) {
+        console.warn('⚠️ Modal element found without ID:', modal);
+        return;
+      }
+      
       this.modals.set(modal.id, modal);
       
       // Close modal when clicking outside
@@ -32,7 +44,9 @@ export class ModalManager {
     // Handle escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        this.hideAll();
+        if (this.activeModal) {
+          this.hide(this.activeModal);
+        }
       }
     });
   }
@@ -59,6 +73,8 @@ export class ModalManager {
       
       if (startDate && endDate) {
         startDate.addEventListener('change', () => {
+          if (!startDate.value) return;
+          
           endDate.min = startDate.value;
           if (endDate.value && endDate.value < startDate.value) {
             endDate.value = startDate.value;
@@ -66,6 +82,8 @@ export class ModalManager {
         });
         
         endDate.addEventListener('change', () => {
+          if (!startDate.value || !endDate.value) return;
+          
           if (startDate.value && endDate.value < startDate.value) {
             endDate.value = startDate.value;
           }
@@ -77,32 +95,65 @@ export class ModalManager {
     setupDateValidation('edit-budget-start-date', 'edit-budget-end-date');
   }
   show(modalId) {
+    if (!modalId || typeof modalId !== 'string') {
+      console.error('ModalManager: Invalid modalId provided to show():', modalId);
+      return;
+    }
+    
     console.log('ModalManager: Showing modal', modalId);
     const modal = this.modals.get(modalId);
     if (modal) {
+      // Hide any currently active modal first
+      if (this.activeModal && this.activeModal !== modalId) {
+        this.hide(this.activeModal);
+      }
+      
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
+      this.activeModal = modalId;
       
       // Focus first input
       const firstInput = modal.querySelector('input, select, textarea');
       if (firstInput) {
         setTimeout(() => firstInput.focus(), 100);
       }
+    } else {
+      console.error('ModalManager: Modal not found:', modalId);
     }
   }
 
   hide(modalId) {
+    if (!modalId || typeof modalId !== 'string') {
+      console.error('ModalManager: Invalid modalId provided to hide():', modalId);
+      return;
+    }
+    
     console.log('ModalManager: Hiding modal', modalId);
     const modal = this.modals.get(modalId);
     if (modal) {
       modal.classList.remove('active');
-      document.body.style.overflow = '';
+      
+      // Only restore body overflow if no other modals are active
+      const activeModals = Array.from(this.modals.values()).filter(m => m.classList.contains('active'));
+      if (activeModals.length === 0) {
+        document.body.style.overflow = '';
+      }
+      
+      if (this.activeModal === modalId) {
+        this.activeModal = null;
+      }
       
       // Reset form if exists
       const form = modal.querySelector('form');
       if (form) {
-        form.reset();
+        try {
+          form.reset();
+        } catch (error) {
+          console.warn('Error resetting form in modal:', modalId, error);
+        }
       }
+    } else {
+      console.error('ModalManager: Modal not found:', modalId);
     }
   }
 
@@ -110,5 +161,15 @@ export class ModalManager {
     this.modals.forEach((modal, id) => {
       this.hide(id);
     });
+    this.activeModal = null;
+    document.body.style.overflow = '';
+  }
+  
+  isModalActive(modalId) {
+    return this.activeModal === modalId;
+  }
+  
+  getActiveModal() {
+    return this.activeModal;
   }
 }

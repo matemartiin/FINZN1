@@ -7,11 +7,15 @@ export default defineConfig({
     rollupOptions: {
       input: './index.html'
     },
-    sourcemap: true
+    sourcemap: true,
+    minify: 'esbuild',
+    target: 'es2015'
   },
   server: {
     port: 3000,
-    host: true
+    host: true,
+    strictPort: false,
+    open: false
   },
   base: './',
   publicDir: './public',
@@ -19,5 +23,11 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  define: {
+    'process.env': {}
+  },
+  optimizeDeps: {
+    include: ['chart.js', '@tensorflow/tfjs', '@supabase/supabase-js']
   }
 })

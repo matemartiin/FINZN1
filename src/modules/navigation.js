@@ -16,6 +16,11 @@ export class NavigationManager {
     const navItems = document.querySelectorAll('.nav-item');
     const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
     
+    if (navItems.length === 0 && mobileNavItems.length === 0) {
+      console.warn('⚠️ No navigation items found in DOM');
+      return;
+    }
+    
     navItems.forEach(item => {
       item.addEventListener('click', () => {
         const section = item.getAttribute('data-section');
@@ -23,6 +28,8 @@ export class NavigationManager {
           this.showSection(section);
           this.setActiveNavItem(item);
           this.closeMobileMenu();
+        } else {
+          console.warn('Navigation item missing data-section attribute:', item);
         }
       });
     });
@@ -35,6 +42,8 @@ export class NavigationManager {
         if (section) {
           this.showSection(section);
           this.setActiveMobileNavItem(item);
+        } else {
+          console.warn('Mobile navigation item missing data-section attribute:', item);
         }
       });
     });
@@ -55,23 +64,42 @@ export class NavigationManager {
           this.closeMobileMenu();
         }
       });
+    } else {
+      console.warn('⚠️ Mobile menu elements not found:', {
+        toggle: !!mobileToggle,
+        menu: !!navMenu
+      });
     }
   }
   
   setupTabNavigation() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     
+    if (tabButtons.length === 0) {
+      console.log('ℹ️ No tab buttons found - tab navigation not needed');
+      return;
+    }
+    
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         const tabName = button.getAttribute('data-tab');
-        this.switchTab(tabName);
-        this.setActiveTab(button);
+        if (tabName) {
+          this.switchTab(tabName);
+          this.setActiveTab(button);
+        } else {
+          console.warn('Tab button missing data-tab attribute:', button);
+        }
       });
     });
   }
   
   setupBreadcrumbs() {
     const breadcrumbItems = document.querySelectorAll('.breadcrumb-item[data-section]');
+    
+    if (breadcrumbItems.length === 0) {
+      console.log('ℹ️ No breadcrumb items found - breadcrumb navigation not needed');
+      return;
+    }
     
     breadcrumbItems.forEach(item => {
       item.addEventListener('click', (e) => {
@@ -80,6 +108,8 @@ export class NavigationManager {
         if (section) {
           this.showSection(section);
           this.updateActiveNavigation(section);
+        } else {
+          console.warn('Breadcrumb item missing data-section attribute:', item);
         }
       });
     });
@@ -149,8 +179,19 @@ export class NavigationManager {
   }
 
   showSection(sectionName) {
+    if (!sectionName || typeof sectionName !== 'string') {
+      console.error('NavigationManager: Invalid section name:', sectionName);
+      return;
+    }
+    
     // Hide all sections
     const sections = document.querySelectorAll('.dashboard-section');
+    
+    if (sections.length === 0) {
+      console.warn('⚠️ No dashboard sections found in DOM');
+      return;
+    }
+    
     sections.forEach(section => {
       section.classList.remove('active');
     });
@@ -170,10 +211,17 @@ export class NavigationManager {
           window.app.contextualBar.updateVisibility(sectionName);
         }, 100);
       }
+    } else {
+      console.error('NavigationManager: Section not found:', `${sectionName}-section`);
     }
   }
   
   updatePageTitle(sectionName) {
+    if (!sectionName) {
+      console.warn('NavigationManager: No section name provided for title update');
+      return;
+    }
+    
     const titles = {
       'dashboard': 'Resumen General',
       'transactions': 'Transacciones',
@@ -185,10 +233,20 @@ export class NavigationManager {
     };
     
     const title = titles[sectionName] || 'FINZN';
-    document.title = `${title} - FINZN`;
+    
+    try {
+      document.title = `${title} - FINZN`;
+    } catch (error) {
+      console.warn('Error updating document title:', error);
+    }
   }
 
   setActiveNavItem(activeItem) {
+    if (!tabName || typeof tabName !== 'string') {
+      console.error('NavigationManager: Invalid tab name:', tabName);
+      return;
+    }
+    
     // Remove active class from all nav items
     const navItems = document.querySelectorAll('.nav-item');
     const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
@@ -211,12 +269,24 @@ export class NavigationManager {
       if (mobileItem) {
         mobileItem.classList.add('active');
       }
+    } else {
+      console.error('NavigationManager: Tab content not found:', `${tabName}-tab`);
     }
   }
   
   setActiveMobileNavItem(activeItem) {
     // Remove active class from all mobile nav items
     const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    if (!activeButton) {
+      console.error('NavigationManager: No button provided to setActiveTab');
+      return;
+    if (!activeItem) {
+      console.error('NavigationManager: No item provided to setActiveMobileNavItem');
+      return;
+    }
+    
+    }
+    
     const navItems = document.querySelectorAll('.nav-item');
     
     mobileNavItems.forEach(item => {
@@ -240,3 +310,8 @@ export class NavigationManager {
     }
   }
 }
+    if (!activeItem) {
+      console.error('NavigationManager: No item provided to setActiveNavItem');
+      return;
+    }
+    

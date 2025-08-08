@@ -63,6 +63,16 @@ export class ChatManager {
     const messagesContainer = document.getElementById('chat-messages');
     if (!messagesContainer) return;
 
+    // Validate input parameters
+    if (!text || typeof text !== 'string') {
+      console.warn('Invalid message text provided to addMessage');
+      return;
+    }
+    
+    if (!sender || !['user', 'bot'].includes(sender)) {
+      console.warn('Invalid sender provided to addMessage:', sender);
+      sender = 'bot'; // Default to bot
+    }
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${sender}`;
     
@@ -73,7 +83,7 @@ export class ChatManager {
           '<img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />'
         }
       </div>
-      <div class="chat-text ${sender}-text">${text}</div>
+      <div class="chat-text ${sender}-text">${this.escapeHtml(text)}</div>
     `;
 
     messagesContainer.appendChild(messageDiv);
@@ -83,6 +93,12 @@ export class ChatManager {
     setTimeout(() => messageDiv.classList.add('fade-in'), 100);
   }
 
+  // Add HTML escaping method for security
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
   async handleSubmit(e) {
     e.preventDefault();
     
@@ -92,6 +108,11 @@ export class ChatManager {
     const message = input.value.trim();
     if (!message) return;
 
+    // Validate message length
+    if (message.length > 1000) {
+      this.addMessage('El mensaje es demasiado largo. Por favor, mantén tus preguntas bajo 1000 caracteres.', 'bot');
+      return;
+    }
     // Add user message
     this.addMessage(message, 'user');
     input.value = '';
@@ -104,7 +125,13 @@ export class ChatManager {
       const response = await this.getAIResponse(message);
       
       this.hideTypingIndicator();
-      this.addMessage(response, 'bot');
+      
+      // Validate response before adding
+      if (response && typeof response === 'string' && response.trim()) {
+        this.addMessage(response, 'bot');
+      } else {
+        this.addMessage('Lo siento, no pude generar una respuesta válida. ¿Podrías reformular tu pregunta?', 'bot');
+      }
 
     } catch (error) {
       console.error('Chat error:', error);
@@ -115,6 +142,11 @@ export class ChatManager {
   }
 
   async getAIResponse(message) {
+    // Validate input message
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      throw new Error('Invalid message provided to getAIResponse');
+    }
+    
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     
     console.log('🤖 Attempting Gemini API call...');
@@ -127,6 +159,9 @@ export class ChatManager {
     }
 
     try {
+      // Sanitize message for API call
+      const sanitizedMessage = message.replace(/[<>]/g, '').trim();
+      
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
         {
@@ -140,9 +175,9 @@ export class ChatManager {
               {
                 parts: [
                   {
-                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
 
 Pregunta del usuario: ${message}`
+                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
                   }
                 ]
               }
@@ -176,29 +211,35 @@ Pregunta del usuario: ${message}`
           errorMessage = "Problema con la API key. Contactá al administrador.";
         } else if (response.status === 400) {
           errorMessage = "Tu mensaje no pudo ser procesado. Intentá reformularlo.";
+        } else if (response.status >= 500) {
+          errorMessage = "El servicio de IA está temporalmente no disponible. Intentá más tarde.";
         }
         
         console.error("❌ Error de Gemini API:", response.status, response.statusText);
-        return errorMessage;
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
       console.log('✅ Gemini API response received');
 
       if (!data.candidates || data.candidates.length === 0) {
-        return "No pude generar una respuesta. ¿Podrías reformular tu pregunta?";
+        throw new Error("No pude generar una respuesta. ¿Podrías reformular tu pregunta?");
       }
 
       const reply = data.candidates[0]?.content?.parts?.[0]?.text || 
                     "No tengo una respuesta clara, ¿podés reformularlo?";
 
+      // Validate reply before returning
+      if (!reply || typeof reply !== 'string' || !reply.trim()) {
+        throw new Error("Respuesta inválida del servicio de IA");
+      }
       return reply.trim();
 
     } catch (error) {
       console.error("❌ Error en la API de Gemini:", error);
       
       // Fallback response
-      return this.getFallbackResponse(message);
+      throw error; // Re-throw to be handled by caller
     }
   }
 
@@ -206,6 +247,8 @@ Pregunta del usuario: ${message}`
     const messagesContainer = document.getElementById('chat-messages');
     if (!messagesContainer) return;
 
+    // Remove existing typing indicator first
+    this.hideTypingIndicator();
     const typingDiv = document.createElement('div');
     typingDiv.className = 'chat-message bot typing-indicator';
     typingDiv.id = 'typing-indicator';
@@ -236,6 +279,11 @@ Pregunta del usuario: ${message}`
   }
 
   getFallbackResponse(message) {
+    // Validate input
+    if (!message || typeof message !== 'string') {
+      return "🤖 Hola! Soy tu asistente financiero. ¿En qué puedo ayudarte?";
+    }
+    
     const lowerMessage = message.toLowerCase();
     
     if (lowerMessage.includes('ahorro') || lowerMessage.includes('ahorrar')) {
