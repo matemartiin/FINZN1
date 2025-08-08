@@ -1609,9 +1609,16 @@ class FinznApp {
 }
 
 // Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   console.log('🌟 DOM LOADED - Creating FINZN App instance');
   window.app = new FinznApp();
+  
+  // Load profile if user is authenticated
+  if (app.auth.isAuthenticated()) {
+    await app.profile.loadProfile();
+    app.profile.updateHeaderDisplay();
+    app.ui.updateProfileDisplay();
+  }
 });
 
 console.log('✅ MAIN.JS LOADED SUCCESSFULLY');
