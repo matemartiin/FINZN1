@@ -16,12 +16,25 @@ export class ChartManager {
       console.log('ℹ️ Expenses chart canvas not visible - skipping update');
       return;
     }
+    
+    // Apply category filter if available
+    let filteredData = data;
+    if (window.app?.contextualBar) {
+      const categoryFilter = window.app.contextualBar.getCurrentCategory();
+      if (categoryFilter !== 'all') {
+        filteredData = {};
+        if (data[categoryFilter]) {
+          filteredData[categoryFilter] = data[categoryFilter];
+        }
+      }
+    }
+    
     if (this.expensesChart) {
       this.expensesChart.destroy();
     }
 
-    const labels = Object.keys(data);
-    const values = Object.values(data);
+    const labels = Object.keys(filteredData);
+    const values = Object.values(filteredData);
     
     // If no data, show empty state
     if (labels.length === 0 || values.every(v => v === 0)) {

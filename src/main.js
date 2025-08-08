@@ -4,6 +4,7 @@ import { UIManager } from './modules/ui.js';
 import { ChartManager } from './modules/charts.js';
 import { ModalManager } from './modules/modals.js';
 import { ChatManager } from './modules/chat.js';
+import { ContextualBarManager } from './modules/contextual-bar.js';
 import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
@@ -25,6 +26,7 @@ class FinznApp {
     this.charts = new ChartManager();
     this.modals = new ModalManager();
     this.chat = new ChatManager();
+    this.contextualBar = new ContextualBarManager();
     this.reports = new ReportManager();
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
@@ -55,6 +57,7 @@ class FinznApp {
       
       // Initialize chat
       this.chat.init();
+      this.contextualBar.init();
       
       // Initialize calendar
       this.calendar.init();

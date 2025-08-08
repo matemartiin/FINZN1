@@ -163,6 +163,13 @@ export class NavigationManager {
       
       // Update page title
       this.updatePageTitle(sectionName);
+      
+      // Update contextual bar visibility
+      if (window.app && window.app.contextualBar) {
+        setTimeout(() => {
+          window.app.contextualBar.updateVisibility(sectionName);
+        }, 100);
+      }
     }
   }
   
