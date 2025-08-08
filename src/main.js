@@ -11,7 +11,6 @@ import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
-import { ContextualBarManager } from './modules/contextual-bar.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -33,7 +32,6 @@ class FinznApp {
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
-    this.contextualBar = new ContextualBarManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -64,8 +62,8 @@ class FinznApp {
       // Initialize user profile
       this.userProfile.init();
       
-      // Initialize contextual bar
-      this.contextualBar.init();
+      // Setup month selector
+      this.setupMonthSelector();
       
       // Check authentication
       await this.auth.initializeAuth();
@@ -120,12 +118,15 @@ class FinznApp {
           this.theme.toggle();
         });
       }
-
-      // Listen for month changes from contextual bar
-      document.addEventListener('monthChanged', (e) => {
-        this.currentMonth = e.detail.month;
-        this.updateDashboard();
-      });
+      
+      // Month selector
+      const monthSelect = document.getElementById('month-select');
+      if (monthSelect) {
+        monthSelect.addEventListener('change', (e) => {
+          this.currentMonth = e.target.value;
+          this.updateDashboard();
+        });
+      }
       
       console.log('✅ All event listeners set up successfully');
     } catch (error) {
@@ -349,6 +350,33 @@ class FinznApp {
         }
       });
     }
+  }
+
+  setupMonthSelector() {
+    const monthSelect = document.getElementById('month-select');
+    if (!monthSelect) return;
+    
+    // Generate last 12 months
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      const monthName = date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      months.push({ key: monthKey, name: monthName });
+    }
+    
+    monthSelect.innerHTML = '';
+    months.forEach(month => {
+      const option = document.createElement('option');
+      option.value = month.key;
+      option.textContent = month.name;
+      if (month.key === this.currentMonth) {
+        option.selected = true;
+      }
+      monthSelect.appendChild(option);
+    });
   }
 
   async handleLogin(e) {
