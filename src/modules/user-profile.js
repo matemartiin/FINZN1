@@ -24,6 +24,10 @@ export class UserProfileManager {
       console.log('👤 Loading user profile for:', userId);
       
       const { supabase } = await import('../config/supabase.js');
+      
+      // First, ensure the profile exists
+      await this.ensureProfileExists(userId);
+      
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -32,13 +36,76 @@ export class UserProfileManager {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading user profile:', error);
-        return null;
+        // If profile doesn't exist, create it
+        if (error.code === 'PGRST116') {
+          console.log('👤 Profile not found, creating default profile...');
+          return await this.createDefaultProfile(userId);
+        }
+        throw error;
       }
 
       console.log('👤 Profile loaded:', data ? 'Found' : 'Not found');
       return data;
     } catch (error) {
       console.error('Error in loadUserProfile:', error);
+      // Try to create a default profile as fallback
+      return await this.createDefaultProfile(userId);
+    }
+  }
+
+  async ensureProfileExists(userId) {
+    try {
+      const { supabase } = await import('../config/supabase.js');
+      
+      // Check if profile exists
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist, create it
+        console.log('👤 Creating missing profile for user:', userId);
+        await this.createDefaultProfile(userId);
+      }
+    } catch (error) {
+      console.error('Error ensuring profile exists:', error);
+    }
+  }
+
+  async createDefaultProfile(userId) {
+    try {
+      const { supabase } = await import('../config/supabase.js');
+      
+      // Get user email for default display name
+      const { data: { user } } = await supabase.auth.getUser();
+      const email = user?.email || '';
+      const defaultDisplayName = email ? email.split('@')[0] : 'Usuario';
+      
+      const defaultProfile = {
+        user_id: userId,
+        display_name: defaultDisplayName,
+        first_name: '',
+        last_name: '',
+        preferences: {}
+      };
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .insert([defaultProfile])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating default profile:', error);
+        return null;
+      }
+
+      console.log('✅ Default profile created:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in createDefaultProfile:', error);
       return null;
     }
   }
@@ -61,7 +128,9 @@ export class UserProfileManager {
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .insert([profile])
+        .upsert([profile], {
+          onConflict: 'user_id'
+        })
         .select();
 
       if (error) {
@@ -99,14 +168,19 @@ export class UserProfileManager {
         .update(updates)
         .eq('user_id', userId)
         .select();
+        .single();
 
       if (error) {
         console.error('Error updating user profile:', error);
-        return false;
+        throw error;
       }
 
       console.log('✅ User profile updated successfully');
-      this.currentProfile = data[0];
+      this.currentProfile = data;
+      
+      // Update the header display immediately
+      this.updateHeaderDisplay();
+      
       return true;
     } catch (error) {
       console.error('Error in updateUserProfile:', error);
@@ -114,9 +188,16 @@ export class UserProfileManager {
     }
   }
 
+  updateHeaderDisplay() {
+    const userNameElement = document.getElementById('user-name');
+    if (userNameElement) {
+      userNameElement.textContent = this.getDisplayName();
+    }
+  }
+
   getDisplayName() {
     if (!this.currentProfile) {
-      return 'Usuario sin nombre';
+      return '¡Bienvenido!';
     }
 
     const displayName = this.currentProfile.display_name?.trim();
@@ -131,7 +212,7 @@ export class UserProfileManager {
       return `${firstName} ${lastName}`.trim();
     }
 
-    return '¡Bienvenido!';
+    return 'Usuario sin nombre';
   }
 
   getFirstName() {
