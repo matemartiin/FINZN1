@@ -19,6 +19,7 @@
     "core-js": "^3.38.1"
   },
   "devDependencies": {
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "@rollup/rollup-linux-x64-gnu": "^4.9.6"
   }
 }

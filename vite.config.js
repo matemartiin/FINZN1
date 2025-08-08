@@ -11,6 +11,7 @@ export default defineConfig({
     sourcemap: false,
     minify: 'esbuild',
     chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000
   },
   server: {
     port: 3000,
@@ -25,6 +26,7 @@ export default defineConfig({
     global: 'globalThis'
   },
   optimizeDeps: {
-    include: ['chart.js', '@supabase/supabase-js']
+    include: ['chart.js', '@supabase/supabase-js'],
+    force: true
   }
 })
