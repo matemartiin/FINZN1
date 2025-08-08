@@ -10,6 +10,7 @@ import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
+import { UserProfileManager } from './modules/user-profile.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -30,6 +31,7 @@ class FinznApp {
     this.calendar = new CalendarManager();
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
+    this.userProfile = new UserProfileManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -57,6 +59,9 @@ class FinznApp {
       // Initialize calendar
       this.calendar.init();
       
+      // Initialize user profile
+      this.userProfile.init();
+      
       // Setup month selector
       this.setupMonthSelector();
       
@@ -68,6 +73,10 @@ class FinznApp {
       if (currentUser) {
         this.showApp();
         await this.loadUserData();
+        
+        // Check if user needs to complete profile
+        await this.checkProfileCompletion();
+        
         this.updateDashboard();
       } else {
         this.showAuth();
@@ -80,6 +89,16 @@ class FinznApp {
       this.showAuth();
       this.setupEventListeners();
     }
+  }
+
+  async checkProfileCompletion() {
+    // Wait a bit for profile to load
+    setTimeout(async () => {
+      if (!this.userProfile.hasCompleteProfile()) {
+        console.log('👤 User needs to complete profile');
+        this.userProfile.showCompleteProfileModal();
+      }
+    }, 1000);
   }
 
   setupEventListeners() {
@@ -418,8 +437,8 @@ class FinznApp {
     }
 
     try {
-      const success = await this.auth.register(username, password);
-      if (success) {
+      const result = await this.auth.register(username, password);
+      if (result && result.success) {
         this.showLogin();
         this.ui.showAlert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.', 'success');
       } else {
@@ -458,12 +477,6 @@ class FinznApp {
     document.getElementById('login-container').classList.add('hidden');
     document.getElementById('register-container').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
-    
-    const currentUser = this.auth.getCurrentUser();
-    const userNameElement = document.getElementById('user-name');
-    if (userNameElement) {
-      userNameElement.textContent = `👤 ${currentUser}`;
-    }
   }
 
   showLogin() {

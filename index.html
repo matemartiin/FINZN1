@@ -922,6 +922,56 @@
       </div>
     </div>
   </div>
+    <!-- Complete Profile Modal -->
+    <div id="complete-profile-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Completa tu Perfil</h3>
+          <p class="modal-subtitle">Para personalizar tu experiencia, necesitamos algunos datos adicionales</p>
+        </div>
+        <form id="complete-profile-form" class="modal-form">
+          <div class="form-group">
+            <label for="complete-first-name">Nombre *</label>
+            <input type="text" id="complete-first-name" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label for="complete-last-name">Apellido *</label>
+            <input type="text" id="complete-last-name" name="last_name" required>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">
+              <span>✅</span> Completar Perfil
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Perfil</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <form id="edit-profile-form" class="modal-form">
+          <div class="form-group">
+            <label for="edit-first-name">Nombre *</label>
+            <input type="text" id="edit-first-name" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-last-name">Apellido *</label>
+            <input type="text" id="edit-last-name" name="last_name" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+              <span>💾</span> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
   <!-- Import Data Modal -->
   <div id="import-data-modal" class="modal">
