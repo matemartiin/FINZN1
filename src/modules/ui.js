@@ -1500,4 +1500,25 @@ export class UIManager {
     `;
     container.classList.remove('hidden');
   }
+
+  async handleLogout() {
+    console.log('🚪 Handling logout...');
+    
+    try {
+      // Clear all data
+      if (window.app && window.app.data) {
+        await window.app.data.clearAllData();
+      }
+      
+      // Clear localStorage
+      localStorage.clear();
+      
+      // Redirect to login
+      window.location.href = 'login.html';
+      
+    } catch (error) {
+      console.error('❌ Error during logout:', error);
+      this.showAlert('Error al cerrar sesión', 'error');
+    }
+  }
 }
