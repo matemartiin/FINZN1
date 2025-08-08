@@ -153,13 +153,15 @@ export class AuthManager {
         // If email confirmation is disabled, user should be able to login immediately
         if (data.user.email_confirmed_at || data.session) {
           this.currentUser = data.user;
-          return { success: true, needsConfirmation: false };
+          return true;
         } else {
-          return { success: true, needsConfirmation: true };
+          // For now, we'll treat this as success and let the profile completion flow handle it
+          this.currentUser = data.user;
+          return true;
         }
       }
 
-      return { success: true, needsConfirmation: false };
+      return true;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
