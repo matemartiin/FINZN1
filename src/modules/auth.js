@@ -3,13 +3,9 @@ import { supabase } from '../config/supabase.js';
 export class AuthManager {
   constructor() {
     this.currentUser = null;
-    this.profileManager = null;
     this.initializeAuth();
   }
 
-  setProfileManager(profileManager) {
-    this.profileManager = profileManager;
-  }
   async initializeAuth() {
     console.log('🔐 Initializing authentication...');
     
@@ -43,21 +39,10 @@ export class AuthManager {
       if (event === 'SIGNED_OUT') {
         // Clear any cached data
         this.clearUserData();
-        // Clear profile data
-        if (this.profileManager) {
-          this.profileManager.clearProfile();
-        }
         // Reload the page to reset application state
         window.location.reload();
       } else if (event === 'SIGNED_IN') {
         console.log('✅ User successfully signed in:', session.user.email);
-        // Load user profile after sign in
-        if (this.profileManager) {
-          setTimeout(async () => {
-            await this.profileManager.loadProfile();
-            this.profileManager.updateHeaderDisplay();
-          }, 500);
-        }
       }
     });
   }
@@ -106,8 +91,6 @@ export class AuthManager {
   }
 
   async register(email, password) {
-  }
-  async register(email, password, displayName) {
     try {
       console.log('📝 Attempting to register user:', email);
       
@@ -130,11 +113,6 @@ export class AuthManager {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password: password,
-        options: {
-          data: {
-            display_name: displayName
-          }
-        }
       });
 
       if (error) {
@@ -172,18 +150,6 @@ export class AuthManager {
       if (data.user) {
         console.log('User created successfully, ID:', data.user.id);
         
-        // Create user profile with the provided name
-        if (this.profileManager && displayName) {
-          try {
-            await this.profileManager.createProfileOnRegistration({
-              display_name: displayName,
-              user_id: data.user.id
-            });
-          } catch (profileError) {
-            console.error('Error creating profile:', profileError);
-          }
-        }
-        
         // If email confirmation is disabled, user should be able to login immediately
         if (data.user.email_confirmed_at || data.session) {
           this.currentUser = data.user;
@@ -209,9 +175,6 @@ export class AuthManager {
       }
       
       this.clearUserData();
-      if (this.profileManager) {
-        this.profileManager.clearProfile();
-      }
       this.currentUser = null;
     } catch (error) {
       console.error('Logout error:', error);

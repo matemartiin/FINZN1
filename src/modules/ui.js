@@ -1500,40 +1500,4 @@ export class UIManager {
     `;
     container.classList.remove('hidden');
   }
-
-  async updateProfileDisplay() {
-    if (!window.app.profile) return;
-    
-    const profile = window.app.profile.getProfile();
-    if (!profile) return;
-    
-    // Update profile info card
-    const profileName = document.getElementById('profile-name');
-    const profileEmail = document.getElementById('profile-email');
-    
-    if (profileName) {
-      profileName.textContent = profile.display_name || 'Sin nombre';
-    }
-    
-    if (profileEmail) {
-      const currentUser = window.app.auth.getCurrentUser();
-      profileEmail.textContent = currentUser || 'Sin email';
-    }
-    
-    // Update edit profile form with current data
-    const editForm = document.getElementById('edit-profile-form');
-    if (editForm) {
-      const displayNameInput = editForm.querySelector('#edit-display-name');
-      const firstNameInput = editForm.querySelector('#edit-first-name');
-      const lastNameInput = editForm.querySelector('#edit-last-name');
-      const phoneInput = editForm.querySelector('#edit-phone');
-      const bioInput = editForm.querySelector('#edit-bio');
-      
-      if (displayNameInput) displayNameInput.value = profile.display_name || '';
-      if (firstNameInput) firstNameInput.value = profile.first_name || '';
-      if (lastNameInput) lastNameInput.value = profile.last_name || '';
-      if (phoneInput) phoneInput.value = profile.phone || '';
-      if (bioInput) bioInput.value = profile.bio || '';
-    }
-  }
 }
