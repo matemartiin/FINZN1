@@ -242,8 +242,8 @@ export class NavigationManager {
   }
 
   setActiveNavItem(activeItem) {
-    if (!tabName || typeof tabName !== 'string') {
-      console.error('NavigationManager: Invalid tab name:', tabName);
+    if (!activeItem) {
+      console.error('NavigationManager: No item provided to setActiveNavItem');
       return;
     }
     
@@ -269,23 +269,17 @@ export class NavigationManager {
       if (mobileItem) {
         mobileItem.classList.add('active');
       }
-    } else {
-      console.error('NavigationManager: Tab content not found:', `${tabName}-tab`);
     }
   }
   
   setActiveMobileNavItem(activeItem) {
-    // Remove active class from all mobile nav items
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-    if (!activeButton) {
-      console.error('NavigationManager: No button provided to setActiveTab');
-      return;
     if (!activeItem) {
       console.error('NavigationManager: No item provided to setActiveMobileNavItem');
       return;
     }
     
-    }
+    // Remove active class from all mobile nav items
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
     
     const navItems = document.querySelectorAll('.nav-item');
     
@@ -309,9 +303,4 @@ export class NavigationManager {
       }
     }
   }
-}
-    if (!activeItem) {
-      console.error('NavigationManager: No item provided to setActiveNavItem');
-      return;
-    }
     

@@ -25,9 +25,23 @@ export default defineConfig({
     }
   },
   define: {
-    'process.env': {}
+    'process.env': {},
+    global: 'globalThis'
   },
   optimizeDeps: {
-    include: ['chart.js', '@tensorflow/tfjs', '@supabase/supabase-js']
+    include: ['chart.js', '@tensorflow/tfjs', '@supabase/supabase-js'],
+    exclude: ['@google/genai']
+  },
+  build: {
+    target: 'es2020',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['chart.js'],
+          ai: ['@tensorflow/tfjs', '@google/genai'],
+          supabase: ['@supabase/supabase-js']
+        }
+      }
+    }
   }
 })
