@@ -4679,3 +4679,7 @@ select:focus-visible {
 .chat-toggle {
   z-index: 999;
 }
+
+.header-actions {
+  color: #333;
+}
