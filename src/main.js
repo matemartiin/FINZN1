@@ -10,6 +10,7 @@ import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
+import { ProfileManager } from './modules/profile.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -19,6 +20,7 @@ class FinznApp {
     
     // Initialize all managers
     this.auth = new AuthManager();
+    this.profile = new ProfileManager();
     this.data = new DataManager();
     this.ui = new UIManager();
     this.charts = new ChartManager();
@@ -30,6 +32,9 @@ class FinznApp {
     this.calendar = new CalendarManager();
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
+    
+    // Set profile manager reference in auth
+    this.auth.setProfileManager(this.profile);
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -67,6 +72,7 @@ class FinznApp {
       
       if (currentUser) {
         this.showApp();
+        await this.loadUserProfile();
         await this.loadUserData();
         this.updateDashboard();
       } else {
@@ -79,6 +85,18 @@ class FinznApp {
       console.error('❌ Error initializing app:', error);
       this.showAuth();
       this.setupEventListeners();
+    }
+  }
+
+  async loadUserProfile() {
+    try {
+      console.log('👤 Loading user profile...');
+      const profile = await this.profile.loadProfile();
+      if (profile) {
+        this.profile.updateHeaderDisplay();
+      }
+    } catch (error) {
+      console.error('❌ Error loading user profile:', error);
     }
   }
 
@@ -152,6 +170,18 @@ class FinznApp {
           this.ui.showAlert('Email de prueba generado', 'info');
         }
       });
+    }
+
+    // Profile management events
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const editProfileForm = document.getElementById('edit-profile-form');
+    
+    if (editProfileBtn) {
+      editProfileBtn.addEventListener('click', () => this.showEditProfileModal());
+    }
+    
+    if (editProfileForm) {
+      editProfileForm.addEventListener('submit', (e) => this.handleEditProfile(e));
     }
   }
 
@@ -376,6 +406,7 @@ class FinznApp {
       const success = await this.auth.login(username, password);
       if (success) {
         this.showApp();
+        await this.loadUserProfile();
         await this.loadUserData();
         this.updateDashboard();
         this.ui.showAlert('¡Bienvenido de vuelta!', 'success');
@@ -400,9 +431,15 @@ class FinznApp {
     
     const username = document.getElementById('register-user').value;
     const password = document.getElementById('register-pass').value;
+    const displayName = document.getElementById('register-name').value;
 
     if (!username || !password) {
       this.ui.showAlert('Por favor completa todos los campos', 'error');
+      return;
+    }
+
+    if (!displayName || displayName.trim().length === 0) {
+      this.ui.showAlert('El nombre es obligatorio', 'error');
       return;
     }
 
@@ -418,8 +455,14 @@ class FinznApp {
     }
 
     try {
-      const success = await this.auth.register(username, password);
-      if (success) {
+      const profileData = {
+        display_name: displayName.trim(),
+        first_name: '',
+        last_name: ''
+      };
+      
+      const result = await this.auth.registerWithProfile(username, password, profileData);
+      if (result.success) {
         this.showLogin();
         this.ui.showAlert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.', 'success');
       } else {
@@ -460,9 +503,11 @@ class FinznApp {
     document.getElementById('app').classList.remove('hidden');
     
     const currentUser = this.auth.getCurrentUser();
+    const profile = this.profile.getProfile();
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-      userNameElement.textContent = `👤 ${currentUser}`;
+      const displayName = profile?.display_name || currentUser || 'Usuario';
+      userNameElement.textContent = `👤 ${displayName}`;
     }
   }
 
@@ -476,6 +521,79 @@ class FinznApp {
     console.log('📝 Showing register form');
     document.getElementById('login-container').classList.add('hidden');
     document.getElementById('register-container').classList.remove('hidden');
+  }
+
+  showEditProfileModal() {
+    console.log('👤 Show edit profile modal');
+    
+    const profile = this.profile.getProfile();
+    if (profile) {
+      // Populate form with current data
+      document.getElementById('edit-display-name').value = profile.display_name || '';
+      document.getElementById('edit-first-name').value = profile.first_name || '';
+      document.getElementById('edit-last-name').value = profile.last_name || '';
+      document.getElementById('edit-phone').value = profile.phone || '';
+      document.getElementById('edit-bio').value = profile.bio || '';
+    }
+    
+    this.modals.show('edit-profile-modal');
+  }
+
+  async handleEditProfile(e) {
+    e.preventDefault();
+    console.log('👤 Handling edit profile...');
+    
+    const formData = this.ui.getFormData('edit-profile-form');
+    
+    // Validate data
+    const validation = this.profile.validateProfileData(formData);
+    if (!validation.isValid) {
+      this.ui.showAlert(validation.errors.join(', '), 'error');
+      return;
+    }
+    
+    try {
+      const updates = {
+        display_name: formData.displayName.trim(),
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        phone: formData.phone.trim(),
+        bio: formData.bio.trim()
+      };
+      
+      const success = await this.profile.updateProfile(updates);
+      
+      if (success) {
+        this.modals.hide('edit-profile-modal');
+        this.ui.showAlert('Perfil actualizado exitosamente', 'success');
+        
+        // Update profile info in settings
+        this.updateProfileInfoCard();
+      } else {
+        this.ui.showAlert('Error al actualizar el perfil', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error editing profile:', error);
+      this.ui.showAlert('Error al actualizar el perfil', 'error');
+    }
+  }
+
+  updateProfileInfoCard() {
+    const profile = this.profile.getProfile();
+    if (!profile) return;
+    
+    const nameElement = document.getElementById('profile-display-name');
+    const emailElement = document.getElementById('profile-email');
+    
+    if (nameElement) {
+      nameElement.textContent = profile.display_name;
+    }
+    
+    if (emailElement) {
+      const currentUser = this.auth.getCurrentUser();
+      emailElement.textContent = currentUser || '';
+    }
   }
 
   async loadUserData() {
@@ -495,6 +613,9 @@ class FinznApp {
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'category-filter');
       this.ui.updateCategoriesSelect(categories, 'limit-category');
+      
+      // Update profile info in settings
+      this.updateProfileInfoCard();
       
       console.log('✅ User data loaded successfully');
     } catch (error) {
