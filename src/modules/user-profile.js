@@ -75,6 +75,8 @@ export class UserProfileManager {
 
   async createUserProfile(profileData) {
     const userId = this.getCurrentUserId();
+    console.log('👤 Creating profile for user ID:', userId);
+    
     if (!userId) return false;
 
     try {
@@ -92,6 +94,8 @@ export class UserProfileManager {
         last_name: profileData.last_name
       };
 
+      console.log('👤 Profile data to insert:', profile);
+      
       const { data, error } = await supabase
         .from('user_profiles')
         .insert([profile])
@@ -100,6 +104,7 @@ export class UserProfileManager {
 
       if (error) {
         console.error('Error creating user profile:', error);
+        console.error('Full error details:', JSON.stringify(error, null, 2));
         return false;
       }
 
@@ -367,13 +372,22 @@ export class UserProfileManager {
   }
 
   getCurrentUserId() {
-    return window.app?.auth?.getCurrentUserId() || null;
+    const userId = window.app?.auth?.getCurrentUserId() || null;
+    console.log('👤 UserProfile getting user ID:', userId);
+    return userId;
   }
 
   hasCompleteProfile() {
-    return this.currentProfile && 
+    const hasComplete = this.currentProfile && 
            this.currentProfile.first_name && 
            this.currentProfile.last_name;
+    console.log('👤 Profile completeness check:', {
+      currentProfile: !!this.currentProfile,
+      firstName: this.currentProfile?.first_name,
+      lastName: this.currentProfile?.last_name,
+      hasComplete
+    });
+    return hasComplete;
   }
 
   getCurrentProfile() {

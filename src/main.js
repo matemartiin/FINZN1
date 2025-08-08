@@ -94,11 +94,15 @@ class FinznApp {
   async checkProfileCompletion() {
     // Wait a bit for profile to load
     setTimeout(async () => {
+      console.log('👤 Checking profile completion...');
+      const hasComplete = this.userProfile.hasCompleteProfile();
+      console.log('👤 Has complete profile:', hasComplete);
+      
       if (!this.userProfile.hasCompleteProfile()) {
         console.log('👤 User needs to complete profile');
         this.userProfile.showCompleteProfileModal();
       }
-    }, 1000);
+    }, 1500); // Increased delay to ensure auth is fully loaded
   }
 
   setupEventListeners() {

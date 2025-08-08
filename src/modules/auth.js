@@ -25,7 +25,8 @@ export class AuthManager {
         await this.handleAuthError(error);
       }
       this.currentUser = session?.user || null;
-      console.log('🔐 Initial session:', session ? `Found for ${session.user.email}` : 'None');
+      console.log('🔐 Initial session:', session ? `Found for ${session.user.email}, ID: ${session.user.id}` : 'None');
+      console.log('🔐 Current user object:', this.currentUser);
     } catch (error) {
       console.error('Error in initializeAuth:', error);
       this.currentUser = null;
@@ -33,8 +34,9 @@ export class AuthManager {
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔐 Auth state changed:', event, session?.user?.email);
+      console.log('🔐 Auth state changed:', event, session?.user?.email, 'ID:', session?.user?.id);
       this.currentUser = session?.user || null;
+      console.log('🔐 Updated currentUser:', this.currentUser);
       
       if (event === 'SIGNED_OUT') {
         // Clear any cached data
@@ -43,6 +45,7 @@ export class AuthManager {
         window.location.reload();
       } else if (event === 'SIGNED_IN') {
         console.log('✅ User successfully signed in:', session.user.email);
+        console.log('✅ User ID:', session.user.id);
       }
     });
   }
@@ -186,7 +189,10 @@ export class AuthManager {
   }
 
   getCurrentUserId() {
-    return this.currentUser?.id || null;
+    console.log('🔐 Getting current user ID, currentUser:', this.currentUser);
+    const userId = this.currentUser?.id || null;
+    console.log('🔐 Returning user ID:', userId);
+    return userId;
   }
 
   isAuthenticated() {
