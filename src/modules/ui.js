@@ -677,11 +677,11 @@ export class UIManager {
         if (income.fixed > 0) {
           const fixedItem = document.createElement('div');
           fixedItem.className = 'income-list-item fixed';
-        const displayName = formData.get('display_name')?.trim();
-        const firstName = formData.get('first_name')?.trim();
-        const lastName = formData.get('last_name')?.trim();
-        const phone = formData.get('phone')?.trim();
-        const bio = formData.get('bio')?.trim();
+          
+          fixedItem.innerHTML = `
+            <div class="income-item-details">
+              <div class="income-item-type">💰 Ingreso Fijo</div>
+              <div class="income-item-description">Sueldo mensual</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
           `;
@@ -1419,10 +1419,10 @@ export class UIManager {
     // Use existing alert system but with budget-specific styling
     const alertElement = document.createElement('div');
     alertElement.className = `alert alert-${alert.severity} budget-alert`;
-          first_name: firstName || '',
-          last_name: lastName || '',
-          phone: phone || '',
-          bio: bio || ''
+    
+    alertElement.innerHTML = `
+      <div class="alert-content">
+        <div class="alert-title">${alert.title}</div>
         <div class="alert-message">${alert.message}</div>
         ${alert.category ? `<div class="alert-category">Categoría: ${alert.category}</div>` : ''}
       </div>
@@ -1499,5 +1499,41 @@ export class UIManager {
       </div>
     `;
     container.classList.remove('hidden');
+  }
+
+  async updateProfileDisplay() {
+    if (!window.app.profile) return;
+    
+    const profile = window.app.profile.getProfile();
+    if (!profile) return;
+    
+    // Update profile info card
+    const profileName = document.getElementById('profile-name');
+    const profileEmail = document.getElementById('profile-email');
+    
+    if (profileName) {
+      profileName.textContent = profile.display_name || 'Sin nombre';
+    }
+    
+    if (profileEmail) {
+      const currentUser = window.app.auth.getCurrentUser();
+      profileEmail.textContent = currentUser || 'Sin email';
+    }
+    
+    // Update edit profile form with current data
+    const editForm = document.getElementById('edit-profile-form');
+    if (editForm) {
+      const displayNameInput = editForm.querySelector('#edit-display-name');
+      const firstNameInput = editForm.querySelector('#edit-first-name');
+      const lastNameInput = editForm.querySelector('#edit-last-name');
+      const phoneInput = editForm.querySelector('#edit-phone');
+      const bioInput = editForm.querySelector('#edit-bio');
+      
+      if (displayNameInput) displayNameInput.value = profile.display_name || '';
+      if (firstNameInput) firstNameInput.value = profile.first_name || '';
+      if (lastNameInput) lastNameInput.value = profile.last_name || '';
+      if (phoneInput) phoneInput.value = profile.phone || '';
+      if (bioInput) bioInput.value = profile.bio || '';
+    }
   }
 }
