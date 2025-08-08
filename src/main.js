@@ -124,30 +124,9 @@ class FinznApp {
       if (monthSelect) {
         monthSelect.addEventListener('change', (e) => {
           this.currentMonth = e.target.value;
-          
-          // Sync with contextual bar
-          if (this.contextualBar) {
-            this.contextualBar.syncMonth(this.currentMonth);
-          }
-          
           this.updateDashboard();
         });
       }
-      
-      // Listen for month changes from contextual bar
-      document.addEventListener('monthChanged', (e) => {
-        if (e.detail.source !== 'main' && e.detail.month !== this.currentMonth) {
-          this.currentMonth = e.detail.month;
-          
-          // Update main month selector
-          const monthSelect = document.getElementById('month-select');
-          if (monthSelect) {
-            monthSelect.value = this.currentMonth;
-          }
-          
-          this.updateDashboard();
-        }
-      });
       
       console.log('✅ All event listeners set up successfully');
     } catch (error) {
