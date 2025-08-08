@@ -10,7 +10,6 @@ import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
-import { UserProfileManager } from './modules/user-profile.js';
 
 console.log('🔥 FINZN App - Starting initialization');
 
@@ -31,7 +30,6 @@ class FinznApp {
     this.calendar = new CalendarManager();
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
-    this.userProfile = new UserProfileManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -70,7 +68,6 @@ class FinznApp {
       if (currentUser) {
         this.showApp();
         await this.loadUserData();
-        await this.loadUserProfile();
         this.updateDashboard();
       } else {
         this.showAuth();
@@ -304,24 +301,6 @@ class FinznApp {
     if (generateReportBtn) {
       generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
     }
-    
-    // Profile completion form
-    const completeProfileForm = document.getElementById('complete-profile-form');
-    if (completeProfileForm) {
-      completeProfileForm.addEventListener('submit', (e) => this.handleCompleteProfile(e));
-    }
-    
-    // Edit profile form
-    const editProfileForm = document.getElementById('edit-profile-form');
-    if (editProfileForm) {
-      editProfileForm.addEventListener('submit', (e) => this.handleEditProfile(e));
-    }
-    
-    // Edit profile button in settings
-    const editProfileBtn = document.getElementById('edit-profile-btn');
-    if (editProfileBtn) {
-      editProfileBtn.addEventListener('click', () => this.showEditProfileModal());
-    }
   }
 
   setupModalEvents() {
@@ -398,7 +377,6 @@ class FinznApp {
       if (success) {
         this.showApp();
         await this.loadUserData();
-        await this.loadUserProfile();
         this.updateDashboard();
         this.ui.showAlert('¡Bienvenido de vuelta!', 'success');
       } else {
@@ -442,8 +420,8 @@ class FinznApp {
     try {
       const success = await this.auth.register(username, password);
       if (success) {
-        // Show profile completion modal instead of going back to login
-        this.showCompleteProfileModal();
+        this.showLogin();
+        this.ui.showAlert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.', 'success');
       } else {
         this.ui.showAlert('Error al crear la cuenta. Intenta con otro email.', 'error');
       }
@@ -481,7 +459,11 @@ class FinznApp {
     document.getElementById('register-container').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     
-    this.updateUserDisplay();
+    const currentUser = this.auth.getCurrentUser();
+    const userNameElement = document.getElementById('user-name');
+    if (userNameElement) {
+      userNameElement.textContent = `👤 ${currentUser}`;
+    }
   }
 
   showLogin() {
@@ -519,129 +501,6 @@ class FinznApp {
       console.error('❌ Error loading user data:', error);
       // Show user-friendly error message
       this.ui.showAlert('Error al cargar los datos. Verifica tu conexión.', 'error');
-    }
-  }
-
-  async loadUserProfile() {
-    console.log('👤 Loading user profile...');
-    try {
-      await this.userProfile.initializeProfile();
-      this.updateUserDisplay();
-    } catch (error) {
-      console.error('❌ Error loading user profile:', error);
-    }
-  }
-
-  updateUserDisplay() {
-    const userNameElement = document.getElementById('user-name');
-    if (userNameElement) {
-      const displayName = this.userProfile.getDisplayName();
-      userNameElement.textContent = `👤 ${displayName}`;
-    }
-  }
-
-  showCompleteProfileModal() {
-    console.log('👤 Show complete profile modal');
-    this.modals.show('complete-profile-modal');
-  }
-
-  showEditProfileModal() {
-    console.log('👤 Show edit profile modal');
-    
-    // Pre-fill form with current data
-    const firstNameInput = document.getElementById('edit-first-name');
-    const lastNameInput = document.getElementById('edit-last-name');
-    
-    if (firstNameInput) {
-      firstNameInput.value = this.userProfile.getFirstName();
-    }
-    
-    if (lastNameInput) {
-      lastNameInput.value = this.userProfile.getLastName();
-    }
-    
-    this.modals.show('edit-profile-modal');
-  }
-
-  async handleCompleteProfile(e) {
-    e.preventDefault();
-    console.log('👤 Handling complete profile...');
-    
-    const formData = this.ui.getFormData('complete-profile-form');
-    
-    // Validate data
-    const validation = this.userProfile.validateProfileData({
-      firstName: formData.firstName,
-      lastName: formData.lastName
-    });
-    
-    if (!validation.isValid) {
-      this.ui.showAlert(validation.errors[0], 'error');
-      return;
-    }
-    
-    try {
-      // Format names properly
-      const profileData = {
-        firstName: this.userProfile.formatName(formData.firstName),
-        lastName: this.userProfile.formatName(formData.lastName)
-      };
-      
-      const success = await this.userProfile.createUserProfile(profileData);
-      
-      if (success) {
-        this.modals.hide('complete-profile-modal');
-        this.ui.showAlert('¡Perfil completado exitosamente!', 'success');
-        
-        // Now show the app
-        this.showApp();
-        await this.loadUserData();
-        this.updateDashboard();
-      } else {
-        this.ui.showAlert('Error al completar el perfil', 'error');
-      }
-    } catch (error) {
-      console.error('Error completing profile:', error);
-      this.ui.showAlert('Error al completar el perfil', 'error');
-    }
-  }
-
-  async handleEditProfile(e) {
-    e.preventDefault();
-    console.log('👤 Handling edit profile...');
-    
-    const formData = this.ui.getFormData('edit-profile-form');
-    
-    // Validate data
-    const validation = this.userProfile.validateProfileData({
-      firstName: formData.firstName,
-      lastName: formData.lastName
-    });
-    
-    if (!validation.isValid) {
-      this.ui.showAlert(validation.errors[0], 'error');
-      return;
-    }
-    
-    try {
-      // Format names properly
-      const updates = {
-        first_name: this.userProfile.formatName(formData.firstName),
-        last_name: this.userProfile.formatName(formData.lastName)
-      };
-      
-      const success = await this.userProfile.updateUserProfile(updates);
-      
-      if (success) {
-        this.modals.hide('edit-profile-modal');
-        this.ui.showAlert('Perfil actualizado exitosamente', 'success');
-        this.updateUserDisplay();
-      } else {
-        this.ui.showAlert('Error al actualizar el perfil', 'error');
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      this.ui.showAlert('Error al actualizar el perfil', 'error');
     }
   }
 
