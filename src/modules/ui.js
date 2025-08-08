@@ -615,7 +615,7 @@ export class UIManager {
   }
 
   // FIXED: Income details with proper counting and display
-  async updateIncomeDetails(income, extraIncomes = []) {
+  updateIncomeDetails(income, extraIncomes = []) {
     const allIncomesList = document.getElementById('all-incomes-list');
     const incomesIndicator = document.getElementById('incomes-indicator');
     const incomeSummary = document.getElementById('income-summary');
@@ -677,10 +677,10 @@ export class UIManager {
         if (income.fixed > 0) {
           const fixedItem = document.createElement('div');
           fixedItem.className = 'income-list-item fixed';
-          
           fixedItem.innerHTML = `
             <div class="income-item-details">
-              <div class="income-item-description">Sueldo mensual</div>
+              <div class="income-item-type">💰 Ingreso Fijo</div>
+              <div class="income-item-description">Salario mensual</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
           `;
@@ -695,7 +695,9 @@ export class UIManager {
           
           item.innerHTML = `
             <div class="income-item-details">
+              <div class="income-item-type">💵 ${extraIncome.category}</div>
               <div class="income-item-description">${extraIncome.description}</div>
+              <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
           `;
@@ -1416,10 +1418,8 @@ export class UIManager {
     // Use existing alert system but with budget-specific styling
     const alertElement = document.createElement('div');
     alertElement.className = \`alert alert-${alert.severity} budget-alert`;
-    
     alertElement.innerHTML = `
       <div class="alert-content">
-        <div class="alert-title">${alert.title}</div>
         <div class="alert-message">${alert.message}</div>
         ${alert.category ? `<div class="alert-category">Categoría: ${alert.category}</div>` : ''}
       </div>
@@ -1496,5 +1496,22 @@ export class UIManager {
       </div>
     `;
     container.classList.remove('hidden');
+  }
+
+  updateUserProfile(userData) {
+    const formData = new FormData();
+    const displayName = formData.get('display_name')?.trim();
+    const firstName = formData.get('first_name')?.trim();
+    const lastName = formData.get('last_name')?.trim();
+    const phone = formData.get('phone')?.trim();
+    const bio = formData.get('bio')?.trim();
+
+    return {
+      display_name: displayName || '',
+      first_name: firstName || '',
+      last_name: lastName || '',
+      phone: phone || '',
+      bio: bio || ''
+    };
   }
 }
