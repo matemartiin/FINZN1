@@ -369,21 +369,6 @@ body {
   flex-shrink: 0;
 }
 
-.month-selector {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.month-selector select {
-  padding: 8px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
 .user-info {
   font-weight: 700;
   color: var(--text-secondary);
