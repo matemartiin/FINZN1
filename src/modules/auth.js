@@ -106,6 +106,7 @@ export class AuthManager {
   }
 
   async register(email, password) {
+  }
   async register(email, password, displayName) {
     try {
       console.log('📝 Attempting to register user:', email);
