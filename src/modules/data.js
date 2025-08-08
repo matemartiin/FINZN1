@@ -1438,6 +1438,16 @@ export class DataManager {
   calculateBalance(month) {
     console.log('💰 Calculating balance for month:', month);
     
+    if (!month || typeof month !== 'string') {
+      console.warn('Invalid month parameter:', month);
+      return {
+        totalIncome: 0,
+        totalExpenses: 0,
+        available: 0,
+        installments: 0
+      };
+    }
+    
     const expenses = this.getExpenses(month);
     const income = this.getIncome(month);
     const extraIncomes = this.getExtraIncomes(month);
@@ -1449,24 +1459,27 @@ export class DataManager {
     });
     
     // Calculate total expenses
-    const totalExpenses = expenses.reduce((sum, expense) => {
+    const totalExpenses = Array.isArray(expenses) ? expenses.reduce((sum, expense) => {
+      if (!expense || !expense.amount) return sum;
       const amount = parseFloat(expense.amount) || 0;
       return sum + amount;
-    }, 0);
+    }, 0) : 0;
     
     // Calculate total income (fixed + extra from incomes table + extra_incomes table)
-    const fixedIncome = parseFloat(income.fixed) || 0;
-    const extraFromIncomes = parseFloat(income.extra) || 0;
-    const extraFromTable = extraIncomes.reduce((sum, extraIncome) => {
+    const fixedIncome = income && typeof income.fixed !== 'undefined' ? parseFloat(income.fixed) || 0 : 0;
+    const extraFromIncomes = income && typeof income.extra !== 'undefined' ? parseFloat(income.extra) || 0 : 0;
+    const extraFromTable = Array.isArray(extraIncomes) ? extraIncomes.reduce((sum, extraIncome) => {
+      if (!extraIncome || !extraIncome.amount) return sum;
       const amount = parseFloat(extraIncome.amount) || 0;
       return sum + amount;
-    }, 0);
+    }, 0) : 0;
     
     const totalIncome = fixedIncome + extraFromIncomes + extraFromTable;
     const available = totalIncome - totalExpenses;
     
     // Count installments
-    const installments = expenses.filter(exp => exp.total_installments > 1).length;
+    const installments = Array.isArray(expenses) ? 
+      expenses.filter(exp => exp && exp.total_installments && exp.total_installments > 1).length : 0;
     
     const result = {
       totalIncome,
@@ -1495,14 +1508,40 @@ export class DataManager {
 
   // Check spending limits
   checkSpendingLimits(month) {
+    if (!month || typeof month !== 'string') {
+      console.warn('Invalid month parameter for spending limits check:', month);
+      return [];
+    }
+    
     const expenses = this.getExpenses(month);
     const limits = this.getSpendingLimits();
     const alerts = [];
 
+    if (!Array.isArray(expenses) || !Array.isArray(limits)) {
+      console.warn('Invalid data for spending limits check');
+      return alerts;
+    }
     limits.forEach(limit => {
+      if (!limit || !limit.category || !limit.amount) {
+        console.warn('Invalid spending limit:', limit);
+        return;
+      }
+      
       const categoryExpenses = expenses.filter(exp => exp.category === limit.category);
-      const currentSpent = categoryExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-      const percentage = (currentSpent / limit.amount) * 100;
+      const currentSpent = categoryExpenses.reduce((sum, exp) => {
+        if (!exp || !exp.amount) return sum;
+        const amount = parseFloat(exp.amount);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+      
+      const limitAmount = parseFloat(limit.amount);
+      if (isNaN(limitAmount) || limitAmount <= 0) {
+        console.warn('Invalid limit amount:', limit.amount);
+        return;
+      }
+      
+      const percentage = (currentSpent / limitAmount) * 100;
+      const warningPercentage = limit.warning_percentage || 80;
 
       if (percentage >= 100) {
         alerts.push({
@@ -1511,7 +1550,7 @@ export class DataManager {
           message: `Has superado el límite de ${limit.category}`,
           percentage: percentage.toFixed(1)
         });
-      } else if (percentage >= limit.warning_percentage) {
+      } else if (percentage >= warningPercentage) {
         alerts.push({
           type: 'warning',
           category: limit.category,
@@ -1520,6 +1559,7 @@ export class DataManager {
         });
       }
     });
+    
     return alerts;
   }
 }

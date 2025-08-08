@@ -196,6 +196,12 @@ export class UserProfileManager {
     try {
       const { supabase } = await import('../config/supabase.js');
       
+      // Check if supabase is properly configured
+      if (!supabase || typeof supabase.from !== 'function') {
+        console.warn('⚠️ Supabase not properly configured');
+        return;
+      }
+      
       // Try to query the table to see if it exists
       const { error } = await supabase
         .from('user_profiles')
@@ -255,12 +261,16 @@ export class UserProfileManager {
           CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
         `;
         
-        const { error: createError } = await supabase.rpc('exec_sql', { sql: createTableSQL });
-        
-        if (createError) {
-          console.warn('⚠️ Could not create user_profiles table automatically. Please create it manually in Supabase.');
-        } else {
-          console.log('✅ User profiles table created successfully');
+        // Note: RPC function may not exist, so we'll just log the warning
+        try {
+          const { error: createError } = await supabase.rpc('exec_sql', { sql: createTableSQL });
+          if (createError) {
+            console.warn('⚠️ Could not create user_profiles table automatically. Please create it manually in Supabase.');
+          } else {
+            console.log('✅ User profiles table created successfully');
+          }
+        } catch (rpcError) {
+          console.warn('⚠️ RPC function not available. Please create user_profiles table manually in Supabase.');
         }
       }
     } catch (error) {

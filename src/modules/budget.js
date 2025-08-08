@@ -166,22 +166,46 @@ export class BudgetManager {
 
   // Calculate budget progress
   calculateBudgetProgress(budget, expenses) {
-    if (!budget || !expenses) return { spent: 0, remaining: 0, percentage: 0, status: 'safe' };
+    if (!budget || !expenses || !Array.isArray(expenses)) {
+      return { spent: 0, remaining: 0, percentage: 0, status: 'safe' };
+    }
+
+    // Validate budget data
+    if (!budget.amount || isNaN(parseFloat(budget.amount))) {
+      console.warn('Invalid budget amount:', budget.amount);
+      return { spent: 0, remaining: 0, percentage: 0, status: 'safe' };
+    }
 
     // Filter expenses for this budget's category and date range
     const budgetExpenses = expenses.filter(expense => {
+      if (!expense || !expense.transaction_date || !expense.category || !expense.amount) {
+        return false;
+      }
+      
       const expenseDate = new Date(expense.transaction_date);
+      if (isNaN(expenseDate.getTime())) {
+        return false;
+      }
+      
       const startDate = new Date(budget.start_date);
       const endDate = new Date(budget.end_date);
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return false;
+      }
       
       return expense.category === budget.category && 
              expenseDate >= startDate && 
              expenseDate <= endDate;
     });
 
-    const spent = budgetExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+    const spent = budgetExpenses.reduce((sum, expense) => {
+      const amount = parseFloat(expense.amount);
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
+    
     const remaining = budget.amount - spent;
-    const percentage = (spent / budget.amount) * 100;
+    const percentage = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
 
     let status = 'safe';
     if (percentage >= 100) {

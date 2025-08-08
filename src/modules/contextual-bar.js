@@ -230,6 +230,9 @@ export class ContextualBarManager {
       }
     } catch (error) {
       console.error('Error updating transactions view:', error);
+      if (window.app && window.app.ui && window.app.ui.showAlert) {
+        window.app.ui.showAlert('Error al actualizar las transacciones', 'error');
+      }
     }
   }
 
@@ -241,6 +244,9 @@ export class ContextualBarManager {
       }
     } catch (error) {
       console.error('Error updating reports view:', error);
+      if (window.app && window.app.ui && window.app.ui.showAlert) {
+        window.app.ui.showAlert('Error al actualizar los reportes', 'error');
+      }
     }
   }
 
@@ -263,6 +269,9 @@ export class ContextualBarManager {
       }
     } catch (error) {
       console.error('Error updating charts view:', error);
+      if (window.app && window.app.ui && window.app.ui.showAlert) {
+        window.app.ui.showAlert('Error al actualizar los gráficos', 'error');
+      }
     }
   }
 

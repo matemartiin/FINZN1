@@ -6,6 +6,20 @@ export class ReportManager {
   async generateAIReport(data, focus, questions) {
     console.log('🤖 Generating AI report with data:', data);
     
+    // Validate input data
+    if (!data || typeof data !== 'object') {
+      console.error('Invalid data provided to generateAIReport');
+      return this.generateEnhancedFallbackReport({
+        totalIncome: 0,
+        totalExpenses: 0,
+        categories: {},
+        goals: [],
+        spendingLimits: [],
+        period: 'current',
+        months: 1
+      }, focus, questions);
+    }
+    
     try {
       // Get API key
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -88,32 +102,43 @@ export class ReportManager {
   }
 
   buildAIPrompt(data, focus, questions) {
-    const balance = data.totalIncome - data.totalExpenses;
-    const savingsRate = data.totalIncome > 0 ? ((balance / data.totalIncome) * 100).toFixed(1) : 0;
+    // Validate data structure
+    const safeData = {
+      totalIncome: parseFloat(data.totalIncome) || 0,
+      totalExpenses: parseFloat(data.totalExpenses) || 0,
+      categories: data.categories || {},
+      goals: Array.isArray(data.goals) ? data.goals : [],
+      spendingLimits: Array.isArray(data.spendingLimits) ? data.spendingLimits : [],
+      period: data.period || 'current',
+      months: parseInt(data.months) || 1
+    };
+    
+    const balance = safeData.totalIncome - safeData.totalExpenses;
+    const savingsRate = safeData.totalIncome > 0 ? ((balance / safeData.totalIncome) * 100).toFixed(1) : 0;
     
     // Get top categories
-    const topCategories = Object.entries(data.categories)
+    const topCategories = Object.entries(safeData.categories)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5);
 
     let prompt = `Eres un experto asesor financiero personal. Analiza los siguientes datos financieros y genera un informe completo y personalizado en español.
 
 DATOS FINANCIEROS:
-- Período: ${this.getPeriodText(data.period)} (${data.months} meses)
-- Ingresos Totales: $${data.totalIncome.toLocaleString()}
-- Gastos Totales: $${data.totalExpenses.toLocaleString()}
+- Período: ${this.getPeriodText(safeData.period)} (${safeData.months} meses)
+- Ingresos Totales: $${safeData.totalIncome.toLocaleString()}
+- Gastos Totales: $${safeData.totalExpenses.toLocaleString()}
 - Balance: $${balance.toLocaleString()}
 - Tasa de Ahorro: ${savingsRate}%
 
 GASTOS POR CATEGORÍA:`;
 
     topCategories.forEach(([category, amount]) => {
-      const percentage = ((amount / data.totalExpenses) * 100).toFixed(1);
+      const percentage = safeData.totalExpenses > 0 ? ((amount / safeData.totalExpenses) * 100).toFixed(1) : 0;
       prompt += `\n- ${category}: $${amount.toLocaleString()} (${percentage}%)`;
     });
 
-    prompt += `\n\nOBJETIVOS DE AHORRO: ${data.goals.length} objetivos activos`;
-    prompt += `\nLÍMITES DE GASTO: ${data.spendingLimits.length} límites configurados`;
+    prompt += `\n\nOBJETIVOS DE AHORRO: ${safeData.goals.length} objetivos activos`;
+    prompt += `\nLÍMITES DE GASTO: ${safeData.spendingLimits.length} límites configurados`;
 
     prompt += `\n\nENFOQUE DEL ANÁLISIS: ${focus}`;
 
