@@ -615,7 +615,7 @@ export class UIManager {
   }
 
   // FIXED: Income details with proper counting and display
-  updateIncomeDetails(income, extraIncomes = []) {
+  async updateIncomeDetails(income, extraIncomes = []) {
     const allIncomesList = document.getElementById('all-incomes-list');
     const incomesIndicator = document.getElementById('incomes-indicator');
     const incomeSummary = document.getElementById('income-summary');
@@ -680,7 +680,6 @@ export class UIManager {
           
           fixedItem.innerHTML = `
             <div class="income-item-details">
-              <div class="income-item-type">💰 Ingreso Fijo</div>
               <div class="income-item-description">Sueldo mensual</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
@@ -696,9 +695,7 @@ export class UIManager {
           
           item.innerHTML = `
             <div class="income-item-details">
-              <div class="income-item-type">💵 ${extraIncome.category}</div>
               <div class="income-item-description">${extraIncome.description}</div>
-              <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
           `;
@@ -874,10 +871,10 @@ export class UIManager {
     
     if (goalNameElement) goalNameElement.textContent = goal.name;
     if (goalProgressElement) {
-      goalProgressElement.textContent = `${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)} (${progress.toFixed(1)}%)`;
+      goalProgressElement.textContent = \`${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)} (${progress.toFixed(1)}%)`;
     }
     if (maxAmountElement) {
-      maxAmountElement.textContent = `Máximo disponible: ${this.formatCurrency(remaining)}`;
+      maxAmountElement.textContent = \`Máximo disponible: ${this.formatCurrency(remaining)}`;
     }
     if (amountInput) {
       amountInput.max = remaining;
@@ -1141,7 +1138,7 @@ export class UIManager {
     
     insights.forEach(insight => {
       const insightCard = document.createElement('div');
-      insightCard.className = `ai-insight-card ${insight.type || 'ai_recommendation'}`;
+      insightCard.className = \`ai-insight-card ${insight.type || 'ai_recommendation'}`;
       insightCard.dataset.recommendationId = insight.id;
       insightCard.dataset.category = insight.category;
       insightCard.dataset.suggestedBudget = insight.suggestedBudget;
@@ -1297,7 +1294,7 @@ export class UIManager {
     
     predictions.forEach(prediction => {
       const predictionCard = document.createElement('div');
-      predictionCard.className = `ml-prediction-card trend-${prediction.trend}`;
+      predictionCard.className = \`ml-prediction-card trend-${prediction.trend}`;
       
       const trendIcons = {
         'increasing': '📈',
@@ -1366,7 +1363,7 @@ export class UIManager {
     
     patterns.forEach(pattern => {
       const patternCard = document.createElement('div');
-      patternCard.className = `pattern-card pattern-${pattern.type}`;
+      patternCard.className = \`pattern-card pattern-${pattern.type}`;
       
       const typeIcons = {
         'day_pattern': '📅',
@@ -1418,7 +1415,7 @@ export class UIManager {
   displayBudgetAlert(alert) {
     // Use existing alert system but with budget-specific styling
     const alertElement = document.createElement('div');
-    alertElement.className = `alert alert-${alert.severity} budget-alert`;
+    alertElement.className = \`alert alert-${alert.severity} budget-alert`;
     
     alertElement.innerHTML = `
       <div class="alert-content">
@@ -1499,41 +1496,5 @@ export class UIManager {
       </div>
     `;
     container.classList.remove('hidden');
-  }
-
-  async updateProfileDisplay() {
-    if (!window.app.profile) return;
-    
-    const profile = window.app.profile.getProfile();
-    if (!profile) return;
-    
-    // Update profile info card
-    const profileName = document.getElementById('profile-name');
-    const profileEmail = document.getElementById('profile-email');
-    
-    if (profileName) {
-      profileName.textContent = profile.display_name || 'Sin nombre';
-    }
-    
-    if (profileEmail) {
-      const currentUser = window.app.auth.getCurrentUser();
-      profileEmail.textContent = currentUser || 'Sin email';
-    }
-    
-    // Update edit profile form with current data
-    const editForm = document.getElementById('edit-profile-form');
-    if (editForm) {
-      const displayNameInput = editForm.querySelector('#edit-display-name');
-      const firstNameInput = editForm.querySelector('#edit-first-name');
-      const lastNameInput = editForm.querySelector('#edit-last-name');
-      const phoneInput = editForm.querySelector('#edit-phone');
-      const bioInput = editForm.querySelector('#edit-bio');
-      
-      if (displayNameInput) displayNameInput.value = profile.display_name || '';
-      if (firstNameInput) firstNameInput.value = profile.first_name || '';
-      if (lastNameInput) lastNameInput.value = profile.last_name || '';
-      if (phoneInput) phoneInput.value = profile.phone || '';
-      if (bioInput) bioInput.value = profile.bio || '';
-    }
   }
 }
