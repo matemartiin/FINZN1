@@ -177,7 +177,7 @@ export class ChatManager {
                   {
 
 Pregunta del usuario: ${message}`
-                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
+                    text: \`Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
                   }
                 ]
               }
