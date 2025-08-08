@@ -64,6 +64,10 @@
       
       <form id="register-form" class="auth-form">
         <div class="input-group">
+          <input type="text" id="register-name" name="displayName" placeholder="Nombre completo" required autocomplete="name" />
+          <small class="input-hint">Tu nombre completo para personalizar la experiencia</small>
+        </div>
+        <div class="input-group">
           <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" />
           <small class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
         </div>
@@ -418,8 +422,17 @@
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Información Personal</h4>
-                    <p>Actualiza tu información de perfil</p>
-                    <button class="btn btn-secondary btn-sm">Editar Perfil</button>
+                    <div class="profile-info">
+                      <div class="profile-detail">
+                        <span class="profile-label">Nombre:</span>
+                        <span id="profile-display-name" class="profile-value">Cargando...</span>
+                      </div>
+                      <div class="profile-detail">
+                        <span class="profile-label">Email:</span>
+                        <span id="profile-email" class="profile-value">Cargando...</span>
+                      </div>
+                    </div>
+                    <button id="edit-profile-btn" class="btn btn-secondary btn-sm">Editar Perfil</button>
                   </div>
                   
                   <div class="settings-card">
@@ -706,6 +719,45 @@
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Crear Límite</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>✏️ Editar Perfil</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-profile-form">
+        <div class="form-group">
+          <label for="edit-display-name">Nombre *</label>
+          <input type="text" id="edit-display-name" name="displayName" placeholder="Tu nombre completo" required maxlength="50">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-first-name">Nombre</label>
+            <input type="text" id="edit-first-name" name="firstName" placeholder="Nombre" maxlength="30">
+          </div>
+          <div class="form-group">
+            <label for="edit-last-name">Apellido</label>
+            <input type="text" id="edit-last-name" name="lastName" placeholder="Apellido" maxlength="30">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-phone">Teléfono</label>
+          <input type="tel" id="edit-phone" name="phone" placeholder="+54 11 1234-5678" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label for="edit-bio">Biografía</label>
+          <textarea id="edit-bio" name="bio" placeholder="Cuéntanos algo sobre ti..." rows="3" maxlength="500"></textarea>
+          <small class="form-help">Máximo 500 caracteres</small>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         </div>
       </form>
     </div>
