@@ -4670,35 +4670,6 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--primary-color);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
-}
-
-/* Focus states */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-/* Ensure proper stacking context */
-.header {
-  position: relative;
-  z-index: 1000;
-}
-
-.mobile-nav {
-  z-index: 1000;
-}
-
-.chat-toggle {
-  z-index: 999;
-}
-
 .header-actions {
   color: #333;
 }
