@@ -6,20 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "server": "node server.js",
-    "lint": "echo 'Linting not configured'",
-    "test": "echo 'Tests not configured'"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "^1.10.0",
     "@supabase/supabase-js": "^2.39.0",
-    "@tensorflow/tfjs": "^4.22.0",
-    "chart.js": "^4.4.0",
-    "core-js": "^3.38.1"
+    "chart.js": "^4.4.0"
   },
   "devDependencies": {
-    "vite": "^5.4.2",
-    "@rollup/rollup-linux-x64-gnu": "^4.9.6"
+    "vite": "^5.0.0"
   }
 }

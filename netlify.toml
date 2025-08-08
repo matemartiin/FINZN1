@@ -1,60 +1,21 @@
 [build]
-  command = "rm -rf node_modules package-lock.json && npm install --include=optional && npm run build"
+  command = "npm install && npm run build"
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "18"
   VITE_GEMINI_API_KEY = "AIzaSyC-azRp6elq_4tI6DfPqGt8IszlZPMQO-I"
   VITE_SUPABASE_URL = "https://iorzfbiiprbwbdygqipu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvcnpmYmlpcHJid2JkeWdxaXB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNjg0MzQsImV4cCI6MjA2Nzk0NDQzNH0.k47RZgrlrL8zis_giZAOTFa6uqds1IKElAev1R4X4ig"
-  VITE_GOOGLE_API_KEY = "AIzaSyBxecuQu0et7yz5IomZsNyP3NSCs2yo99w"
-  VITE_GOOGLE_CLIENT_ID = "883628880517-ic7i3i5fb1dq0c20p3uig3e5j7hh8g2p.apps.googleusercontent.com"
+
 [[headers]]
-# Security headers
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co; font-src 'self';"
-
-[[headers]]
-  for = "*.js"
-  [headers.values]
-    Content-Type = "application/javascript"
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.css"
-  [headers.values]
-    Content-Type = "text/css"
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[functions]
-  directory = "netlify/functions"
-  
-[build.processing]
-  skip_processing = false
-
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = true
-  minify = true
