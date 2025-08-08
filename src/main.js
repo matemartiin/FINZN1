@@ -102,7 +102,7 @@ class FinznApp {
         console.log('👤 User needs to complete profile');
         this.userProfile.showCompleteProfileModal();
       }
-    }, 1500); // Increased delay to ensure auth is fully loaded
+    }, 2000); // Increased delay to ensure auth and profile are fully loaded
   }
 
   setupEventListeners() {
@@ -565,12 +565,16 @@ class FinznApp {
       });
       
       // Update charts
-      const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
-      this.charts.updateExpensesChart(expensesByCategory);
-      
-      // Update trend chart
-      const trendData = await this.data.getTrendData();
-      this.charts.updateTrendChart(trendData);
+      try {
+        const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
+        this.charts.updateExpensesChart(expensesByCategory);
+        
+        // Update trend chart
+        const trendData = await this.data.getTrendData();
+        this.charts.updateTrendChart(trendData);
+      } catch (chartError) {
+        console.log('ℹ️ Charts not available in current view:', chartError.message);
+      }
       
       // Update budgets with AI insights
       const budgets = await this.budget.loadBudgets();

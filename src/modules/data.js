@@ -255,7 +255,7 @@ export class DataManager {
         .select('*')
         .eq('user_id', userId)
         .eq('month', month)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading income:', error);

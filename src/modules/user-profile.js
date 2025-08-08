@@ -98,7 +98,10 @@ export class UserProfileManager {
       
       const { data, error } = await supabase
         .from('user_profiles')
-        .insert([profile])
+        .upsert([profile], {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        })
         .select()
         .single();
 
@@ -134,31 +137,30 @@ export class UserProfileManager {
       await this.ensureUserProfilesTableExists();
       
       const updates = {
+        user_id: userId,
         display_name: `${profileData.first_name} ${profileData.last_name}`.trim(),
         first_name: profileData.first_name,
         last_name: profileData.last_name,
         updated_at: new Date().toISOString()
       };
 
-      // Try to update first
-      const { data: updateData, error: updateError } = await supabase
+      // Use upsert to handle both update and insert cases
+      const { data, error } = await supabase
         .from('user_profiles')
-        .update(updates)
-        .eq('user_id', userId)
+        .upsert([updates], {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        })
         .select()
         .single();
 
-      if (updateError && updateError.code === 'PGRST116') {
-        // Profile doesn't exist, create it (UPSERT behavior)
-        console.log('👤 Profile not found, creating new one...');
-        return await this.createUserProfile(profileData);
-      } else if (updateError) {
-        console.error('Error updating user profile:', updateError);
+      if (error) {
+        console.error('Error updating user profile:', error);
         return false;
       }
 
-      this.currentProfile = updateData;
-      console.log('✅ Profile updated successfully:', updateData);
+      this.currentProfile = data;
+      console.log('✅ Profile updated successfully:', data);
       
       // Update header display
       this.updateHeaderDisplay();
@@ -174,16 +176,19 @@ export class UserProfileManager {
     try {
       const { supabase } = await import('../config/supabase.js');
       
-      // Try to create the table if it doesn't exist
-      const { error } = await supabase.rpc('create_user_profiles_table_if_not_exists');
+      // Try to query the table to see if it exists
+      const { error } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .limit(1);
       
-      if (error && !error.message.includes('already exists')) {
+      if (error && error.message && error.message.includes('relation "public.user_profiles" does not exist')) {
         console.log('📝 Creating user_profiles table via SQL...');
         
-        // Fallback: try to create table directly
+        // Create the table using SQL
         const createTableSQL = `
           CREATE TABLE IF NOT EXISTS user_profiles (
-            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(), 
             user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
             display_name text NOT NULL DEFAULT '',
             first_name text DEFAULT '',
@@ -198,34 +203,45 @@ export class UserProfileManager {
           
           ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
           
-          CREATE POLICY IF NOT EXISTS "Users can view their own profile"
+          DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
+          CREATE POLICY "Users can view their own profile"
             ON user_profiles
             FOR SELECT
             TO authenticated
             USING (auth.uid() = user_id);
           
-          CREATE POLICY IF NOT EXISTS "Users can insert their own profile"
+          DROP POLICY IF EXISTS "Users can insert their own profile" ON user_profiles;
+          CREATE POLICY "Users can insert their own profile"
             ON user_profiles
             FOR INSERT
             TO authenticated
             WITH CHECK (auth.uid() = user_id);
           
-          CREATE POLICY IF NOT EXISTS "Users can update their own profile"
+          DROP POLICY IF EXISTS "Users can update their own profile" ON user_profiles;
+          CREATE POLICY "Users can update their own profile"
             ON user_profiles
             FOR UPDATE
             TO authenticated
             USING (auth.uid() = user_id)
             WITH CHECK (auth.uid() = user_id);
           
-          CREATE POLICY IF NOT EXISTS "Users can delete their own profile"
+          DROP POLICY IF EXISTS "Users can delete their own profile" ON user_profiles;
+          CREATE POLICY "Users can delete their own profile"
             ON user_profiles
             FOR DELETE
             TO authenticated
             USING (auth.uid() = user_id);
+          
+          CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
         `;
         
-        // This won't work directly, but we'll handle it gracefully
-        console.log('⚠️ Table creation needs to be done manually in Supabase');
+        const { error: createError } = await supabase.rpc('exec_sql', { sql: createTableSQL });
+        
+        if (createError) {
+          console.warn('⚠️ Could not create user_profiles table automatically. Please create it manually in Supabase.');
+        } else {
+          console.log('✅ User profiles table created successfully');
+        }
       }
     } catch (error) {
       console.log('ℹ️ Table check completed, proceeding...');

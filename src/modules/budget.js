@@ -21,12 +21,15 @@ export class BudgetManager {
     try {
       console.log('💰 Loading budgets for user:', userId);
       
+      // Ensure budgets table exists
+      await this.ensureBudgetsTableExists();
+      
       const { supabase } = await import('../config/supabase.js');
       const { data, error } = await supabase
         .from('budgets')
         .select('*')
         .eq('user_id', userId)
-        .eq('status', 'active')
+        .in('status', ['active', 'paused'])
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -43,6 +46,60 @@ export class BudgetManager {
     }
   }
 
+  // Ensure budgets table exists
+  async ensureBudgetsTableExists() {
+    try {
+      const { supabase } = await import('../config/supabase.js');
+      
+      // Try to query the table to see if it exists
+      const { error } = await supabase
+        .from('budgets')
+        .select('id')
+        .limit(1);
+      
+      if (error && error.message.includes('relation "public.budgets" does not exist')) {
+        console.log('📝 Creating budgets table...');
+        
+        // Create the table using SQL
+        const createTableSQL = `
+          CREATE TABLE IF NOT EXISTS budgets (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+            name text NOT NULL,
+            category text NOT NULL,
+            amount decimal(10,2) NOT NULL,
+            start_date date NOT NULL,
+            end_date date NOT NULL,
+            status text DEFAULT 'active',
+            ai_recommended boolean DEFAULT false,
+            created_at timestamptz DEFAULT now(),
+            updated_at timestamptz DEFAULT now()
+          );
+          
+          ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
+          
+          CREATE POLICY "Users can manage their own budgets"
+            ON budgets
+            FOR ALL
+            TO authenticated
+            USING (auth.uid() = user_id)
+            WITH CHECK (auth.uid() = user_id);
+          
+          CREATE INDEX IF NOT EXISTS idx_budgets_user_status ON budgets(user_id, status);
+        `;
+        
+        const { error: createError } = await supabase.rpc('exec_sql', { sql: createTableSQL });
+        
+        if (createError) {
+          console.warn('⚠️ Could not create budgets table automatically. Please create it manually in Supabase.');
+        } else {
+          console.log('✅ Budgets table created successfully');
+        }
+      }
+    } catch (error) {
+      console.log('ℹ️ Budgets table check completed');
+    }
+  }
   // Add new budget to Supabase
   async addBudget(budgetData) {
     const userId = this.getCurrentUserId();

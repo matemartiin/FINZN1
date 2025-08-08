@@ -7,10 +7,15 @@ export class ChartManager {
   updateExpensesChart(data) {
     const ctx = document.getElementById('expenses-chart');
     if (!ctx) {
-      console.warn('Expenses chart canvas not found');
+      console.log('ℹ️ Expenses chart canvas not found - not in charts view');
       return;
     }
 
+    // Verify canvas is visible and ready
+    if (ctx.offsetParent === null) {
+      console.log('ℹ️ Expenses chart canvas not visible - skipping update');
+      return;
+    }
     if (this.expensesChart) {
       this.expensesChart.destroy();
     }
@@ -20,12 +25,16 @@ export class ChartManager {
     
     // If no data, show empty state
     if (labels.length === 0 || values.every(v => v === 0)) {
-      ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
-      const context = ctx.getContext('2d');
-      context.fillStyle = '#666';
-      context.font = '14px Arial';
-      context.textAlign = 'center';
-      context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
+      try {
+        const context = ctx.getContext('2d');
+        context.clearRect(0, 0, ctx.width, ctx.height);
+        context.fillStyle = '#666';
+        context.font = '14px Arial';
+        context.textAlign = 'center';
+        context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
+      } catch (error) {
+        console.warn('Could not draw empty state on expenses chart:', error);
+      }
       return;
     }
     
@@ -77,10 +86,15 @@ export class ChartManager {
   updateTrendChart(data) {
     const ctx = document.getElementById('trend-chart');
     if (!ctx) {
-      console.warn('Trend chart canvas not found');
+      console.log('ℹ️ Trend chart canvas not found - not in charts view');
       return;
     }
 
+    // Verify canvas is visible and ready
+    if (ctx.offsetParent === null) {
+      console.log('ℹ️ Trend chart canvas not visible - skipping update');
+      return;
+    }
     if (this.trendChart) {
       this.trendChart.destroy();
     }
@@ -90,12 +104,16 @@ export class ChartManager {
     
     // If no data, show empty state
     if (labels.length === 0 || values.every(v => v === 0)) {
-      ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
-      const context = ctx.getContext('2d');
-      context.fillStyle = '#666';
-      context.font = '14px Arial';
-      context.textAlign = 'center';
-      context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
+      try {
+        const context = ctx.getContext('2d');
+        context.clearRect(0, 0, ctx.width, ctx.height);
+        context.fillStyle = '#666';
+        context.font = '14px Arial';
+        context.textAlign = 'center';
+        context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
+      } catch (error) {
+        console.warn('Could not draw empty state on trend chart:', error);
+      }
       return;
     }
 
