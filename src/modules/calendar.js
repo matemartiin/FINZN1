@@ -421,9 +421,17 @@ export class CalendarManager {
         </div>
         ${event.time ? `<div class="event-detail-item"><strong>Hora:</strong> ${event.time}</div>` : ''}
         ${event.amount ? `<div class="event-detail-item"><strong>Monto:</strong> ${this.formatCurrency(event.amount)}</div>` : ''}
-        ${event.description ? `<div class="event-detail-item"><strong>Descripción:</strong> ${event.description}</div>` : ''}
+        ${event.description ? `<div class="event-detail-item"><strong>Descripción:</strong> <span class="event-description-text"></span></div>` : ''}
         ${event.recurring ? `<div class="event-detail-item"><strong>Recurrencia:</strong> ${this.getFrequencyName(event.frequency)}</div>` : ''}
       `;
+      
+      // Safely set user-provided description
+      if (event.description) {
+        const descriptionElement = content.querySelector('.event-description-text');
+        if (descriptionElement) {
+          descriptionElement.textContent = event.description;
+        }
+      }
     }
 
     // Store event ID for editing

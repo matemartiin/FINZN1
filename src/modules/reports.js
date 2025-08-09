@@ -259,10 +259,12 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
       report += `
         <h4>❓ Respuesta a tus Preguntas</h4>
         <div class="question-section">
-          <p><em>"${questions}"</em></p>
-          <p>${this.generateQuestionResponse(questions, data)}</p>
+          <p><em class="user-question"></em></p>
+          <p class="ai-response"></p>
         </div>
       `;
+      
+      // Note: Questions and responses will be safely set after DOM insertion
     }
 
     // Action plan

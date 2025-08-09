@@ -247,7 +247,7 @@ export class UIManager {
       
       item.innerHTML = `
         <div class="goal-header">
-          <div class="goal-name"></div>
+          <div class="goal-name">${goal.name}</div>
           <div class="goal-amount">${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}</div>
         </div>
         <div class="goal-progress">
@@ -268,10 +268,6 @@ export class UIManager {
           </button>
         </div>
       `;
-      
-      // Safely set user-provided goal name
-      const goalNameElement = item.querySelector('.goal-name');
-      goalNameElement.textContent = goal.name;
       
       container.appendChild(item);
     });
