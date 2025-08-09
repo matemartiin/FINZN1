@@ -829,4 +829,524 @@
       <form id="edit-goal-form" class="modal-form">
         <div class="form-group">
           <label for="edit-goal-name">Nombre del Objetivo</label>
+          <input type="text" id="edit-goal-name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-goal-target">Monto Objetivo</label>
+          <input type="number" id="edit-goal-target" name="targetAmount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-goal-current">Monto Actual</label>
+          <input type="number" id="edit-goal-current" name="currentAmount" step="0.01" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Money to Goal Modal -->
+  <div id="add-money-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Dinero al Objetivo</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="goal-info">
+          <h3 id="add-money-goal-name">Objetivo</h3>
+          <p id="add-money-goal-progress">Progreso actual</p>
+          <p id="add-money-max-amount" class="text-muted">Máximo disponible</p>
+        </div>
+        <form id="add-money-form" class="modal-form">
+          <div class="form-group">
+            <label for="add-money-amount">Monto a Agregar</label>
+            <input type="number" id="add-money-amount" name="amount" step="0.01" min="0.01" required />
+            <small class="input-hint">Ingresa el monto que quieres agregar a este objetivo</small>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Agregar Dinero</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Categories Modal -->
+  <div id="manage-categories-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🏷️ Gestionar Categorías</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="categories-management">
+          <div class="add-category-section">
+            <h3>Agregar Nueva Categoría</h3>
+            <form id="add-category-form" class="category-form">
+              <div class="form-group">
+                <label for="category-name">Nombre</label>
+                <input type="text" id="category-name" name="name" required />
+                <span>➕</span>
+                Agregar Categoría
+              </button>
+            </form>
+          </div>
           
+          <div class="categories-list-section">
+            <h3>Categorías Existentes</h3>
+            <div id="categories-management-list" class="categories-management-list">
+              <!-- Categories will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- Complete Profile Modal -->
+    <div id="complete-profile-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Completa tu Perfil</h3>
+          <p class="modal-subtitle">Para personalizar tu experiencia, necesitamos algunos datos adicionales</p>
+        </div>
+        <form id="complete-profile-form" class="modal-form">
+          <div class="form-group">
+            <label for="complete-first-name">Nombre *</label>
+            <input type="text" id="complete-first-name" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label for="complete-last-name">Apellido *</label>
+            <input type="text" id="complete-last-name" name="last_name" required>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">
+              <span>✅</span> Completar Perfil
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Perfil</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <form id="edit-profile-form" class="modal-form">
+          <div class="form-group">
+            <label for="edit-first-name">Nombre *</label>
+            <input type="text" id="edit-first-name" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-last-name">Apellido *</label>
+            <input type="text" id="edit-last-name" name="last_name" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+              <span>💾</span> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  <!-- Import Data Modal -->
+  <div id="import-data-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📥 Importar Datos</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="import-section">
+          <h3>Seleccionar Archivo CSV</h3>
+          <div class="file-upload-area">
+            <input type="file" id="import-file" accept=".csv" />
+            <div class="file-upload-info">
+              <p><strong>Formatos soportados automáticamente:</strong></p>
+              <ul>
+                <li><strong>FINZN Completo:</strong> tipo,descripcion,monto,categoria,fecha,mes,cuota_actual,total_cuotas,monto_original,es_recurrente</li>
+                <li><strong>Gastos:</strong> descripcion,monto,categoria,fecha,cuota_actual,total_cuotas</li>
+                <li><strong>Ingresos:</strong> tipo,monto,descripcion,fecha</li>
+                <li><strong>Banco:</strong> fecha,descripcion,monto (detecta automáticamente gastos/ingresos)</li>
+                <li><strong>Otros formatos:</strong> Se detectan automáticamente por contenido</li>
+              </ul>
+              <p><em>El sistema detecta automáticamente el formato y tipo de datos.</em></p>
+            </div>
+          </div>
+          <div class="import-options">
+            <label>
+              <input type="radio" name="import-type" value="auto" checked />
+              Detección Automática (Recomendado)
+            </label>
+            <label>
+              <input type="radio" name="import-type" value="expenses" />
+              Forzar como Gastos
+            </label>
+            <label>
+              <input type="radio" name="import-type" value="incomes" />
+              Forzar como Ingresos
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="button" id="process-import-btn" class="btn btn-primary">
+          <span>📥</span>
+          Importar Datos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate AI Report Modal -->
+  <div id="generate-ai-report-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🤖 Generar Informe Financiero con IA</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-report-options">
+          <div class="form-group">
+            <label for="report-period">Período del Informe</label>
+            <select id="report-period" name="period">
+              <option value="current">Mes Actual</option>
+              <option value="last3">Últimos 3 Meses</option>
+              <option value="last6">Últimos 6 Meses</option>
+              <option value="year">Año Completo</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="report-focus">Enfoque del Informe</label>
+            <select id="report-focus" name="focus">
+              <option value="general">Análisis General</option>
+              <option value="savings">Enfoque en Ahorros</option>
+              <option value="expenses">Análisis de Gastos</option>
+              <option value="budget">Optimización de Presupuesto</option>
+              <option value="goals">Progreso hacia Objetivos</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="report-questions">Preguntas Específicas (Opcional)</label>
+            <textarea id="report-questions" name="questions" rows="3" placeholder="¿Hay algo específico que te gustaría saber sobre tus finanzas?"></textarea>
+          </div>
+        </div>
+        
+        <div id="ai-report-result" class="ai-report-result hidden">
+          <h3>📊 Tu Informe Financiero Personalizado</h3>
+          <div id="ai-report-content" class="ai-report-content">
+            <!-- El informe generado aparecerá aquí -->
+          </div>
+          <div class="ai-report-actions">
+            <button id="download-report-btn" class="btn btn-secondary">
+              <span>📄</span>
+              Descargar
+            </button>
+            <button id="share-report-btn" class="btn btn-secondary">
+              <span>📤</span>
+              Compartir
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="button" id="generate-report-btn" class="btn btn-primary">
+          <span>🤖</span>
+          Generar Informe
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Widget -->
+  <div id="chat-widget" class="chat-widget">
+    <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">
+      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-icon" />
+    </button>
+    
+    <div id="chat-window" class="chat-window hidden">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <img src="/robot-chat.png" alt="Asistente" class="chat-header-avatar" />
+          <div class="chat-header-text">
+            <h3>Asistente FINZN</h3>
+            <p>Tu consejero financiero</p>
+          </div>
+        </div>
+        <button id="chat-close" class="chat-close">&times;</button>
+      </div>
+      
+      <div id="chat-messages" class="chat-messages">
+        <!-- Messages will be added here -->
+      </div>
+      
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
+        <button type="submit" class="chat-send">
+          <span>📤</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Calendar Event Modal -->
+  <div id="add-event-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Evento Financiero</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-event-form" class="modal-form">
+        <div class="form-group">
+          <label for="event-title">Título del Evento</label>
+          <input type="text" id="event-title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="event-type">Tipo de Evento</label>
+          <select id="event-type" name="type" required>
+            <option value="">Selecciona un tipo</option>
+            <option value="payment">💳 Pago de Cuota</option>
+            <option value="income">💰 Cobro</option>
+            <option value="card-close">🏦 Cierre de Tarjeta</option>
+            <option value="reminder">⏰ Recordatorio</option>
+            <option value="deadline">📅 Vencimiento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="event-date">Fecha</label>
+          <input type="date" id="event-date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label for="event-time">Hora (opcional)</label>
+          <input type="time" id="event-time" name="time" />
+        </div>
+        <div class="form-group">
+          <label for="event-amount">Monto (opcional)</label>
+          <input type="number" id="event-amount" name="amount" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="event-description">Descripción</label>
+          <textarea id="event-description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="event-recurring" name="recurring" />
+            Evento recurrente
+          </label>
+        </div>
+        <div id="recurring-options" class="form-group hidden">
+          <label for="recurring-frequency">Frecuencia</label>
+          <select id="recurring-frequency" name="frequency">
+            <option value="weekly">Semanal</option>
+            <option value="monthly">Mensual</option>
+            <option value="yearly">Anual</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="event-notification" name="notification" checked />
+            Recordatorio por notificación
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Calendar Event Modal -->
+  <div id="edit-event-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Evento</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-event-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-event-title">Título del Evento</label>
+          <input type="text" id="edit-event-title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-type">Tipo de Evento</label>
+          <select id="edit-event-type" name="type" required>
+            <option value="payment">💳 Pago de Cuota</option>
+            <option value="income">💰 Cobro</option>
+            <option value="card-close">🏦 Cierre de Tarjeta</option>
+            <option value="reminder">⏰ Recordatorio</option>
+            <option value="deadline">📅 Vencimiento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-event-date">Fecha</label>
+          <input type="date" id="edit-event-date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-time">Hora</label>
+          <input type="time" id="edit-event-time" name="time" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-amount">Monto</label>
+          <input type="number" id="edit-event-amount" name="amount" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="edit-event-description">Descripción</label>
+          <textarea id="edit-event-description" name="description" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" id="delete-event-btn" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Event Details Modal -->
+  <div id="event-details-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="event-details-title">Detalles del Evento</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="event-details-content">
+          <!-- Event details will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
+        <button type="button" id="edit-event-from-details" class="btn btn-primary">Editar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Budget Modal -->
+  <div id="add-budget-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Crear Nuevo Presupuesto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="add-budget-form" class="modal-form">
+        <div class="form-group">
+          <label for="budget-name">Nombre del Presupuesto</label>
+          <input type="text" id="budget-name" name="name" required placeholder="Ej: Presupuesto Mensual Comida" />
+        </div>
+        <div class="form-group">
+          <label for="budget-category">Categoría</label>
+          <select id="budget-category" name="category" required>
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="budget-amount">Monto Límite</label>
+          <input type="number" id="budget-amount" name="amount" step="0.01" required placeholder="0.00" />
+          <small class="input-hint">Monto máximo que planeas gastar en esta categoría</small>
+        </div>
+        <div class="form-group">
+          <label for="budget-start-date">Fecha de Inicio</label>
+          <input type="date" id="budget-start-date" name="start_date" required />
+        </div>
+        <div class="form-group">
+          <label for="budget-end-date">Fecha de Finalización</label>
+          <input type="date" id="budget-end-date" name="end_date" required />
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="budget-ai-recommendations" name="ai_recommended" />
+            Permitir recomendaciones de IA para este presupuesto
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Presupuesto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Budget Modal -->
+  <div id="edit-budget-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Presupuesto</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="edit-budget-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-budget-name">Nombre del Presupuesto</label>
+          <input type="text" id="edit-budget-name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-budget-category">Categoría</label>
+          <select id="edit-budget-category" name="category" required>
+            <option value="">Selecciona una categoría</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-budget-amount">Monto Límite</label>
+          <input type="number" id="edit-budget-amount" name="amount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-budget-start-date">Fecha de Inicio</label>
+          <input type="date" id="edit-budget-start-date" name="start_date" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-budget-end-date">Fecha de Finalización</label>
+          <input type="date" id="edit-budget-end-date" name="end_date" required />
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="edit-budget-ai-recommendations" name="ai_recommended" />
+            Permitir recomendaciones de IA para este presupuesto
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" id="delete-budget-btn" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Budget AI Insights Modal -->
+  <div id="budget-ai-insights-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🤖 Análisis IA de Presupuestos</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="budget-ai-analysis-content" class="budget-ai-analysis-content">
+          <!-- AI analysis will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
+        <button type="button" id="apply-ai-recommendations-btn" class="btn btn-primary">
+          <span>✨</span>
+          Aplicar Recomendaciones
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load main application -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
