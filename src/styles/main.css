@@ -2651,21 +2651,28 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: flex;                 /* mantenemos flex para centrar contenido */
   align-items: center;
   justify-content: center;
   z-index: 10000;
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-normal);
-  pointer-events: none
+  pointer-events: none;
+  /* transición afinada: el overlay hace fade y la visibilidad se difiere al final */
+  transition:
+    opacity 220ms cubic-bezier(.22,.61,.36,1),
+    visibility 0s linear 220ms;
 }
 
 .modal.active {
-  display: flex !important; /* Forzar que aparezca incluso si alguien le puso hidden */
+  display: flex !important;      /* por si alguien mete .hidden en otro lado */
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  /* cuando se muestra, la visibilidad es inmediata */
+  transition:
+    opacity 220ms cubic-bezier(.22,.61,.36,1),
+    visibility 0s;
 }
 
 .modal-content {
@@ -2676,13 +2683,42 @@ body {
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  transform: scale(0.9);
-  transition: transform var(--transition-normal);
+  /* animación de entrada/salida */
+  transform: translateY(10px) scale(.98);
+  opacity: 0;
+  transition:
+    transform 220ms cubic-bezier(.22,.61,.36,1),
+    opacity 220ms cubic-bezier(.22,.61,.36,1);
   box-shadow: var(--shadow-xl);
+  will-change: transform, opacity;
 }
 
 .modal.active .modal-content {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Variantes opcionales por si querés estilos de entrada distintos */
+.modal.animate-slide .modal-content {
+  transform: translateY(24px);
+}
+.modal.active.animate-slide .modal-content {
+  transform: translateY(0);
+}
+
+.modal.animate-zoom .modal-content {
+  transform: scale(.94);
+}
+.modal.active.animate-zoom .modal-content {
   transform: scale(1);
+}
+
+/* Respeta “reducir movimiento” del SO */
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .modal .modal-content {
+    transition: none !important;
+  }
 }
 
 .modal-header {
