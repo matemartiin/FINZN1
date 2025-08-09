@@ -1,3 +1,5 @@
+import { calendarService } from './calendar-service.js';
+
 export class CalendarManager {
   constructor() {
     this.currentDate = new Date();
@@ -284,11 +286,13 @@ export class CalendarManager {
   previousMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() - 1);
     this.renderCalendar();
+    this.loadEvents(); // Reload events for new month
   }
 
   nextMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() + 1);
     this.renderCalendar();
+    this.loadEvents(); // Reload events for new month
   }
 
   showAddEventModal(date = null) {
@@ -344,13 +348,164 @@ export class CalendarManager {
 
   async addEvent(eventData) {
     const userId = this.getCurrentUserId();
+    if (!userId) {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Usuario no autenticado', 'error');
+      }
+      throw new Error('Usuario no autenticado');
+    }
+
+    try {
+      const event = {
+        user_id: userId,
+        title: eventData.title,
+        type: eventData.type,
+        date: eventData.date,
+        time: eventData.time,
+        amount: eventData.amount,
+        description: eventData.description,
+        recurring: eventData.recurring,
+        frequency: eventData.frequency
+      };
+
+      const { data, error } = await calendarService.createEvent(event);
+      
+      if (error) {
+        console.error('Error creating calendar event:', error);
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('Error al crear el evento', 'error');
+        }
+        throw error;
+      }
+
+      // Add to local events array
+      this.events.unshift(data);
+      
+      // If recurring, create additional events
+      if (data.recurring && data.frequency) {
+        await this.createRecurringEventsInDB(data);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in addEvent:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al agregar el evento', 'error');
+      }
+      throw error;
+    }
+  }
+
+  async createRecurringEventsInDB(baseEvent) {
+    try {
+      const { data, error } = await calendarService.createRecurringEvents(baseEvent);
+      
+      if (error) {
+        console.error('Error creating recurring events:', error);
+        return;
+      }
+      
+      // Add recurring events to local array
+      if (data && data.length > 0) {
+        this.events.push(...data);
+      }
+    } catch (error) {
+      console.error('Error in createRecurringEventsInDB:', error);
+    }
+  }
+
+  createRecurringEvents(baseEvent) {
+    // This method is now handled by the service
+    // Keep for backward compatibility but don't use
+    console.log('📅 Using database-based recurring events');
+  }
+
+  async updateEvent(eventId, updates) {
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Usuario no autenticado', 'error');
+      }
+      throw new Error('Usuario no autenticado');
+    }
+
+    try {
+      const { data, error } = await calendarService.updateEvent(eventId, updates);
+      
+      if (error) {
+        console.error('Error updating calendar event:', error);
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('Error al actualizar el evento', 'error');
+        }
+        throw error;
+      }
+
+      // Update local events array
+      const eventIndex = this.events.findIndex(e => e.id === eventId);
+      if (eventIndex !== -1) {
+        this.events[eventIndex] = data;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in updateEvent:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al actualizar el evento', 'error');
+      }
+      throw error;
+    }
+  }
+
+  async deleteEvent(eventId) {
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Usuario no autenticado', 'error');
+      }
+      throw new Error('Usuario no autenticado');
+    }
+
+    try {
+      const { data, error } = await calendarService.deleteEvent(eventId);
+      
+      if (error) {
+        console.error('Error deleting calendar event:', error);
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('Error al eliminar el evento', 'error');
+        }
+        throw error;
+      }
+
+      // Remove from local events array
+      this.events = this.events.filter(e => e.id !== eventId);
+      
+      return true;
+    } catch (error) {
+      console.error('Error in deleteEvent:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al eliminar el evento', 'error');
+      }
+      throw error;
+    }
+  }
+
+  // Legacy method - now handled by service
+  async addEventLegacy(eventData) {
+    const userId = this.getCurrentUserId();
     if (!userId) throw new Error('Usuario no autenticado');
 
-    // For now, store in memory (later will be database)
+    // Create event object with generated ID for backward compatibility
     const event = {
       id: this.generateId(),
       user_id: userId,
-      ...eventData,
+      title: eventData.title,
+      type: eventData.type,
+      date: eventData.date,
+      time: eventData.time,
+      amount: eventData.amount,
+      description: eventData.description,
+      recurring: eventData.recurring,
+      frequency: eventData.frequency,
       created_at: new Date().toISOString()
     };
 
@@ -362,35 +517,6 @@ export class CalendarManager {
     }
 
     return event;
-  }
-
-  createRecurringEvents(baseEvent) {
-    const startDate = new Date(baseEvent.date);
-    const endDate = new Date(startDate);
-    endDate.setFullYear(endDate.getFullYear() + 1); // Create events for 1 year
-
-    let currentDate = new Date(startDate);
-    
-    while (currentDate <= endDate) {
-      if (baseEvent.frequency === 'weekly') {
-        currentDate.setDate(currentDate.getDate() + 7);
-      } else if (baseEvent.frequency === 'monthly') {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-      } else if (baseEvent.frequency === 'yearly') {
-        currentDate.setFullYear(currentDate.getFullYear() + 1);
-      }
-
-      if (currentDate <= endDate) {
-        const recurringEvent = {
-          ...baseEvent,
-          id: this.generateId(),
-          date: currentDate.toISOString().split('T')[0],
-          parent_id: baseEvent.id
-        };
-        
-        this.events.push(recurringEvent);
-      }
-    }
   }
 
   showEventDetails(eventId) {
@@ -514,14 +640,6 @@ export class CalendarManager {
     }
   }
 
-  async updateEvent(eventId, updates) {
-    const eventIndex = this.events.findIndex(e => e.id === eventId);
-    if (eventIndex === -1) throw new Error('Evento no encontrado');
-
-    this.events[eventIndex] = { ...this.events[eventIndex], ...updates };
-    return this.events[eventIndex];
-  }
-
   async handleDeleteEvent() {
     const modal = document.getElementById('edit-event-modal');
     const eventId = modal?.dataset.eventId;
@@ -556,13 +674,52 @@ export class CalendarManager {
     this.events = this.events.filter(e => e.id !== eventId);
   }
 
-  loadEvents() {
-    // For now, load from memory
-    // Later this will load from database
-    console.log('📅 Loading calendar events...');
-    this.updateUpcomingEventsCount();
-  }
+  async loadEvents() {
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      console.log('📅 No user authenticated, skipping event loading');
+      this.events = [];
+      this.updateUpcomingEventsCount();
+      return;
+    }
 
+    try {
+      console.log('📅 Loading calendar events from Supabase...');
+      
+      // Get date range for current month view
+      const startOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+      const endOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+      
+      // Extend range to include previous and next month for better UX
+      const rangeStart = new Date(startOfMonth);
+      rangeStart.setMonth(rangeStart.getMonth() - 1);
+      const rangeEnd = new Date(endOfMonth);
+      rangeEnd.setMonth(rangeEnd.getMonth() + 1);
+      
+      const monthStartISO = rangeStart.toISOString().split('T')[0];
+      const monthEndISO = rangeEnd.toISOString().split('T')[0];
+      
+      const { data, error } = await calendarService.listEvents(userId, monthStartISO, monthEndISO);
+      
+      if (error) {
+        console.error('Error loading calendar events:', error);
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('Error al cargar eventos del calendario', 'error');
+        }
+        return;
+      }
+      
+      this.events = data || [];
+      console.log('📅 Calendar events loaded:', this.events.length, 'items');
+      
+      // Update UI
+      this.renderCalendar();
+      this.updateUpcomingEventsCount();
+      
+    } catch (error) {
+      console.error('Error in loadEvents:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al cargar eventos del calendario', 'error');
   updateUpcomingEventsCount() {
     const badge = document.getElementById('upcoming-events');
     if (!badge) return;
