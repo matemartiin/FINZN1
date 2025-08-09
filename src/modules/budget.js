@@ -32,17 +32,35 @@ export class BudgetManager {
       if (error) {
         // Check if table doesn't exist
         if (error.code === '42P01' || (error.message && error.message.includes('relation "public.budgets" does not exist'))) {
+          console.error('❌ Budget Error: Tabla "budgets" no encontrada en Supabase. Verifica que las migraciones se hayan ejecutado correctamente.');
           console.warn('⚠️ Tabla "budgets" no encontrada en Supabase. Créala manualmente en tu dashboard.');
           return [];
         }
+        console.error('❌ Budget Error: Error al cargar presupuestos desde Supabase:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          userId: userId
+        });
         console.error('Error loading budgets:', error);
         return [];
       }
 
       this.budgets = data || [];
       console.log('💰 Budgets loaded:', this.budgets.length, 'items');
+      
+      if (this.budgets.length === 0) {
+        console.log('ℹ️ Budget Info: No se encontraron presupuestos para el usuario. Esto es normal para usuarios nuevos.');
+      }
+      
       return this.budgets;
     } catch (error) {
+      console.error('❌ Budget Error: Excepción al cargar presupuestos:', {
+        error: error.message,
+        stack: error.stack,
+        userId: userId
+      });
       console.error('Error in loadBudgets:', error);
       return [];
     }
@@ -76,17 +94,36 @@ export class BudgetManager {
       if (error) {
         // Check if table doesn't exist
         if (error.code === '42P01' || (error.message && error.message.includes('relation "public.budgets" does not exist'))) {
+          console.error('❌ Budget Error: No se puede agregar presupuesto - tabla "budgets" no existe. Ejecuta las migraciones de Supabase.');
           console.warn('⚠️ Tabla "budgets" no encontrada. No se puede agregar presupuesto.');
           return false;
         }
+        console.error('❌ Budget Error: Fallo al insertar presupuesto en Supabase:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          budgetData: budget,
+          userId: userId
+        });
         console.error('Error adding budget:', error);
         return false;
       }
 
+      if (!data || data.length === 0) {
+        console.error('❌ Budget Error: Supabase no devolvió datos después de insertar el presupuesto');
+        return false;
+      }
+      
       console.log('✅ Budget added successfully:', data[0]);
       this.budgets.unshift(data[0]);
       return true;
     } catch (error) {
+      console.error('❌ Budget Error: Excepción al agregar presupuesto:', {
+        error: error.message,
+        stack: error.stack,
+        budgetData: budgetData,
+        userId: userId
+      });
       console.error('Error in addBudget:', error);
       return false;
     }
@@ -111,22 +148,45 @@ export class BudgetManager {
       if (error) {
         // Check if table doesn't exist
         if (error.code === '42P01' || (error.message && error.message.includes('relation "public.budgets" does not exist'))) {
+          console.error('❌ Budget Error: No se puede actualizar presupuesto - tabla "budgets" no existe.');
           console.warn('⚠️ Tabla "budgets" no encontrada. No se puede actualizar presupuesto.');
           return false;
         }
+        console.error('❌ Budget Error: Fallo al actualizar presupuesto en Supabase:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          budgetId: budgetId,
+          updates: updates,
+          userId: userId
+        });
         console.error('Error updating budget:', error);
         return false;
       }
 
+      if (!data || data.length === 0) {
+        console.error('❌ Budget Error: No se encontró el presupuesto para actualizar o no se devolvieron datos');
+        return false;
+      }
+      
       // Update local data
       const budgetIndex = this.budgets.findIndex(budget => budget.id === budgetId);
       if (budgetIndex !== -1) {
         this.budgets[budgetIndex] = { ...this.budgets[budgetIndex], ...data[0] };
+      } else {
+        console.warn('⚠️ Budget Warning: Presupuesto actualizado en Supabase pero no encontrado en datos locales');
       }
 
       console.log('✅ Budget updated successfully');
       return true;
     } catch (error) {
+      console.error('❌ Budget Error: Excepción al actualizar presupuesto:', {
+        error: error.message,
+        stack: error.stack,
+        budgetId: budgetId,
+        updates: updates,
+        userId: userId
+      });
       console.error('Error in updateBudget:', error);
       return false;
     }
@@ -148,17 +208,37 @@ export class BudgetManager {
       if (error) {
         // Check if table doesn't exist
         if (error.code === '42P01' || (error.message && error.message.includes('relation "public.budgets" does not exist'))) {
+          console.error('❌ Budget Error: No se puede eliminar presupuesto - tabla "budgets" no existe.');
           console.warn('⚠️ Tabla "budgets" no encontrada. No se puede eliminar presupuesto.');
           return false;
         }
+        console.error('❌ Budget Error: Fallo al eliminar presupuesto de Supabase:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          budgetId: budgetId,
+          userId: userId
+        });
         console.error('Error deleting budget:', error);
         return false;
       }
 
+      const initialLength = this.budgets.length;
       this.budgets = this.budgets.filter(budget => budget.id !== budgetId);
+      
+      if (this.budgets.length === initialLength) {
+        console.warn('⚠️ Budget Warning: Presupuesto eliminado de Supabase pero no se encontró en datos locales');
+      }
+      
       console.log('✅ Budget deleted successfully');
       return true;
     } catch (error) {
+      console.error('❌ Budget Error: Excepción al eliminar presupuesto:', {
+        error: error.message,
+        stack: error.stack,
+        budgetId: budgetId,
+        userId: userId
+      });
       console.error('Error in deleteBudget:', error);
       return false;
     }
@@ -166,7 +246,15 @@ export class BudgetManager {
 
   // Calculate budget progress
   calculateBudgetProgress(budget, expenses) {
-    if (!budget || !expenses) return { spent: 0, remaining: 0, percentage: 0, status: 'safe' };
+    if (!budget || !expenses) {
+      if (!budget) {
+        console.warn('⚠️ Budget Warning: calculateBudgetProgress llamado sin presupuesto válido');
+      }
+      if (!expenses) {
+        console.warn('⚠️ Budget Warning: calculateBudgetProgress llamado sin datos de gastos');
+      }
+      return { spent: 0, remaining: 0, percentage: 0, status: 'safe' };
+    }
 
     // Filter expenses for this budget's category and date range
     const budgetExpenses = expenses.filter(expense => {
