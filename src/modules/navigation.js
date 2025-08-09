@@ -189,6 +189,10 @@ export class NavigationManager {
   }
 
   setActiveNavItem(activeItem) {
+    if (!activeItem) {
+      return;
+    }
+    
     // Remove active class from all nav items
     const navItems = document.querySelectorAll('.nav-item');
     const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
