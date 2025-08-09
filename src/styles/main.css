@@ -3698,7 +3698,7 @@ body {
   .contextual-bar-content {
     flex-direction: column;
     gap: 12px;
-    align-items: center;
+    align-items: stretch;
   }
   
   .contextual-filters {
@@ -4405,21 +4405,6 @@ body {
   .user-actions {
     flex-direction: column;
     gap: 0.3rem;
-  }
-  
-  .header-content {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: center;
-  }
-  
-  .user-info {
-    font-size: 0.9rem;
-  }
-  
-  .header-actions {
-    display: flex;
-    gap: 0.5rem;
   }
 }
 
