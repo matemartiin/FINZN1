@@ -78,10 +78,18 @@ export class ModalManager {
   }
   show(modalId) {
     console.log('ModalManager: Showing modal', modalId);
+    
+    // Debug: Check if modal exists
+    console.log('Available modals:', Array.from(this.modals.keys()));
+    
     const modal = this.modals.get(modalId);
+    console.log('Modal found:', !!modal);
+    
     if (modal) {
+      console.log('Modal classes before:', modal.className);
       modal.classList.remove('hidden');
       modal.classList.add('active');
+      console.log('Modal classes after:', modal.className);
       document.body.style.overflow = 'hidden';
       
       // Focus first input
@@ -89,6 +97,8 @@ export class ModalManager {
       if (firstInput) {
         setTimeout(() => firstInput.focus(), 100);
       }
+    } else {
+      console.error('Modal not found:', modalId);
     }
   }
 
