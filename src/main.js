@@ -1526,11 +1526,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 console.log('✅ MAIN.JS LOADED SUCCESSFULLY');
 
-import { ModalManager } from './modules/modals.js';
 
-const modalManager = new ModalManager();
-modalManager.init();
-
-// (opcional) Exponerlo para usarlo desde consola o desde otros módulos
-window.app = window.app || {};
-window.app.modals = modalManager;
