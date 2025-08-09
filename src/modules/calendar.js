@@ -60,7 +60,7 @@ export class CalendarManager {
     }
 
     // Event forms
-    const addEventForm = document.getElementById('add-event-form');
+    const addEventForm = document.getElementById('new-calendar-event-form');
     console.log('📅 DEBUG: Add event form found:', !!addEventForm);
     if (addEventForm) {
       addEventForm.addEventListener('submit', (e) => this.handleAddEvent(e));
@@ -73,8 +73,8 @@ export class CalendarManager {
     }
 
     // Recurring checkbox
-    const recurringCheckbox = document.getElementById('event-recurring');
-    const recurringOptions = document.getElementById('recurring-options');
+    const recurringCheckbox = document.getElementById('new-event-recurring');
+    const recurringOptions = document.getElementById('new-recurring-options');
     
     if (recurringCheckbox && recurringOptions) {
       recurringCheckbox.addEventListener('change', (e) => {
@@ -317,14 +317,14 @@ export class CalendarManager {
   showAddEventModal(date = null) {
     console.log('📅 DEBUG: showAddEventModal called with date:', date);
     
-    const modal = document.getElementById('add-event-modal');
+    const modal = document.getElementById('new-calendar-event-modal');
     console.log('📅 DEBUG: Modal element found:', !!modal);
     if (modal) {
       console.log('📅 DEBUG: Modal element:', modal);
       console.log('📅 DEBUG: Modal classes:', modal.className);
     }
     
-    const dateInput = document.getElementById('event-date');
+    const dateInput = document.getElementById('new-event-date');
     console.log('📅 DEBUG: Date input found:', !!dateInput);
     
     if (date && dateInput) {
@@ -337,7 +337,7 @@ export class CalendarManager {
     
     if (window.app && window.app.modals) {
       console.log('📅 DEBUG: Calling window.app.modals.show');
-      window.app.modals.show('add-event-modal');
+      window.app.modals.show('new-calendar-event-modal');
       console.log('📅 DEBUG: Modal show called');
     }
   }
@@ -362,7 +362,7 @@ export class CalendarManager {
       await this.addEvent(eventData);
       
       if (window.app && window.app.modals) {
-        window.app.modals.hide('add-event-modal');
+        window.app.modals.hide('new-calendar-event-modal');
       }
       
       if (window.app && window.app.ui) {
