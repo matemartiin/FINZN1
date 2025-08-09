@@ -7,6 +7,21 @@ export class UIManager {
     this.setupMascotHoverBehavior();
   }
 
+  // Utility function to safely escape HTML characters
+  escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Utility function to safely set text content
+  safeSetText(element, text) {
+    if (element && typeof text === 'string') {
+      element.textContent = text;
+    }
+  }
+
   setupMascotHoverBehavior() {
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', () => {
