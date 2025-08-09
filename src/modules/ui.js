@@ -1,33 +1,3 @@
-// Security utilities
-function escapeHTML(str) {
-  if (!str) return '';
-  return str.replace(/[&<>"']/g, function(match) {
-    return {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[match];
-  });
-}
-
-function validateNumericInput(value, min = 0) {
-  const num = parseFloat(value);
-  return !isNaN(num) && isFinite(num) && num >= min ? num : 0;
-}
-
-function validateStringInput(value, maxLength = 255) {
-  if (!value || typeof value !== 'string') return '';
-  return value.trim().substring(0, maxLength);
-}
-
-function validateDateInput(dateStr) {
-  if (!dateStr) return new Date().toISOString().split('T')[0];
-  const date = new Date(dateStr);
-  return !isNaN(date.getTime()) ? dateStr : new Date().toISOString().split('T')[0];
-}
-
 export class UIManager {
   constructor() {
     this.alertContainer = document.getElementById('alert-container');
