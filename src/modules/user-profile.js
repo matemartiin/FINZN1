@@ -31,11 +31,15 @@ export class UserProfileManager {
 
   async loadUserProfile() {
     const userId = this.getCurrentUserId();
-    console.log('👤 loadUserProfile - userId:', userId);
+    if (import.meta.env.DEV) {
+      console.log('👤 loadUserProfile - userId:', userId);
+    }
     if (!userId) return null;
 
     try {
-      console.log('👤 Loading user profile for:', userId);
+      if (import.meta.env.DEV) {
+        console.log('👤 Loading user profile for:', userId);
+      }
       
       const { supabase } = await import('../config/supabase.js');
       
@@ -49,7 +53,9 @@ export class UserProfileManager {
         .single();
 
       if (error) {
-        console.log('👤 Profile load error:', error);
+        if (import.meta.env.DEV) {
+          console.log('👤 Profile load error:', error);
+        }
         
         // If no profile found, that's expected for new users
         if (error.code === 'PGRST116') {
@@ -71,7 +77,9 @@ export class UserProfileManager {
       }
 
       this.currentProfile = data;
-      console.log('👤 Profile loaded:', this.currentProfile);
+      if (import.meta.env.DEV) {
+        console.log('👤 Profile loaded:', this.currentProfile);
+      }
       
       // Update header display
       this.updateHeaderDisplay();
@@ -85,12 +93,16 @@ export class UserProfileManager {
 
   async createUserProfile(profileData) {
     const userId = this.getCurrentUserId();
-    console.log('👤 createUserProfile - userId:', userId, 'profileData:', profileData);
+    if (import.meta.env.DEV) {
+      console.log('👤 createUserProfile - userId:', userId, 'profileData:', profileData);
+    }
     
     if (!userId) return false;
 
     try {
-      console.log('👤 Creating user profile:', profileData);
+      if (import.meta.env.DEV) {
+        console.log('👤 Creating user profile:', profileData);
+      }
       
       const { supabase } = await import('../config/supabase.js');
       
@@ -104,7 +116,9 @@ export class UserProfileManager {
         last_name: profileData.last_name
       };
 
-      console.log('👤 Profile data to insert:', profile);
+      if (import.meta.env.DEV) {
+        console.log('👤 Profile data to insert:', profile);
+      }
       
       const { data, error } = await supabase
         .from('user_profiles')
@@ -114,7 +128,9 @@ export class UserProfileManager {
 
       if (error) {
         console.error('Error creating user profile:', error);
-        console.error('Full error details:', JSON.stringify(error, null, 2));
+        if (import.meta.env.DEV) {
+          console.error('Full error details:', JSON.stringify(error, null, 2));
+        }
         
         // If profile already exists, try updating instead
         if (error.code === '23505') {
@@ -126,7 +142,9 @@ export class UserProfileManager {
       }
 
       this.currentProfile = data;
-      console.log('✅ Profile created successfully:', data);
+      if (import.meta.env.DEV) {
+        console.log('✅ Profile created successfully:', data);
+      }
       
       // Update header display
       this.updateHeaderDisplay();
@@ -140,11 +158,15 @@ export class UserProfileManager {
 
   async updateUserProfile(profileData) {
     const userId = this.getCurrentUserId();
-    console.log('👤 updateUserProfile - userId:', userId, 'profileData:', profileData);
+    if (import.meta.env.DEV) {
+      console.log('👤 updateUserProfile - userId:', userId, 'profileData:', profileData);
+    }
     if (!userId) return false;
 
     try {
-      console.log('👤 Updating user profile:', profileData);
+      if (import.meta.env.DEV) {
+        console.log('👤 Updating user profile:', profileData);
+      }
       
       const { supabase } = await import('../config/supabase.js');
       
@@ -158,7 +180,9 @@ export class UserProfileManager {
         updated_at: new Date().toISOString()
       };
 
-      console.log('👤 Update data:', updates);
+      if (import.meta.env.DEV) {
+        console.log('👤 Update data:', updates);
+      }
       
       const { data, error } = await supabase
         .from('user_profiles')
@@ -180,7 +204,9 @@ export class UserProfileManager {
       }
 
       this.currentProfile = data;
-      console.log('✅ Profile updated successfully:', data);
+      if (import.meta.env.DEV) {
+        console.log('✅ Profile updated successfully:', data);
+      }
       
       // Update header display
       this.updateHeaderDisplay();
@@ -383,7 +409,9 @@ export class UserProfileManager {
 
   updateHeaderDisplay() {
     const userNameElement = document.getElementById('user-name');
-    console.log('👤 updateHeaderDisplay - element found:', !!userNameElement, 'currentProfile:', this.currentProfile);
+    if (import.meta.env.DEV) {
+      console.log('👤 updateHeaderDisplay - element found:', !!userNameElement, 'currentProfile:', this.currentProfile);
+    }
     if (!userNameElement) return;
 
     let displayText = '¡Bienvenido!';
@@ -396,7 +424,9 @@ export class UserProfileManager {
       displayText = '👤 Usuario sin nombre';
     }
     
-    console.log('👤 Setting header text to:', displayText);
+    if (import.meta.env.DEV) {
+      console.log('👤 Setting header text to:', displayText);
+    }
     userNameElement.textContent = displayText;
   }
 
@@ -411,7 +441,9 @@ export class UserProfileManager {
 
   getCurrentUserId() {
     const userId = window.app?.auth?.getCurrentUserId() || null;
-    console.log('👤 UserProfile getting user ID:', userId);
+    if (import.meta.env.DEV) {
+      console.log('👤 UserProfile getting user ID:', userId);
+    }
     return userId;
   }
 
@@ -420,12 +452,14 @@ export class UserProfileManager {
            this.currentProfile.first_name && 
            this.currentProfile.last_name;
             
-    console.log('👤 Profile completeness check:', {
-      currentProfile: !!this.currentProfile,
-      firstName: this.currentProfile?.first_name,
-      lastName: this.currentProfile?.last_name,
-      hasComplete
-    });
+    if (import.meta.env.DEV) {
+      console.log('👤 Profile completeness check:', {
+        currentProfile: !!this.currentProfile,
+        firstName: this.currentProfile?.first_name,
+        lastName: this.currentProfile?.last_name,
+        hasComplete
+      });
+    }
     
     return hasComplete;
   }

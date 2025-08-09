@@ -117,8 +117,10 @@ export class ChatManager {
   async getAIResponse(message) {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     
-    console.log('🤖 Attempting Gemini API call...');
-    console.log('🔑 API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'Missing');
+    if (import.meta.env.DEV) {
+      console.log('🤖 Attempting Gemini API call...');
+      console.log('🔑 API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'Missing');
+    }
 
     // If no API key, use fallback responses
     if (!apiKey) {

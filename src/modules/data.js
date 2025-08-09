@@ -33,7 +33,9 @@ export class DataManager {
     if (!userId) return;
 
     try {
-      console.log('📊 Loading user data for:', userId);
+      if (import.meta.env.DEV) {
+        console.log('📊 Loading user data for:', userId);
+      }
       
       // Load data in correct order - categories first, then everything else
       await this.loadCategories();
@@ -71,7 +73,9 @@ export class DataManager {
     if (!userId) return;
 
     try {
-      console.log('🏷️ Loading categories for user:', userId);
+      if (import.meta.env.DEV) {
+        console.log('🏷️ Loading categories for user:', userId);
+      }
       
       const { data, error } = await supabase
         .from('categories')
@@ -169,7 +173,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('💳 Adding expense with data:', expenseData);
+      if (import.meta.env.DEV) {
+        console.log('💳 Adding expense with data:', expenseData);
+      }
       
       const expense = {
         user_id: userId,
@@ -185,7 +191,9 @@ export class DataManager {
         recurring: expenseData.recurring || false
       };
 
-      console.log('💳 Expense data prepared:', expense);
+      if (import.meta.env.DEV) {
+        console.log('💳 Expense data prepared:', expense);
+      }
       
       const { data, error } = await supabase
         .from('expenses')
@@ -197,7 +205,9 @@ export class DataManager {
         return false;
       }
 
-      console.log('✅ Expense added successfully:', data[0]);
+      if (import.meta.env.DEV) {
+        console.log('✅ Expense added successfully:', data[0]);
+      }
       
       if (!this.data.expenses[expense.month]) {
         this.data.expenses[expense.month] = [];
@@ -282,7 +292,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('💰 Adding fixed income:', amount, 'for month:', month);
+      if (import.meta.env.DEV) {
+        console.log('💰 Adding fixed income:', amount, 'for month:', month);
+      }
       
       const { data, error } = await supabase
         .from('incomes')
@@ -322,7 +334,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('💵 Adding extra income:', incomeData);
+      if (import.meta.env.DEV) {
+        console.log('💵 Adding extra income:', incomeData);
+      }
       
       const extraIncome = {
         user_id: userId,
@@ -500,7 +514,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('🎯 Updating goal:', goalId, updates);
+      if (import.meta.env.DEV) {
+        console.log('🎯 Updating goal:', goalId, updates);
+      }
       
       const { data, error } = await supabase
         .from('goals')
@@ -533,7 +549,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('💰 Adding money to goal:', goalId, amount);
+      if (import.meta.env.DEV) {
+        console.log('💰 Adding money to goal:', goalId, amount);
+      }
       
       // Validate amount
       const numericAmount = parseFloat(amount);
@@ -581,7 +599,9 @@ export class DataManager {
       
       // Check if goal is completed
       if (newCurrentAmount >= targetAmount) {
-        console.log('🎉 Goal completed!');
+        if (import.meta.env.DEV) {
+          console.log('🎉 Goal completed!');
+        }
         // You could add an achievement here
         return { success: true, completed: true, goal: data[0] };
       }
@@ -623,7 +643,9 @@ export class DataManager {
     if (!userId) return;
 
     try {
-      console.log('🚦 Loading spending limits for user:', userId);
+      if (import.meta.env.DEV) {
+        console.log('🚦 Loading spending limits for user:', userId);
+      }
       
       const { data, error } = await supabase
         .from('spending_limits')
@@ -651,7 +673,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('🚦 Adding spending limit:', limitData);
+      if (import.meta.env.DEV) {
+        console.log('🚦 Adding spending limit:', limitData);
+      }
       
       const limit = {
         user_id: userId,
@@ -736,7 +760,9 @@ export class DataManager {
     if (!userId) return false;
 
     try {
-      console.log('🏷️ Adding category:', categoryData);
+      if (import.meta.env.DEV) {
+        console.log('🏷️ Adding category:', categoryData);
+      }
       
       const category = {
         user_id: userId,
@@ -1436,17 +1462,21 @@ export class DataManager {
 
   // Balance calculations - FIXED
   calculateBalance(month) {
-    console.log('💰 Calculating balance for month:', month);
+    if (import.meta.env.DEV) {
+      console.log('💰 Calculating balance for month:', month);
+    }
     
     const expenses = this.getExpenses(month);
     const income = this.getIncome(month);
     const extraIncomes = this.getExtraIncomes(month);
     
-    console.log('💰 Balance calculation data:', {
-      expenses: expenses.length,
-      income,
-      extraIncomes: extraIncomes.length
-    });
+    if (import.meta.env.DEV) {
+      console.log('💰 Balance calculation data:', {
+        expenses: expenses.length,
+        income,
+        extraIncomes: extraIncomes.length
+      });
+    }
     
     // Calculate total expenses
     const totalExpenses = expenses.reduce((sum, expense) => {
@@ -1475,7 +1505,9 @@ export class DataManager {
       installments
     };
     
-    console.log('💰 Balance calculated:', result);
+    if (import.meta.env.DEV) {
+      console.log('💰 Balance calculated:', result);
+    }
     return result;
   }
 

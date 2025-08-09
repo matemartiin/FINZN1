@@ -19,7 +19,9 @@ export class AIBudgetManager {
     if (!userId) return null;
 
     try {
-      console.log('📊 Collecting training data from Supabase...');
+      if (import.meta.env.DEV) {
+        console.log('📊 Collecting training data from Supabase...');
+      }
       
       const { supabase } = await import('../config/supabase.js');
       
@@ -39,7 +41,9 @@ export class AIBudgetManager {
         return null;
       }
 
-      console.log(`📊 Collected ${expenses.length} expense records for training`);
+      if (import.meta.env.DEV) {
+        console.log(`📊 Collected ${expenses.length} expense records for training`);
+      }
       return this.preprocessData(expenses);
     } catch (error) {
       console.error('Error in getTrainingData:', error);
@@ -122,7 +126,9 @@ export class AIBudgetManager {
       }
     });
 
-    console.log(`📊 Preprocessed data: ${processedData.features.length} training samples`);
+    if (import.meta.env.DEV) {
+      console.log(`📊 Preprocessed data: ${processedData.features.length} training samples`);
+    }
     return processedData;
   }
 
@@ -314,7 +320,9 @@ export class AIBudgetManager {
     }
 
     try {
-      console.log('🤖 Generating Gemini AI recommendations...');
+      if (import.meta.env.DEV) {
+        console.log('🤖 Generating Gemini AI recommendations...');
+      }
       
       const prompt = this.buildGeminiPrompt(userData);
       
@@ -457,7 +465,9 @@ Genera las recomendaciones ahora:`;
       }
     });
     
-    console.log(`🤖 Parsed ${recommendations.length} Gemini recommendations`);
+    if (import.meta.env.DEV) {
+      console.log(`🤖 Parsed ${recommendations.length} Gemini recommendations`);
+    }
     return recommendations;
   }
 

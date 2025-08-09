@@ -25,8 +25,10 @@ export class AuthManager {
         await this.handleAuthError(error);
       }
       this.currentUser = session?.user || null;
-      console.log('🔐 Initial session:', session ? `Found for ${session.user.email}, ID: ${session.user.id}` : 'None');
-      console.log('🔐 Current user object:', this.currentUser);
+      if (import.meta.env.DEV) {
+        console.log('🔐 Initial session:', session ? `Found for ${session.user.email}, ID: ${session.user.id}` : 'None');
+        console.log('🔐 Current user object:', this.currentUser);
+      }
     } catch (error) {
       console.error('Error in initializeAuth:', error);
       this.currentUser = null;
@@ -34,9 +36,13 @@ export class AuthManager {
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔐 Auth state changed:', event, session?.user?.email, 'ID:', session?.user?.id);
+      if (import.meta.env.DEV) {
+        console.log('🔐 Auth state changed:', event, session?.user?.email, 'ID:', session?.user?.id);
+      }
       this.currentUser = session?.user || null;
-      console.log('🔐 Updated currentUser:', this.currentUser);
+      if (import.meta.env.DEV) {
+        console.log('🔐 Updated currentUser:', this.currentUser);
+      }
       
       if (event === 'SIGNED_OUT') {
         // Clear any cached data
@@ -44,8 +50,10 @@ export class AuthManager {
         // Reload the page to reset application state
         window.location.reload();
       } else if (event === 'SIGNED_IN') {
-        console.log('✅ User successfully signed in:', session.user.email);
-        console.log('✅ User ID:', session.user.id);
+        if (import.meta.env.DEV) {
+          console.log('✅ User successfully signed in:', session.user.email);
+          console.log('✅ User ID:', session.user.id);
+        }
         
         // Load user profile after successful sign in
         setTimeout(async () => {
@@ -71,7 +79,9 @@ export class AuthManager {
   }
   async login(email, password) {
     try {
-      console.log('🔐 Attempting login for:', email);
+      if (import.meta.env.DEV) {
+        console.log('🔐 Attempting login for:', email);
+      }
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -92,7 +102,9 @@ export class AuthManager {
         throw new Error(error.message);
       }
 
-      console.log('✅ Login successful:', data.user?.email);
+      if (import.meta.env.DEV) {
+        console.log('✅ Login successful:', data.user?.email);
+      }
       this.currentUser = data.user;
       return true;
     } catch (error) {
@@ -103,7 +115,9 @@ export class AuthManager {
 
   async register(email, password) {
     try {
-      console.log('📝 Attempting to register user:', email);
+      if (import.meta.env.DEV) {
+        console.log('📝 Attempting to register user:', email);
+      }
       
       // Check if we have a valid Supabase client
       if (!supabase || typeof supabase.auth?.signUp !== 'function') {
@@ -130,7 +144,9 @@ export class AuthManager {
         console.error('Registration error:', error);
         
         // Log the full error for debugging
-        console.error('Full error object:', JSON.stringify(error, null, 2));
+        if (import.meta.env.DEV) {
+          console.error('Full error object:', JSON.stringify(error, null, 2));
+        }
         
         // Handle specific error cases
         if (error.message.includes('User already registered')) {
@@ -155,11 +171,15 @@ export class AuthManager {
         throw new Error(error.message);
       }
 
-      console.log('✅ Registration successful:', data);
+      if (import.meta.env.DEV) {
+        console.log('✅ Registration successful:', data);
+      }
       
       // Check if user was created successfully
       if (data.user) {
-        console.log('User created successfully, ID:', data.user.id);
+        if (import.meta.env.DEV) {
+          console.log('User created successfully, ID:', data.user.id);
+        }
         
         // If email confirmation is disabled, user should be able to login immediately
         if (data.user.email_confirmed_at || data.session) {
@@ -197,9 +217,13 @@ export class AuthManager {
   }
 
   getCurrentUserId() {
-    console.log('🔐 Getting current user ID, currentUser:', this.currentUser);
+    if (import.meta.env.DEV) {
+      console.log('🔐 Getting current user ID, currentUser:', this.currentUser);
+    }
     const userId = this.currentUser?.id || null;
-    console.log('🔐 Returning user ID:', userId);
+    if (import.meta.env.DEV) {
+      console.log('🔐 Returning user ID:', userId);
+    }
     return userId;
   }
 

@@ -4,7 +4,9 @@ export class ReportManager {
   }
 
   async generateAIReport(data, focus, questions) {
-    console.log('🤖 Generating AI report with data:', data);
+    if (import.meta.env.DEV) {
+      console.log('🤖 Generating AI report with data:', data);
+    }
     
     try {
       // Get API key
@@ -18,7 +20,9 @@ export class ReportManager {
       // Prepare comprehensive prompt for AI
       const prompt = this.buildAIPrompt(data, focus, questions);
       
-      console.log('🤖 Sending request to Gemini API...');
+      if (import.meta.env.DEV) {
+        console.log('🤖 Sending request to Gemini API...');
+      }
       
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
@@ -64,7 +68,9 @@ export class ReportManager {
       }
 
       const result = await response.json();
-      console.log('✅ Gemini API response received');
+      if (import.meta.env.DEV) {
+        console.log('✅ Gemini API response received');
+      }
 
       if (!result.candidates || result.candidates.length === 0) {
         console.warn('⚠️ No candidates in Gemini response, using fallback');
