@@ -80,7 +80,7 @@ export class ModalManager {
     console.log('ModalManager: Showing modal', modalId);
     const modal = this.modals.get(modalId);
     if (modal) {
-     modal.classList.remove('hidden');
+      modal.classList.remove('hidden');
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
       
@@ -97,7 +97,7 @@ export class ModalManager {
     const modal = this.modals.get(modalId);
     if (modal) {
       modal.classList.remove('active');
-     modal.classList.add('hidden');
+      modal.classList.add('hidden');
       document.body.style.overflow = '';
       
       // Reset form if exists
