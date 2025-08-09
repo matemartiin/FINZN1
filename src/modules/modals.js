@@ -78,36 +78,51 @@ export class ModalManager {
   }
 
   show(modalId) {
-    console.log('ModalManager: Showing modal', modalId);
-    const modal = this.modals.get(modalId) || document.getElementById(modalId);
-    if (!modal) return console.warn('ModalManager: modal not found ->', modalId);
+  console.log('ModalManager: Showing modal', modalId);
+  const modal = this.modals.get(modalId) || document.getElementById(modalId);
+  if (!modal) return console.warn('ModalManager: modal not found ->', modalId);
 
-    // Asegurar que está directamente bajo body (evita stacking raro)
-    if (modal.parentNode !== document.body) {
-      document.body.appendChild(modal);
-    }
-
-    // Estado visible
-    modal.classList.remove('hidden', 'closing');
-    modal.classList.add('active');
-
-    // Llevar al frente y bloquear scroll del fondo
-    modal.style.zIndex = '2147483647';
-    document.body.style.overflow = 'hidden';
-
-    // Focus al primer elemento interactivo
-    const firstInput = modal.querySelector('input, select, textarea, button');
-    if (firstInput) setTimeout(() => firstInput.focus(), 50);
-
-    // Handler de escape individual (se limpia en hide)
-    const escHandler = (e) => {
-      if (e.key === 'Escape') {
-        this.hide(modalId);
-        document.removeEventListener('keydown', escHandler);
-      }
-    };
-    document.addEventListener('keydown', escHandler);
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
   }
+
+  // Estado base (sin cierre)
+  modal.classList.remove('closing');
+
+  // 1) quitar display:none (hidden)
+  modal.classList.remove('hidden');
+
+  // 2) forzar reflow para que se apliquen los estilos iniciales
+  //    (opacity 0 / translateY) antes de activar la animación
+  // eslint-disable-next-line no-unused-expressions
+  modal.offsetHeight; // <- clave
+
+  // 3) ahora sí, activar (dispara transición de .modal-content)
+  modal.classList.add('active');
+
+  // llevar al frente y bloquear scroll
+  modal.style.zIndex = '2147483647';
+  document.body.style.overflow = 'hidden';
+
+  // focus inicial
+  const firstInput = modal.querySelector('input, select, textarea, button');
+  if (firstInput) setTimeout(() => firstInput.focus(), 50);
+
+  // Escape por modal
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      this.hide(modalId);
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const open = document.querySelector('.modal.active');
+  if (open) this.hide(open.id);
+});
+
+}
+
 
   hide(modalId) {
     console.log('ModalManager: Hiding modal', modalId);
