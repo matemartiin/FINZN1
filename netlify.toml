@@ -4,14 +4,20 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  VITE_GEMINI_API_KEY = "AIzaSyC-azRp6elq_4tI6DfPqGt8IszlZPMQO-I"
-  VITE_SUPABASE_URL = "https://iorzfbiiprbwbdygqipu.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvcnpmYmlpcHJid2JkeWdxaXB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNjg0MzQsImV4cCI6MjA2Nzk0NDQzNH0.k47RZgrlrL8zis_giZAOTFa6uqds1IKElAev1R4X4ig"
-  VITE_GOOGLE_API_KEY = "AIzaSyBxecuQu0et7yz5IomZsNyP3NSCs2yo99w"
-  VITE_GOOGLE_CLIENT_ID = "883628880517-ic7i3i5fb1dq0c20p3uig3e5j7hh8g2p.apps.googleusercontent.com"
+  # SECURITY: Environment variables moved to Netlify Site Settings
+  # Configure these in Netlify Dashboard → Site settings → Environment variables:
+  # - VITE_SUPABASE_URL (client-side, required for Supabase)
+  # - VITE_SUPABASE_ANON_KEY (client-side, required for Supabase)
+  # - GEMINI_API_KEY (server-side only, for serverless functions)
+  # - GOOGLE_API_KEY (server-side only, if needed)
+  # - GOOGLE_CLIENT_ID (server-side only, if needed)
+
 [[headers]]
   for = "/*"
   [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.pexels.com; connect-src 'self' https://*.supabase.co https://*.supabase.in /.netlify/functions; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"

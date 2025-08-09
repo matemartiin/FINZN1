@@ -2,6 +2,10 @@ import { createClient } from '@supabase/supabase-js'
 
 console.log('🔧 Loading Supabase configuration...');
 
+// SECURITY NOTE: These environment variables are client-side visible
+// VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required for Supabase client
+// CRITICAL: Ensure ALL database tables have Row Level Security (RLS) enabled
+// and proper policies that restrict access to auth.uid() = user_id only
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
@@ -15,10 +19,7 @@ console.log('🔧 Supabase Config Check:', {
 let supabase;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Missing Supabase environment variables:', {
-    url: supabaseUrl,
-    key: supabaseAnonKey ? 'Present' : 'Missing'
-  });
+  console.error('❌ Missing Supabase environment variables. Configure in Netlify Site Settings.');
   console.warn('⚠️ Creating mock Supabase client for development');
   
   supabase = {

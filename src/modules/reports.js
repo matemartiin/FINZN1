@@ -1,3 +1,45 @@
+// Security utilities
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, function(match) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[match];
+  });
+}
+
+function sanitizeHTML(html) {
+  // Allow only safe formatting tags
+  const allowedTags = ['strong', 'em', 'p', 'br', 'ul', 'ol', 'li', 'h3', 'h4', 'h5', 'div'];
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  // Remove all script tags and dangerous elements
+  const dangerousElements = div.querySelectorAll('script, iframe, object, embed, style');
+  dangerousElements.forEach(el => el.remove());
+  
+  const allElements = div.querySelectorAll('*');
+  allElements.forEach(el => {
+    // Remove all event handlers
+    Array.from(el.attributes).forEach(attr => {
+      if (attr.name.startsWith('on') || attr.name === 'href' || attr.name === 'src') {
+        el.removeAttribute(attr.name);
+      }
+    });
+    
+    // Remove non-allowed tags but keep content
+    if (!allowedTags.includes(el.tagName.toLowerCase())) {
+      el.replaceWith(...el.childNodes);
+    }
+  });
+  
+  return div.innerHTML;
+}
+
 export class ReportManager {
   constructor() {
     this.reports = [];
@@ -7,71 +49,41 @@ export class ReportManager {
     console.log('🤖 Generating AI report with data:', data);
     
     try {
-      // Get API key
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        console.warn('⚠️ No Gemini API key found, using enhanced fallback');
-        return this.generateEnhancedFallbackReport(data, focus, questions);
-      }
-
       // Prepare comprehensive prompt for AI
       const prompt = this.buildAIPrompt(data, focus, questions);
       
-      console.log('🤖 Sending request to Gemini API...');
+      console.log('🤖 Sending request to Gemini via serverless...');
       
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: prompt
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 2048,
-            },
-            safetySettings: [
-              {
-                category: "HARM_CATEGORY_HARASSMENT",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              },
-              {
-                category: "HARM_CATEGORY_HATE_SPEECH",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
-          }),
-        }
-      );
+      const response = await fetch('/.netlify/functions/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          config: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048
+          }
+        })
+      });
 
       if (!response.ok) {
-        console.error('❌ Gemini API error:', response.status, response.statusText);
+        console.error('❌ Gemini function error:', response.status, response.statusText);
         return this.generateEnhancedFallbackReport(data, focus, questions);
       }
 
-      const result = await response.json();
-      console.log('✅ Gemini API response received');
+      const data_response = await response.json();
+      console.log('✅ Gemini response received via serverless');
 
-      if (!result.candidates || result.candidates.length === 0) {
-        console.warn('⚠️ No candidates in Gemini response, using fallback');
+      if (data_response.error) {
+        console.warn('⚠️ Gemini function error:', data_response.error);
         return this.generateEnhancedFallbackReport(data, focus, questions);
       }
 
-      const aiContent = result.candidates[0]?.content?.parts?.[0]?.text || '';
+      const aiContent = data_response.text || '';
       
       if (!aiContent.trim()) {
         console.warn('⚠️ Empty AI response, using fallback');
@@ -175,8 +187,9 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
   }
 
   formatAIText(text) {
-    // Convert markdown-like formatting to HTML
-    return text
+    // First escape HTML, then convert markdown-like formatting to safe HTML
+    const escaped = escapeHTML(text);
+    const formatted = escaped
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/^(\d+\.\s.*$)/gm, '<div class="numbered-item">$1</div>')
@@ -184,6 +197,9 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
       .replace(/\n\n/g, '</p><p>')
       .replace(/^/, '<p>')
       .replace(/$/, '</p>');
+    
+    // Sanitize the result to ensure only safe tags remain
+    return sanitizeHTML(formatted);
   }
 
   generateEnhancedFallbackReport(data, focus, questions) {
@@ -476,6 +492,9 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
       // Write content to new window
       printWindow.document.write(htmlContent);
       printWindow.document.close();
+      
+      // Security: Prevent reverse tabnabbing
+      printWindow.opener = null;
       
       // Wait for content to load, then print
       printWindow.onload = () => {

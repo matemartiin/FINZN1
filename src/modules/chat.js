@@ -1,3 +1,45 @@
+// Security utilities
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, function(match) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[match];
+  });
+}
+
+function sanitizeHTML(html) {
+  // Allow only safe tags
+  const allowedTags = ['strong', 'em', 'p', 'br', 'ul', 'ol', 'li'];
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  // Remove all script tags and event handlers
+  const scripts = div.querySelectorAll('script');
+  scripts.forEach(script => script.remove());
+  
+  const allElements = div.querySelectorAll('*');
+  allElements.forEach(el => {
+    // Remove event handlers
+    Array.from(el.attributes).forEach(attr => {
+      if (attr.name.startsWith('on')) {
+        el.removeAttribute(attr.name);
+      }
+    });
+    
+    // Remove non-allowed tags
+    if (!allowedTags.includes(el.tagName.toLowerCase())) {
+      el.replaceWith(...el.childNodes);
+    }
+  });
+  
+  return div.innerHTML;
+}
+
 export class ChatManager {
   constructor() {
     this.isOpen = false;
@@ -66,15 +108,40 @@ export class ChatManager {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${sender}`;
     
-    messageDiv.innerHTML = `
-      <div class="chat-avatar">
-        ${sender === 'user' ? 
-          '<div class="user-avatar"><span class="user-avatar-icon">👤</span></div>' : 
-          '<img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />'
-        }
-      </div>
-      <div class="chat-text ${sender}-text">${text}</div>
-    `;
+    // Create avatar element safely
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'chat-avatar';
+    
+    if (sender === 'user') {
+      const userAvatar = document.createElement('div');
+      userAvatar.className = 'user-avatar';
+      const avatarIcon = document.createElement('span');
+      avatarIcon.className = 'user-avatar-icon';
+      avatarIcon.textContent = '👤';
+      userAvatar.appendChild(avatarIcon);
+      avatarDiv.appendChild(userAvatar);
+    } else {
+      const botImg = document.createElement('img');
+      botImg.src = '/robot-chat.png';
+      botImg.alt = 'Bot';
+      botImg.className = 'chat-avatar-img';
+      avatarDiv.appendChild(botImg);
+    }
+    
+    // Create text element safely
+    const textDiv = document.createElement('div');
+    textDiv.className = `chat-text ${sender}-text`;
+    
+    // For bot messages, allow basic formatting but sanitize
+    if (sender === 'bot') {
+      textDiv.innerHTML = sanitizeHTML(escapeHTML(text));
+    } else {
+      // For user messages, use plain text only
+      textDiv.textContent = text;
+    }
+    
+    messageDiv.appendChild(avatarDiv);
+    messageDiv.appendChild(textDiv);
 
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -115,87 +182,54 @@ export class ChatManager {
   }
 
   async getAIResponse(message) {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    
-    console.log('🤖 Attempting Gemini API call...');
-    console.log('🔑 API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'Missing');
-
-    // If no API key, use fallback responses
-    if (!apiKey) {
-      console.log('⚠️ No API key found, using fallback responses');
-      return this.getFallbackResponse(message);
-    }
+    console.log('🤖 Calling Gemini via serverless function...');
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
+      // Validate input
+      if (!message || message.length > 1000) {
+        throw new Error('Mensaje inválido');
+      }
+      
+      const prompt = `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
 
-Pregunta del usuario: ${message}`
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 200,
-            },
-            safetySettings: [
-              {
-                category: "HARM_CATEGORY_HARASSMENT",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              },
-              {
-                category: "HARM_CATEGORY_HATE_SPEECH",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
-          }),
-        }
-      );
+Pregunta del usuario: ${escapeHTML(message)}`;
+      
+      const response = await fetch('/.netlify/functions/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          config: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 200
+          }
+        })
+      });
 
       if (!response.ok) {
-        let errorMessage = "Error en el servicio de IA";
-        
         if (response.status === 429) {
-          errorMessage = "¡Muchas consultas! Esperá un minuto y volvé a intentarlo 😊";
-        } else if (response.status === 403) {
-          errorMessage = "Problema con la API key. Contactá al administrador.";
-        } else if (response.status === 400) {
-          errorMessage = "Tu mensaje no pudo ser procesado. Intentá reformularlo.";
+          return "¡Muchas consultas! Esperá un minuto y volvé a intentarlo 😊";
+        } else {
+          throw new Error(`HTTP ${response.status}`);
         }
-        
-        console.error("❌ Error de Gemini API:", response.status, response.statusText);
-        return errorMessage;
       }
 
       const data = await response.json();
-      console.log('✅ Gemini API response received');
-
-      if (!data.candidates || data.candidates.length === 0) {
-        return "No pude generar una respuesta. ¿Podrías reformular tu pregunta?";
+      
+      if (data.error) {
+        throw new Error(data.error);
       }
 
-      const reply = data.candidates[0]?.content?.parts?.[0]?.text || 
-                    "No tengo una respuesta clara, ¿podés reformularlo?";
+      console.log('✅ Gemini response received via serverless');
+      return data.text || "No pude generar una respuesta. ¿Podrías reformular tu pregunta?";
 
-      return reply.trim();
 
     } catch (error) {
-      console.error("❌ Error en la API de Gemini:", error);
+      console.error("❌ Error calling Gemini function:", error);
       
       // Fallback response
       return this.getFallbackResponse(message);
