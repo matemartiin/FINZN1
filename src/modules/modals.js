@@ -87,12 +87,17 @@ export class ModalManager {
     
     if (modal) {
       console.log('Modal classes before:', modal.className);
-      // Force remove hidden and add active
+      
+      // CRITICAL: Remove hidden class first
       modal.classList.remove('hidden');
+      
+      // Then add active class
       modal.classList.add('active');
       
-      // Force display style as backup
+      // Force display style to ensure visibility
       modal.style.display = 'flex';
+      modal.style.visibility = 'visible';
+      modal.style.opacity = '1';
       
       console.log('Modal classes after:', modal.className);
       document.body.style.overflow = 'hidden';
@@ -111,11 +116,16 @@ export class ModalManager {
     console.log('ModalManager: Hiding modal', modalId);
     const modal = this.modals.get(modalId);
     if (modal) {
+      // Remove active class first
       modal.classList.remove('active');
+      
+      // Then add hidden class
       modal.classList.add('hidden');
       
-      // Force hide style as backup
+      // Force hide styles
       modal.style.display = 'none';
+      modal.style.visibility = 'hidden';
+      modal.style.opacity = '0';
       
       document.body.style.overflow = '';
       
