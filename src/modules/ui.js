@@ -242,89 +242,34 @@ export class UIManager {
 
     goals.forEach(goal => {
       const progress = (goal.current_amount / goal.target_amount) * 100;
-      const progressClamped = Math.min(progress, 100);
       const item = document.createElement('div');
+      item.className = 'goal-item fade-in';
       
-      const goalItem = document.createElement('div');
-      goalItem.className = 'goal-item';
-      goalItem.setAttribute('data-goal-id', goal.id);
+      item.innerHTML = `
+        <div class="goal-header">
+          <div class="goal-name">${goal.name}</div>
+          <div class="goal-amount">${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}</div>
+        </div>
+        <div class="goal-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+          </div>
+          <div class="progress-text">${progress.toFixed(1)}%</div>
+        </div>
+        <div class="goal-actions">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
+            💰 Agregar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
+            🗑️ Eliminar
+          </button>
+        </div>
+      `;
       
-      // Create info section
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'goal-info';
-      
-      const nameDiv = document.createElement('div');
-      nameDiv.className = 'goal-name';
-      nameDiv.textContent = goal.name;
-      
-      const progressDiv = document.createElement('div');
-      progressDiv.className = 'goal-progress';
-      
-      const progressBar = document.createElement('div');
-      progressBar.className = 'progress-bar';
-      
-      const progressFill = document.createElement('div');
-      progressFill.className = 'progress-fill';
-      progressFill.style.width = `${progressClamped}%`;
-      
-      const progressText = document.createElement('div');
-      progressText.className = 'progress-text';
-      progressText.textContent = `${progressClamped.toFixed(1)}%`;
-      
-      progressBar.appendChild(progressFill);
-      progressDiv.appendChild(progressBar);
-      progressDiv.appendChild(progressText);
-      
-      const amountsDiv = document.createElement('div');
-      amountsDiv.className = 'goal-amounts';
-      
-      const currentSpan = document.createElement('span');
-      currentSpan.className = 'current-amount';
-      currentSpan.textContent = `$${goal.current_amount.toLocaleString()}`;
-      
-      const targetSpan = document.createElement('span');
-      targetSpan.className = 'target-amount';
-      targetSpan.textContent = `/ $${goal.target_amount.toLocaleString()}`;
-      
-      amountsDiv.appendChild(currentSpan);
-      amountsDiv.appendChild(targetSpan);
-      
-      infoDiv.appendChild(nameDiv);
-      infoDiv.appendChild(progressDiv);
-      infoDiv.appendChild(amountsDiv);
-      
-      // Create actions section
-      const actionsDiv = document.createElement('div');
-      actionsDiv.className = 'goal-actions';
-      
-      const addMoneyBtn = document.createElement('button');
-      addMoneyBtn.className = 'btn btn-sm btn-primary';
-      addMoneyBtn.setAttribute('aria-label', 'Agregar dinero al objetivo');
-      addMoneyBtn.addEventListener('click', () => this.showAddMoneyToGoalModal(goal.id));
-      
-      const moneyIcon = document.createElement('span');
-      moneyIcon.className = 'btn-icon';
-      moneyIcon.textContent = '💰';
-      addMoneyBtn.appendChild(moneyIcon);
-      
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'btn btn-sm btn-danger';
-      deleteBtn.setAttribute('aria-label', 'Eliminar objetivo');
-      deleteBtn.addEventListener('click', () => this.deleteGoal(goal.id));
-      
-      const deleteIcon = document.createElement('span');
-      deleteIcon.className = 'btn-icon';
-      deleteIcon.textContent = '🗑️';
-      deleteBtn.appendChild(deleteIcon);
-      
-      actionsDiv.appendChild(addMoneyBtn);
-      actionsDiv.appendChild(deleteBtn);
-      
-      // Assemble goal item
-      goalItem.appendChild(infoDiv);
-      goalItem.appendChild(actionsDiv);
-      
-      container.appendChild(goalItem);
+      container.appendChild(item);
     });
   }
 

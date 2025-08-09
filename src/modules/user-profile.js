@@ -39,6 +39,9 @@ export class UserProfileManager {
       
       const { supabase } = await import('../config/supabase.js');
       
+      // Ensure table exists before trying to query
+      await this.ensureUserProfilesTableExists();
+      
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -55,16 +58,15 @@ export class UserProfileManager {
           return null;
         }
         
-        // If table doesn't exist, show helpful message
-        if (error.code === '42P01' || (error.message && error.message.includes('relation "public.user_profiles" does not exist'))) {
-          console.error('❌ La tabla user_profiles no existe. Ejecuta las migraciones de Supabase.');
-          if (window.app && window.app.ui) {
-            window.app.ui.showAlert('Tabla de perfiles no encontrada. Ejecuta las migraciones de la base de datos.', 'warning');
-          }
-          return null;
-        }
-        
         console.error('Error loading user profile:', error);
+        
+        // If table doesn't exist, show helpful message
+        if (error.message && error.message.includes('relation "public.user_profiles" does not exist')) {
+          console.error('❌ La tabla user_profiles no existe en Supabase. Por favor, ejecuta las migraciones o créala manualmente.');
+          if (window.app && window.app.ui) {
+            window.app.ui.showAlert('Error: Tabla de perfiles no encontrada. Contacta al administrador.', 'error');
+          }
+        }
         return null;
       }
 
@@ -92,11 +94,14 @@ export class UserProfileManager {
       
       const { supabase } = await import('../config/supabase.js');
       
+      // First, ensure the table exists
+      await this.ensureUserProfilesTableExists();
+      
       const profile = {
         user_id: userId,
-        display_name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim(),
-        first_name: profileData.first_name || '',
-        last_name: profileData.last_name || ''
+        display_name: `${profileData.first_name} ${profileData.last_name}`.trim(),
+        first_name: profileData.first_name,
+        last_name: profileData.last_name
       };
 
       console.log('👤 Profile data to insert:', profile);
@@ -143,10 +148,13 @@ export class UserProfileManager {
       
       const { supabase } = await import('../config/supabase.js');
       
+      // First, ensure the table exists
+      await this.ensureUserProfilesTableExists();
+      
       const updates = {
-        display_name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim(),
-        first_name: profileData.first_name || '',
-        last_name: profileData.last_name || '',
+        display_name: `${profileData.first_name} ${profileData.last_name}`.trim(),
+        first_name: profileData.first_name,
+        last_name: profileData.last_name,
         updated_at: new Date().toISOString()
       };
 
@@ -184,11 +192,81 @@ export class UserProfileManager {
     }
   }
 
-  // SECURITY: Table creation removed from client-side code
-  // Tables must be created via Supabase migrations or SQL editor
-  // Required RLS policies:
-  // - Users can only access their own profile (auth.uid() = user_id)
-  // - All CRUD operations restricted to authenticated users
+  async ensureUserProfilesTableExists() {
+    try {
+      const { supabase } = await import('../config/supabase.js');
+      
+      // Try to query the table to see if it exists
+      const { error } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .limit(1);
+      
+      if (error && error.message && error.message.includes('relation "public.user_profiles" does not exist')) {
+        console.log('📝 Creating user_profiles table via SQL...');
+        
+        // Create the table using SQL
+        const createTableSQL = `
+          CREATE TABLE IF NOT EXISTS user_profiles (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(), 
+            user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
+            display_name text NOT NULL DEFAULT '',
+            first_name text DEFAULT '',
+            last_name text DEFAULT '',
+            phone text,
+            avatar_url text,
+            bio text,
+            preferences jsonb DEFAULT '{}',
+            created_at timestamptz DEFAULT now(),
+            updated_at timestamptz DEFAULT now()
+          );
+          
+          ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+          
+          DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
+          CREATE POLICY "Users can view their own profile"
+            ON user_profiles
+            FOR SELECT
+            TO authenticated
+            USING (auth.uid() = user_id);
+          
+          DROP POLICY IF EXISTS "Users can insert their own profile" ON user_profiles;
+          CREATE POLICY "Users can insert their own profile"
+            ON user_profiles
+            FOR INSERT
+            TO authenticated
+            WITH CHECK (auth.uid() = user_id);
+          
+          DROP POLICY IF EXISTS "Users can update their own profile" ON user_profiles;
+          CREATE POLICY "Users can update their own profile"
+            ON user_profiles
+            FOR UPDATE
+            TO authenticated
+            USING (auth.uid() = user_id)
+            WITH CHECK (auth.uid() = user_id);
+          
+          DROP POLICY IF EXISTS "Users can delete their own profile" ON user_profiles;
+          CREATE POLICY "Users can delete their own profile"
+            ON user_profiles
+            FOR DELETE
+            TO authenticated
+            USING (auth.uid() = user_id);
+          
+          CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
+        `;
+        
+        const { error: createError } = await supabase.rpc('exec_sql', { sql: createTableSQL });
+        
+        if (createError) {
+          console.warn('⚠️ Could not create user_profiles table automatically. Please create it manually in Supabase.');
+        } else {
+          console.log('✅ User profiles table created successfully');
+        }
+      }
+    } catch (error) {
+      console.log('ℹ️ Table check completed, proceeding...');
+    }
+  }
 
   showCompleteProfileModal() {
     console.log('👤 Showing complete profile modal');
