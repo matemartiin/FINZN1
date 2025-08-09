@@ -1,16 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-console.log('🔧 Loading Supabase configuration...');
-
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-console.log('🔧 Supabase Config Check:', {
-  url: supabaseUrl ? 'Present' : 'Missing',
-  key: supabaseAnonKey ? 'Present' : 'Missing',
-  urlLength: supabaseUrl ? supabaseUrl.length : 0,
-  keyLength: supabaseAnonKey ? supabaseAnonKey.length : 0
-})
 
 let supabase;
 
@@ -38,7 +29,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
     })
   };
 } else {
-  console.log('✅ Creating real Supabase client');
   supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
