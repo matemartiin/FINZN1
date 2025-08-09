@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: './',
   build: {
     outDir: 'dist',
     rollupOptions: {
       input: './index.html'
     },
-    sourcemap: true
+    sourcemap: mode === 'development'
   },
   server: {
     port: 3000,
@@ -20,4 +20,4 @@ export default defineConfig({
       '@': '/src'
     }
   }
-})
+}))
