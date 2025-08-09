@@ -2649,18 +2649,22 @@ body {
   inset: 0;
   z-index: 9999;
   background: rgba(0, 0, 0, 0.5);
-  display: none;
+  display: none !important;
   align-items: center;
   justify-content: center;
   transition: opacity 0.2s ease;
 }
 
-.modal.hidden {
-  display: none !important;
-}
-
 .modal.active {
   display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.modal.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 .modal-content {

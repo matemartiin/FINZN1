@@ -87,8 +87,13 @@ export class ModalManager {
     
     if (modal) {
       console.log('Modal classes before:', modal.className);
+      // Force remove hidden and add active
       modal.classList.remove('hidden');
       modal.classList.add('active');
+      
+      // Force display style as backup
+      modal.style.display = 'flex';
+      
       console.log('Modal classes after:', modal.className);
       document.body.style.overflow = 'hidden';
       
@@ -108,6 +113,10 @@ export class ModalManager {
     if (modal) {
       modal.classList.remove('active');
       modal.classList.add('hidden');
+      
+      // Force hide style as backup
+      modal.style.display = 'none';
+      
       document.body.style.overflow = '';
       
       // Reset form if exists
