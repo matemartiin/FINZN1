@@ -199,7 +199,7 @@ export class UIManager {
       item.innerHTML = `
         <div class="expense-icon">${category.icon}</div>
         <div class="expense-details">
-          <div class="expense-description">${expense.description}</div>
+          <div class="expense-description"></div>
           <div class="expense-category">${category.name} • ${transactionDate}</div>
           ${expense.total_installments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.total_installments}</div>` : ''}
         </div>
@@ -213,6 +213,10 @@ export class UIManager {
           </button>
         </div>
       `;
+      
+      // Safely set user-provided description
+      const descriptionElement = item.querySelector('.expense-description');
+      descriptionElement.textContent = expense.description;
       
       item.style.borderLeftColor = category.color;
       container.appendChild(item);
