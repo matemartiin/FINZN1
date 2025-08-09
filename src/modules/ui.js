@@ -5,6 +5,10 @@ export class UIManager {
     this.isShowingMascotMessage = false;
     this.currentMascotTimeout = null;
     this.setupMascotHoverBehavior();
+    this.setupThemeToggle();
+    this.setupLogoutButton();
+    this.setupExpenseForm();
+    this.setupIncomeForm();
   }
 
   setupMascotHoverBehavior() {
