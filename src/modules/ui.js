@@ -236,10 +236,7 @@ export class UIManager {
             Crear Objetivo
           </button>
         </div>
-    // Clear and rebuild safely
-    goalsList.innerHTML = '';
-    
-    goals.forEach(goal => {
+      `;
       return;
     }
 
@@ -267,7 +264,7 @@ export class UIManager {
       
       const progressFill = document.createElement('div');
       progressFill.className = 'progress-fill';
-      progressFill.style.width = \`${progressClamped}%`;
+      progressFill.style.width = `${progressClamped}%`;
       
       const progressText = document.createElement('div');
       progressText.className = 'progress-text';
@@ -327,7 +324,6 @@ export class UIManager {
       goalItem.appendChild(actionsDiv);
       
       goalsList.appendChild(goalItem);
-    });
     });
   }
 
@@ -413,7 +409,7 @@ export class UIManager {
       // Add to summary card with FUNCTIONAL SEMAPHORE and actions
       if (summaryContainer) {
         const summaryItem = document.createElement('div');
-        summaryItem.className = \`spending-limit-summary-item ${statusClass}`;
+        summaryItem.className = `spending-limit-summary-item ${statusClass}`;
         
         summaryItem.innerHTML = `
           ${semaphoreHtml}
@@ -491,7 +487,7 @@ export class UIManager {
       const categoryInfo = this.getCategoryInfo(limit.category);
       
       const limitItem = document.createElement('div');
-      limitItem.className = \`category-limit-item ${statusClass}`;
+      limitItem.className = `category-limit-item ${statusClass}`;
       
       limitItem.innerHTML = `
         <div class="category-limit-header">
@@ -604,14 +600,14 @@ export class UIManager {
     categories.forEach(category => {
       const option = document.createElement('option');
       option.value = category.name;
-      option.textContent = \`${category.icon} ${category.name}`;
+      option.textContent = `${category.icon} ${category.name}`;
       select.appendChild(option);
     });
   }
 
   showAlert(message, type = 'info') {
     const alert = document.createElement('div');
-    alert.className = \`alert alert-${type}`;
+    alert.className = `alert alert-${type}`;
     alert.textContent = message;
     
     this.alertContainer.appendChild(alert);
@@ -932,10 +928,10 @@ export class UIManager {
     
     if (goalNameElement) goalNameElement.textContent = goal.name;
     if (goalProgressElement) {
-      goalProgressElement.textContent = \`${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)} (${progress.toFixed(1)}%)`;
+      goalProgressElement.textContent = `${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)} (${progress.toFixed(1)}%)`;
     }
     if (maxAmountElement) {
-      maxAmountElement.textContent = \`Máximo disponible: ${this.formatCurrency(remaining)}`;
+      maxAmountElement.textContent = `Máximo disponible: ${this.formatCurrency(remaining)}`;
     }
     if (amountInput) {
       amountInput.max = remaining;
@@ -1199,7 +1195,7 @@ export class UIManager {
     
     insights.forEach(insight => {
       const insightCard = document.createElement('div');
-      insightCard.className = \`ai-insight-card ${insight.type || 'ai_recommendation'}`;
+      insightCard.className = `ai-insight-card ${insight.type || 'ai_recommendation'}`;
       insightCard.dataset.recommendationId = insight.id;
       insightCard.dataset.category = insight.category;
       insightCard.dataset.suggestedBudget = insight.suggestedBudget;
@@ -1355,7 +1351,7 @@ export class UIManager {
     
     predictions.forEach(prediction => {
       const predictionCard = document.createElement('div');
-      predictionCard.className = \`ml-prediction-card trend-${prediction.trend}`;
+      predictionCard.className = `ml-prediction-card trend-${prediction.trend}`;
       
       const trendIcons = {
         'increasing': '📈',
@@ -1424,7 +1420,7 @@ export class UIManager {
     
     patterns.forEach(pattern => {
       const patternCard = document.createElement('div');
-      patternCard.className = \`pattern-card pattern-${pattern.type}`;
+      patternCard.className = `pattern-card pattern-${pattern.type}`;
       
       const typeIcons = {
         'day_pattern': '📅',
@@ -1476,7 +1472,7 @@ export class UIManager {
   displayBudgetAlert(alert) {
     // Use existing alert system but with budget-specific styling
     const alertElement = document.createElement('div');
-    alertElement.className = \`alert alert-${alert.severity} budget-alert`;
+    alertElement.className = `alert alert-${alert.severity} budget-alert`;
     
     alertElement.innerHTML = `
       <div class="alert-content">
