@@ -57,7 +57,6 @@ class FinznApp {
       
       // Initialize chat
       this.chat.init();
-      console.log('💬 Chat system initialized');
       this.contextualBar.init();
       
       // Initialize calendar
