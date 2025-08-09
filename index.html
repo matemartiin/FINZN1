@@ -886,15 +886,19 @@
         <div class="categories-management">
           <div class="add-category-section">
             <h3>Agregar Nueva Categoría</h3>
-            <form id="add-category-form" class="category-form">
-              <div class="form-group">
-                <label for="category-name">Nombre</label>
-                <input type="text" id="category-name" name="name" required />
-                <span>➕</span>
-                Agregar Categoría
-              </button>
-            </form>
-          </div>
+  <form id="add-category-form" class="category-form">
+  <div class="form-group">
+    <label for="category-name">Nombre</label>
+    <input type="text" id="category-name" name="name" required />
+  </div>
+  <div class="modal-actions">
+    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+    <button type="submit" class="btn btn-primary">
+      <span>➕</span>
+      Agregar Categoría
+    </button>
+  </div>
+</form>
           
           <div class="categories-list-section">
             <h3>Categorías Existentes</h3>

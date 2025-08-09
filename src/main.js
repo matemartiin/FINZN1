@@ -1526,4 +1526,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
 console.log('✅ MAIN.JS LOADED SUCCESSFULLY');
 
+document.addEventListener('DOMContentLoaded', () => {
+  const modals = window.app.modals;
+
+  // Gastos
+  document.getElementById('add-expense-btn-dashboard')
+    ?.addEventListener('click', () => modals.show('add-expense-modal'));
+  document.getElementById('add-expense-btn-transactions')
+    ?.addEventListener('click', () => modals.show('add-expense-modal'));
+
+  // Ingresos
+  document.getElementById('add-income-btn-dashboard')
+    ?.addEventListener('click', () => modals.show('add-income-modal'));
+  document.getElementById('add-income-btn-transactions')
+    ?.addEventListener('click', () => modals.show('add-income-modal'));
+  document.getElementById('incomes-indicator')
+    ?.addEventListener('click', () => modals.show('view-incomes-modal'));
+
+  // Límites
+  document.getElementById('add-spending-limit-btn-transactions')
+    ?.addEventListener('click', () => modals.show('add-spending-limit-modal'));
+
+  // Objetivos
+  document.getElementById('add-goal-btn')
+    ?.addEventListener('click', () => modals.show('add-goal-modal'));
+
+  // Reporte IA
+  document.getElementById('generate-report-btn-section')
+    ?.addEventListener('click', () => modals.show('generate-ai-report-modal'));
+
+  // Calendario
+  document.getElementById('add-event-btn')
+    ?.addEventListener('click', () => modals.show('add-event-modal'));
+
+  // Settings
+  document.getElementById('manage-categories-btn')
+    ?.addEventListener('click', () => modals.show('manage-categories-modal'));
+  document.getElementById('edit-profile-btn')
+    ?.addEventListener('click', () => modals.show('edit-profile-modal'));
+});
 
