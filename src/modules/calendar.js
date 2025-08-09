@@ -11,21 +11,29 @@ export class CalendarManager {
 
   init() {
     console.log('📅 Initializing Calendar Manager...');
+    console.log('📅 DEBUG: Calendar init started');
     this.setupEventListeners();
+    console.log('📅 DEBUG: Event listeners setup completed');
     this.renderCalendar();
+    console.log('📅 DEBUG: Calendar rendered');
     this.loadEvents();
+    console.log('📅 DEBUG: Events loading initiated');
   }
 
   setupEventListeners() {
+    console.log('📅 DEBUG: Setting up event listeners...');
+    
     // Navigation buttons
     const prevBtn = document.getElementById('prev-month');
     const nextBtn = document.getElementById('next-month');
+    console.log('📅 DEBUG: Navigation buttons found:', { prevBtn: !!prevBtn, nextBtn: !!nextBtn });
     
     if (prevBtn) prevBtn.addEventListener('click', () => this.previousMonth());
     if (nextBtn) nextBtn.addEventListener('click', () => this.nextMonth());
 
     // View toggle buttons
     const viewButtons = document.querySelectorAll('.view-btn');
+    console.log('📅 DEBUG: View buttons found:', viewButtons.length);
     viewButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
         const view = e.target.getAttribute('data-view');
@@ -35,8 +43,14 @@ export class CalendarManager {
 
     // Add event button
     const addEventBtn = document.getElementById('add-event-btn');
+    console.log('📅 DEBUG: Add event button found:', !!addEventBtn);
+    if (addEventBtn) {
+      console.log('📅 DEBUG: Add event button element:', addEventBtn);
+      console.log('📅 DEBUG: Add event button parent:', addEventBtn.parentElement);
+    }
     if (addEventBtn) {
       addEventBtn.addEventListener('click', () => this.showAddEventModal());
+      console.log('📅 DEBUG: Add event button listener attached');
     }
 
     // Google Calendar sync button
@@ -47,8 +61,10 @@ export class CalendarManager {
 
     // Event forms
     const addEventForm = document.getElementById('add-event-form');
+    console.log('📅 DEBUG: Add event form found:', !!addEventForm);
     if (addEventForm) {
       addEventForm.addEventListener('submit', (e) => this.handleAddEvent(e));
+      console.log('📅 DEBUG: Add event form listener attached');
     }
 
     const editEventForm = document.getElementById('edit-event-form');
@@ -81,6 +97,8 @@ export class CalendarManager {
     if (editFromDetailsBtn) {
       editFromDetailsBtn.addEventListener('click', () => this.editEventFromDetails());
     }
+    
+    console.log('📅 DEBUG: Event listeners setup completed');
   }
 
   renderCalendar() {
@@ -185,6 +203,7 @@ export class CalendarManager {
 
     // Click handler for adding events
     cell.addEventListener('click', () => {
+      console.log('📅 DEBUG: Calendar cell clicked, date:', date);
       this.selectedDate = date;
       this.showAddEventModal(date);
     });
@@ -296,15 +315,30 @@ export class CalendarManager {
   }
 
   showAddEventModal(date = null) {
+    console.log('📅 DEBUG: showAddEventModal called with date:', date);
+    
     const modal = document.getElementById('add-event-modal');
+    console.log('📅 DEBUG: Modal element found:', !!modal);
+    if (modal) {
+      console.log('📅 DEBUG: Modal element:', modal);
+      console.log('📅 DEBUG: Modal classes:', modal.className);
+    }
+    
     const dateInput = document.getElementById('event-date');
+    console.log('📅 DEBUG: Date input found:', !!dateInput);
     
     if (date && dateInput) {
       dateInput.value = date.toISOString().split('T')[0];
+      console.log('📅 DEBUG: Date set to:', dateInput.value);
     }
     
+    console.log('📅 DEBUG: window.app exists:', !!window.app);
+    console.log('📅 DEBUG: window.app.modals exists:', !!(window.app && window.app.modals));
+    
     if (window.app && window.app.modals) {
+      console.log('📅 DEBUG: Calling window.app.modals.show');
       window.app.modals.show('add-event-modal');
+      console.log('📅 DEBUG: Modal show called');
     }
   }
 

@@ -4,9 +4,12 @@ export class ModalManager {
   }
 
   init() {
+    console.log('🔧 DEBUG: ModalManager init started');
     // Register all modals
     const modalElements = document.querySelectorAll('.modal');
+    console.log('🔧 DEBUG: Found modal elements:', modalElements.length);
     modalElements.forEach(modal => {
+      console.log('🔧 DEBUG: Registering modal:', modal.id, modal.className);
       this.modals.set(modal.id, modal);
       
       // Close modal when clicking outside
@@ -35,6 +38,8 @@ export class ModalManager {
         this.hideAll();
       }
     });
+    
+    console.log('🔧 DEBUG: ModalManager registered modals:', Array.from(this.modals.keys()));
   }
 
   setupBudgetModalEvents() {
@@ -78,9 +83,13 @@ export class ModalManager {
   }
   show(modalId) {
     console.log('ModalManager: Showing modal', modalId);
+    console.log('🔧 DEBUG: Available modals:', Array.from(this.modals.keys()));
     const modal = this.modals.get(modalId);
+    console.log('🔧 DEBUG: Modal found:', !!modal);
     if (modal) {
+      console.log('🔧 DEBUG: Modal element before show:', modal.className);
       modal.classList.add('active');
+      console.log('🔧 DEBUG: Modal element after show:', modal.className);
       document.body.style.overflow = 'hidden';
       
       // Focus first input
@@ -88,6 +97,8 @@ export class ModalManager {
       if (firstInput) {
         setTimeout(() => firstInput.focus(), 100);
       }
+    } else {
+      console.error('🔧 ERROR: Modal not found:', modalId);
     }
   }
 
