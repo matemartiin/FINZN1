@@ -3698,7 +3698,7 @@ body {
   .contextual-bar-content {
     flex-direction: column;
     gap: 12px;
-    align-items: stretch;
+    align-items: center;
   }
   
   .contextual-filters {
@@ -4406,6 +4406,21 @@ body {
     flex-direction: column;
     gap: 0.3rem;
   }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .user-info {
+    font-size: 0.9rem;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
 }
 
 /* Tablets (769px to 1024px) */
@@ -4574,12 +4589,6 @@ body {
 .darkmode .mobile-nav-item.active {
   color: white;
   background: rgba(255, 255, 255, 0.15);
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 @media (max-width: 480px) {
