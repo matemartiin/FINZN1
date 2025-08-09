@@ -720,6 +720,9 @@ export class CalendarManager {
       console.error('Error in loadEvents:', error);
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Error al cargar eventos del calendario', 'error');
+      }
+    }
+  }
   updateUpcomingEventsCount() {
     const badge = document.getElementById('upcoming-events');
     if (!badge) return;
