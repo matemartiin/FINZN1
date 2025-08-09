@@ -75,6 +75,8 @@
   --border-color: #4A5568;
 }
 
+@import url('./responsive-fixes.css');
+
 /* Reset y base */
 * {
   margin: 0;
