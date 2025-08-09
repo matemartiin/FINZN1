@@ -2662,6 +2662,7 @@ body {
 }
 
 .modal.active {
+  display: flex !important; /* Forzar que aparezca incluso si alguien le puso hidden */
   opacity: 1;
   visibility: visible;
   pointer-events: auto;

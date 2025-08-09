@@ -86,21 +86,27 @@ export class ModalManager {
 show(modalId) {
   console.log('ModalManager: Showing modal', modalId);
   const modal = this.modals.get(modalId) || document.getElementById(modalId);
-  if (!modal) {
-    console.warn('ModalManager: modal not found ->', modalId);
-    return;
+  if (!modal) return console.warn('ModalManager: modal not found ->', modalId);
+
+  // 👇 Mover modal al <body> para que no quede atrapado en contenedores con overflow/transform
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
   }
 
-  // 👇 Hace visible el modal de verdad
-  modal.classList.remove('hidden');   // Quita el "display:none !important"
-  modal.classList.add('active');      // Activa estilos visibles
-  document.body.style.overflow = 'hidden'; // Evita scroll del fondo
+  modal.classList.remove('hidden');
+  modal.classList.add('active');
 
-  // Foco al primer campo para mejor UX
+  // 👇 Asegurar que esté siempre encima
+  modal.style.zIndex = '2147483647';
+  document.body.style.overflow = 'hidden';
+
+  // 👇 Foco automático en primer campo interactivo
   const firstInput = modal.querySelector('input, select, textarea, button');
-  if (firstInput) setTimeout(() => firstInput.focus(), 50);
+  if (firstInput) {
+    setTimeout(() => firstInput.focus(), 50);
+  }
 
-  // Cerrar con ESC
+  // 👇 Cerrar con Escape
   const escHandler = (e) => {
     if (e.key === 'Escape') {
       this.hide(modalId);
