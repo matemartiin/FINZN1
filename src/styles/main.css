@@ -3698,6 +3698,15 @@ body {
   }
   
   .contextual-bar-content {
+    /* (opcional) conserva el layout si lo necesitas */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+  }
+
   .filter-select {
     min-width: 100px;
     font-size: 13px;

@@ -324,7 +324,7 @@ export class CalendarManager {
       console.log('📅 DEBUG: Modal classes:', modal.className);
     }
     
-    const dateInput = document.getElementById('event-date');
+    const dateInput = document.querySelector('#add-event-modal [name="date"]');
     console.log('📅 DEBUG: Date input found:', !!dateInput);
     
     if (date && dateInput) {
