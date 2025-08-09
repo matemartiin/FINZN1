@@ -81,41 +81,49 @@ export class ModalManager {
     setupDateValidation('budget-start-date', 'budget-end-date');
     setupDateValidation('edit-budget-start-date', 'edit-budget-end-date');
   }
-  show(modalId) {
-    console.log('ModalManager: Showing modal', modalId);
-    console.log('🔧 DEBUG: Available modals:', Array.from(this.modals.keys()));
-    const modal = this.modals.get(modalId);
-    console.log('🔧 DEBUG: Modal found:', !!modal);
-    if (modal) {
-      console.log('🔧 DEBUG: Modal element before show:', modal.className);
-      modal.classList.add('active');
-      console.log('🔧 DEBUG: Modal element after show:', modal.className);
-      document.body.style.overflow = 'hidden';
-      
-      // Focus first input
-      const firstInput = modal.querySelector('input, select, textarea');
-      if (firstInput) {
-        setTimeout(() => firstInput.focus(), 100);
-      }
-    } else {
-      console.error('🔧 ERROR: Modal not found:', modalId);
-    }
+  // src/modules/modals.js
+
+show(modalId) {
+  console.log('ModalManager: Showing modal', modalId);
+  const modal = this.modals.get(modalId) || document.getElementById(modalId);
+  if (!modal) {
+    console.warn('ModalManager: modal not found ->', modalId);
+    return;
   }
 
-  hide(modalId) {
-    console.log('ModalManager: Hiding modal', modalId);
-    const modal = this.modals.get(modalId);
-    if (modal) {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-      
-      // Reset form if exists
-      const form = modal.querySelector('form');
-      if (form) {
-        form.reset();
-      }
+  // 👇 Hace visible el modal de verdad
+  modal.classList.remove('hidden');   // Quita el "display:none !important"
+  modal.classList.add('active');      // Activa estilos visibles
+  document.body.style.overflow = 'hidden'; // Evita scroll del fondo
+
+  // Foco al primer campo para mejor UX
+  const firstInput = modal.querySelector('input, select, textarea, button');
+  if (firstInput) setTimeout(() => firstInput.focus(), 50);
+
+  // Cerrar con ESC
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      this.hide(modalId);
+      document.removeEventListener('keydown', escHandler);
     }
-  }
+  };
+  document.addEventListener('keydown', escHandler);
+}
+
+hide(modalId) {
+  console.log('ModalManager: Hiding modal', modalId);
+  const modal = this.modals.get(modalId) || document.getElementById(modalId);
+  if (!modal) return;
+
+  modal.classList.remove('active');  // Saca estilos visibles
+  modal.classList.add('hidden');     // Lo vuelve a ocultar
+  document.body.style.overflow = ''; // Restaura scroll del fondo
+
+  // Limpia el formulario del modal
+  const form = modal.querySelector('form');
+  if (form) form.reset();
+}
+
 
   hideAll() {
     this.modals.forEach((modal, id) => {
