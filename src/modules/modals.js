@@ -78,28 +78,10 @@ export class ModalManager {
   }
   show(modalId) {
     console.log('ModalManager: Showing modal', modalId);
-    
-    // Debug: Check if modal exists
-    console.log('Available modals:', Array.from(this.modals.keys()));
-    
     const modal = this.modals.get(modalId);
-    console.log('Modal found:', !!modal);
-    
     if (modal) {
-      console.log('Modal classes before:', modal.className);
-      
-      // CRITICAL: Remove hidden class first
       modal.classList.remove('hidden');
-      
-      // Then add active class
       modal.classList.add('active');
-      
-      // Force display style to ensure visibility
-      modal.style.display = 'flex';
-      modal.style.visibility = 'visible';
-      modal.style.opacity = '1';
-      
-      console.log('Modal classes after:', modal.className);
       document.body.style.overflow = 'hidden';
       
       // Focus first input
@@ -107,8 +89,6 @@ export class ModalManager {
       if (firstInput) {
         setTimeout(() => firstInput.focus(), 100);
       }
-    } else {
-      console.error('Modal not found:', modalId);
     }
   }
 
@@ -116,17 +96,8 @@ export class ModalManager {
     console.log('ModalManager: Hiding modal', modalId);
     const modal = this.modals.get(modalId);
     if (modal) {
-      // Remove active class first
       modal.classList.remove('active');
-      
-      // Then add hidden class
       modal.classList.add('hidden');
-      
-      // Force hide styles
-      modal.style.display = 'none';
-      modal.style.visibility = 'hidden';
-      modal.style.opacity = '0';
-      
       document.body.style.overflow = '';
       
       // Reset form if exists

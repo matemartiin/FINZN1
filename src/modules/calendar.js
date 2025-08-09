@@ -296,23 +296,15 @@ export class CalendarManager {
   }
 
   showAddEventModal(date = null) {
-    console.log('📅 showAddEventModal called with date:', date);
     const modal = document.getElementById('add-event-modal');
-    console.log('📅 Modal element found:', !!modal);
-    
     const dateInput = document.getElementById('event-date');
-    console.log('📅 Date input found:', !!dateInput);
     
     if (date && dateInput) {
       dateInput.value = date.toISOString().split('T')[0];
     }
     
-    console.log('📅 Calling window.app.modals.show...');
     if (window.app && window.app.modals) {
-      console.log('📅 window.app.modals exists:', !!window.app.modals);
       window.app.modals.show('add-event-modal');
-    } else {
-      console.error('📅 window.app.modals not available');
     }
   }
 
