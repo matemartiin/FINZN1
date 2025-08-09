@@ -5,7 +5,6 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# ÚNICO bloque de headers para /*
 [[headers]]
   for = "/*"
   [headers.values]
@@ -15,17 +14,16 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = """
       default-src 'self';
-      script-src 'self' https://unpkg.com https://cdn.jsdelivr.net;
+      script-src 'self' https://cdn.jsdelivr.net;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com data:;
-      img-src 'self' data: blob: https://images.unsplash.com https://*.unsplash.com;
+      img-src 'self' data: blob:;
       connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com;
       frame-ancestors 'none';
-      object-src 'none';
       base-uri 'self';
+      object-src 'none';
     """
 
-# (Opcional) Netlify normalmente ya sirve el tipo correcto
 [[headers]]
   for = "*.js"
   [headers.values]
@@ -40,4 +38,3 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
-

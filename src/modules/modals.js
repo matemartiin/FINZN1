@@ -14,6 +14,9 @@ export class ModalManager {
     modalElements.forEach(modal => {
       console.log('🔧 DEBUG: Registering modal:', modal.id, modal.className);
       this.modals.set(modal.id, modal);
+      
+      // Forzar que cualquier modal que no esté activo arranque oculto
+      modal.classList.toggle('hidden', !modal.classList.contains('active'));
 
       // Cerrar al clickear fuera
       modal.addEventListener('click', (e) => {

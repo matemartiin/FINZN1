@@ -2678,6 +2678,15 @@ body {
   display: flex !important;     /* por si alguien mete display:none */
 }
 
+/* Modal pointer events fix */
+.modal { 
+  pointer-events: none; 
+}
+
+.modal.active { 
+  pointer-events: auto; 
+}
+
 /* Contenido del modal */
 .modal-content {
   background: var(--bg-primary);
@@ -2710,7 +2719,7 @@ body {
   opacity: 0;
 }
 
-/* Accesibilidad: usuarios con “reduced motion” */
+/* Accesibilidad: usuarios con "reduced motion" */
 @media (prefers-reduced-motion: reduce) {
   .modal,
   .modal-content {
@@ -2815,7 +2824,8 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 1000;
+  z-index: 2147483600; /* debajo de los modales (2147483647), encima de todo lo demás */
+  isolation: isolate; /* evita stacking context de padres */
 }
 
 .chat-toggle {
@@ -2872,6 +2882,7 @@ body {
   transform: scale(0.9) translateY(20px);
   opacity: 0;
   transition: all var(--transition-normal);
+  z-index: 2147483600; /* mismo nivel que el widget */
 }
 
 .chat-window:not(.hidden) {
