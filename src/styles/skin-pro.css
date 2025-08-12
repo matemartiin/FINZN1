@@ -1162,3 +1162,36 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
   .btn{ height: 44px; }
   .pro-card{ padding: 12px; border-radius: 12px; }
 }
+
+/* ===== Bottom-nav HARD FIX (mobile) ===== */
+@media (max-width: 900px){
+  /* 1) Siempre fija y por encima de todo */
+  .mobile-nav{
+    position: fixed !important;
+    left: 0; right: 0; bottom: 0;
+    z-index: 2147483000; /* muy alto */
+  }
+
+  /* 2) Evitar que algún contenedor la “encierre” o tape */
+  html, body, #app, .main-dashboard{
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+  }
+  .main-dashboard, .dashboard-section, .section-content{
+    overflow: visible !important; /* que scrollee la página, no un div */
+  }
+
+  /* 3) Dejar espacio inferior en las secciones que usan .section-content */
+  #transactions-section .section-content,
+  #reports-section .section-content,
+  #dashboard-section .section-content,
+  #budgets-section .section-content,
+  #goals-section .section-content,
+  #calendar-section .section-content{
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  /* 4) Chat arriba de la barra en móvil */
+  #chat-widget{ bottom: 92px; }
+}
