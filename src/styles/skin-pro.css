@@ -997,3 +997,32 @@ body[data-skin="pro"] .content-wrapper {
   min-height:0;
   overflow:auto;
 }
+
+/* === Modo content-fit: cards ajustan a su contenido === */
+.dashboard-row.grid-12.content-fit { align-items: start; }
+
+.dashboard-row.grid-12.content-fit .pro-card{
+  display: flex;
+  flex-direction: column;
+  min-height: auto;          /* sin alto mínimo fijo */
+  overflow: visible;         /* no recorta internos */
+}
+
+/* Listas internas NO rellenan el alto: se adaptan al contenido */
+.dashboard-row.grid-12.content-fit #card-budgets-vs-spend .budget-bars,
+.dashboard-row.grid-12.content-fit #card-recent .tx-list,
+.dashboard-row.grid-12.content-fit #card-upcoming .upcoming-list,
+.dashboard-row.grid-12.content-fit #card-goals .goals-mini,
+.dashboard-row.grid-12.content-fit #card-insights .alerts{
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+/* Ajustes de ítems para que no “floten” ni se superpongan */
+.tx-list, .upcoming-list, .goals-mini, .alerts { display: grid; gap: 10px; }
+.tx-item, .upcoming-item, .goal-mini {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+}
