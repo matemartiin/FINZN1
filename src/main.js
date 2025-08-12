@@ -1,6 +1,7 @@
 import { AuthManager } from './modules/auth.js';
 import { DataManager } from './modules/data.js';
 import { UIManager } from './modules/ui.js';
+import { ChartManager } from './modules/charts.js';
 import { ModalManager } from './modules/modals.js';
 import { ChatManager } from './modules/chat.js';
 import { ContextualBarManager } from './modules/contextual-bar.js';
@@ -23,6 +24,7 @@ class FinznApp {
     this.auth = new AuthManager();
     this.data = new DataManager();
     this.ui = new UIManager();
+    this.charts = new ChartManager();
     this.modals = new ModalManager();
     this.chat = new ChatManager();
     this.contextualBar = new ContextualBarManager();
@@ -623,7 +625,17 @@ setupDashboardEvents() {
         this.ui.showAlert(alert.message, alert.type);
       });
       
-    
+      // Update charts
+      try {
+        const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
+        this.charts.updateExpensesChart(expensesByCategory);
+        
+        // Update trend chart
+        const trendData = await this.data.getTrendData();
+        this.charts.updateTrendChart(trendData);
+      } catch (chartError) {
+        console.log('ℹ️ Charts not available in current view:', chartError.message);
+      }
       
       // Update budgets with AI insights
       const budgets = await this.budget.loadBudgets();

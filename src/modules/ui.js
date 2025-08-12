@@ -38,7 +38,106 @@ export class UIManager {
     }
   }
 
-  
+  initializeMascotHover() {
+    const mascotContainer = document.querySelector('.chart-mascot-container');
+    const dynamicMessage = document.getElementById('mascot-dynamic-message');
+    
+    if (!mascotContainer || !dynamicMessage) {
+      // Retry after a short delay if elements aren't ready
+      setTimeout(() => this.initializeMascotHover(), 500);
+      return;
+    }
+
+    console.log('🐾 Initializing mascot hover behavior');
+
+    mascotContainer.addEventListener('mouseenter', () => {
+      this.showHoverMessage(dynamicMessage);
+    });
+
+    mascotContainer.addEventListener('mouseleave', () => {
+      this.hideHoverMessage(dynamicMessage);
+    });
+  }
+
+  showHoverMessage(messageElement) {
+    if (!messageElement) return;
+
+    // Clear any existing message first
+    this.clearMascotMessage(messageElement);
+
+    // Get current financial context for personalized message
+    const messages = this.getContextualMascotMessages();
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    
+    // Set flag to prevent overlapping
+    this.isShowingMascotMessage = true;
+    
+    messageElement.textContent = randomMessage.text;
+    messageElement.className = `mascot-alert mascot-alert-${randomMessage.type}`;
+    messageElement.style.opacity = '1';
+    messageElement.style.visibility = 'visible';
+    messageElement.style.pointerEvents = 'none';
+    
+    console.log('🐾 Mascot speaking on hover:', randomMessage.text);
+  }
+
+  hideHoverMessage(messageElement) {
+    if (!messageElement) return;
+    
+    this.clearMascotMessage(messageElement);
+    console.log('🐾 Mascot returning to silent state');
+  }
+
+  clearMascotMessage(messageElement) {
+    if (!messageElement) return;
+    
+    // Clear any existing timeout
+    if (this.currentMascotTimeout) {
+      clearTimeout(this.currentMascotTimeout);
+      this.currentMascotTimeout = null;
+    }
+    
+    // Hide message immediately
+    messageElement.style.opacity = '0';
+    messageElement.style.visibility = 'hidden';
+    messageElement.textContent = '';
+    messageElement.className = 'mascot-alert';
+    
+    // Reset flag
+    this.isShowingMascotMessage = false;
+  }
+
+  getContextualMascotMessages() {
+    // Get current balance if available
+    const balanceElement = document.getElementById('balance-amount-new');
+    const balanceText = balanceElement ? balanceElement.textContent : '';
+    
+    // Parse balance (remove currency symbols and convert to number)
+    const balanceValue = parseFloat(balanceText.replace(/[^0-9.-]/g, '')) || 0;
+    
+    const messages = [
+      { text: '¡Hola! Soy tu asistente financiero personal', type: 'info' },
+      { text: '¿Sabías que ahorrar el 20% de tus ingresos es ideal?', type: 'info' },
+      { text: 'Revisa tus gastos regularmente para mantener el control', type: 'info' },
+      { text: '¡Cada peso ahorrado es un paso hacia tus metas!', type: 'success' },
+      { text: 'Planifica tus compras para evitar gastos impulsivos', type: 'info' }
+    ];
+
+    // Add contextual messages based on balance
+    if (balanceValue < 0) {
+      messages.push(
+        { text: '¡Cuidado! Estás gastando más de lo que ingresas', type: 'warning' },
+        { text: 'Considera revisar tus gastos no esenciales', type: 'warning' }
+      );
+    } else if (balanceValue > 1000) {
+      messages.push(
+        { text: '¡Excelente! Tienes un buen balance este mes', type: 'success' },
+        { text: '¡Buen trabajo! Considera invertir tus ahorros', type: 'success' }
+      );
+    }
+
+    return messages;
+  }
 
   updateBalance(balance) {
     const balanceAmount = document.getElementById('balance-amount-new');
@@ -1472,6 +1571,7 @@ initDashboard() {
   document.addEventListener('DOMContentLoaded', () => {
     this.wireDashboardButtons();
     this.bindBudgetForm();
+    this.initExpensesChart();
   });
 }
 
@@ -1495,9 +1595,68 @@ wireDashboardButtons() {
   $('#go-transactions')?.addEventListener('click', () => window.app?.navigation?.showSection?.('transactions'));
 }
 
+// === 3) Gráfico de gastos (doughnut) ===
+initExpensesChart() {
+  const canvas = document.getElementById('expenses-chart');
+  if (!canvas || !window.Chart) return;
 
+  // Obtener gastos del mes (fallbacks defensivos)
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const getAll = () => (window.app?.data?.getExpenses?.() || []);
+  const expenses = (window.app?.data?.getCurrentMonthExpenses?.() || getAll())
+    .filter(e => {
+      if (!e?.transaction_date) return true; // si no viene fecha, lo contamos
+      const d = new Date(e.transaction_date);
+      return d.getFullYear() === y && d.getMonth() === m;
+    });
 
+  // Agrupar por categoría
+  const byCat = new Map();
+  for (const e of expenses) {
+    const cat = e.category || 'Otros';
+    const amt = Number(e.amount) || 0;
+    byCat.set(cat, (byCat.get(cat) || 0) + amt);
+  }
 
+  // Si no hay datos, mostramos un dataset vacío simpático
+  const labels = byCat.size ? [...byCat.keys()] : ['Sin datos'];
+  const data = byCat.size ? [...byCat.values()] : [1];
+
+  // Limpiar gráfico previo si existe
+  if (this._expensesChart) {
+    this._expensesChart.destroy();
+  }
+
+  this._expensesChart = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: {
+          label: (ctx) => {
+            const val = ctx.parsed || 0;
+            return `${ctx.label}: ${this.formatCurrency(val)}`;
+          }
+        }}
+      }
+    }
+  });
+}
+
+// Llamá esto cada vez que cambien gastos para refrescar el gráfico
+refreshExpensesChart() {
+  this.initExpensesChart();
+}
 
 // === 4) Crear Presupuesto (sin recargar) ===
 bindBudgetForm() {
