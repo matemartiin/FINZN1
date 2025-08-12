@@ -1886,4 +1886,32 @@ console.log('✅ MAIN.JS LOADED SUCCESSFULLY');
   close?.addEventListener('click', () => win.classList.add('hidden'));
 })();
 
+// === Drawer mobile para la sidebar (no es Bootstrap; solo arranque de JS) ===
+(function () {
+  const body = document.body;
+  const burger = document.getElementById('header-menu-toggle');
+
+  // crear scrim si no existe
+  let scrim = document.getElementById('drawer-scrim');
+  if (!scrim) {
+    scrim = document.createElement('div');
+    scrim.id = 'drawer-scrim';
+    scrim.className = 'drawer-scrim';
+    document.body.appendChild(scrim);
+  }
+
+  function openDrawer(){ body.classList.add('nav-open'); }
+  function closeDrawer(){ body.classList.remove('nav-open'); }
+
+  burger?.addEventListener('click', (e)=> {
+    e.preventDefault();
+    body.classList.toggle('nav-open');
+  });
+  scrim.addEventListener('click', closeDrawer);
+
+  // cierra al navegar
+  document.querySelectorAll('.nav-item,[data-section]').forEach(el=>{
+    el.addEventListener('click', closeDrawer);
+  });
+})();
 
