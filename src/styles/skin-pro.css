@@ -1056,3 +1056,109 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
 @media (max-width: 1200px){
   body[data-skin="pro"] .col-span-4 { grid-column: span 12; }
 }
+
+/* ===== Bottom navigation (móvil) ===== */
+.mobile-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(16,21,28,.85);
+  backdrop-filter: blur(8px) saturate(120%);
+  border-top: 1px solid rgba(255,255,255,.08);
+  z-index: 1100;                 /* por encima del contenido */
+}
+.mobile-nav-item{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 0;
+  text-decoration: none;
+  color: var(--pro-text-2, #9CA3AF);
+  border-radius: 10px;
+}
+.mobile-nav-item.active,
+.mobile-nav-item:focus-visible{
+  color: var(--pro-text, #E5E7EB);
+  background: rgba(255,255,255,.06);
+  outline: none;
+}
+.mobile-nav-icon .ph{ font-size: 20px; }
+.mobile-nav-label{ font-size: 12px; font-weight: 600; }
+
+/* Ocultar en desktop */
+@media (min-width: 901px){
+  .mobile-nav{ display: none; }
+}
+
+/* Dejar espacio abajo para que no la tape el contenido */
+@media (max-width: 900px){
+  .dashboard-section{ padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+}
+
+/* Evitar que el chat flote encima de la barra en móvil */
+@media (max-width: 900px){
+  #chat-widget{ bottom: 92px; } /* súbelo un poco */
+}
+
+/* ===== DASHBOARD — RESPONSIVE POLISH ===== */
+
+/* Fila de 2 cards (Movimientos + Próximos) bien fiteada */
+.dashboard-row.grid-12.content-fit { align-items: start; }
+.dashboard-row.grid-12.content-fit .pro-card{
+  min-height: auto;
+  overflow: hidden;            /* evita solapes/“tubos” */
+}
+.dashboard-row.grid-12.content-fit #card-recent .tx-list,
+.dashboard-row.grid-12.content-fit #card-upcoming .upcoming-list{
+  max-height: clamp(200px, 32vh, 420px);
+  overflow: auto;
+  padding-right: 4px;          /* no salta por scrollbar */
+}
+
+/* T1: >=1200px (desktop grande) — 3 KPIs, fila 2 en 2 columnas */
+@media (min-width: 1200px){
+  body[data-skin="pro"] .summary-cards{
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+}
+
+/* T2: 900–1199px (laptop) — KPIs en 2 columnas, fila 2 apilada */
+@media (max-width: 1199px){
+  body[data-skin="pro"] .summary-cards{
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+  /* la fila de 2 cards se apila una debajo de la otra */
+  body[data-skin="pro"] .col-span-6 { grid-column: span 12; }
+  #card-budgets-vs-spend { min-height: 220px; }
+  .pro-card { padding: 14px; border-radius: 14px; }
+  .pro-card-head h3 { font-size: 15px; }
+}
+
+/* T3: <=900px (tablet) — todo 1 columna, contenidos más compactos */
+@media (max-width: 900px){
+  .dashboard-section{ padding-inline: 16px; }
+  body[data-skin="pro"] .summary-cards{
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .summary-card{ min-height: 150px; padding: 14px; }
+  .card-header-simple{ padding: 8px 8px 4px; }
+  .summary-card .card-action{ padding: 0 8px 10px; }
+  /* listas pueden crecer un poco más en móvil */
+  .dashboard-row.grid-12.content-fit #card-recent .tx-list,
+  .dashboard-row.grid-12.content-fit #card-upcoming .upcoming-list{
+    max-height: 40vh;
+  }
+}
+
+/* T4: <=480px (teléfono chico) — tipografías y botones */
+@media (max-width: 480px){
+  .summary-card .card-amount{ font-size: clamp(20px, 6vw, 28px); }
+  .btn{ height: 44px; }
+  .pro-card{ padding: 12px; border-radius: 12px; }
+}
