@@ -964,3 +964,36 @@ body[data-skin="pro"] .content-wrapper {
   border: 1px solid var(--border-muted, #e5e7eb);
   background: var(--surface, #fff);
 }
+
+/* Toolbar de acciones globales del dashboard */
+.dashboard-actions{
+  display:flex;
+  gap:12px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  margin: 8px 0 16px;
+}
+@media (max-width: 900px){
+  .dashboard-actions{ justify-content:flex-start; }
+}
+
+/* Cards: estructura segura para evitar que algo “salte” fuera */
+.pro-card{
+  display:flex;
+  flex-direction:column;
+  min-height:280px;
+  overflow:hidden;            /* evita que botones/elementos sobresalgan */
+}
+
+/* Que cada fila de la grilla estire alturas de sus columnas */
+.dashboard-row.grid-12{ align-items:stretch; }
+
+/* Listas internas ocupan el alto disponible y scrollean si hace falta */
+#card-budgets-vs-spend .budget-bars,
+#card-recent .tx-list,
+#card-upcoming .upcoming-list,
+#card-goals .goals-mini{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+}
