@@ -1,0 +1,951 @@
+/* ========= FINZN - Skin PRO (seguro) ========= */
+/* Paleta oscura profesional compatible con tu look actual */
+
+/* === Tokens base (fallbacks) === */
+:root{
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  --surface-1-pro: var(--surface-1, #0f1115);
+  --border-subtle: rgba(255,255,255,0.08);
+  --text-1: var(--text-color, #e7e9ee);
+  --text-2: rgba(231,233,238,0.72);
+  --brand: #8f7bff;
+  --brand-2: #6d58ff;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --elevation-2: 0 4px 10px rgba(0,0,0,.25);
+  --elevation-4: 0 8px 20px rgba(0,0,0,.35);
+  --elevation-6: 0 14px 28px rgba(0,0,0,.4);
+}
+
+html, body{ font-family: var(--font-sans); }
+
+body[data-skin="pro"]{
+  --pro-bg:        #10151c;
+  --pro-surface:   #151c26;
+  --pro-elev:      #1b2430;
+  --pro-border:    rgba(255,255,255,.08);
+  --pro-text:      #E5E7EB;
+  --pro-text-2:    #9CA3AF;
+
+  --pro-primary:   #B8A7FF;  /* lavanda FINZN */
+  --pro-primary-2: #9F8CFF;
+
+  --pro-success:   #22C55E;
+  --pro-warning:   #F59E0B;
+  --pro-error:     #EF4444;
+
+  --pro-shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+  --pro-shadow-md: 0 6px 18px rgba(0,0,0,.35);
+}
+
+/* Header y contenedores elevables: NO cambiamos layout, solo estilo */
+body[data-skin="pro"] .header{
+  background: var(--pro-surface);
+  box-shadow: var(--pro-shadow-sm);
+}
+body[data-skin="pro"] .main-dashboard,
+body[data-skin="pro"] .dashboard-section.active{
+  background: transparent;
+  color: var(--pro-text);
+}
+
+/* Sidebar */
+body[data-skin="pro"] .sidebar-nav{
+  background: var(--pro-surface);
+  border-right: 1px solid var(--pro-border);
+}
+body[data-skin="pro"] .nav-item.active{
+  background: #232b3a;
+  border: 1px solid var(--pro-border);
+  box-shadow: var(--pro-shadow-sm);
+}
+
+/* Tarjetas (NO tocamos display ni grid) */
+body[data-skin="pro"] .summary-card,
+body[data-skin="pro"] .chart-card-new,
+body[data-skin="pro"] .expenses-section-card,
+body[data-skin="pro"] .income-section-card,
+body[data-skin="pro"] .spending-limits-main-card,
+body[data-skin="pro"] .settings-card,
+body[data-skin="pro"] .report-card,
+body[data-skin="pro"] .budgets-container {
+  background: var(--pro-elev);
+  border: 1px solid var(--pro-border);
+  box-shadow: var(--pro-shadow-sm);
+  color: var(--pro-text);
+}
+
+/* Tipografía y jerarquía: solo tamaños/colores, sin mover nada */
+body[data-skin="pro"] .section-header h1 { 
+  color: var(--pro-text); 
+  font-size: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+}
+body[data-skin="pro"] .card-amount{
+  color: var(--pro-text);
+  font-weight: 800;
+}
+body[data-skin="pro"] .card-title,
+body[data-skin="pro"] .breadcrumb-nav,
+body[data-skin="pro"] .nav-label{
+  color: var(--pro-text-2);
+}
+
+/* Botones: look FINZN pero más “pro” */
+body[data-skin="pro"] .btn-primary{
+  background: linear-gradient(135deg, var(--pro-primary), var(--pro-primary-2));
+  color: #0B0E13;
+  box-shadow: 0 8px 20px rgba(159,140,255,.18);
+}
+body[data-skin="pro"] .btn-secondary{
+  background: #232b3a;
+  color: var(--pro-text);
+  border: 1px solid var(--pro-border);
+}
+
+/* Accesibilidad: foco visible en todo lo interactivo */
+body[data-skin="pro"] a:focus-visible,
+body[data-skin="pro"] button:focus-visible,
+body[data-skin="pro"] .nav-item:focus-visible,
+body[data-skin="pro"] .btn:focus-visible{
+  outline: 3px solid color-mix(in oklab, var(--pro-primary), #000 10%);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+body[data-skin="pro"] .summary-card .card-amount{
+  font-size: clamp(1.4rem, 1.2rem + 1vw, 2rem);
+  letter-spacing: .2px;
+}
+body[data-skin="pro"] .summary-card .card-header-simple{ 
+  padding-bottom: 6px; 
+  border-bottom: 1px solid var(--pro-border);
+}
+
+@media (min-width: 1024px){
+  body[data-skin="pro"] .summary-cards{
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 16px;
+  }
+}
+@media (max-width: 1023px){
+  body[data-skin="pro"] .summary-cards{
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/***** PRO UI POLISH v2 — pegar al final de skin-pro.css *****/
+
+/* 1) Escala tipográfica & espaciado base */
+body[data-skin="pro"] {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --text-muted: rgba(255,255,255,.72);
+
+  font-feature-settings: "cv01","cv02","ss01";
+}
+
+body[data-skin="pro"] .section-header h1 {
+  font-size: clamp(20px, 2.2vw, 28px);
+  line-height: 1.2;
+  letter-spacing: .2px;
+  margin: 0;
+}
+
+/* 2) Summary cards: altura, padding, jerarquía */
+body[data-layout="v2"][data-skin="pro"] .summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-7);
+}
+
+body[data-skin="pro"] .summary-card {
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+body[data-skin="pro"] .summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+}
+body[data-skin="pro"] .card-header-simple {
+  display: flex; align-items: center; gap: var(--space-3);
+}
+body[data-skin="pro"] .card-title {
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+body[data-skin="pro"] .card-amount {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 800;
+  letter-spacing: .4px;
+}
+
+/* 3) Icon chips más prolijos */
+body[data-skin="pro"] .icon-chip {
+  display:inline-flex; align-items:center; justify-content:center;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(180deg, rgba(137,116,255,.22), rgba(137,116,255,.06));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+body[data-skin="pro"] .icon-chip .ph { font-size: 18px; }
+
+/* 4) Botones: tamaño consistente y microinteracción */
+body[data-skin="pro"] .btn {
+  height: 40px; padding: 0 var(--space-4);
+  border-radius: 12px; font-weight: 700; letter-spacing:.2px;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+body[data-skin="pro"] .btn:active { transform: translateY(1px) scale(.99); }
+body[data-skin="pro"] .btn.btn-primary {
+  box-shadow: 0 10px 22px rgba(137,116,255,.28);
+}
+body[data-skin="pro"] .btn.btn-primary:hover {
+  box-shadow: 0 14px 28px rgba(137,116,255,.36);
+}
+
+/* 5) Sidebar: item activo con marcador lateral + foco accesible */
+body[data-skin="pro"] .sidebar-nav { padding: 14px 8px; }
+body[data-skin="pro"] .nav-item {
+  border-radius: 10px; padding: 10px 12px; position: relative;
+}
+body[data-skin="pro"] .nav-item:focus-visible {
+  outline: 2px solid rgba(137,116,255,.6);
+  outline-offset: 2px;
+}
+body[data-skin="pro"] .nav-item.active {
+  background: linear-gradient(180deg, rgba(137,116,255,.22), rgba(137,116,255,.06));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 22px rgba(137,116,255,.18);
+}
+body[data-skin="pro"] .nav-item.active::before{
+  content:""; position:absolute; left:-2px; top:8px; bottom:8px; width:4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #8a74ff, #61dafb);
+}
+body[data-skin="pro"] .nav-icon .ph { font-size: 18px; }
+
+/* Badges de nav más legibles */
+body[data-skin="pro"] .nav-badge{
+  margin-left:auto; min-width: 22px; height: 22px; padding: 0 6px;
+  border-radius: 999px; display:inline-flex; align-items:center; justify-content:center;
+  font-size: 12px; font-weight: 800; color: #0b1020;
+  background: linear-gradient(180deg,#61dafb,#8a74ff);
+  box-shadow: 0 6px 16px rgba(97,218,251,.35);
+}
+
+/* 6) Breadcrumb limpio y sutil */
+body[data-skin="pro"] .breadcrumb-nav{
+  display:flex; align-items:center; gap: var(--space-2);
+  color: var(--text-muted); margin: 2px 0 var(--space-4);
+  font-weight: 600;
+}
+body[data-skin="pro"] .breadcrumb-item.active{
+  color:#fff; background: rgba(255,255,255,.04);
+  padding: 6px 10px; border-radius: 10px;
+}
+
+/* 7) Gráfico: alto fluido y marco */
+body[data-skin="pro"] .chart-card-new{
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+body[data-skin="pro"] .chart-container-new{
+  /* altura responsiva: 320–460 según ancho */
+  height: clamp(320px, 46vw, 460px);
+}
+body[data-skin="pro"] .chart-card-new h3{
+  display:flex; align-items:center; gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+}
+
+/* 8) Listas (gastos/ingresos): densidad y hover */
+body[data-skin="pro"] .expenses-list .expense-item,
+body[data-skin="pro"] .income-list .income-item{
+  display:grid; grid-template-columns: 1fr auto auto; gap: var(--space-4);
+  align-items:center; padding: 12px 14px; border-radius: 12px;
+  background: rgba(255,255,255,.02);
+  transition: background .12s ease, transform .12s ease;
+}
+body[data-skin="pro"] .expenses-list .expense-item + .expense-item,
+body[data-skin="pro"] .income-list .income-item + .income-item{ margin-top: 8px; }
+body[data-skin="pro"] .expenses-list .expense-item:hover,
+body[data-skin="pro"] .income-list .income-item:hover{
+  background: rgba(255,255,255,.04); transform: translateY(-1px);
+}
+
+/* 9) Section header “pegajoso” para pantallas largas */
+body[data-skin="pro"] .section-content .section-header{
+  position: sticky; top: 64px; z-index: 1;
+  padding: var(--space-3) 0; backdrop-filter: blur(6px);
+}
+
+/* 10) Responsivo fino: 3 → 2 → 1 columnas */
+@media (max-width: 1280px){
+  body[data-layout="v2"][data-skin="pro"] .summary-cards{
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+}
+@media (max-width: 720px){
+  body[data-layout="v2"][data-skin="pro"] .summary-cards{
+    grid-template-columns: 1fr;
+  }
+  body[data-skin="pro"] .btn { height: 44px; }
+}
+
+/* 11) Estados vacíos (por si una lista viene vacía) */
+body[data-skin="pro"] .empty-state{
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  padding: var(--space-7); border-radius: var(--radius-lg);
+  color: var(--text-muted); background: rgba(255,255,255,.03);
+  border: 1px dashed rgba(255,255,255,.08);
+}
+
+/* ==== PASO 3 SAFE — Tabs + estados vacíos (solo visual) ==== */
+
+/* Contenedor de tabs */
+.transaction-tabs{
+  display:flex;
+  gap:8px;
+  padding:6px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;
+  background:rgba(255,255,255,.03);
+  margin-bottom:14px;
+}
+
+/* Botón de tab */
+.transaction-tabs .tab-btn{
+  appearance:none;
+  border:1px solid transparent;
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:600;
+  opacity:.9;
+  cursor:pointer;
+  background:transparent;
+  transition:all .18s ease;
+  line-height:1;
+}
+.transaction-tabs .tab-btn:hover{
+  opacity:1;
+  background:rgba(255,255,255,.05);
+}
+.transaction-tabs .tab-btn.active{
+  background:linear-gradient(180deg, rgba(137,116,255,.18), rgba(137,116,255,.06));
+  border-color:rgba(137,116,255,.35);
+  box-shadow:0 8px 20px rgba(137,116,255,.20);
+}
+
+/* Tarjetas dentro de cada tab (solo estilos, sin cambiar display) */
+.transactions-container .expenses-section-card,
+.transactions-container .income-section-card{
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+}
+
+/* Estados vacíos (sin JS). 
+   Muestra un mensaje cuando aún no hay datos en las listas */
+#expenses-list:empty::before,
+#income-list:empty::before,
+#category-limits-display:empty::before{
+  content:"Nada por aquí todavía. Usá los botones de arriba para empezar.";
+  display:block;
+  text-align:center;
+  padding:28px 12px;
+  opacity:.75;
+  border:1px dashed rgba(255,255,255,.15);
+  border-radius:12px;
+  margin-top:8px;
+  font-weight:500;
+}
+
+/* === PRO v2 · Sidebar/Nav === */
+body[data-skin="pro"] .sidebar-nav{
+  border-right: 1px solid var(--border-subtle);
+}
+
+body[data-skin="pro"] .nav-item{
+  display:flex; align-items:center; gap:.75rem;
+  padding: .625rem .9rem;
+  border-radius: 10px;
+  color: var(--text-2);
+  transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+body[data-skin="pro"] .nav-item .nav-icon{
+  width: 1.25rem; display:grid; place-items:center;
+  opacity:.9;
+}
+body[data-skin="pro"] .nav-item:hover{
+  background: rgba(255,255,255,0.05);
+  color: var(--text-1);
+  transform: translateX(1px);
+}
+body[data-skin="pro"] .nav-item.active{
+  color: var(--text-1);
+  background: linear-gradient(90deg, rgba(143,123,255,.14), rgba(143,123,255,0));
+  position: relative;
+}
+body[data-skin="pro"] .nav-item.active::before{
+  content:"";
+  position:absolute; left:-10px; top:8px; bottom:8px;
+  width:3px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+  box-shadow: 0 0 10px rgba(143,123,255,.6);
+}
+
+/* Mobile bottom-nav coherente */
+body[data-skin="pro"] .mobile-nav-item.active{
+  color: var(--text-1);
+}
+
+/* === PRO v2 · Botones === */
+body[data-skin="pro"] .btn{
+  border-radius: 12px;
+  padding: .625rem .9rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255,255,255,0.02);
+  color: var(--text-1);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+}
+body[data-skin="pro"] .btn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.04);
+  box-shadow: var(--elevation-2);
+}
+body[data-skin="pro"] .btn:active{
+  transform: translateY(0);
+  box-shadow: none;
+}
+body[data-skin="pro"] .btn:focus-visible{
+  outline: 2px solid rgba(143,123,255,.6);
+  outline-offset: 2px;
+}
+
+/* Principal */
+body[data-skin="pro"] .btn.btn-primary{
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+  border-color: transparent;
+}
+body[data-skin="pro"] .btn.btn-primary:hover{
+  box-shadow: 0 8px 18px rgba(143,123,255,.35);
+}
+
+/* Ghost */
+body[data-skin="pro"] .btn.ghost{
+  background: transparent;
+  border-color: var(--border-subtle);
+  color: var(--text-2);
+}
+body[data-skin="pro"] .btn.ghost:hover{
+  color: var(--text-1);
+  border-color: rgba(255,255,255,.16);
+}
+
+/* === PRO v2 · Headers de tarjeta === */
+body[data-skin="pro"] .card-header-simple{
+  display:flex; align-items:center; justify-content: space-between;
+  margin-bottom: .35rem;
+}
+body[data-skin="pro"] .card-title{
+  display:flex; align-items:center; gap:.5rem;
+  font-weight: 700;
+}
+body[data-skin="pro"] .card-icon-simple .icon-chip{
+  display:inline-grid; place-items:center;
+  width: 32px; height: 32px; border-radius: 10px;
+  background: rgba(143,123,255,.12);
+  color: #cbbfff;
+  border: 1px solid rgba(143,123,255,.25);
+}
+
+/* === PRO v2 · Header de la card de gráfico === */
+body[data-skin="pro"] .chart-card-head{
+  display:flex; align-items:center; justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+body[data-skin="pro"] .chart-card-head h3{
+  display:flex; align-items:center; gap: var(--space-3);
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+body[data-skin="pro"] .card-title-actions{
+  display:flex; align-items:center; gap: .5rem;
+}
+
+/* ============ PRO v3 ============ */
+
+/* 1) Contenedor y separación entre filas */
+body[data-skin="pro"] .dashboard-section{
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 24px);
+}
+body[data-skin="pro"] .dashboard-grid{
+  display:grid;
+  row-gap: var(--space-7);
+}
+
+/* 2) Summary cards parejas (ya tenías V2, acá lo reforzamos) */
+body[data-skin="pro"] .summary-cards{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  align-items: stretch;
+}
+@media (max-width: 1200px){
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px){
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: 1fr; }
+}
+body[data-skin="pro"] .summary-card{
+  height:100%;
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-1-pro);
+  position: relative;
+  z-index: 0;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  will-change: transform;
+}
+@media (hover:hover){
+  body[data-skin="pro"] .summary-card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(20,20,40,.08);
+    border-color: color-mix(in oklab, var(--border-subtle), transparent 25%);
+  }
+  body[data-skin="pro"] .chart-card-new:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(20,20,40,.08);
+    border-color: color-mix(in oklab, var(--border-subtle), transparent 25%);
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  body[data-skin="pro"] .summary-card,
+  body[data-skin="pro"] .chart-card-new{ transition: none; }
+}
+body[data-skin="pro"] .summary-card .card-amount{
+  font-weight:700;
+  font-size: clamp(1.6rem, 2vw + .5rem, 2.2rem);
+}
+
+/* 3) Encabezados e icon-chips */
+body[data-skin="pro"] .card-header-simple{
+  display:flex; align-items:center; gap:var(--space-3);
+  margin-bottom: var(--space-2);
+}
+body[data-skin="pro"] .card-title{ font-weight:600; letter-spacing:.2px; }
+body[data-skin="pro"] .icon-chip{
+  --chip-bg: color-mix(in oklab, #6B5BFF 12%, transparent);
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:10px;
+  background: var(--chip-bg);
+  border:1px solid var(--border-subtle);
+}
+body[data-skin="pro"] .icon-chip .ph{ font-size:18px; }
+
+/* 4) Variantes sutiles para KPI */
+body[data-skin="pro"] .balance-card-new{
+  background: linear-gradient(180deg, rgba(107,91,255,.06), transparent);
+}
+body[data-skin="pro"] .income-card{
+  background: linear-gradient(180deg, rgba(34,197,94,.08), transparent);
+}
+body[data-skin="pro"] .expenses-card{
+  background: linear-gradient(180deg, rgba(244,63,94,.08), transparent);
+}
+
+/* 5) Chart card más pro y responsive */
+body[data-skin="pro"] .chart-card-new{
+  padding: var(--space-6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, rgba(143,123,255,.06), transparent);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+body[data-skin="pro"] .chart-card-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:var(--space-4); margin-bottom:var(--space-4);
+}
+body[data-skin="pro"] .chart-card-head h3{
+  display:flex; align-items:center; gap:var(--space-3);
+  margin:0; font-weight:700; letter-spacing:.2px;
+}
+body[data-skin="pro"] .card-title-actions{ display:flex; align-items:center; gap:.5rem; }
+body[data-skin="pro"] .chart-content-with-mascot{
+  display:grid; gap:var(--space-6);
+  grid-template-columns: minmax(0,1fr) 220px;
+  align-items:center;
+}
+@media (max-width: 900px){
+  body[data-skin="pro"] .chart-content-with-mascot{
+    grid-template-columns: 1fr;
+  }
+  body[data-skin="pro"] .chart-mascot{ order:2; }
+}
+body[data-skin="pro"] .chart-container-new{ min-height: 280px; }
+body[data-skin="pro"] .chart-mascot-img{ max-width:160px; opacity:.9; }
+@media (max-width: 900px){
+  body[data-skin="pro"] .chart-mascot{ display:none; }
+}
+
+/* 6) Botones consistentes */
+body[data-skin="pro"] .btn{
+  border-radius: 12px;
+  padding: .6rem .9rem;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-1-pro);
+  transition: box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+}
+body[data-skin="pro"] .btn.btn-primary{
+  --brand: #6B5BFF;
+  background: var(--brand);
+  border-color: transparent;
+  color: #fff;
+}
+body[data-skin="pro"] .btn.ghost{
+  background: transparent;
+}
+@media (hover:hover){
+  body[data-skin="pro"] .btn:hover{ box-shadow: 0 6px 14px rgba(107,91,255,.18); }
+}
+
+/* 7) Sidebar / navegación */
+body[data-skin="pro"] .nav-item{
+  display:flex; align-items:center; gap:.75rem;
+  padding:.6rem .9rem;
+  border-radius:.8rem;
+  color: var(--text-muted, #6b7280);
+}
+body[data-skin="pro"] .nav-item .ph{ font-size:18px; }
+body[data-skin="pro"] .nav-item.active{
+  background: color-mix(in oklab, #6B5BFF 12%, transparent);
+  color: var(--text-strong, #0f172a);
+}
+
+/* 8) Seguridad de visibilidad (no ocultar secciones por error) */
+body[data-skin="pro"] .dashboard-section{ display:none; }
+body[data-skin="pro"] .dashboard-section.active{ display:block; }
+
+/* =========================
+   PRO v3 — Dashboard Polish
+   ========================= */
+
+/* Tokens suaves para sombras/bordes */
+:root {
+  --pro3-radius: 14px;
+  --pro3-gap: 18px;
+  --pro3-stroke: rgba(255,255,255,.06);
+  --pro3-stroke-strong: rgba(148, 120, 255, .28); /* acento violeta sutil */
+  --pro3-glow: 0 10px 24px rgba(96, 165, 250, .08); /* luz fría */
+  --pro3-surface: rgba(255,255,255,.02);
+  --pro3-surface-strong: rgba(255,255,255,.04);
+}
+
+/* Grid general un poco más respirado */
+.dashboard-grid { gap: var(--pro3-gap); }
+
+/* Summary cards – borde + gradiente sutil + hover consistente */
+.summary-card {
+  position: relative;
+  border: 1px solid var(--pro3-stroke);
+  border-radius: var(--pro3-radius);
+  background:
+    linear-gradient(180deg, var(--pro3-surface), transparent 60%),
+    var(--card-bg, rgba(255,255,255,.01));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  transition: transform .16s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--pro3-stroke-strong);
+  box-shadow: var(--pro3-glow);
+  background:
+    linear-gradient(180deg, var(--pro3-surface-strong), transparent 60%),
+    var(--card-bg, rgba(255,255,255,.012));
+}
+
+/* Header simple de las cards: icon chip alineado + título */
+.card-header-simple {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 4px 16px;
+}
+
+.card-header-simple .card-title {
+  font-weight: 600;
+  letter-spacing: .2px;
+  opacity: .9;
+}
+
+/* Monto grande más legible y alineado */
+.summary-card .card-amount {
+  padding: 2px 16px 10px 16px;
+  font-size: clamp(22px, 2.3vw, 28px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Botón dentro de la card separado del borde inferior */
+.summary-card .card-action { padding: 0 16px 14px 16px; }
+
+/* Balance con acento violeta fino (no neon) */
+.balance-card-new { --card-bg: rgba(124, 58, 237, .05); }
+
+/* Ingresos con acento verde suave */
+.income-card     { --card-bg: rgba(34, 197, 94,  .05); }
+
+/* Gastos con acento rojo suave */
+.expenses-card   { --card-bg: rgba(239, 68, 68,  .05); }
+
+/* Chips de ícono */
+.icon-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 9px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--pro3-stroke);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* --------- Chart card (gráfico) --------- */
+.chart-section { margin-top: 8px; }
+.chart-card-new {
+  border: 1px solid var(--pro3-stroke);
+  border-radius: var(--pro3-radius);
+  background:
+    linear-gradient(180deg, var(--pro3-surface), transparent 60%),
+    var(--card-bg, rgba(255,255,255,.012));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  transition: box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+.chart-card-new:hover {
+  border-color: var(--pro3-stroke-strong);
+  box-shadow: var(--pro3-glow);
+}
+
+.chart-card-new > h3 {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  font-size: 16px; font-weight: 600; letter-spacing: .2px;
+  border-bottom: 1px dashed var(--pro3-stroke);
+  margin: 0;
+}
+.chart-card-new > h3 i { opacity: .85; margin-right: 6px; }
+
+/* Área del gráfico con “panel” suave */
+.chart-content-with-mascot { padding: 12px 12px 16px 12px; }
+.chart-container-new {
+  border: 1px solid var(--pro3-stroke);
+  border-radius: calc(var(--pro3-radius) - 4px);
+  background:
+    radial-gradient(1200px 300px at 50% 0%, rgba(148,163,184,.06), transparent 60%),
+    linear-gradient(180deg, rgba(148,163,184,.05), rgba(148,163,184,.03));
+  min-height: 280px;
+  padding: 12px;
+}
+
+/* Botón secundario (por ej. “Ver reportes”) más discreto */
+.btn.btn-secondary,
+.chart-card-new .btn.btn-secondary {
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--pro3-stroke);
+  color: rgba(255,255,255,.9);
+}
+.btn.btn-secondary:hover {
+  background: rgba(255,255,255,.08);
+  border-color: var(--pro3-stroke-strong);
+}
+
+/* Ajustes finos del botón primario para que combine con el polish */
+.btn.btn-primary {
+  box-shadow: 0 6px 18px rgba(124, 58, 237, .18);
+  border: 1px solid rgba(124, 58, 237, .25);
+}
+.btn.btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(124, 58, 237, .24);
+  transform: translateY(-1px);
+}
+
+/* Sidebar: un pelo más nítida la selección */
+.sidebar .nav-item.active {
+  background: linear-gradient(90deg, rgba(124, 58, 237, .15), transparent 70%);
+  border: 1px solid rgba(124, 58, 237, .28);
+}
+
+/* ===== Dashboard Grid Utilities ===== */
+body[data-skin="pro"] .grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--space-6, 24px);
+  margin-top: var(--space-6, 24px);
+}
+body[data-skin="pro"] .col-span-12 { grid-column: span 12; }
+body[data-skin="pro"] .col-span-7  { grid-column: span 7; }
+body[data-skin="pro"] .col-span-6  { grid-column: span 6; }
+body[data-skin="pro"] .col-span-5  { grid-column: span 5; }
+
+@media (max-width: 1200px) {
+  body[data-skin="pro"] .col-span-7,
+  body[data-skin="pro"] .col-span-6,
+  body[data-skin="pro"] .col-span-5 { grid-column: span 12; }
+}
+
+/* ===== Quick actions ===== */
+body[data-skin="pro"] .quick-actions.pro {
+  display: flex; flex-wrap: wrap; gap: var(--space-3, 12px);
+  margin: var(--space-6, 24px) 0 var(--space-2,8px);
+}
+body[data-skin="pro"] .qa-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-full, 999px);
+  background: linear-gradient(180deg, rgba(120,120,255,.13), rgba(120,120,255,.05));
+  border: 1px solid rgba(153, 143, 255, .25);
+  color: var(--text-primary, #E9EDF5);
+  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 24px rgba(0,0,0,.18);
+  transition: .2s ease;
+}
+body[data-skin="pro"] .qa-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(153, 143, 255, .45);
+  box-shadow: 0 2px 0 rgba(255,255,255,.06) inset, 0 16px 28px rgba(0,0,0,.22);
+}
+
+/* ===== PRO card ===== */
+body[data-skin="pro"] .pro-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border: 1px solid rgba(180, 175, 255, .18);
+  border-radius: var(--radius-2xl, 18px);
+  padding: var(--space-4, 16px);
+  box-shadow:
+    0 0 0 1px rgba(120, 110, 255, .06) inset,
+    0 10px 30px rgba(0,0,0,.22),
+    0 2px 8px rgba(0,0,0,.12);
+}
+body[data-skin="pro"] .pro-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 14px;
+}
+body[data-skin="pro"] .pro-card-head h3 {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 600; letter-spacing: .2px;
+}
+
+/* botón pequeño a la derecha del header */
+body[data-skin="pro"] .btn-chip {
+  font-size: 12.5px; padding: 6px 10px; border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.18);
+  color: var(--text-secondary, #C7D1E0);
+  transition: .2s ease; white-space: nowrap;
+}
+body[data-skin="pro"] .btn-chip:hover { background: rgba(255,255,255,.1); }
+
+/* ===== Budget bars ===== */
+body[data-skin="pro"] .budget-bars { display: grid; gap: 12px; }
+body[data-skin="pro"] .budget-bar {
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+}
+body[data-skin="pro"] .budget-bar .meta {
+  display: flex; gap: 10px; align-items: baseline;
+  font-size: 13px;
+}
+body[data-skin="pro"] .budget-track {
+  height: 10px; border-radius: 999px; overflow: hidden;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+}
+body[data-skin="pro"] .budget-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7C6BFF, #9E8BFF);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.08) inset;
+}
+
+/* ===== Recent transactions ===== */
+body[data-skin="pro"] .tx-list { display: grid; gap: 10px; }
+body[data-skin="pro"] .tx-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+  padding: 10px 12px; border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+}
+body[data-skin="pro"] .tx-item .tx-meta { display: flex; gap: 8px; align-items: baseline; }
+body[data-skin="pro"] .tx-item .tx-amount { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ===== Próximos pagos ===== */
+body[data-skin="pro"] .upcoming-list { display: grid; gap: 10px; }
+body[data-skin="pro"] .upcoming-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+/* ===== Goals mini ===== */
+body[data-skin="pro"] .goals-mini { display: grid; gap: 10px; }
+body[data-skin="pro"] .goal-mini {
+  padding: 10px 12px; border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+}
+body[data-skin="pro"] .goal-track { margin-top: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.06); }
+body[data-skin="pro"] .goal-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #3CCF91, #69E3B2); }
+
+/* ===== Alerts ===== */
+body[data-skin="pro"] .alerts { display: grid; gap: 10px; }
+body[data-skin="pro"] .alert {
+  padding: 10px 12px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, rgba(255,83,112,.12), rgba(255,83,112,.06));
+}
+
+/* Ancho máximo más generoso para el contenido principal */
+body[data-skin="pro"] .app-main,
+body[data-skin="pro"] .main-content,
+body[data-skin="pro"] .content-wrapper {
+  max-width: 1400px; /* probá 1440px si tu monitor es ancho */
+  margin-inline: auto;
+  padding-inline: clamp(16px, 2vw, 28px);
+}
+
+/* si ya tenés .form-group con estilos, quizá no haga falta */
+#expense-date {
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-muted, #e5e7eb);
+  background: var(--surface, #fff);
+}
