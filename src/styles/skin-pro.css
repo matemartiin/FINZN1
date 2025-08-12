@@ -1036,3 +1036,23 @@ body[data-skin="pro"] .col-span-1 { grid-column: span 1; }
 body[data-skin="pro"] .col-span-2 { grid-column: span 2; }
 body[data-skin="pro"] .col-span-3 { grid-column: span 3; }
 body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
+
+/* FILA 2 compacta y fiteada */
+.dashboard-row.grid-12.content-fit { align-items: start; }
+.dashboard-row.grid-12.content-fit .pro-card{
+  min-height: auto;      /* la card solo crece lo necesario */
+  overflow: hidden;      /* nada se sale */
+}
+.dashboard-row.grid-12.content-fit #card-upcoming .upcoming-list,
+.dashboard-row.grid-12.content-fit #card-goals .goals-mini,
+.dashboard-row.grid-12.content-fit #card-insights .alerts{
+  max-height: clamp(180px, 30vh, 360px);  /* alto cómodo y responsivo */
+  overflow: auto;                         /* si hay mucho contenido, scroll */
+  padding-right: 4px;                     /* evita salto por scrollbar */
+}
+.dashboard-row.grid-12.content-fit .pro-card-head { margin-bottom: 8px; }
+
+/* Responsive: en pantallas medias/chicas que se apilen limpias */
+@media (max-width: 1200px){
+  body[data-skin="pro"] .col-span-4 { grid-column: span 12; }
+}
