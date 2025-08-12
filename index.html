@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="./src/styles/main.css">
   <link rel="stylesheet" href="./src/styles/skin-pro.css">
 </head>
-<body data-layout="v2" data-skin="pro" data-nav="overlay" >
+<body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
   <div id="alert-container" class="alert-container"></div>
   
@@ -236,81 +236,103 @@
   <button class="btn btn-primary" id="qa-add-budget"><i class="ph ph-target"></i> Nuevo presupuesto</button>
 </div>
           <div class="dashboard-grid">
-           <!-- DASHBOARD · Focus (sin sidebar) -->
-<div class="focus-grid">
-  <!-- KPIs en tira -->
-  <div class="kpi-row">
-    <div class="summary-card balance-card-new">
-      <div class="card-header-simple">
-        <div class="card-icon-simple"><span class="icon-chip"><i class="ph ph-coins"></i></span></div>
-        <span class="card-title">Balance</span>
-      </div>
-      <div class="card-amount" id="balance-amount-new">$2,750</div>
-      <div class="installments-info">
-        <button id="installments-btn" class="installments-button">
-          <span id="installments-count">0</span> cuotas activas
-        </button>
-      </div>
+            <!-- Primera fila: Balance, Ingresos, Gastos -->
+            <div class="summary-cards">
+              <div class="summary-card balance-card-new">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-coins"></i></span>
     </div>
+    <span class="card-title">Balance</span>
+  </div>
+                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
+                <div class="installments-info">
+                  <button id="installments-btn" class="installments-button">
+                    <span id="installments-count">0</span> cuotas activas
+                  </button>
+                </div>
+              </div>
 
-    <div class="summary-card income-card">
-      <div class="card-header-simple">
-        <div class="card-icon-simple"><span class="icon-chip"><i class="ph ph-trend-up"></i></span></div>
-        <span class="card-title">
-          Ingresos
-          <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
-            <span class="indicator-count">0</span>
-          </button>
-        </span>
-      </div>
-      <div class="card-amount" id="income-summary">$3,500</div>
-      <div class="card-action">
-        <button id="add-income-btn-dashboard" class="btn btn-primary"><i class="ph ph-plus"></i> Agregar Ingreso</button>
-      </div>
+              <div class="summary-card income-card">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-trend-up"></i></span>
     </div>
+    <span class="card-title">
+      Ingresos
+      <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
+        <span class="indicator-count">0</span>
+      </button>
+    </span>
+  </div>
+                <div class="card-amount" id="income-summary">$3,500</div>
+                <div class="card-action">
+                  <button id="add-income-btn-dashboard" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Agregar Ingreso
+</button>
+                </div>
+              </div>
 
-    <div class="summary-card expenses-card">
-      <div class="card-header-simple">
-        <div class="card-icon-simple"><span class="icon-chip"><i class="ph ph-trend-down"></i></span></div>
-        <span class="card-title">Gastos del Mes</span>
-      </div>
-      <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
-      <div class="card-action">
-        <button id="add-expense-btn-dashboard" class="btn btn-primary"><i class="ph ph-plus"></i> Agregar Gasto</button>
-      </div>
+              <div class="summary-card expenses-card">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-trend-down"></i></span>
     </div>
+    <span class="card-title">Gastos del Mes</span>
   </div>
 
-  <!-- Zona principal + rail derecho -->
-  <div class="content-row">
-    <!-- Protagonista -->
-    <section class="pro-card" id="card-budgets-vs-spend">
-      <header class="pro-card-head">
-        <h3><i class="ph ph-chart-bar"></i> Gasto vs Presupuesto</h3>
-      </header>
-      <ul class="budget-bars" id="budget-bars"></ul>
-    </section>
+  <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
 
-    <!-- Rail derecho -->
-    <div class="rail">
-      <section class="pro-card" id="card-upcoming">
-        <header class="pro-card-head">
-          <h3><i class="ph ph-calendar-blank"></i> Próximos pagos</h3>
-        </header>
-        <ul class="upcoming-list" id="upcoming-list"></ul>
-      </section>
-
-      <section class="pro-card" id="card-recent">
-        <header class="pro-card-head">
-          <h3><i class="ph ph-clock"></i> Movimientos recientes</h3>
-          <button class="btn-chip" id="go-transactions">Ver todas</button>
-        </header>
-        <ul class="tx-list" id="recent-transactions"></ul>
-      </section>
-    </div>
+  <div class="card-action">
+    <button id="add-expense-btn-dashboard" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Agregar Gasto
+</button>
   </div>
 </div>
           </div>
+
+<!-- FILA 1: Gasto vs Presupuesto + Movimientos recientes -->
+<div class="dashboard-row grid-12">
+  <section class="pro-card col-span-7" id="card-budgets-vs-spend">
+<header class="pro-card-head">
+  <h3><i class="ph ph-chart-bar"></i> Gasto vs Presupuesto</h3>
+</header>
+    <ul class="budget-bars" id="budget-bars"></ul>
+  </section>
+
+  <section class="pro-card col-span-5" id="card-recent">
+    <header class="pro-card-head">
+      <h3><i class="ph ph-clock"></i> Movimientos recientes</h3>
+      <button class="btn-chip" id="go-transactions">Ver todas</button>
+    </header>
+    <ul class="tx-list" id="recent-transactions"></ul>
+  </section>
+</div>
+
+<!-- FILA 2: Próximos pagos + Objetivos + Alertas e insights -->
+<div class="dashboard-row grid-12 content-fit">
+  <section class="pro-card col-span-4" id="card-upcoming">
+    <header class="pro-card-head">
+      <h3><i class="ph ph-calendar-blank"></i> Próximos pagos</h3>
+    </header>
+    <ul class="upcoming-list" id="upcoming-list"></ul>
+  </section>
+
+  <section class="pro-card col-span-4" id="card-goals">
+    <header class="pro-card-head">
+      <h3><i class="ph ph-trophy"></i> Objetivos</h3>
+    </header>
+    <ul class="goals-mini" id="goals-mini"></ul>
+  </section>
+
+  <section class="pro-card col-span-4" id="card-insights">
+    <header class="pro-card-head">
+      <h3><i class="ph ph-warning"></i> Alertas e insights</h3>
+    </header>
+    <div class="alerts" id="alerts"></div>
+  </section>
+</div>
+
         </section>
 
         <!-- Transactions Section (Renamed from Expenses) -->
