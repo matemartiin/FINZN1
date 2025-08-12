@@ -981,7 +981,7 @@ body[data-skin="pro"] .content-wrapper {
 .pro-card{
   display:flex;
   flex-direction:column;
-  min-height:280px;
+  min-height:260px;
   overflow:hidden;            /* evita que botones/elementos sobresalgan */
 }
 
@@ -1030,3 +1030,9 @@ body[data-skin="pro"] .content-wrapper {
   position: relative;
   height: auto;      /* si algún estilo anterior imponía height:100%, lo neutralizamos */
 }
+
+/* Helpers de grilla que faltaban */
+body[data-skin="pro"] .col-span-1 { grid-column: span 1; }
+body[data-skin="pro"] .col-span-2 { grid-column: span 2; }
+body[data-skin="pro"] .col-span-3 { grid-column: span 3; }
+body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
