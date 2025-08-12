@@ -1264,3 +1264,74 @@ img, canvas, svg, video { max-width: 100%; height: auto; }
 @media (max-width: 900px){
   [style*="100vw"]{ width: 100% !important; max-width: 100% !important; }
 }
+
+/* ===== Overlay nav (oculta sidebar, muestra menú del header) ===== */
+body[data-nav="overlay"] .sidebar-nav{ display:none !important; }
+body[data-nav="overlay"] .header .hamburger{ display:inline-flex !important; }
+body[data-nav="overlay"] .header .header-right{ gap: 10px; }
+
+/* El menú del header funciona también en desktop como overlay */
+body[data-nav="overlay"] #header-menu{
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0,0,0,.35);
+  display: none;
+}
+body[data-nav="overlay"] #header-menu.open{ display:block; }
+body[data-nav="overlay"] #header-menu .header-menu{
+  background: var(--pro-surface, #151c26);
+}
+
+/* Evita scroll lateral en todo el sitio */
+html, body{ overflow-x: hidden; }
+
+/* ===== Dashboard Focus layout ===== */
+.focus-grid{ display:grid; gap: clamp(16px,2.2vw,24px); }
+
+/* KPIs en tira fluida */
+.kpi-row{
+  display:grid; gap: clamp(12px,2vw,16px);
+  grid-template-columns: repeat(3, minmax(0,1fr));
+}
+@media (max-width: 980px){
+  .kpi-row{ grid-template-columns: 1fr; }
+}
+
+/* Contenido: protagonista + rail */
+.content-row{
+  display:grid; gap: clamp(16px,2vw,24px);
+  grid-template-columns: minmax(0,1fr) 360px;   /* rail de 360 */
+  align-items: start;
+}
+@media (min-width: 1400px){
+  .content-row{ grid-template-columns: minmax(0,1fr) 420px; }
+}
+@media (max-width: 1024px){
+  .content-row{ grid-template-columns: 1fr; }
+}
+
+/* Protagonista más alto por defecto */
+#card-budgets-vs-spend{ min-height: 440px; }
+
+/* Rail: stack vertical */
+.rail{ display:grid; gap: clamp(12px,2vw,16px); }
+.rail .pro-card{ min-height: 240px; }
+
+/* Listas internas: scroll si se exceden */
+#card-budgets-vs-spend .budget-bars,
+#card-upcoming .upcoming-list,
+#card-recent .tx-list{ min-height: 0; overflow:auto; }
+
+/* Contenedores globales sin ancho extra (evita desplazamiento lateral) */
+body[data-skin="pro"] .dashboard-section{
+  max-width: 1280px; margin-inline: auto;
+  padding-inline: clamp(12px, 3vw, 24px);
+}
+
+/* Asegura que la bottom-nav siga fija en móvil */
+@media (max-width: 900px){
+  .mobile-nav{
+    position: fixed; left:0; right:0; bottom:0;
+    z-index: 70;
+  }
+  body{ padding-bottom: 72px; } /* safe space para la bottom nav */
+}
