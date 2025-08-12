@@ -1195,3 +1195,72 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
   /* 4) Chat arriba de la barra en móvil */
   #chat-widget{ bottom: 92px; }
 }
+
+/* ========= FIX MOBILE NAV + NO HORIZONTAL SCROLL ========= */
+
+/* 0) Caja: evita desbordes por padding/gaps */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* 1) Nunca permitir scroll lateral */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100%;
+}
+
+/* 2) Asegurar que grids/containers no empujen el ancho */
+.summary-cards,
+.dashboard-grid,
+.grid-12,
+.dashboard-section {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.summary-cards > *, .grid-12 > * { min-width: 0; } /* evita que una card “rompa” el ancho */
+
+/* 3) Bottom nav: siempre fija, por encima, y visible SOLO en móvil */
+.mobile-nav{
+  position: fixed !important;
+  left: 0; right: 0; bottom: 0;
+  display: none;              /* se muestra en mobile debajo */
+  z-index: 2147483000;        /* por encima de todo */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+@media (max-width: 900px){
+  .mobile-nav{ display: flex; }
+
+  /* que scrollee la página, no contenedores internos */
+  html, body, #app, .main-dashboard, .dashboard-section, .section-content{
+    transform: none !important;
+    perspective: none !important;
+    filter: none !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+
+  /* reservar espacio inferior para la bottom nav */
+  body{
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  /* Sidebar out, navegación móvil in */
+  .sidebar-nav{ display: none !important; }
+
+  /* Stacking limpio en móvil: 1 columna todo lo “grid” */
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: 1fr !important; }
+  body[data-skin="pro"] .grid-12{ grid-template-columns: 1fr !important; }
+  /* cualquier .col-span-* ocupa el ancho completo en mobile */
+  body[data-skin="pro"] .grid-12 > [class*="col-span-"]{ grid-column: 1 / -1 !important; }
+
+  /* Widget del chat por encima de la bottom nav */
+  #chat-widget{ bottom: calc(92px + env(safe-area-inset-bottom)); }
+}
+
+/* 4) Imágenes/canvas nunca más anchos que el viewport */
+img, canvas, svg, video { max-width: 100%; height: auto; }
+
+/* 5) Nada con width:100vw en mobile (evita “empujar” el ancho por la barra de scroll) */
+@media (max-width: 900px){
+  [style*="100vw"]{ width: 100% !important; max-width: 100% !important; }
+}
