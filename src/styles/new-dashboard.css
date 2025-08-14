@@ -7,18 +7,60 @@
 }
 
 .new-unified-card {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(200, 182, 255, 0.3);
-  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%);
+  border: 1px solid rgba(200, 182, 255, 0.4);
+  border-radius: 24px;
   padding: 2rem 3rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(200, 182, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(200, 182, 255, 0.15),
+    0 2px 8px rgba(200, 182, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 4rem;
   width: 100%;
   min-height: 120px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardEntrance 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.new-unified-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(200, 182, 255, 0.1), transparent);
+  transition: left 0.8s ease;
+}
+
+.new-unified-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 48px rgba(200, 182, 255, 0.25),
+    0 4px 16px rgba(200, 182, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(200, 182, 255, 0.6);
+}
+
+.new-unified-card:hover::before {
+  left: 100%;
 }
 
 /* Balance Section (Left) */
@@ -39,17 +81,56 @@
 .new-balance-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background: rgba(200, 182, 255, 0.2);
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.3), rgba(181, 163, 255, 0.4));
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 
+    0 4px 12px rgba(200, 182, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.new-balance-icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.new-balance-icon:hover::before {
+  opacity: 1;
+  transform: rotate(45deg) translate(50%, 50%);
 }
 
 .new-balance-icon i {
   font-size: 1.5rem;
   color: var(--primary-color);
   font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.new-balance-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 6px 18px rgba(200, 182, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.new-balance-icon:hover i {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(200, 182, 255, 0.5));
 }
 
 .new-balance-title {
@@ -66,24 +147,72 @@
   margin: 0.25rem 0;
   user-select: text;
   cursor: text;
+  background: linear-gradient(135deg, #374151 0%, #4B5563 50%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 8px rgba(200, 182, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  animation: balanceShimmer 3s ease-in-out infinite;
+}
+
+@keyframes balanceShimmer {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(200, 182, 255, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(200, 182, 255, 0.4));
+  }
+}
+
+.new-balance-amount:hover {
+  transform: scale(1.02);
+  filter: drop-shadow(0 0 16px rgba(200, 182, 255, 0.6));
 }
 
 .new-installments-button {
-  background: rgba(200, 182, 255, 0.1);
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.1), rgba(181, 163, 255, 0.15));
   border: 1px solid rgba(200, 182, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 0.5rem 1rem;
   color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: text;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(200, 182, 255, 0.1);
+}
+
+.new-installments-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .new-installments-button:hover {
-  background: rgba(200, 182, 255, 0.2);
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.2), rgba(181, 163, 255, 0.25));
   border-color: rgba(200, 182, 255, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 16px rgba(200, 182, 255, 0.2),
+    0 1px 4px rgba(200, 182, 255, 0.1);
+}
+
+.new-installments-button:hover::before {
+  left: 100%;
+}
+
+.new-installments-button:active {
+  transform: translateY(0);
 }
 
 /* Income & Expenses Section (Right) */
@@ -113,22 +242,60 @@
 .new-item-icon {
   width: 2rem;
   height: 2rem;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   font-weight: 600;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.new-item-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent, rgba(255, 255, 255, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.new-item-icon:hover::before {
+  opacity: 1;
 }
 
 .new-income-icon {
   color: #059669;
-  background: rgba(5, 150, 105, 0.1);
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.15), rgba(16, 185, 129, 0.2));
+  border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.new-income-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    0 4px 16px rgba(5, 150, 105, 0.3),
+    0 0 12px rgba(5, 150, 105, 0.2);
+  color: #047857;
 }
 
 .new-expense-icon {
   color: #dc2626;
-  background: rgba(220, 38, 38, 0.1);
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(239, 68, 68, 0.2));
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.new-expense-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    0 4px 16px rgba(220, 38, 38, 0.3),
+    0 0 12px rgba(220, 38, 38, 0.2);
+  color: #b91c1c;
 }
 
 .new-item-title {
@@ -159,7 +326,7 @@
 .new-action-btn {
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 8px;
+  border-radius: 12px;
   border: none;
   display: flex;
   align-items: center;
@@ -167,46 +334,196 @@
   font-size: 1.25rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.new-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.4s ease;
+  transform: translate(-50%, -50%);
+}
+
+.new-action-btn:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.new-action-btn i {
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
 }
 
 .new-income-action {
-  background: rgba(16, 185, 129, 0.9);
+  background: linear-gradient(135deg, #10B981, #059669);
   color: white;
 }
 
 .new-income-action:hover {
-  background: #10B981;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 
+    0 8px 20px rgba(16, 185, 129, 0.4),
+    0 0 16px rgba(16, 185, 129, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.new-income-action:hover i {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.new-income-action:active {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .new-expense-action {
-  background: rgba(239, 68, 68, 0.9);
+  background: linear-gradient(135deg, #EF4444, #DC2626);
   color: white;
 }
 
 .new-expense-action:hover {
-  background: #EF4444;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 
+    0 8px 20px rgba(239, 68, 68, 0.4),
+    0 0 16px rgba(239, 68, 68, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.new-expense-action:hover i {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.new-expense-action:active {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .new-incomes-indicator {
-  background: transparent;
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.05), rgba(181, 163, 255, 0.1));
   border: 1px solid rgba(200, 182, 255, 0.3);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.25rem 0.5rem;
   color: var(--text-primary);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: text;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(200, 182, 255, 0.1);
+}
+
+.new-incomes-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(200, 182, 255, 0.1), transparent);
+  transition: left 0.5s ease;
 }
 
 .new-incomes-indicator:hover {
-  background: rgba(200, 182, 255, 0.1);
-  box-shadow: 0 1px 4px rgba(200, 182, 255, 0.2);
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.15), rgba(181, 163, 255, 0.2));
+  border-color: rgba(200, 182, 255, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(200, 182, 255, 0.2),
+    0 0 8px rgba(200, 182, 255, 0.1);
+}
+
+.new-incomes-indicator:hover::before {
+  left: 100%;
+}
+
+/* Staggered entrance animations */
+.new-balance-section {
+  animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+.new-income-expenses-section {
+  animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+}
+
+.new-income-item {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
+}
+
+.new-expense-item {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Floating animation for numbers */
+.new-item-amount {
+  animation: floatNumbers 4s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+@keyframes floatNumbers {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Glow effect on focus */
+.new-unified-card:focus-within {
+  box-shadow: 
+    0 12px 48px rgba(200, 182, 255, 0.3),
+    0 4px 16px rgba(200, 182, 255, 0.2),
+    0 0 20px rgba(200, 182, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(200, 182, 255, 0.7);
 }
 
 /* Responsive Design */
@@ -260,8 +577,70 @@
 
 /* Dark mode adjustments */
 .darkmode .new-unified-card {
-  background: rgba(45, 55, 72, 0.95);
+  background: linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.98) 100%);
+  border-color: rgba(200, 182, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(200, 182, 255, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.darkmode .new-unified-card:hover {
+  box-shadow: 
+    0 12px 48px rgba(200, 182, 255, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(200, 182, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: rgba(200, 182, 255, 0.4);
+}
+
+.darkmode .new-balance-icon {
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.2), rgba(181, 163, 255, 0.3));
+  box-shadow: 
+    0 4px 12px rgba(200, 182, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.darkmode .new-installments-button {
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.08), rgba(181, 163, 255, 0.12));
   border-color: rgba(200, 182, 255, 0.2);
+  color: #E2E8F0;
+}
+
+.darkmode .new-income-icon {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(16, 185, 129, 0.3));
+  border-color: rgba(5, 150, 105, 0.3);
+}
+
+.darkmode .new-expense-icon {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(239, 68, 68, 0.3));
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.darkmode .new-incomes-indicator {
+  background: linear-gradient(135deg, rgba(200, 182, 255, 0.08), rgba(181, 163, 255, 0.12));
+  border-color: rgba(200, 182, 255, 0.2);
+  color: #E2E8F0;
+}
+
+/* Pulse animation for active elements */
+@keyframes violetPulse {
+  0%, 100% {
+    box-shadow: 
+      0 8px 32px rgba(200, 182, 255, 0.15),
+      0 2px 8px rgba(200, 182, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  50% {
+    box-shadow: 
+      0 12px 40px rgba(200, 182, 255, 0.25),
+      0 4px 12px rgba(200, 182, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+}
+
+.new-unified-card.pulse {
+  animation: violetPulse 2s ease-in-out infinite;
 }
 
 /* Hide old unified card */
