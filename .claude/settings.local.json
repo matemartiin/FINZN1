@@ -6,7 +6,10 @@
       "mcp__ide__getDiagnostics",
       "Bash(npm run dev:*)",
       "Bash(npm install)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)"
     ],
     "defaultMode": "acceptEdits"
   }
