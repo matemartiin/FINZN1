@@ -844,11 +844,9 @@ table,
 
 .section-header {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-2xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 2px solid var(--border-color);
+  margin-bottom: var(--spacing-xl);
 }
 
 .section-header h1 {
@@ -6649,13 +6647,10 @@ textarea:focus-visible{
 }
 
 .section-content .section-header{
-  position: sticky;
-  top: 80px;                     /* que quede debajo del header */
-  z-index: 12;
-  padding: 8px 0;
-  background: linear-gradient(180deg, rgba(16,20,28,.85), rgba(16,20,28,.65));
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  position: static;
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
 .section-header h1{
@@ -6807,7 +6802,6 @@ textarea:focus-visible{
 
 /* H) Responsivo suave */
 @media (max-width: 1024px){
-  .section-content .section-header{ top: 70px; }
   .transaction-tabs{ top: 118px; }
 }
 @media (max-width: 640px){

@@ -295,10 +295,12 @@ body[data-skin="pro"] .income-list .income-item:hover{
   background: rgba(255,255,255,.04); transform: translateY(-1px);
 }
 
-/* 9) Section header “pegajoso” para pantallas largas */
+/* 9) Section header - clean style without background */
 body[data-skin="pro"] .section-content .section-header{
-  position: sticky; top: 64px; z-index: 1;
-  padding: var(--space-3) 0; backdrop-filter: blur(6px);
+  position: static;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
 }
 
 /* 10) Responsivo fino: 3 → 2 → 1 columnas */
