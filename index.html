@@ -17,7 +17,6 @@
   <link rel="stylesheet" href="./src/styles/main.css">
   <link rel="stylesheet" href="./src/styles/skin-pro.css">
   <link rel="stylesheet" href="./src/styles/consolidated-fixes.css">
-  <link rel="stylesheet" href="./src/styles/dashboard-new.css">
 </head>
 <body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
@@ -238,64 +237,73 @@
   <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen General
 </span>
           </nav>
-          <!-- Month selector hidden -->
-          <div class="dashboard-controls" style="display: none;">
-            <select id="month-select" class="form-select">
-              <option value="2025-01">Enero 2025</option>
-              <option value="2024-12">Diciembre 2024</option>
-              <option value="2024-11">Noviembre 2024</option>
-            </select>
-          </div>
+          <div class="dashboard-actions">
+  <div class="dashboard-controls">
+    <select id="month-select" class="form-select">
+      <option value="2025-01">Enero 2025</option>
+      <option value="2024-12">Diciembre 2024</option>
+      <option value="2024-11">Noviembre 2024</option>
+    </select>
+  </div>
+  <button class="btn ghost" id="qa-import"><i class="ph ph-upload-simple"></i> Importar CSV</button>
+  <button class="btn ghost" id="qa-ai-report"><i class="ph ph-robot"></i> Informe IA</button>
+  <button class="btn ghost" id="go-reports"><i class="ph ph-chart-line-up"></i> Ver Reportes</button>
+  <button class="btn btn-primary" id="qa-add-budget"><i class="ph ph-target"></i> Nuevo presupuesto</button>
+</div>
           <div class="dashboard-grid">
-            <!-- Row 1: Balance Card -->
-            <div class="balance-row">
-              <div class="balance-card-horizontal" id="balance-card">
-                <div class="balance-main">
-                  <h2 class="balance-title">Balance Total</h2>
-                  <div class="balance-amount" id="balance-amount">$2,750</div>
-                </div>
-                <div class="balance-breakdown">
-                  <div class="breakdown-item income-breakdown">
-                    <i class="ph ph-plus breakdown-icon income-icon"></i>
-                    <span class="breakdown-amount" id="income-breakdown">$3,500</span>
-                  </div>
-                  <div class="breakdown-item expense-breakdown">
-                    <i class="ph ph-minus breakdown-icon expense-icon"></i>
-                    <span class="breakdown-amount" id="expense-breakdown">$750</span>
-                  </div>
+            <!-- Primera fila: Balance, Ingresos, Gastos -->
+            <div class="summary-cards">
+              <div class="summary-card balance-card-new">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-coins"></i></span>
+    </div>
+    <span class="card-title">Balance</span>
+  </div>
+                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
+                <div class="installments-info">
+                  <button id="installments-btn" class="installments-button">
+                    <span id="installments-count">0</span> cuotas activas
+                  </button>
                 </div>
               </div>
-            </div>
-            
-            <!-- Action Toolbar -->
-            <div class="dashboard-toolbar">
-              <div class="toolbar-actions">
-                <button class="btn ghost" id="qa-import"><i class="ph ph-upload-simple"></i> Importar CSV</button>
-                <button class="btn ghost" id="qa-ai-report"><i class="ph ph-robot"></i> Informe IA</button>
-                <button class="btn btn-primary" id="qa-add-budget"><i class="ph ph-target"></i> Nuevo presupuesto</button>
-              </div>
-            </div>
-            
-            <!-- Row 2: Events and Recent Movements -->
-            <div class="dashboard-row-2">
-              <div class="events-card">
-                <div class="card-header">
-                  <h3><i class="ph ph-calendar"></i> Próximos Eventos</h3>
-                </div>
-                <div class="card-content" id="upcoming-events">
-                  <!-- Events will be populated here -->
-                </div>
-              </div>
-              
-              <div class="movements-card">
-                <div class="card-header">
-                  <h3><i class="ph ph-arrows-clockwise"></i> Movimientos Recientes</h3>
-                </div>
-                <div class="card-content" id="recent-movements">
-                  <!-- Recent movements will be populated here -->
+
+              <div class="summary-card income-card">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-trend-up"></i></span>
+    </div>
+    <span class="card-title">
+      Ingresos
+      <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
+        <span class="indicator-count">0</span>
+      </button>
+    </span>
+  </div>
+                <div class="card-amount" id="income-summary">$3,500</div>
+                <div class="card-action">
+                  <button id="add-income-btn-dashboard" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Agregar Ingreso
+</button>
                 </div>
               </div>
-            </div>
+
+              <div class="summary-card expenses-card">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-trend-down"></i></span>
+    </div>
+    <span class="card-title">Gastos del Mes</span>
+  </div>
+
+  <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
+
+  <div class="card-action">
+    <button id="add-expense-btn-dashboard" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Agregar Gasto
+</button>
+  </div>
+</div>
           </div>
 
 

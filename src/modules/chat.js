@@ -114,11 +114,12 @@ export class ChatManager {
     }
   }
 
-  async getAIResponse(message) {
+  async getAIResponse(message, retryCount = 0) {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const maxRetries = 2;
     
     if (import.meta.env.DEV) {
-      console.log('🤖 Attempting Gemini API call...');
+      console.log('🤖 Attempting Gemini API call...', { attempt: retryCount + 1, maxRetries: maxRetries + 1 });
       console.log('🔑 API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'Missing');
     }
 
@@ -129,6 +130,9 @@ export class ChatManager {
     }
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
@@ -166,8 +170,11 @@ Pregunta del usuario: ${message}`
               }
             ]
           }),
+          signal: controller.signal
         }
       );
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         let errorMessage = "Error en el servicio de IA";
@@ -178,6 +185,22 @@ Pregunta del usuario: ${message}`
           errorMessage = "Problema con la API key. Contactá al administrador.";
         } else if (response.status === 400) {
           errorMessage = "Tu mensaje no pudo ser procesado. Intentá reformularlo.";
+        } else if (response.status === 503) {
+          // Service unavailable - retry if we haven't exceeded max retries
+          if (retryCount < maxRetries) {
+            console.log(`⚠️ Gemini API 503 error, retrying in ${(retryCount + 1) * 2} seconds... (attempt ${retryCount + 2}/${maxRetries + 1})`);
+            await this.delay((retryCount + 1) * 2000); // Progressive delay: 2s, 4s
+            return this.getAIResponse(message, retryCount + 1);
+          }
+          errorMessage = "El servicio de IA está temporalmente no disponible. Intentá en unos minutos.";
+        } else if (response.status >= 500) {
+          // Other server errors
+          if (retryCount < maxRetries) {
+            console.log(`⚠️ Gemini API server error ${response.status}, retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
+            await this.delay(1000 * (retryCount + 1)); // Progressive delay
+            return this.getAIResponse(message, retryCount + 1);
+          }
+          errorMessage = "Error del servidor. Por favor intentá más tarde.";
         }
         
         console.error("❌ Error de Gemini API:", response.status, response.statusText);
@@ -199,7 +222,23 @@ Pregunta del usuario: ${message}`
     } catch (error) {
       console.error("❌ Error en la API de Gemini:", error);
       
-      // Fallback response
+      // Handle network errors and timeouts
+      if (error.name === 'AbortError') {
+        if (retryCount < maxRetries) {
+          console.log(`⚠️ Request timeout, retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
+          await this.delay(1000 * (retryCount + 1));
+          return this.getAIResponse(message, retryCount + 1);
+        }
+        return "La consulta tomó demasiado tiempo. Intentá con un mensaje más corto.";
+      }
+      
+      if (error.message.includes('Failed to fetch') && retryCount < maxRetries) {
+        console.log(`⚠️ Network error, retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
+        await this.delay(2000 * (retryCount + 1));
+        return this.getAIResponse(message, retryCount + 1);
+      }
+      
+      // Fallback response for other errors
       return this.getFallbackResponse(message);
     }
   }
@@ -269,5 +308,10 @@ Pregunta del usuario: ${message}`
     }
     
     return "🤖 Hola! Soy tu asistente financiero. Puedo ayudarte con presupuestos, ahorros, inversiones y planificación financiera. ¿En qué tema específico te gustaría que te ayude?";
+  }
+  
+  // Helper method for delays in retry logic
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
