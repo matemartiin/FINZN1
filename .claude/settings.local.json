@@ -9,7 +9,8 @@
       "Bash(cp:*)",
       "Bash(find:*)",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(rm:*)"
     ],
     "defaultMode": "acceptEdits"
   }
