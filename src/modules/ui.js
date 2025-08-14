@@ -176,6 +176,10 @@ export class UIManager {
     const expensesEl = monthlyExpenses || unifiedExpensesAmount;
     if (expensesEl) {
       expensesEl.textContent = this.formatCurrency(balance.totalExpenses);
+      // Ensure unified card expense amounts use same color as balance
+      if (unifiedExpensesAmount) {
+        expensesEl.style.color = '#374151';
+      }
       console.log('💳 Monthly expenses updated:', balance.totalExpenses);
     }
     
@@ -183,6 +187,10 @@ export class UIManager {
     const incomeEl = incomeAmount || unifiedIncomeAmount;
     if (incomeEl) {
       incomeEl.textContent = this.formatCurrency(balance.totalIncome);
+      // Ensure unified card income amounts use same color as balance
+      if (unifiedIncomeAmount) {
+        incomeEl.style.color = '#374151';
+      }
       console.log('💵 Income amount updated:', balance.totalIncome);
     }
     

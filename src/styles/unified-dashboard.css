@@ -254,7 +254,11 @@ body[data-skin="pro"] .unified-balance-card .income-item:hover {
 
 /* Ensure income and expense amounts match balance color */
 #income-summary,
-#monthly-expenses-summary {
+#monthly-expenses-summary,
+.unified-balance-card #income-summary,
+.unified-balance-card #monthly-expenses-summary,
+.income-expenses-section #income-summary,
+.income-expenses-section #monthly-expenses-summary {
   color: #374151 !important;
 }
 
