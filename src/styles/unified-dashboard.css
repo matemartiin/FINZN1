@@ -1,5 +1,11 @@
 /* Unified Dashboard Card Styles */
 
+/* Override dashboard grid to allow full width */
+.dashboard-grid {
+  display: block !important;
+  width: 100% !important;
+}
+
 .unified-balance-card {
   background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, #C4B5FD 100%);
   border-radius: 16px;
@@ -12,6 +18,8 @@
   gap: 3rem;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: none;
 }
 
 .unified-balance-card::before {
