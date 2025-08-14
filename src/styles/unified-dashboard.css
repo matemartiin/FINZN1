@@ -67,7 +67,7 @@
 .balance-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #4B5563;
+  color: var(--text-primary);
   opacity: 0.9;
 }
 
@@ -90,7 +90,7 @@
   border: 1px solid rgba(156, 163, 175, 0.25);
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  color: #6B7280;
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -114,14 +114,75 @@
   align-items: stretch;
 }
 
-.income-item, .expense-item {
+.unified-balance-card .income-item, 
+.unified-balance-card .expense-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  transition: none !important;
+  cursor: default !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.unified-balance-card .income-item:hover, 
+.unified-balance-card .expense-item:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Higher specificity overrides for problematic external styles */
+body[data-skin="pro"] .unified-balance-card .expense-item,
+body[data-skin="pro"] .unified-balance-card .income-item {
+  background: transparent !important;
+  transition: none !important;
+  cursor: default !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+body[data-skin="pro"] .unified-balance-card .expense-item:hover,
+body[data-skin="pro"] .unified-balance-card .income-item:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Override main.css hover effects with highest specificity */
+.unified-balance-card .expense-item:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Additional specificity override for all possible selectors */
+.dashboard-section .unified-balance-card .expense-item,
+.dashboard-section .unified-balance-card .income-item {
+  background: transparent !important;
+  transition: none !important;
+  cursor: default !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.dashboard-section .unified-balance-card .expense-item:hover,
+.dashboard-section .unified-balance-card .income-item:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .item-header {
@@ -155,7 +216,7 @@
 .item-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #4B5563;
+  color: var(--text-primary);
   opacity: 1;
   flex: 1;
 }
@@ -165,7 +226,7 @@
   border: 1px solid rgba(156, 163, 175, 0.3);
   border-radius: 6px;
   padding: 0.25rem 0.5rem;
-  color: #6B7280;
+  color: var(--text-primary);
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -187,7 +248,7 @@
 .item-amount {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1F2937;
+  color: #374151;
   text-shadow: 0 1px 4px rgba(156, 163, 175, 0.05);
 }
 
