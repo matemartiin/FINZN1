@@ -157,6 +157,37 @@ if (goReports) {
           this.updateDashboard();
         });
       }
+
+      // Event delegation for goals section buttons
+      const goalsList = document.getElementById('goals-list');
+      if (goalsList) {
+        goalsList.addEventListener('click', (e) => {
+          const button = e.target.closest('button[data-action]');
+          if (!button) return;
+          
+          e.preventDefault();
+          const action = button.getAttribute('data-action');
+          const goalId = button.getAttribute('data-goal-id');
+          const goalName = button.getAttribute('data-goal-name');
+          
+          switch (action) {
+            case 'create-goal':
+              this.showAddGoalModal();
+              break;
+            case 'add-money':
+              if (goalId) this.addToGoal(goalId);
+              break;
+            case 'edit-goal':
+              if (goalId) this.editGoal(goalId);
+              break;
+            case 'delete-goal':
+              if (goalId && goalName) this.deleteGoal(goalId, goalName);
+              break;
+            default:
+              console.warn('Unknown goal action:', action);
+          }
+        });
+      }
       
       console.log('✅ All event listeners set up successfully');
     } catch (error) {
@@ -707,81 +738,7 @@ try {
     `).join('')) || `<li class="upcoming-item"><div>No hay pagos próximos</div></li>`;
   }
 
-  // 4) Objetivos mini (progreso simple)
-  const goals = this.data.getGoals() || [];
-  const goalsMini = document.getElementById('goals-mini');
-  if (goalsMini) {
-    if (goals.length === 0) {
-      goalsMini.innerHTML = `
-        <li class="goal-mini empty-goal">
-          <div class="meta">Crea tu primer objetivo para verlo aquí</div>
-          <button class="btn btn-primary btn-sm" data-action="create-goal">
-            <i class="ph ph-plus" aria-hidden="true"></i> Crear Objetivo
-          </button>
-        </li>
-      `;
-    } else {
-      goalsMini.innerHTML = goals.slice(0,3).map(g => {
-        const curr = parseFloat(g.current_amount ?? g.currentAmount ?? 0);
-        const trg  = parseFloat(g.target_amount ?? g.targetAmount ?? 0) || 1;
-        const pct  = Math.min(100, Math.round((curr / trg) * 100));
-        return `
-          <li class="goal-mini" data-goal-id="${g.id}" data-goal-name="${g.name || 'Objetivo'}">
-            <div class="goal-header-mini">
-              <div class="meta"><strong>${g.name || 'Objetivo'}</strong></div>
-              <div class="goal-actions-mini">
-                <button class="btn btn-icon btn-sm" data-action="add-money" data-goal-id="${g.id}" title="Agregar dinero">
-                  <i class="ph ph-plus-circle" aria-hidden="true"></i>
-                </button>
-                <button class="btn btn-icon btn-sm" data-action="edit-goal" data-goal-id="${g.id}" title="Editar objetivo">
-                  <i class="ph ph-pencil-simple" aria-hidden="true"></i>
-                </button>
-                <button class="btn btn-icon btn-sm btn-danger" data-action="delete-goal" data-goal-id="${g.id}" data-goal-name="${g.name || 'Objetivo'}" title="Eliminar objetivo">
-                  <i class="ph ph-trash" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div class="goal-amount-mini">${this.ui.formatCurrency(curr)} / ${this.ui.formatCurrency(trg)} (${pct}%)</div>
-            <div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div>
-          </li>
-        `;
-      }).join('');
-      
-      // Add "Ver todos" button if there are more than 3 goals
-      if (goals.length > 3) {
-        goalsMini.innerHTML += `
-          <li class="goal-mini see-all">
-            <button class="btn btn-secondary btn-sm" data-action="view-all-goals">
-              <i class="ph ph-arrow-right" aria-hidden="true"></i> Ver todos (${goals.length})
-            </button>
-          </li>
-        `;
-      }
-    }
-    
-    // Setup event delegation for goal buttons
-    this.setupGoalsMiniEventHandlers();
-  }
-
-  // 5) Alertas e insights (aprovechamos limitAlerts ya calculadas arriba)
-  const alertsBox = document.getElementById('alerts');
-  if (alertsBox) {
-    const limitAlerts = this.data.checkSpendingLimits(this.currentMonth) || [];
-    // sumamos alertas por presupuesto excedido
-    const catSpend = this.data.getExpensesByCategory(this.currentMonth) || {};
-    const budgetAlerts = (Array.isArray(budgets) ? budgets : []).map(b => {
-      const spent = catSpend[b.category] || 0;
-      if (spent > b.amount) {
-        return { type: 'warning', message: `Presupuesto de ${b.category} superado (${this.ui.formatCurrency(spent)} / ${this.ui.formatCurrency(b.amount)})` };
-      }
-      return null;
-    }).filter(Boolean);
-
-    const all = [...limitAlerts, ...budgetAlerts];
-    alertsBox.innerHTML = all.length
-      ? all.slice(0,5).map(a => `<div class="alert">${a.message}</div>`).join('')
-      : `<div class="alert">Sin alertas por ahora. ¡Buen trabajo! 🎉</div>`;
-  }
+  // Goals and alerts cards have been removed from dashboard
 } catch (wErr) {
   console.log('Widgets skipped:', wErr);
 }
@@ -1871,46 +1828,6 @@ showEditExpenseModal(expenseId) {
         this.ui.showAlert('Error al eliminar el límite', 'error');
       }
     }
-  }
-  setupGoalsMiniEventHandlers() {
-    const goalsMini = document.getElementById('goals-mini');
-    if (!goalsMini) return;
-    
-    // Remove existing event listeners to prevent duplicates
-    goalsMini.removeEventListener('click', this.handleGoalsMiniClick);
-    
-    // Add event delegation for goal buttons
-    this.handleGoalsMiniClick = (e) => {
-      const button = e.target.closest('button[data-action]');
-      if (!button) return;
-      
-      e.preventDefault();
-      const action = button.getAttribute('data-action');
-      const goalId = button.getAttribute('data-goal-id');
-      const goalName = button.getAttribute('data-goal-name');
-      
-      switch (action) {
-        case 'create-goal':
-          this.showAddGoalModal();
-          break;
-        case 'add-money':
-          if (goalId) this.addToGoal(goalId);
-          break;
-        case 'edit-goal':
-          if (goalId) this.editGoal(goalId);
-          break;
-        case 'delete-goal':
-          if (goalId && goalName) this.deleteGoal(goalId, goalName);
-          break;
-        case 'view-all-goals':
-          this.navigation.navigateTo('goals');
-          break;
-        default:
-          console.warn('Unknown goal action:', action);
-      }
-    };
-    
-    goalsMini.addEventListener('click', this.handleGoalsMiniClick);
   }
 
   getCurrentMonth() {

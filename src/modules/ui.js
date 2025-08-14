@@ -251,7 +251,7 @@ export class UIManager {
           <div class="empty-icon">🎯</div>
           <h3>No tienes objetivos de ahorro</h3>
           <p>Establece metas para motivarte a ahorrar</p>
-          <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
+          <button class="btn btn-primary" data-action="create-goal">
             <i class="ph ph-plus" aria-hidden="true"></i>
             Crear Objetivo
           </button>
@@ -277,13 +277,13 @@ export class UIManager {
           <div class="progress-text">${progress.toFixed(1)}%</div>
         </div>
         <div class="goal-actions">
-          <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
+          <button class="btn btn-secondary btn-sm" data-action="add-money" data-goal-id="${goal.id}">
             <i class="ph ph-plus-circle" aria-hidden="true"></i> Agregar
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
+          <button class="btn btn-secondary btn-sm" data-action="edit-goal" data-goal-id="${goal.id}">
             <i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar
           </button>
-          <button class="btn btn-danger btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
+          <button class="btn btn-danger btn-sm" data-action="delete-goal" data-goal-id="${goal.id}" data-goal-name="${goal.name}">
             <i class="ph ph-trash" aria-hidden="true"></i> Eliminar
           </button>
         </div>
