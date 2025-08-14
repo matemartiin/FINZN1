@@ -250,6 +250,9 @@ body[data-skin="pro"] .unified-balance-card .income-item:hover {
   font-weight: 700;
   color: #374151;
   text-shadow: 0 1px 4px rgba(156, 163, 175, 0.05);
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
 }
 
 /* Ensure income and expense amounts match balance color */
@@ -374,4 +377,8 @@ html body .unified-balance-card span#monthly-expenses-summary,
 html body #income-summary.item-amount,
 html body #monthly-expenses-summary.item-amount {
   color: #374151 !important;
+  position: relative !important;
+  z-index: 15 !important;
+  pointer-events: auto !important;
+  user-select: text !important;
 }
