@@ -190,7 +190,7 @@ export class UIManager {
           <h3>No hay gastos registrados</h3>
           <p>Comienza agregando tu primer gasto del mes</p>
           <button class="btn btn-primary" onclick="window.app.showAddExpenseModal()">
-            <span>➕</span>
+            <i class="ph ph-plus" aria-hidden="true"></i>
             Agregar Gasto
           </button>
         </div>
@@ -223,13 +223,13 @@ export class UIManager {
   <button class="expense-action-btn edit-btn js-expense-edit" 
           data-id="${expense.id}" 
           title="Editar">
-    ✏️
+    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
   </button>
   <button class="expense-action-btn delete-btn js-expense-delete" 
           data-id="${expense.id}" 
           data-description="${this.escapeHtml(expense.description)}" 
           title="Eliminar">
-    🗑️
+    <i class="ph ph-trash" aria-hidden="true"></i>
   </button>
 </div>
       `;
@@ -252,7 +252,7 @@ export class UIManager {
           <h3>No tienes objetivos de ahorro</h3>
           <p>Establece metas para motivarte a ahorrar</p>
           <button class="btn btn-primary" onclick="window.app.showAddGoalModal()">
-            <span>➕</span>
+            <i class="ph ph-plus" aria-hidden="true"></i>
             Crear Objetivo
           </button>
         </div>
@@ -278,13 +278,13 @@ export class UIManager {
         </div>
         <div class="goal-actions">
           <button class="btn btn-secondary btn-sm" onclick="window.app.addToGoal('${goal.id}')">
-            💰 Agregar
+            <i class="ph ph-plus-circle" aria-hidden="true"></i> Agregar
           </button>
           <button class="btn btn-secondary btn-sm" onclick="window.app.editGoal('${goal.id}')">
-            ✏️ Editar
+            <i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
-            🗑️ Eliminar
+          <button class="btn btn-danger btn-sm" onclick="window.app.deleteGoal('${goal.id}', '${goal.name}')">
+            <i class="ph ph-trash" aria-hidden="true"></i> Eliminar
           </button>
         </div>
       `;
@@ -324,7 +324,7 @@ export class UIManager {
             <h3>No tienes límites de gasto configurados</h3>
             <p>Establece límites para controlar mejor tus gastos</p>
             <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
-              <span>➕</span>
+              <i class="ph ph-plus" aria-hidden="true"></i>
               Agregar Límite
             </button>
           </div>
@@ -390,12 +390,12 @@ export class UIManager {
   <button class="expense-action-btn edit-btn js-limit-edit" 
           data-id="${limit.id}" 
           title="Editar límite">
-    ✏️
+    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
   </button>
   <button class="expense-action-btn delete-btn js-limit-delete" 
           data-id="${limit.id}" 
           title="Eliminar límite">
-    🗑️
+    <i class="ph ph-trash" aria-hidden="true"></i>
   </button>
 </div>
         `;
@@ -421,7 +421,7 @@ export class UIManager {
           <h3>No hay límites de gasto configurados</h3>
           <p>Establece límites presupuestarios para controlar mejor tus gastos por categoría</p>
           <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
-            <span>➕</span>
+            <i class="ph ph-plus" aria-hidden="true"></i>
             Configurar Primer Límite
           </button>
         </div>
@@ -474,12 +474,12 @@ export class UIManager {
   <button class="expense-action-btn edit-btn js-limit-edit" 
           data-id="${limit.id}" 
           title="Editar límite">
-    ✏️
+    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
   </button>
   <button class="expense-action-btn delete-btn js-limit-delete" 
           data-id="${limit.id}" 
           title="Eliminar límite">
-    🗑️
+    <i class="ph ph-trash" aria-hidden="true"></i>
   </button>
 </div>
         </div>
@@ -552,7 +552,7 @@ export class UIManager {
           </div>
           <div class="no-limit-actions">
             <button class="btn btn-secondary btn-sm" onclick="window.app.showAddSpendingLimitModal('${category.name}')">
-              <span>➕</span>
+              <i class="ph ph-plus" aria-hidden="true"></i>
               Configurar Límite
             </button>
           </div>
@@ -826,7 +826,7 @@ export class UIManager {
         </div>
         <div class="category-actions">
           <button class="expense-action-btn delete-btn" onclick="window.app.deleteCategory('${category.id}')" title="Eliminar">
-            🗑️
+            <i class="ph ph-trash" aria-hidden="true"></i>
           </button>
         </div>
       `;
@@ -945,7 +945,7 @@ export class UIManager {
           <h3>No tienes presupuestos configurados</h3>
           <p>Crea tu primer presupuesto para controlar mejor tus gastos</p>
           <button class="btn btn-primary" onclick="window.app.showAddBudgetModal()">
-            <span>➕</span>
+            <i class="ph ph-plus" aria-hidden="true"></i>
             Crear Presupuesto
           </button>
         </div>
@@ -1036,10 +1036,10 @@ export class UIManager {
         
         <div class="budget-actions">
           <button class="btn btn-secondary btn-sm" onclick="window.app.showEditBudgetModal('${budget.id}')">
-            ✏️ Editar
+            <i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.deleteBudget('${budget.id}', '${budget.name}')">
-            🗑️ Eliminar
+          <button class="btn btn-danger btn-sm" onclick="window.app.deleteBudget('${budget.id}', '${budget.name}')">
+            <i class="ph ph-trash" aria-hidden="true"></i> Eliminar
           </button>
           <button class="btn btn-primary btn-sm" onclick="window.app.generateBudgetInsights('${budget.id}')">
             🤖 Analizar
@@ -1307,7 +1307,7 @@ getBudgetFormData(formId) {
           
           <div class="insufficient-data-actions">
             <button class="btn btn-primary" onclick="window.app.navigation.showSection('transactions')">
-              <span>➕</span>
+              <i class="ph ph-plus" aria-hidden="true"></i>
               Registrar Más Gastos
             </button>
             <button class="btn btn-secondary" onclick="window.app.generateBudgetInsights()">

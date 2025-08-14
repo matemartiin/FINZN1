@@ -1031,6 +1031,89 @@ body[data-skin="pro"] .content-wrapper {
   height: auto;      /* si algún estilo anterior imponía height:100%, lo neutralizamos */
 }
 
+/* Goals mini with actions */
+.goal-mini {
+  padding: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.goal-mini.empty-goal {
+  text-align: center;
+  padding: 20px;
+}
+
+.goal-mini.empty-goal .meta {
+  margin-bottom: 12px;
+  color: var(--text-muted);
+}
+
+.goal-header-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.goal-header-mini .meta {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.goal-actions-mini {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.goal-mini:hover .goal-actions-mini {
+  opacity: 1;
+}
+
+.goal-actions-mini .btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.goal-actions-mini .btn i {
+  font-size: 12px;
+}
+
+.goal-amount-mini {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.goal-track {
+  height: 4px;
+  background: var(--background-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.goal-fill {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.goal-mini.see-all {
+  text-align: center;
+  padding: 12px;
+  background: var(--background-tertiary);
+  border: 1px dashed var(--border-color);
+}
+
 /* Helpers de grilla que faltaban */
 body[data-skin="pro"] .col-span-1 { grid-column: span 1; }
 body[data-skin="pro"] .col-span-2 { grid-column: span 2; }

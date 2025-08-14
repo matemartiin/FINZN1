@@ -711,17 +711,53 @@ try {
   const goals = this.data.getGoals() || [];
   const goalsMini = document.getElementById('goals-mini');
   if (goalsMini) {
-    goalsMini.innerHTML = goals.slice(0,4).map(g => {
-      const curr = parseFloat(g.current_amount ?? g.currentAmount ?? 0);
-      const trg  = parseFloat(g.target_amount ?? g.targetAmount ?? 0) || 1;
-      const pct  = Math.min(100, Math.round((curr / trg) * 100));
-      return `
-        <li class="goal-mini">
-          <div class="meta"><strong>${g.name || 'Objetivo'}</strong> · ${this.ui.formatCurrency(curr)} / ${this.ui.formatCurrency(trg)} (${pct}%)</div>
-          <div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div>
+    if (goals.length === 0) {
+      goalsMini.innerHTML = `
+        <li class="goal-mini empty-goal">
+          <div class="meta">Crea tu primer objetivo para verlo aquí</div>
+          <button class="btn btn-primary btn-sm" onclick="window.app.showAddGoalModal()">
+            <i class="ph ph-plus" aria-hidden="true"></i> Crear Objetivo
+          </button>
         </li>
       `;
-    }).join('') || `<li class="goal-mini">Crea tu primer objetivo para verlo aquí</li>`;
+    } else {
+      goalsMini.innerHTML = goals.slice(0,3).map(g => {
+        const curr = parseFloat(g.current_amount ?? g.currentAmount ?? 0);
+        const trg  = parseFloat(g.target_amount ?? g.targetAmount ?? 0) || 1;
+        const pct  = Math.min(100, Math.round((curr / trg) * 100));
+        return `
+          <li class="goal-mini">
+            <div class="goal-header-mini">
+              <div class="meta"><strong>${g.name || 'Objetivo'}</strong></div>
+              <div class="goal-actions-mini">
+                <button class="btn btn-icon btn-sm" onclick="window.app.addToGoal('${g.id}')" title="Agregar dinero">
+                  <i class="ph ph-plus-circle" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-icon btn-sm" onclick="window.app.editGoal('${g.id}')" title="Editar objetivo">
+                  <i class="ph ph-pencil-simple" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-icon btn-sm btn-danger" onclick="window.app.deleteGoal('${g.id}', '${g.name}')" title="Eliminar objetivo">
+                  <i class="ph ph-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div class="goal-amount-mini">${this.ui.formatCurrency(curr)} / ${this.ui.formatCurrency(trg)} (${pct}%)</div>
+            <div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div>
+          </li>
+        `;
+      }).join('');
+      
+      // Add "Ver todos" button if there are more than 3 goals
+      if (goals.length > 3) {
+        goalsMini.innerHTML += `
+          <li class="goal-mini see-all">
+            <button class="btn btn-secondary btn-sm" onclick="window.app.navigation.navigateTo('goals')">
+              <i class="ph ph-arrow-right" aria-hidden="true"></i> Ver todos (${goals.length})
+            </button>
+          </li>
+        `;
+      }
+    }
   }
 
   // 5) Alertas e insights (aprovechamos limitAlerts ya calculadas arriba)
