@@ -146,21 +146,22 @@ export class UIManager {
     const incomeAmount = document.getElementById('income-summary');
     const installmentsCount = document.getElementById('installments-count');
     
-    // Alternative selectors for unified card
+    // Alternative selectors for unified card and new card
     const unifiedBalanceAmount = document.querySelector('.balance-amount');
+    const newBalanceAmount = document.querySelector('.new-balance-amount');
     const unifiedIncomeAmount = document.querySelector('#income-summary');
     const unifiedExpensesAmount = document.querySelector('#monthly-expenses-summary');
     const unifiedInstallmentsCount = document.querySelector('#installments-count');
     
     console.log('🔄 Updating balance UI with:', balance);
     
-    // Update balance amount (try both selectors)
-    const balanceEl = balanceAmount || unifiedBalanceAmount;
+    // Update balance amount (try all selectors)
+    const balanceEl = balanceAmount || unifiedBalanceAmount || newBalanceAmount;
     if (balanceEl) {
       balanceEl.textContent = this.formatCurrency(balance.available);
       console.log('💰 Balance amount updated:', balance.available);
       
-      // Color changes only for legacy card (unified card uses fixed white color)
+      // Color changes only for legacy card (unified and new cards use fixed color)
       if (balanceAmount) {
         if (balance.available < 0) {
           balanceAmount.style.color = '#ef4444';
