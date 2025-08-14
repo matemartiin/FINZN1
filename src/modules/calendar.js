@@ -1,4 +1,5 @@
 import { calendarService } from './calendar-service.js';
+import { DOMHelpers } from '../utils/dom-helpers.js';
 
 export class CalendarManager {
   constructor() {
@@ -606,16 +607,16 @@ export class CalendarManager {
     const event = this.events.find(e => e.id === eventId);
     if (!event) return;
 
-    // Populate edit form
-    document.getElementById('edit-event-title').value = event.title;
-    document.getElementById('edit-event-type').value = event.type;
-    document.getElementById('edit-event-date').value = event.date;
-    document.getElementById('edit-event-time').value = event.time || '';
-    document.getElementById('edit-event-amount').value = event.amount || '';
-    document.getElementById('edit-event-description').value = event.description || '';
+    // Populate edit form safely
+    DOMHelpers.safeSetValue('edit-event-title', event.title);
+    DOMHelpers.safeSetValue('edit-event-type', event.type);
+    DOMHelpers.safeSetValue('edit-event-date', event.date);
+    DOMHelpers.safeSetValue('edit-event-time', event.time || '');
+    DOMHelpers.safeSetValue('edit-event-amount', event.amount || '');
+    DOMHelpers.safeSetValue('edit-event-description', event.description || '');
 
-    // Store event ID
-    const modal = document.getElementById('edit-event-modal');
+    // Store event ID safely
+    const modal = DOMHelpers.safeGetElement('edit-event-modal');
     if (modal) modal.dataset.eventId = eventId;
 
     if (window.app && window.app.modals) {

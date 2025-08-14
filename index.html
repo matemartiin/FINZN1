@@ -16,6 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
   <link rel="stylesheet" href="./src/styles/main.css">
   <link rel="stylesheet" href="./src/styles/skin-pro.css">
+  <link rel="stylesheet" href="./src/styles/consolidated-fixes.css">
 </head>
 <body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
@@ -37,10 +38,12 @@
       
       <form id="login-form" class="auth-form">
         <div class="input-group">
-          <input type="email" id="login-user" name="username" placeholder="Email" required autocomplete="email" />
+          <label for="login-user" class="sr-only">Email</label>
+          <input type="email" id="login-user" name="username" placeholder="Email" required autocomplete="email" aria-label="Email" />
         </div>
         <div class="input-group">
-          <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" />
+          <label for="login-pass" class="sr-only">Contraseña</label>
+          <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" aria-label="Contraseña" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
           <span>✨</span>
@@ -71,12 +74,14 @@
       
       <form id="register-form" class="auth-form">
         <div class="input-group">
-          <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" />
-          <small class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
+          <label for="register-user" class="sr-only">Email</label>
+          <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" aria-label="Email" aria-describedby="email-hint" />
+          <small id="email-hint" class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
         </div>
         <div class="input-group">
-          <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" />
-          <small class="input-hint">Mínimo 6 caracteres</small>
+          <label for="register-pass" class="sr-only">Contraseña</label>
+          <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" aria-label="Contraseña" aria-describedby="password-hint" />
+          <small id="password-hint" class="input-hint">Mínimo 6 caracteres</small>
         </div>
         <div class="input-group">
           <button type="button" id="generate-test-email" class="btn btn-secondary btn-sm">
@@ -231,8 +236,16 @@
 </span>
           </nav>
           <div class="dashboard-actions">
+  <div class="dashboard-controls">
+    <select id="month-select" class="form-select">
+      <option value="2025-01">Enero 2025</option>
+      <option value="2024-12">Diciembre 2024</option>
+      <option value="2024-11">Noviembre 2024</option>
+    </select>
+  </div>
   <button class="btn ghost" id="qa-import"><i class="ph ph-upload-simple"></i> Importar CSV</button>
   <button class="btn ghost" id="qa-ai-report"><i class="ph ph-robot"></i> Informe IA</button>
+  <button class="btn ghost" id="go-reports"><i class="ph ph-chart-line-up"></i> Ver Reportes</button>
   <button class="btn btn-primary" id="qa-add-budget"><i class="ph ph-target"></i> Nuevo presupuesto</button>
 </div>
           <div class="dashboard-grid">
@@ -788,11 +801,11 @@
   <div class="modal-content">
     <h2>Editar Límite de Gasto</h2>
     <form id="edit-limit-form">
-      <label>Categoría</label>
-      <select name="category" required></select>
+      <label for="edit-limit-category">Categoría</label>
+      <select id="edit-limit-category" name="category" required></select>
 
-      <label>Monto límite</label>
-      <input type="number" step="0.01" name="amount" required>
+      <label for="edit-limit-amount">Monto límite</label>
+      <input id="edit-limit-amount" type="number" step="0.01" name="amount" required>
 
       <div class="modal-actions">
         <button type="submit" class="btn-primary">Guardar cambios</button>
@@ -857,17 +870,17 @@
   <div class="modal-content">
     <h2>Editar Gasto</h2>
     <form id="edit-expense-form">
-      <label>Descripción</label>
-      <input type="text" name="description" required>
+      <label for="edit-expense-description">Descripción</label>
+      <input id="edit-expense-description" type="text" name="description" required>
 
-      <label>Monto</label>
-      <input type="number" step="0.01" name="amount" required>
+      <label for="edit-expense-amount">Monto</label>
+      <input id="edit-expense-amount" type="number" step="0.01" name="amount" required>
 
-      <label>Categoría</label>
-      <select name="category" required></select>
+      <label for="edit-expense-category">Categoría</label>
+      <select id="edit-expense-category" name="category" required></select>
 
-      <label>Fecha</label>
-      <input type="date" name="transactionDate" required>
+      <label for="edit-expense-date">Fecha</label>
+      <input id="edit-expense-date" type="date" name="transactionDate" required>
 
       <div class="modal-actions">
         <button type="submit" class="btn-primary">Guardar cambios</button>
@@ -1245,13 +1258,13 @@
 
     <form id="add-event-form" class="modal-form">
       <div class="form-group">
-        <label>Título</label>
-        <input name="title" required />
+        <label for="add-event-title-input">Título</label>
+        <input id="add-event-title-input" name="title" required />
       </div>
 
       <div class="form-group">
-        <label>Tipo</label>
-        <select name="type" required>
+        <label for="add-event-type">Tipo</label>
+        <select id="add-event-type" name="type" required>
           <option value="gasto">Gasto</option>
           <option value="ingreso">Ingreso</option>
           <option value="recordatorio">Recordatorio</option>
@@ -1259,23 +1272,23 @@
       </div>
 
       <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" name="date" required />
+        <label for="add-event-date">Fecha</label>
+        <input id="add-event-date" type="date" name="date" required />
       </div>
 
       <div class="form-group">
-        <label>Hora (opcional)</label>
-        <input type="time" name="time" />
+        <label for="add-event-time">Hora (opcional)</label>
+        <input id="add-event-time" type="time" name="time" />
       </div>
 
       <div class="form-group">
-        <label>Monto (opcional)</label>
-        <input type="number" step="0.01" name="amount" />
+        <label for="add-event-amount">Monto (opcional)</label>
+        <input id="add-event-amount" type="number" step="0.01" name="amount" />
       </div>
 
       <div class="form-group">
-        <label>Descripción</label>
-        <textarea name="description"></textarea>
+        <label for="add-event-description">Descripción</label>
+        <textarea id="add-event-description" name="description"></textarea>
       </div>
 
       <div class="modal-actions">

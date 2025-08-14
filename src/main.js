@@ -12,6 +12,7 @@ import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
+import { DOMHelpers } from './utils/dom-helpers.js';
 
 
 console.log('🔥 FINZN App - Starting initialization');
@@ -448,8 +449,8 @@ setupDashboardEvents() {
     e.preventDefault();
     console.log('🔐 Handling login...');
     
-    const username = document.getElementById('login-user').value;
-    const password = document.getElementById('login-pass').value;
+    const username = DOMHelpers.safeGetValue('login-user');
+    const password = DOMHelpers.safeGetValue('login-pass');
 
     if (!username || !password) {
       this.ui.showAlert('Por favor completa todos los campos', 'error');
@@ -482,8 +483,8 @@ setupDashboardEvents() {
       errorElement.textContent = '';
     }
     
-    const username = document.getElementById('register-user').value;
-    const password = document.getElementById('register-pass').value;
+    const username = DOMHelpers.safeGetValue('register-user');
+    const password = DOMHelpers.safeGetValue('register-pass');
 
     if (!username || !password) {
       this.ui.showAlert('Por favor completa todos los campos', 'error');
@@ -830,8 +831,8 @@ showEditLimitModal(limitId) {
   this.ui.updateCategoriesSelect(categories, 'edit-limit-category');
 
   // Precargar
-  form.querySelector('#edit-limit-category').value = lim.category || '';
-  form.querySelector('input[name="amount"]').value = parseFloat(lim.amount || 0);
+  DOMHelpers.safeSetValue('edit-limit-category', lim.category || '');
+  DOMHelpers.safeSetValue('edit-limit-amount', parseFloat(lim.amount || 0));
   const warn = (lim.warning_percentage ?? 80);
   const warnInput = form.querySelector('input[name="warningPercentage"]');
   if (warnInput) warnInput.value = warn;
@@ -1509,18 +1510,20 @@ async handleAddIncome(e) {
   async handleGenerateAiReport() {
     console.log('🤖 Generating AI report...');
     
-    const period = document.getElementById('report-period').value;
-    const focus = document.getElementById('report-focus').value;
-    const questions = document.getElementById('report-questions').value;
+    const period = DOMHelpers.safeGetValue('report-period', 'current');
+    const focus = DOMHelpers.safeGetValue('report-focus', 'general');
+    const questions = DOMHelpers.safeGetValue('report-questions');
     
-    const resultDiv = document.getElementById('ai-report-result');
-    const contentDiv = document.getElementById('ai-report-content');
-    const generateBtn = document.getElementById('generate-report-btn');
-    const downloadBtn = document.getElementById('download-report-btn');
+    const resultDiv = DOMHelpers.safeGetElement('ai-report-result');
+    const contentDiv = DOMHelpers.safeGetElement('ai-report-content');
+    const generateBtn = DOMHelpers.safeGetElement('generate-report-btn');
+    const downloadBtn = DOMHelpers.safeGetElement('download-report-btn');
     
     // Show loading state
-    generateBtn.disabled = true;
-    generateBtn.innerHTML = '<div class="loading-spinner"></div> Generando...';
+    if (generateBtn) {
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<div class="loading-spinner"></div> Generando...';
+    }
     
     try {
       // Prepare data for AI analysis

@@ -1,0 +1,327 @@
+/* 
+ * FINZN - Consolidated CSS Fixes
+ * This file consolidates the most critical CSS duplications
+ * Include this after main.css and skin-pro.css
+ */
+
+/* ========= UNIFIED BUTTON SYSTEM ========= */
+
+/* Remove multiple button definitions and create single source of truth */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-sm, 8px);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Unified Primary Button */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color, #C8B6FF), var(--primary-dark, #B5A3FF));
+  color: var(--text-primary, #2D3748);
+  box-shadow: 0 4px 12px rgba(200, 182, 255, 0.3);
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(200, 182, 255, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Unified Secondary Button */
+.btn-secondary {
+  background: var(--bg-secondary, #F8F9FA);
+  color: var(--text-primary, #2D3748);
+  border: 1px solid var(--border-color, #E2E8F0);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-tertiary, #E2E2E2);
+  border-color: var(--primary-color, #C8B6FF);
+}
+
+/* Ghost/Outline Button */
+.btn.ghost {
+  background: transparent;
+  color: var(--text-secondary, #718096);
+  border: 1px solid var(--border-color, #E2E8F0);
+}
+
+.btn.ghost:hover {
+  background: var(--bg-secondary, #F8F9FA);
+  color: var(--text-primary, #2D3748);
+}
+
+/* Dark theme overrides for buttons */
+body[data-skin="pro"] .btn-primary {
+  background: linear-gradient(135deg, var(--pro-primary, #B8A7FF), var(--pro-primary-2, #9F8CFF));
+  color: #0B0E13;
+  box-shadow: 0 8px 20px rgba(159,140,255,.18);
+}
+
+body[data-skin="pro"] .btn-secondary {
+  background: #232b3a;
+  color: var(--pro-text, #E5E7EB);
+  border: 1px solid var(--pro-border, rgba(255,255,255,.08));
+}
+
+body[data-skin="pro"] .btn.ghost {
+  background: transparent;
+  color: var(--pro-text-2, #9CA3AF);
+  border: 1px solid var(--pro-border, rgba(255,255,255,.08));
+}
+
+/* ========= UNIFIED BORDER RADIUS SYSTEM ========= */
+
+/* Standardize all border radius values */
+.modal,
+.card,
+.summary-card,
+.chart-card-new,
+.expenses-section-card,
+.income-section-card,
+.spending-limits-main-card,
+.settings-card,
+.report-card,
+.budgets-container {
+  border-radius: var(--border-radius, 12px) !important;
+}
+
+.btn,
+.form-select,
+.input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  border-radius: var(--border-radius-sm, 8px) !important;
+}
+
+.nav-item {
+  border-radius: var(--border-radius-sm, 8px) !important;
+}
+
+/* ========= UNIFIED FORM STYLES ========= */
+
+/* Consolidate all form input styles */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary, #2D3748);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #E2E8F0);
+  border-radius: var(--border-radius-sm, 8px);
+  background: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #2D3748);
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #C8B6FF);
+  box-shadow: 0 0 0 3px rgba(200, 182, 255, 0.1);
+}
+
+/* Dark theme form overrides */
+body[data-skin="pro"] .form-group label {
+  color: var(--pro-text, #E5E7EB);
+}
+
+body[data-skin="pro"] .form-group input,
+body[data-skin="pro"] .form-group select,
+body[data-skin="pro"] .form-group textarea {
+  background: var(--pro-elev, #1b2430);
+  border-color: var(--pro-border, rgba(255,255,255,.08));
+  color: var(--pro-text, #E5E7EB);
+}
+
+body[data-skin="pro"] .form-group input:focus,
+body[data-skin="pro"] .form-group select:focus,
+body[data-skin="pro"] .form-group textarea:focus {
+  border-color: var(--pro-primary, #B8A7FF);
+  box-shadow: 0 0 0 3px rgba(184, 167, 255, 0.1);
+}
+
+/* ========= UNIFIED GRID SYSTEM ========= */
+
+/* Consolidate summary cards grid definitions */
+.summary-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Dashboard grid fixes */
+.dashboard-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  
+  .summary-cards {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ========= ACCESSIBILITY IMPROVEMENTS ========= */
+
+/* Screen reader only labels */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Unified focus styles */
+button:focus-visible,
+.btn:focus-visible,
+.nav-item:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary-color, #C8B6FF);
+  outline-offset: 2px;
+}
+
+body[data-skin="pro"] button:focus-visible,
+body[data-skin="pro"] .btn:focus-visible,
+body[data-skin="pro"] .nav-item:focus-visible,
+body[data-skin="pro"] input:focus-visible,
+body[data-skin="pro"] select:focus-visible,
+body[data-skin="pro"] textarea:focus-visible {
+  outline-color: var(--pro-primary, #B8A7FF);
+}
+
+/* ========= PERFORMANCE OPTIMIZATIONS ========= */
+
+/* Reduce repaints and reflows */
+.btn,
+.nav-item,
+.summary-card {
+  will-change: transform;
+}
+
+/* GPU acceleration for animations */
+.btn:hover,
+.nav-item:hover {
+  transform: translateZ(0) translateY(-1px);
+}
+
+/* ========= OVERRIDE CONFLICTING RULES ========= */
+
+/* These rules override the most problematic duplications */
+body[data-skin="pro"] .btn.btn-primary {
+  background: linear-gradient(135deg, var(--pro-primary, #B8A7FF), var(--pro-primary-2, #9F8CFF)) !important;
+  color: #0B0E13 !important;
+}
+
+/* Remove the multiple conflicting button definitions */
+body[data-skin="pro"] .btn-primary {
+  --brand: var(--pro-primary, #B8A7FF);
+  background: linear-gradient(135deg, var(--pro-primary, #B8A7FF), var(--pro-primary-2, #9F8CFF)) !important;
+}
+
+/* ========= CRITICAL OVERRIDES TO ELIMINATE CONFLICTS ========= */
+
+/* Force override all button duplications with highest specificity */
+.btn-primary,
+.btn.btn-primary,
+body .btn-primary,
+body[data-skin="pro"] .btn-primary,
+body[data-skin="pro"] .btn.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color, #C8B6FF), var(--primary-dark, #B5A3FF)) !important;
+  color: var(--text-primary, #2D3748) !important;
+  box-shadow: 0 4px 12px rgba(200, 182, 255, 0.3) !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Dark theme button override */
+body[data-skin="pro"] .btn-primary,
+body[data-skin="pro"] .btn.btn-primary {
+  background: linear-gradient(135deg, var(--pro-primary, #B8A7FF), var(--pro-primary-2, #9F8CFF)) !important;
+  color: #0B0E13 !important;
+  box-shadow: 0 8px 20px rgba(159,140,255,.18) !important;
+}
+
+/* Force border-radius consistency */
+.btn,
+.modal,
+.card,
+.summary-card,
+input,
+select,
+textarea {
+  border-radius: var(--border-radius-sm, 8px) !important;
+}
+
+/* Remove any conflicting button styles from main.css and skin-pro.css */
+.btn-primary[class*="duplicate"],
+.btn-secondary[class*="duplicate"] {
+  display: none !important;
+}
+
+/* Final cleanup - force our styles over any remaining duplicates */
+* .btn-primary {
+  background: linear-gradient(135deg, var(--primary-color, #C8B6FF), var(--primary-dark, #B5A3FF)) !important;
+}
+
+body[data-skin="pro"] * .btn-primary {
+  background: linear-gradient(135deg, var(--pro-primary, #B8A7FF), var(--pro-primary-2, #9F8CFF)) !important;
+  color: #0B0E13 !important;
+}
