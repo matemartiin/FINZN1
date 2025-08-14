@@ -674,30 +674,7 @@ try {
     }).join('') || `<li class="tx-item"><div>Sin movimientos recientes</div></li>`;
   }
 
-  // 2) Gasto vs Presupuesto por categoría (usa budgets + gastos por categoría del mes actual)
-  const bars = document.getElementById('budget-bars');
-  if (bars) {
-    const catSpend = this.data.getExpensesByCategory(this.currentMonth); // {cat: total}
-    const budgetsList = Array.isArray(budgets) ? budgets : [];
-
-    const items = budgetsList.map(b => {
-      const spent = catSpend[b.category] || 0;
-      const pct = Math.min(100, Math.round((spent / b.amount) * 100));
-      const amountSpent = this.ui.formatCurrency(spent);
-      const amountBudget = this.ui.formatCurrency(b.amount);
-      return `
-        <li class="budget-bar">
-          <div class="meta">
-            <strong>${b.category}</strong>
-            <span>${amountSpent} / ${amountBudget}</span>
-            <span>(${pct}%)</span>
-          </div>
-          <div class="budget-track"><div class="budget-fill" style="width:${pct}%"></div></div>
-        </li>`;
-    });
-
-    bars.innerHTML = items.join('') || `<li class="budget-bar"><div class="meta">Sin presupuestos aún</div></li>`;
-  }
+  // 2) Gasto vs Presupuesto - ELIMINADO - La card ya no existe en el dashboard
 
   // 3) Próximos pagos (cuotas activas que continúan el mes siguiente)
   const upcoming = [];

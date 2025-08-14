@@ -325,3 +325,34 @@ body[data-skin="pro"] * .btn-primary {
   background: linear-gradient(135deg, var(--pro-primary, #B8A7FF), var(--pro-primary-2, #9F8CFF)) !important;
   color: #0B0E13 !important;
 }
+
+/* ========= DASHBOARD LAYOUT IMPROVEMENTS ========= */
+
+/* Improved responsive behavior for dashboard cards */
+@media (max-width: 768px) {
+  .dashboard-row.grid-12 .pro-card.col-span-12,
+  .dashboard-row.grid-12 .pro-card.col-span-6,
+  .dashboard-row.grid-12 .pro-card.col-span-3 {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* Ensure proper spacing for dashboard cards */
+.dashboard-row {
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced upcoming payments card */
+#card-upcoming .upcoming-list {
+  min-height: 120px;
+  padding: 1rem 0;
+}
+
+#card-upcoming .upcoming-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1));
+}
+
+#card-upcoming .upcoming-item:last-child {
+  border-bottom: none;
+}
