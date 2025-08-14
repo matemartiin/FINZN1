@@ -109,7 +109,7 @@ export class UIManager {
 
   getContextualMascotMessages() {
     // Get current balance if available
-    const balanceElement = document.getElementById('balance-amount') || document.getElementById('balance-amount-new');
+    const balanceElement = document.getElementById('balance-amount-new');
     const balanceText = balanceElement ? balanceElement.textContent : '';
     
     // Parse balance (remove currency symbols and convert to number)
@@ -140,58 +140,24 @@ export class UIManager {
   }
 
   updateBalance(balance) {
-    // New horizontal balance card
-    const balanceAmount = document.getElementById('balance-amount');
-    const incomeBreakdown = document.getElementById('income-breakdown');
-    const expenseBreakdown = document.getElementById('expense-breakdown');
-    const balanceCard = document.getElementById('balance-card');
-    
-    // Legacy elements for backward compatibility
-    const legacyBalanceAmount = document.getElementById('balance-amount-new');
+    const balanceAmount = document.getElementById('balance-amount-new');
     const monthlyExpenses = document.getElementById('monthly-expenses-summary');
     const incomeAmount = document.getElementById('income-summary');
     const installmentsCount = document.getElementById('installments-count');
     
     console.log('🔄 Updating balance UI with:', balance);
     
-    // Update new balance card
     if (balanceAmount) {
       balanceAmount.textContent = this.formatCurrency(balance.available);
-      console.log('💰 New balance amount updated:', balance.available);
-    }
-    
-    if (incomeBreakdown) {
-      incomeBreakdown.textContent = this.formatCurrency(balance.totalIncome);
-    }
-    
-    if (expenseBreakdown) {
-      expenseBreakdown.textContent = this.formatCurrency(balance.totalExpenses);
-    }
-    
-    // Apply adaptive gradient to balance card
-    if (balanceCard) {
-      balanceCard.classList.remove('negative', 'positive-high', 'neutral');
-      
-      if (balance.available < 0) {
-        balanceCard.classList.add('negative');
-      } else if (balance.available >= 10000) {
-        balanceCard.classList.add('positive-high');
-      } else {
-        balanceCard.classList.add('neutral');
-      }
-    }
-    
-    // Update legacy elements for backward compatibility
-    if (legacyBalanceAmount) {
-      legacyBalanceAmount.textContent = this.formatCurrency(balance.available);
+      console.log('💰 Balance amount updated:', balance.available);
       
       // Change color based on balance
       if (balance.available < 0) {
-        legacyBalanceAmount.style.color = '#ef4444';
+        balanceAmount.style.color = '#ef4444';
       } else if (balance.available < 1000) {
-        legacyBalanceAmount.style.color = '#f59e0b';
+        balanceAmount.style.color = '#f59e0b';
       } else {
-        legacyBalanceAmount.style.color = '#C8B6FF';
+        balanceAmount.style.color = '#C8B6FF';
       }
     }
     
@@ -209,10 +175,6 @@ export class UIManager {
       installmentsCount.textContent = balance.installments;
       console.log('📊 Installments count updated:', balance.installments);
     }
-    
-    // Update new dashboard sections
-    this.updateUpcomingEvents();
-    this.updateRecentMovements(balance);
   }
 
   updateExpensesList(expenses, app) {
@@ -648,139 +610,6 @@ export class UIManager {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
-  }
-
-  updateUpcomingEvents() {
-    const eventsContainer = document.getElementById('upcoming-events');
-    if (!eventsContainer) return;
-    
-    // Get upcoming events from calendar (mock data for now)
-    const upcomingEvents = this.getUpcomingEvents();
-    
-    if (upcomingEvents.length === 0) {
-      eventsContainer.innerHTML = `
-        <div class="empty-state-small">
-          <div class="empty-icon"><i class="ph ph-calendar"></i></div>
-          <h4>No hay eventos próximos</h4>
-          <p>Tus próximos eventos aparecerán aquí</p>
-        </div>
-      `;
-      return;
-    }
-    
-    eventsContainer.innerHTML = upcomingEvents.map(event => `
-      <div class="event-item">
-        <div class="event-info">
-          <div class="event-icon">
-            <i class="ph ph-${this.getEventIcon(event.type)}"></i>
-          </div>
-          <div class="event-details">
-            <p class="event-title">${event.title}</p>
-            <p class="event-date">${event.date}</p>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  }
-  
-  updateRecentMovements(balance) {
-    const movementsContainer = document.getElementById('recent-movements');
-    if (!movementsContainer) return;
-    
-    // Get recent movements (mock data based on balance for now)
-    const recentMovements = this.getRecentMovements(balance);
-    
-    if (recentMovements.length === 0) {
-      movementsContainer.innerHTML = `
-        <div class="empty-state-small">
-          <div class="empty-icon"><i class="ph ph-arrows-clockwise"></i></div>
-          <h4>No hay movimientos recientes</h4>
-          <p>Tus transacciones aparecerán aquí</p>
-        </div>
-      `;
-      return;
-    }
-    
-    movementsContainer.innerHTML = recentMovements.map(movement => `
-      <div class="movement-item">
-        <div class="movement-info">
-          <div class="movement-icon">
-            <i class="ph ph-${movement.type === 'income' ? 'trend-up' : 'trend-down'}"></i>
-          </div>
-          <div class="movement-details">
-            <p class="movement-title">${movement.title}</p>
-            <p class="movement-category">${movement.category} • ${movement.date}</p>
-          </div>
-        </div>
-        <div class="movement-amount ${movement.type}">
-          ${movement.type === 'income' ? '+' : '-'}${this.formatCurrency(Math.abs(movement.amount))}
-        </div>
-      </div>
-    `).join('');
-  }
-  
-  getUpcomingEvents() {
-    // Mock data - in real implementation, this would fetch from calendar
-    return [
-      {
-        id: 1,
-        title: 'Pago de alquiler',
-        date: '15 Ene',
-        type: 'payment'
-      },
-      {
-        id: 2,
-        title: 'Cobro de sueldo',
-        date: '20 Ene',
-        type: 'income'
-      },
-      {
-        id: 3,
-        title: 'Vencimiento tarjeta',
-        date: '25 Ene',
-        type: 'deadline'
-      }
-    ];
-  }
-  
-  getRecentMovements(balance) {
-    // Mock data - in real implementation, this would fetch recent transactions
-    return [
-      {
-        id: 1,
-        title: 'Supermercado',
-        category: 'Alimentación',
-        date: 'Hoy',
-        amount: 1500,
-        type: 'expense'
-      },
-      {
-        id: 2,
-        title: 'Freelance trabajo',
-        category: 'Ingresos extra',
-        date: 'Ayer',
-        amount: 5000,
-        type: 'income'
-      },
-      {
-        id: 3,
-        title: 'Netflix',
-        category: 'Entretenimiento',
-        date: '2 días',
-        amount: 890,
-        type: 'expense'
-      }
-    ];
-  }
-  
-  getEventIcon(type) {
-    const icons = {
-      payment: 'credit-card',
-      income: 'money',
-      deadline: 'calendar',
-      reminder: 'clock'
-    };
-    return icons[type] || 'calendar';
   }
 
   getCategoryInfo(categoryName) {

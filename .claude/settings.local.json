@@ -5,7 +5,8 @@
       "Bash(python:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npm run dev:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(cp:*)"
     ],
     "defaultMode": "acceptEdits"
   }
