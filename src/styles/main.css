@@ -844,9 +844,9 @@ table,
 
 .section-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
   padding-bottom: var(--spacing-lg);
   border-bottom: 2px solid var(--border-color);
 }
@@ -5137,6 +5137,145 @@ table,
 .darkmode .mobile-nav-item.active {
   color: white;
   background: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== DARK MODE CALENDAR STYLES ===== */
+.darkmode .calendar-container {
+  background: #2d3748;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.darkmode .calendar-nav {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  color: #e2e8f0;
+}
+
+.darkmode .calendar-nav h3 {
+  color: #e2e8f0;
+}
+
+.darkmode .calendar-nav-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+}
+
+.darkmode .calendar-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.darkmode .calendar-view-toggle {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.darkmode .view-btn {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.darkmode .view-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+}
+
+.darkmode .view-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.darkmode .calendar-grid.month-view {
+  background: #4a5568;
+}
+
+.darkmode .calendar-day-header {
+  background: #4a5568;
+  color: #a0aec0;
+}
+
+.darkmode .calendar-day {
+  background: #2d3748;
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+.darkmode .calendar-day:hover {
+  background: #4a5568;
+}
+
+.darkmode .calendar-day.other-month {
+  background: #1a202c;
+  color: #718096;
+}
+
+.darkmode .calendar-day.today {
+  background: #2a4365;
+  border-color: #C8B6FF;
+  color: #e2e8f0;
+}
+
+.darkmode .day-number {
+  color: #e2e8f0;
+}
+
+.darkmode .day-event {
+  background: rgba(200, 182, 255, 0.2);
+  color: #C8B6FF;
+  border-color: rgba(200, 182, 255, 0.3);
+}
+
+.darkmode .day-event:hover {
+  background: rgba(200, 182, 255, 0.3);
+}
+
+.darkmode .calendar-agenda {
+  background: #2d3748;
+}
+
+.darkmode .agenda-events {
+  color: #e2e8f0;
+}
+
+.darkmode .agenda-event {
+  background: #4a5568;
+  border-color: #718096;
+  color: #e2e8f0;
+}
+
+.darkmode .agenda-event:hover {
+  background: #5a6578;
+}
+
+/* Event Legend Dark Mode */
+.darkmode .event-legend {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.darkmode .event-legend h4 {
+  color: #e2e8f0;
+}
+
+.darkmode .legend-item span {
+  color: #a0aec0;
+}
+
+/* Event type colors for dark mode */
+.darkmode .legend-color.payment {
+  background: #ff7675;
+}
+
+.darkmode .legend-color.income {
+  background: #00b894;
+}
+
+.darkmode .legend-color.card-close {
+  background: #fdcb6e;
+}
+
+.darkmode .legend-color.reminder {
+  background: #a29bfe;
+}
+
+.darkmode .legend-color.deadline {
+  background: #fd79a8;
 }
 
 @media (max-width: 480px) {
