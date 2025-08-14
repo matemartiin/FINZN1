@@ -715,7 +715,7 @@ try {
       goalsMini.innerHTML = `
         <li class="goal-mini empty-goal">
           <div class="meta">Crea tu primer objetivo para verlo aquí</div>
-          <button class="btn btn-primary btn-sm" onclick="window.app.showAddGoalModal()">
+          <button class="btn btn-primary btn-sm" data-action="create-goal">
             <i class="ph ph-plus" aria-hidden="true"></i> Crear Objetivo
           </button>
         </li>
@@ -726,17 +726,17 @@ try {
         const trg  = parseFloat(g.target_amount ?? g.targetAmount ?? 0) || 1;
         const pct  = Math.min(100, Math.round((curr / trg) * 100));
         return `
-          <li class="goal-mini">
+          <li class="goal-mini" data-goal-id="${g.id}" data-goal-name="${g.name || 'Objetivo'}">
             <div class="goal-header-mini">
               <div class="meta"><strong>${g.name || 'Objetivo'}</strong></div>
               <div class="goal-actions-mini">
-                <button class="btn btn-icon btn-sm" onclick="window.app.addToGoal('${g.id}')" title="Agregar dinero">
+                <button class="btn btn-icon btn-sm" data-action="add-money" data-goal-id="${g.id}" title="Agregar dinero">
                   <i class="ph ph-plus-circle" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-icon btn-sm" onclick="window.app.editGoal('${g.id}')" title="Editar objetivo">
+                <button class="btn btn-icon btn-sm" data-action="edit-goal" data-goal-id="${g.id}" title="Editar objetivo">
                   <i class="ph ph-pencil-simple" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-icon btn-sm btn-danger" onclick="window.app.deleteGoal('${g.id}', '${g.name}')" title="Eliminar objetivo">
+                <button class="btn btn-icon btn-sm btn-danger" data-action="delete-goal" data-goal-id="${g.id}" data-goal-name="${g.name || 'Objetivo'}" title="Eliminar objetivo">
                   <i class="ph ph-trash" aria-hidden="true"></i>
                 </button>
               </div>
@@ -751,13 +751,16 @@ try {
       if (goals.length > 3) {
         goalsMini.innerHTML += `
           <li class="goal-mini see-all">
-            <button class="btn btn-secondary btn-sm" onclick="window.app.navigation.navigateTo('goals')">
+            <button class="btn btn-secondary btn-sm" data-action="view-all-goals">
               <i class="ph ph-arrow-right" aria-hidden="true"></i> Ver todos (${goals.length})
             </button>
           </li>
         `;
       }
     }
+    
+    // Setup event delegation for goal buttons
+    this.setupGoalsMiniEventHandlers();
   }
 
   // 5) Alertas e insights (aprovechamos limitAlerts ya calculadas arriba)
@@ -1869,6 +1872,47 @@ showEditExpenseModal(expenseId) {
       }
     }
   }
+  setupGoalsMiniEventHandlers() {
+    const goalsMini = document.getElementById('goals-mini');
+    if (!goalsMini) return;
+    
+    // Remove existing event listeners to prevent duplicates
+    goalsMini.removeEventListener('click', this.handleGoalsMiniClick);
+    
+    // Add event delegation for goal buttons
+    this.handleGoalsMiniClick = (e) => {
+      const button = e.target.closest('button[data-action]');
+      if (!button) return;
+      
+      e.preventDefault();
+      const action = button.getAttribute('data-action');
+      const goalId = button.getAttribute('data-goal-id');
+      const goalName = button.getAttribute('data-goal-name');
+      
+      switch (action) {
+        case 'create-goal':
+          this.showAddGoalModal();
+          break;
+        case 'add-money':
+          if (goalId) this.addToGoal(goalId);
+          break;
+        case 'edit-goal':
+          if (goalId) this.editGoal(goalId);
+          break;
+        case 'delete-goal':
+          if (goalId && goalName) this.deleteGoal(goalId, goalName);
+          break;
+        case 'view-all-goals':
+          this.navigation.navigateTo('goals');
+          break;
+        default:
+          console.warn('Unknown goal action:', action);
+      }
+    };
+    
+    goalsMini.addEventListener('click', this.handleGoalsMiniClick);
+  }
+
   getCurrentMonth() {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
