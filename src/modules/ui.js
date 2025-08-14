@@ -944,7 +944,7 @@ export class UIManager {
           <div class="empty-icon">💰</div>
           <h3>No tienes presupuestos configurados</h3>
           <p>Crea tu primer presupuesto para controlar mejor tus gastos</p>
-          <button class="btn btn-primary" onclick="window.app.showAddBudgetModal()">
+          <button class="btn btn-primary" data-action="create-budget">
             <i class="ph ph-plus" aria-hidden="true"></i>
             Crear Presupuesto
           </button>
@@ -1030,19 +1030,19 @@ export class UIManager {
               <span class="detail-label">Transacciones:</span>
               <span class="detail-value">${progress.expenseCount}</span>
             </div>
-            ${budget.ai_recommended ? '<div class="ai-badge">🤖 Recomendado por IA</div>' : ''}
+            ${budget.ai_recommended ? '<div class="ai-badge"><i class="ph ph-robot" aria-hidden="true"></i> Recomendado por IA</div>' : ''}
           </div>
         </div>
         
         <div class="budget-actions">
-          <button class="btn btn-secondary btn-sm" onclick="window.app.showEditBudgetModal('${budget.id}')">
+          <button class="btn btn-secondary btn-sm" data-action="edit-budget" data-budget-id="${budget.id}">
             <i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar
           </button>
-          <button class="btn btn-danger btn-sm" onclick="window.app.deleteBudget('${budget.id}', '${budget.name}')">
+          <button class="btn btn-danger btn-sm" data-action="delete-budget" data-budget-id="${budget.id}" data-budget-name="${budget.name}">
             <i class="ph ph-trash" aria-hidden="true"></i> Eliminar
           </button>
-          <button class="btn btn-primary btn-sm" onclick="window.app.generateBudgetInsights('${budget.id}')">
-            🤖 Analizar
+          <button class="btn btn-primary btn-sm" data-action="analyze-budget" data-budget-id="${budget.id}">
+            <i class="ph ph-robot" aria-hidden="true"></i> Analizar
           </button>
         </div>
       `;

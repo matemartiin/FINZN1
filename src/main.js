@@ -188,6 +188,37 @@ if (goReports) {
           }
         });
       }
+
+      // Event delegation for budgets section buttons
+      const budgetsList = document.getElementById('budgets-list');
+      if (budgetsList) {
+        budgetsList.addEventListener('click', (e) => {
+          const button = e.target.closest('button[data-action]');
+          if (!button) return;
+          
+          e.preventDefault();
+          const action = button.getAttribute('data-action');
+          const budgetId = button.getAttribute('data-budget-id');
+          const budgetName = button.getAttribute('data-budget-name');
+          
+          switch (action) {
+            case 'create-budget':
+              this.showAddBudgetModal();
+              break;
+            case 'edit-budget':
+              if (budgetId) this.showEditBudgetModal(budgetId);
+              break;
+            case 'delete-budget':
+              if (budgetId && budgetName) this.deleteBudget(budgetId, budgetName);
+              break;
+            case 'analyze-budget':
+              if (budgetId) this.generateBudgetInsights(budgetId);
+              break;
+            default:
+              console.warn('Unknown budget action:', action);
+          }
+        });
+      }
       
       console.log('✅ All event listeners set up successfully');
     } catch (error) {
