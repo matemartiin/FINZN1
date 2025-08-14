@@ -7,19 +7,20 @@
 }
 
 .unified-balance-card {
-  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, #C4B5FD 100%);
-  border-radius: 16px;
-  padding: 2rem;
+  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 30%, #F8F9FA 100%);
+  border-radius: 20px;
+  padding: 1.5rem 3rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 2px 16px rgba(139, 92, 246, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 3rem;
+  gap: 4rem;
   position: relative;
   overflow: hidden;
   width: 100%;
   max-width: none;
+  min-height: 120px;
 }
 
 .unified-balance-card::before {
@@ -29,8 +30,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(167, 139, 250, 0.08) 50%, rgba(196, 181, 253, 0.05) 100%);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(167, 139, 250, 0.03) 30%, rgba(248, 249, 250, 0.01) 100%);
+  backdrop-filter: blur(5px);
   z-index: 0;
 }
 
@@ -57,34 +58,34 @@
 .balance-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(139, 92, 246, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
 }
 
 .balance-icon i {
   font-size: 1.5rem;
-  color: white;
+  color: #8B5CF6;
   font-weight: 600;
 }
 
 .balance-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: white;
+  color: #6D28D9;
   opacity: 0.9;
 }
 
 .balance-amount {
-  font-size: 3rem;
+  font-size: 2.75rem;
   font-weight: 700;
-  color: white;
+  color: #5B21B6;
   line-height: 1;
-  margin: 0.5rem 0;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0.25rem 0;
+  text-shadow: 0 1px 4px rgba(139, 92, 246, 0.1);
 }
 
 .balance-subtitle {
@@ -93,22 +94,23 @@
 }
 
 .installments-button {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  color: white;
+  color: #7C3AED;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
 }
 
 .installments-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
 }
 
 /* Income & Expenses Section (Right) */
@@ -143,36 +145,37 @@
 }
 
 .income-icon {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
 }
 
 .expense-icon {
-  background: rgba(239, 68, 68, 0.2);
-  color: #EF4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
 }
 
 .item-title {
   font-size: 1rem;
   font-weight: 600;
-  color: white;
+  color: #374151;
   opacity: 0.9;
   flex: 1;
 }
 
 .incomes-indicator {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 6px;
   padding: 0.25rem 0.5rem;
-  color: white;
+  color: #059669;
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .incomes-indicator:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.1);
 }
 
 .item-amount-row {
@@ -185,8 +188,8 @@
 .item-amount {
   font-size: 1.5rem;
   font-weight: 600;
-  color: white;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  color: #374151;
+  text-shadow: 0 1px 4px rgba(139, 92, 246, 0.05);
 }
 
 .action-btn {
