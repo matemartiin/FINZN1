@@ -108,8 +108,8 @@ export class UIManager {
   }
 
   getContextualMascotMessages() {
-    // Get current balance if available (try both new unified and legacy IDs)
-    const balanceElement = document.getElementById('balance-amount-new') || document.querySelector('.balance-amount');
+    // Get current balance if available
+    const balanceElement = document.getElementById('balance-amount-new');
     const balanceText = balanceElement ? balanceElement.textContent : '';
     
     // Parse balance (remove currency symbols and convert to number)
@@ -140,56 +140,39 @@ export class UIManager {
   }
 
   updateBalance(balance) {
-    // New unified card elements (primary)
     const balanceAmount = document.getElementById('balance-amount-new');
     const monthlyExpenses = document.getElementById('monthly-expenses-summary');
     const incomeAmount = document.getElementById('income-summary');
     const installmentsCount = document.getElementById('installments-count');
     
-    // Alternative selectors for unified card
-    const unifiedBalanceAmount = document.querySelector('.balance-amount');
-    const unifiedIncomeAmount = document.querySelector('#income-summary');
-    const unifiedExpensesAmount = document.querySelector('#monthly-expenses-summary');
-    const unifiedInstallmentsCount = document.querySelector('#installments-count');
-    
     console.log('🔄 Updating balance UI with:', balance);
     
-    // Update balance amount (try both selectors)
-    const balanceEl = balanceAmount || unifiedBalanceAmount;
-    if (balanceEl) {
-      balanceEl.textContent = this.formatCurrency(balance.available);
+    if (balanceAmount) {
+      balanceAmount.textContent = this.formatCurrency(balance.available);
       console.log('💰 Balance amount updated:', balance.available);
       
-      // Color changes only for legacy card (unified card uses fixed white color)
-      if (balanceAmount) {
-        if (balance.available < 0) {
-          balanceAmount.style.color = '#ef4444';
-        } else if (balance.available < 1000) {
-          balanceAmount.style.color = '#f59e0b';
-        } else {
-          balanceAmount.style.color = '#C8B6FF';
-        }
+      // Change color based on balance
+      if (balance.available < 0) {
+        balanceAmount.style.color = '#ef4444';
+      } else if (balance.available < 1000) {
+        balanceAmount.style.color = '#f59e0b';
+      } else {
+        balanceAmount.style.color = '#C8B6FF';
       }
     }
     
-    // Update expenses (try both selectors)
-    const expensesEl = monthlyExpenses || unifiedExpensesAmount;
-    if (expensesEl) {
-      expensesEl.textContent = this.formatCurrency(balance.totalExpenses);
+    if (monthlyExpenses) {
+      monthlyExpenses.textContent = this.formatCurrency(balance.totalExpenses);
       console.log('💳 Monthly expenses updated:', balance.totalExpenses);
     }
     
-    // Update income (try both selectors)
-    const incomeEl = incomeAmount || unifiedIncomeAmount;
-    if (incomeEl) {
-      incomeEl.textContent = this.formatCurrency(balance.totalIncome);
+    if (incomeAmount) {
+      incomeAmount.textContent = this.formatCurrency(balance.totalIncome);
       console.log('💵 Income amount updated:', balance.totalIncome);
     }
     
-    // Update installments count (try both selectors)
-    const installmentsEl = installmentsCount || unifiedInstallmentsCount;
-    if (installmentsEl) {
-      installmentsEl.textContent = balance.installments;
+    if (installmentsCount) {
+      installmentsCount.textContent = balance.installments;
       console.log('📊 Installments count updated:', balance.installments);
     }
   }

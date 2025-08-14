@@ -17,7 +17,6 @@
   <link rel="stylesheet" href="./src/styles/main.css">
   <link rel="stylesheet" href="./src/styles/skin-pro.css">
   <link rel="stylesheet" href="./src/styles/consolidated-fixes.css">
-  <link rel="stylesheet" href="./src/styles/unified-dashboard.css">
 </head>
 <body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
@@ -252,62 +251,60 @@
   <button class="btn btn-primary" id="qa-add-budget"><i class="ph ph-target"></i> Nuevo presupuesto</button>
 </div>
           <div class="dashboard-grid">
-            <!-- Unified Balance Card -->
-            <div class="unified-balance-card">
-              <!-- Balance Section (Left) -->
-              <div class="balance-section">
-                <div class="balance-header">
-                  <div class="balance-icon">
-                    <i class="ph ph-wallet"></i>
-                  </div>
-                  <span class="balance-title">Balance Total</span>
-                </div>
-                <div class="balance-amount" id="balance-amount-new">$2,750</div>
-                <div class="balance-subtitle">
+            <!-- Primera fila: Balance, Ingresos, Gastos -->
+            <div class="summary-cards">
+              <div class="summary-card balance-card-new">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-coins"></i></span>
+    </div>
+    <span class="card-title">Balance</span>
+  </div>
+                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
+                <div class="installments-info">
                   <button id="installments-btn" class="installments-button">
                     <span id="installments-count">0</span> cuotas activas
                   </button>
                 </div>
               </div>
-              
-              <!-- Income & Expenses Section (Right) -->
-              <div class="income-expenses-section">
-                <!-- Income -->
-                <div class="income-item">
-                  <div class="item-header">
-                    <div class="item-icon income-icon">
-                      <i class="ph ph-trend-up"></i>
-                    </div>
-                    <span class="item-title">Ingresos</span>
-                    <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
-                      <span class="indicator-count">0</span>
-                    </button>
-                  </div>
-                  <div class="item-amount-row">
-                    <span class="item-amount" id="income-summary">$3,500</span>
-                    <button id="add-income-btn-dashboard" class="action-btn income-action" title="Agregar Ingreso">
-                      <i class="ph ph-plus"></i>
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- Expenses -->
-                <div class="expense-item">
-                  <div class="item-header">
-                    <div class="item-icon expense-icon">
-                      <i class="ph ph-trend-down"></i>
-                    </div>
-                    <span class="item-title">Gastos</span>
-                  </div>
-                  <div class="item-amount-row">
-                    <span class="item-amount" id="monthly-expenses-summary">$1,200</span>
-                    <button id="add-expense-btn-dashboard" class="action-btn expense-action" title="Agregar Gasto">
-                      <i class="ph ph-minus"></i>
-                    </button>
-                  </div>
+
+              <div class="summary-card income-card">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-trend-up"></i></span>
+    </div>
+    <span class="card-title">
+      Ingresos
+      <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
+        <span class="indicator-count">0</span>
+      </button>
+    </span>
+  </div>
+                <div class="card-amount" id="income-summary">$3,500</div>
+                <div class="card-action">
+                  <button id="add-income-btn-dashboard" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Agregar Ingreso
+</button>
                 </div>
               </div>
-            </div>
+
+              <div class="summary-card expenses-card">
+  <div class="card-header-simple">
+    <div class="card-icon-simple">
+      <span class="icon-chip"><i class="ph ph-trend-down"></i></span>
+    </div>
+    <span class="card-title">Gastos del Mes</span>
+  </div>
+
+  <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
+
+  <div class="card-action">
+    <button id="add-expense-btn-dashboard" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Agregar Gasto
+</button>
+  </div>
+</div>
+          </div>
 
 
 
