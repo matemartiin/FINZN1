@@ -666,6 +666,7 @@ setupDashboardEvents() {
       // Update UI
       this.ui.updateBalance(balance);
       this.ui.updateExpensesList(expenses, this);
+      this.ui.updateRecentTransactions(expenses, income, extraIncomes);
       
       // Update income details (this will show the indicator and total)
       this.ui.updateIncomeDetails(income, extraIncomes);
@@ -692,6 +693,7 @@ setupDashboardEvents() {
       try {
         const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
         this.charts.updateExpensesChart(expensesByCategory);
+        this.charts.updateDashboardExpensesChart(expensesByCategory);
         
         // Update trend chart
         const trendData = await this.data.getTrendData();

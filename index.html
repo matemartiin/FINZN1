@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="./src/styles/consolidated-fixes.css">
   <link rel="stylesheet" href="./src/styles/unified-dashboard.css">
   <link rel="stylesheet" href="./src/styles/new-dashboard.css">
+  <link rel="stylesheet" href="./src/styles/dashboard-second-row.css">
 </head>
 <body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
@@ -297,19 +298,32 @@
               </div>
             </div>
 
-            <!-- Dashboard Actions Below Card -->
-            <div class="dashboard-actions">
-              <div class="dashboard-controls">
-                <select id="month-select" class="form-select">
-                  <option value="2025-01">Enero 2025</option>
-                  <option value="2024-12">Diciembre 2024</option>
-                  <option value="2024-11">Noviembre 2024</option>
-                </select>
+            <!-- Dashboard Second Row -->
+            <div class="dashboard-second-row">
+              <!-- Chart Section -->
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3>Distribución de Gastos</h3>
+                  <span class="chart-subtitle">Por categoría</span>
+                </div>
+                <div class="chart-container">
+                  <canvas id="dashboard-expenses-chart"></canvas>
+                </div>
               </div>
-              <button class="btn ghost" id="qa-import"><i class="ph ph-upload-simple"></i> Importar CSV</button>
-              <button class="btn ghost" id="qa-ai-report"><i class="ph ph-robot"></i> Informe IA</button>
-              <button class="btn ghost" id="go-reports"><i class="ph ph-chart-line-up"></i> Ver Reportes</button>
-              <button class="btn btn-primary" id="qa-add-budget"><i class="ph ph-target"></i> Nuevo presupuesto</button>
+
+              <!-- Recent Transactions Card -->
+              <div class="recent-transactions-card">
+                <div class="card-header">
+                  <h3>Movimientos Recientes</h3>
+                  <button class="view-all-btn" data-section="transactions">
+                    <span>Ver todos</span>
+                    <i class="ph ph-arrow-right"></i>
+                  </button>
+                </div>
+                <div class="recent-transactions-list" id="recent-transactions-list">
+                  <!-- Se llenarán con JavaScript -->
+                </div>
+              </div>
             </div>
 
         </section>

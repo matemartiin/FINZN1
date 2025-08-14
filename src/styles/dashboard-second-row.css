@@ -1,0 +1,244 @@
+/* Dashboard Second Row Styles */
+
+/* Dashboard second row layout */
+.dashboard-second-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Chart Card */
+.chart-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.chart-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.chart-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.chart-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.chart-container {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+.chart-container canvas {
+  max-height: 100%;
+}
+
+/* Recent Transactions Card */
+.recent-transactions-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.recent-transactions-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.view-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+  background: var(--primary-color-alpha-10);
+  transform: translateX(2px);
+}
+
+/* Recent Transactions List */
+.recent-transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.recent-transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--bg-subtle);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.recent-transaction-item:hover {
+  background: var(--bg-hover);
+  transform: translateX(4px);
+}
+
+.transaction-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--bg-white);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.transaction-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.transaction-description {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.transaction-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.transaction-amount {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.transaction-amount.income {
+  color: var(--success-color);
+}
+
+.transaction-amount.expense {
+  color: var(--danger-color);
+}
+
+/* Empty State */
+.empty-state-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.empty-state-small i {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+.empty-state-small span {
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-second-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .chart-card,
+  .recent-transactions-card {
+    padding: 20px;
+  }
+  
+  .chart-container {
+    height: 240px;
+  }
+  
+  .card-header h3,
+  .chart-header h3 {
+    font-size: 16px;
+  }
+  
+  .recent-transaction-item {
+    padding: 10px 12px;
+  }
+  
+  .transaction-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .recent-transactions-card {
+  background: var(--card-bg-dark);
+  border-color: var(--border-color-dark);
+}
+
+[data-theme="dark"] .recent-transaction-item {
+  background: var(--bg-subtle-dark);
+}
+
+[data-theme="dark"] .recent-transaction-item:hover {
+  background: var(--bg-hover-dark);
+}
+
+[data-theme="dark"] .transaction-icon {
+  background: var(--bg-white-dark);
+}

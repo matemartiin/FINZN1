@@ -267,6 +267,97 @@ export class UIManager {
     });
   }
 
+  updateRecentTransactions(expenses, income, extraIncomes) {
+    const container = document.getElementById('recent-transactions-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    // Combine all transactions
+    const allTransactions = [];
+    
+    // Add expenses
+    expenses.forEach(expense => {
+      allTransactions.push({
+        type: 'expense',
+        id: expense.id,
+        description: expense.description,
+        amount: -expense.amount,
+        date: new Date(expense.transaction_date),
+        category: expense.category
+      });
+    });
+    
+    // Add fixed income
+    if (income && income.amount > 0) {
+      allTransactions.push({
+        type: 'income',
+        id: 'fixed-income',
+        description: income.description || 'Salario fijo',
+        amount: income.amount,
+        date: new Date(),
+        category: 'income'
+      });
+    }
+    
+    // Add extra incomes
+    extraIncomes.forEach(extraIncome => {
+      allTransactions.push({
+        type: 'income',
+        id: extraIncome.id,
+        description: extraIncome.description,
+        amount: extraIncome.amount,
+        date: new Date(extraIncome.date),
+        category: 'income'
+      });
+    });
+    
+    // Sort by date (most recent first) and take last 5
+    const recentTransactions = allTransactions
+      .sort((a, b) => b.date - a.date)
+      .slice(0, 5);
+      
+    if (recentTransactions.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state-small">
+          <i class="ph ph-list-dashes"></i>
+          <span>No hay transacciones recientes</span>
+        </div>
+      `;
+      return;
+    }
+
+    recentTransactions.forEach(transaction => {
+      const item = document.createElement('div');
+      item.className = 'recent-transaction-item';
+      
+      const isIncome = transaction.type === 'income';
+      const categoryInfo = isIncome 
+        ? { icon: '<i class="ph ph-arrow-up"></i>', name: 'Ingreso', color: '#22c55e' }
+        : this.getCategoryInfo(transaction.category);
+      
+      const formattedDate = transaction.date.toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+      
+      item.innerHTML = `
+        <div class="transaction-icon" style="color: ${categoryInfo.color}">
+          ${categoryInfo.icon}
+        </div>
+        <div class="transaction-details">
+          <div class="transaction-description">${transaction.description}</div>
+          <div class="transaction-date">${formattedDate}</div>
+        </div>
+        <div class="transaction-amount ${isIncome ? 'income' : 'expense'}">
+          ${isIncome ? '+' : ''}${this.formatCurrency(Math.abs(transaction.amount))}
+        </div>
+      `;
+      
+      container.appendChild(item);
+    });
+  }
+
   updateGoalsList(goals) {
     const container = document.getElementById('goals-list');
     if (!container) return;

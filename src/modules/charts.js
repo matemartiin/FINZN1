@@ -1,6 +1,7 @@
 export class ChartManager {
   constructor() {
     this.expensesChart = null;
+    this.dashboardExpensesChart = null;
     this.trendChart = null;
   }
 
@@ -11,15 +12,29 @@ export class ChartManager {
       return;
     }
 
+    this.renderChart(ctx, data, 'expensesChart');
+  }
+
+  updateDashboardExpensesChart(data) {
+    const ctx = document.getElementById('dashboard-expenses-chart');
+    if (!ctx) {
+      console.log('ℹ️ Dashboard expenses chart canvas not found');
+      return;
+    }
+
+    this.renderChart(ctx, data, 'dashboardExpensesChart');
+  }
+
+  renderChart(ctx, data, chartProperty) {
     // Verify canvas is visible and ready
     if (ctx.offsetParent === null) {
-      console.log('ℹ️ Expenses chart canvas not visible - skipping update');
+      console.log('ℹ️ Chart canvas not visible - skipping update');
       return;
     }
     
-    // Apply category filter if available
+    // Apply category filter if available (only for main expenses chart)
     let filteredData = data;
-    if (window.app?.contextualBar) {
+    if (chartProperty === 'expensesChart' && window.app?.contextualBar) {
       const categoryFilter = window.app.contextualBar.getCurrentCategory();
       if (categoryFilter !== 'all') {
         filteredData = {};
@@ -29,8 +44,8 @@ export class ChartManager {
       }
     }
     
-    if (this.expensesChart) {
-      this.expensesChart.destroy();
+    if (this[chartProperty]) {
+      this[chartProperty].destroy();
     }
 
     const labels = Object.keys(filteredData);
@@ -53,7 +68,7 @@ export class ChartManager {
     
     const colors = this.generateColors(labels.length);
 
-    this.expensesChart = new Chart(ctx, {
+    this[chartProperty] = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels,
