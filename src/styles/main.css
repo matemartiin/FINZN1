@@ -806,6 +806,42 @@ body {
   box-sizing: border-box;
 }
 
+/* Additional overflow fixes for all sections */
+.expenses-list,
+.goals-list,
+.budgets-list,
+.reports-grid,
+.settings-categories,
+.calendar-container,
+.transactions-summary-cards {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Ensure all card content fits */
+.expense-item *,
+.goal-item *,
+.budget-card *,
+.report-card *,
+.settings-card * {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Tables and wide content */
+table,
+.table-responsive,
+.chart-container,
+.calendar-grid {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -4359,25 +4395,158 @@ body {
     justify-content: flex-start;
   }
   
-  /* Grid layouts for better mobile experience */
-  .transactions-grid,
-  .goals-list,
-  .budgets-list,
-  .reports-grid,
-  .settings-categories {
+  /* TRANSACTIONS SECTION - Card improvements */
+  .transactions-summary-cards,
+  .expenses-list,
+  .installments-list {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+    width: 100%;
+    max-width: 100%;
   }
   
-  /* Card improvements */
-  .expense-item,
-  .goal-item,
-  .budget-card,
-  .report-card,
-  .settings-card {
+  .expense-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
     padding: var(--spacing-md);
     border-radius: var(--border-radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .expense-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .expense-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* GOALS SECTION - Card improvements */
+  .goals-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+  
+  .goal-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .goal-progress {
+    margin: var(--spacing-sm) 0;
+  }
+  
+  /* BUDGETS SECTION - Card improvements */
+  .budgets-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+  
+  .budget-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* CALENDAR SECTION - Card improvements */
+  .calendar-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .calendar-grid {
+    min-width: 300px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  
+  .calendar-day {
+    min-height: 80px;
+    padding: var(--spacing-xs);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem;
+  }
+  
+  /* REPORTS SECTION - Card improvements */
+  .reports-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+  
+  .report-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  
+  /* SETTINGS SECTION - Card improvements */
+  .settings-categories {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    width: 100%;
+  }
+  
+  .settings-category {
+    width: 100%;
+  }
+  
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+  
+  .settings-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
   }
   
   /* Calendar responsive */
@@ -4395,9 +4564,9 @@ body {
 @media (max-width: 768px) {
   .section-content {
     padding: var(--spacing-md);
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
+    margin: 0 var(--spacing-xs);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
   }
   
   .section-header h1 {
@@ -4408,28 +4577,156 @@ body {
   .section-actions {
     flex-direction: column;
     gap: var(--spacing-sm);
+    width: 100%;
   }
   
   .section-actions .btn {
     width: 100%;
     justify-content: center;
+    min-height: 44px; /* Better touch target */
   }
   
-  /* Better card layouts */
-  .expense-actions,
-  .goal-actions,
-  .budget-actions {
-    flex-direction: column;
+  /* MOBILE - Transactions Section */
+  .transactions-summary-cards {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .expense-item {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .expense-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    justify-content: space-between;
+  }
+  
+  .expense-actions .btn {
+    flex: 1;
+    min-width: calc(33.33% - var(--spacing-xs));
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+  
+  /* MOBILE - Goals Section */
+  .goals-list {
+    gap: var(--spacing-sm);
+  }
+  
+  .goal-item {
+    padding: var(--spacing-sm);
+  }
+  
+  .goal-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: var(--spacing-xs);
   }
   
-  .expense-actions .btn,
-  .goal-actions .btn,
+  .goal-actions .btn {
+    flex: 1;
+    min-width: calc(33.33% - var(--spacing-xs));
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+  
+  /* MOBILE - Budgets Section */
+  .budgets-list {
+    gap: var(--spacing-sm);
+  }
+  
+  .budget-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .budget-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  
   .budget-actions .btn {
-    width: 100%;
+    flex: 1;
+    min-width: calc(33.33% - var(--spacing-xs));
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+  
+  /* MOBILE - Calendar Section */
+  .calendar-container {
+    margin: 0 -var(--spacing-sm);
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .calendar-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+    padding: var(--spacing-sm);
+  }
+  
+  .calendar-nav {
     justify-content: center;
-    font-size: 0.875rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    gap: var(--spacing-md);
+  }
+  
+  .calendar-day {
+    min-height: 60px;
+    font-size: 0.75rem;
+    padding: 4px;
+  }
+  
+  /* MOBILE - Reports Section */
+  .reports-grid {
+    gap: var(--spacing-sm);
+  }
+  
+  .report-card {
+    padding: var(--spacing-sm);
+    text-align: left;
+  }
+  
+  .report-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .report-card .btn {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* MOBILE - Settings Section */
+  .settings-categories {
+    gap: var(--spacing-md);
+  }
+  
+  .settings-category h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .settings-grid {
+    gap: var(--spacing-sm);
+  }
+  
+  .settings-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .settings-card h4 {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  /* Chart improvements */
+  .chart-container {
+    height: 250px;
+    margin: var(--spacing-md) 0;
+    overflow: hidden;
   }
   
   /* Form improvements */
@@ -4441,44 +4738,16 @@ body {
     flex-direction: column;
     gap: var(--spacing-md);
   }
-  
-  /* Chart improvements */
-  .chart-container {
-    height: 250px;
-    margin: var(--spacing-md) 0;
-  }
-  
-  /* Settings grid improvements */
-  .settings-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-  }
-  
-  /* Reports grid improvements */
-  .reports-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  
-  /* Calendar mobile improvements */
-  .calendar-header {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-  }
-  
-  .calendar-nav {
-    justify-content: center;
-  }
-  
-  .calendar-day {
-    min-height: 60px;
-    font-size: 0.875rem;
-  }
 }
 
 /* Small Mobile Improvements */
 @media (max-width: 480px) {
+  .section-content {
+    padding: var(--spacing-sm);
+    margin: 0;
+    border-radius: var(--border-radius-sm);
+  }
+  
   .section-header h1 {
     font-size: 1.25rem;
   }
@@ -4488,41 +4757,82 @@ body {
     gap: var(--spacing-xs);
   }
   
-  /* Further compress button layouts */
-  .budget-actions,
-  .goal-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-  }
-  
-  .budget-actions .btn,
-  .goal-actions .btn {
-    flex: 1;
-    min-width: 0;
-    font-size: 0.8rem;
+  /* SMALL MOBILE - All Cards */
+  .expense-item,
+  .goal-item,
+  .budget-card,
+  .report-card,
+  .settings-card {
     padding: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
   }
   
-  /* Compact expense items */
-  .expense-item {
-    padding: var(--spacing-sm);
-  }
-  
-  .expense-meta {
+  /* SMALL MOBILE - Button improvements */
+  .expense-actions,
+  .goal-actions,
+  .budget-actions {
     flex-direction: column;
     gap: var(--spacing-xs);
   }
   
-  .expense-amount {
+  .expense-actions .btn,
+  .goal-actions .btn,
+  .budget-actions .btn {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: var(--spacing-xs);
+    min-height: 36px;
+  }
+  
+  /* SMALL MOBILE - Content adjustments */
+  .expense-meta,
+  .goal-header,
+  .budget-header {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .expense-amount,
+  .goal-amount,
+  .budget-amount {
+    font-size: 0.9rem;
+  }
+  
+  /* SMALL MOBILE - Calendar ultra-compact */
+  .calendar-day {
+    min-height: 45px;
+    font-size: 0.7rem;
+    padding: 2px;
+  }
+  
+  /* SMALL MOBILE - Reports */
+  .report-card h3 {
     font-size: 1rem;
   }
   
-  /* Calendar ultra-compact */
-  .calendar-day {
-    min-height: 50px;
+  .report-card p {
+    font-size: 0.875rem;
+  }
+  
+  /* SMALL MOBILE - Settings */
+  .settings-category h3 {
+    font-size: 1.1rem;
+  }
+  
+  .settings-card h4 {
+    font-size: 0.9rem;
+  }
+  
+  /* SMALL MOBILE - Progress bars */
+  .progress-bar,
+  .goal-track {
+    height: 6px;
+    border-radius: 3px;
+  }
+  
+  .progress-text,
+  .progress-percentage {
     font-size: 0.75rem;
-    padding: 2px;
   }
 }
 
