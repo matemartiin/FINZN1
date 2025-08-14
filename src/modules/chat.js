@@ -69,7 +69,7 @@ export class ChatManager {
     messageDiv.innerHTML = `
       <div class="chat-avatar">
         ${sender === 'user' ? 
-          '<div class="user-avatar"><span class="user-avatar-icon">👤</span></div>' : 
+          '<div class="user-avatar"><span class="user-avatar-icon"><i class="ph ph-user"></i></span></div>' : 
           '<img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />'
         }
       </div>
@@ -130,7 +130,7 @@ export class ChatManager {
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { 

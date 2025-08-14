@@ -33,7 +33,7 @@ export class ThemeManager {
   updateToggleIcon() {
     const icon = document.querySelector('.theme-icon');
     if (icon) {
-      icon.textContent = this.currentTheme === 'light' ? '🌙' : '☀️';
+      icon.innerHTML = this.currentTheme === 'light' ? '<i class="ph ph-moon"></i>' : '<i class="ph ph-sun"></i>';
     }
   }
 }

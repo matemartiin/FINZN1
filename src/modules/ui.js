@@ -186,7 +186,7 @@ export class UIManager {
     if (expenses.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">💳</div>
+          <div class="empty-icon"><i class="ph ph-credit-card"></i></div>
           <h3>No hay gastos registrados</h3>
           <p>Comienza agregando tu primer gasto del mes</p>
           <button class="btn btn-primary" onclick="window.app.showAddExpenseModal()">
@@ -248,7 +248,7 @@ export class UIManager {
     if (goals.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">🎯</div>
+          <div class="empty-icon"><i class="ph ph-target"></i></div>
           <h3>No tienes objetivos de ahorro</h3>
           <p>Establece metas para motivarte a ahorrar</p>
           <button class="btn btn-primary" data-action="create-goal">
@@ -320,7 +320,7 @@ export class UIManager {
       if (summaryContainer) {
         summaryContainer.innerHTML = `
           <div class="empty-state">
-            <div class="empty-icon">⚠️</div>
+            <div class="empty-icon"><i class="ph ph-warning"></i></div>
             <h3>No tienes límites de gasto configurados</h3>
             <p>Establece límites para controlar mejor tus gastos</p>
             <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
@@ -417,7 +417,7 @@ export class UIManager {
     if (limits.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">💰</div>
+          <div class="empty-icon"><i class="ph ph-money"></i></div>
           <h3>No hay límites de gasto configurados</h3>
           <p>Establece límites presupuestarios para controlar mejor tus gastos por categoría</p>
           <button class="btn btn-primary" onclick="window.app.showAddSpendingLimitModal()">
@@ -757,7 +757,7 @@ export class UIManager {
     if (installments.length === 0) {
       installmentsList.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📊</div>
+          <div class="empty-icon"><i class="ph ph-chart-pie"></i></div>
           <h3>No hay cuotas activas este mes</h3>
           <p>Los gastos en cuotas aparecerán aquí</p>
         </div>
@@ -941,7 +941,7 @@ export class UIManager {
     if (budgets.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">💰</div>
+          <div class="empty-icon"><i class="ph ph-money"></i></div>
           <h3>No tienes presupuestos configurados</h3>
           <p>Crea tu primer presupuesto para controlar mejor tus gastos</p>
           <button class="btn btn-primary" data-action="create-budget">

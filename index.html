@@ -46,7 +46,7 @@
           <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" aria-label="Contraseña" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
-          <span>✨</span>
+          <i class="ph ph-sparkle" aria-hidden="true"></i>
           Iniciar Sesión
         </button>
         <div id="login-error" class="error-message"></div>
@@ -85,11 +85,11 @@
         </div>
         <div class="input-group">
           <button type="button" id="generate-test-email" class="btn btn-secondary btn-sm">
-            🎲 Generar email de prueba
+            <i class="ph ph-dice-six" aria-hidden="true"></i> Generar email de prueba
           </button>
         </div>
         <button type="submit" class="btn btn-primary btn-full">
-          <span>🚀</span>
+          <i class="ph ph-rocket-launch" aria-hidden="true"></i>
           Crear Cuenta
         </button>
         <div id="register-error" class="error-message"></div>
@@ -146,12 +146,14 @@
             <div class="menu-user-avatar">🧑</div>
             <div class="menu-user-name" id="menu-user-name">Usuario</div>
           </div>
-          <button id="header-menu-close" class="menu-close" aria-label="Cerrar">✕</button>
+          <button id="header-menu-close" class="menu-close" aria-label="Cerrar">
+            <i class="ph ph-x" aria-hidden="true"></i>
+          </button>
         </div>
 
         <nav class="header-menu-items">
           <button class="menu-item" id="header-menu-settings">
-            <span>⚙️</span> Configuración
+            <i class="ph ph-gear-six" aria-hidden="true"></i> Configuración
           </button>
 
           <label class="menu-item switch">
@@ -161,7 +163,7 @@
           </label>
 
           <button class="menu-item danger" id="header-menu-logout">
-            <span>🚪</span> Salir
+            <i class="ph ph-door-open" aria-hidden="true"></i> Salir
           </button>
         </nav>
       </div>
@@ -311,7 +313,9 @@
         <!-- Transactions Section (Renamed from Expenses) -->
         <section id="transactions-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
             <span class="breadcrumb-item active">
   <i class="ph ph-credit-card" aria-hidden="true"></i> Transacciones
@@ -342,7 +346,7 @@
               <div class="tab-content active" id="expenses-tab">
                 <div class="expenses-section-card">
                   <div class="card-header">
-                    <h3>💳 Gastos del Mes</h3>
+                    <h3><i class="ph ph-credit-card" aria-hidden="true"></i> Gastos del Mes</h3>
                   </div>
                   <div id="expenses-list" class="expenses-list">
                     <!-- Expenses will be loaded here -->
@@ -353,7 +357,7 @@
               <div class="tab-content" id="income-tab">
                 <div class="income-section-card">
                   <div class="card-header">
-                    <h3>💰 Ingresos del Mes</h3>
+                    <h3><i class="ph ph-money" aria-hidden="true"></i> Ingresos del Mes</h3>
                   </div>
                   <div id="income-list" class="income-list">
                     <!-- Income will be loaded here -->
@@ -364,9 +368,9 @@
               <div class="tab-content" id="limits-tab">
                 <div class="expenses-section-card spending-limits-main-card">
                   <div class="card-header">
-                    <h3>🚦 Límites Presupuestarios</h3>
+                    <h3><i class="ph ph-traffic-sign" aria-hidden="true"></i> Límites Presupuestarios</h3>
                     <button id="add-spending-limit-btn-transactions" class="btn btn-primary btn-sm">
-                      <span>➕</span>
+                      <i class="ph ph-plus" aria-hidden="true"></i>
                       Nuevo Límite
                     </button>
                   </div>
@@ -383,9 +387,13 @@
         <!-- Goals Section (Renamed from Savings) -->
         <section id="goals-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">🎯 Objetivos</span>
+            <span class="breadcrumb-item active">
+              <i class="ph ph-target" aria-hidden="true"></i> Objetivos
+            </span>
           </nav>
           
           <div class="section-content">
@@ -393,7 +401,7 @@
               <h1>Objetivos de Ahorro</h1>
               <div class="section-actions">
                 <button id="add-goal-btn" class="btn btn-primary">
-                  <span>🎯</span>
+                  <i class="ph ph-target" aria-hidden="true"></i>
                   Nuevo Objetivo
                 </button>
               </div>
@@ -408,9 +416,13 @@
         <!-- Reports Section (Renamed from Achievements) -->
         <section id="reports-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">📈 Reportes</span>
+            <span class="breadcrumb-item active">
+              <i class="ph ph-chart-line-up" aria-hidden="true"></i> Reportes
+            </span>
           </nav>
           
           <div class="section-content">
@@ -425,25 +437,25 @@
             
             <div class="reports-grid">
               <div class="report-card">
-                <h3>📊 Análisis Mensual</h3>
+                <h3><i class="ph ph-chart-bar" aria-hidden="true"></i> Análisis Mensual</h3>
                 <p>Resumen detallado de ingresos y gastos del mes</p>
                 <button class="btn btn-secondary">Ver Reporte</button>
               </div>
               
               <div class="report-card">
-                <h3>📈 Tendencias</h3>
+                <h3><i class="ph ph-trend-up" aria-hidden="true"></i> Tendencias</h3>
                 <p>Análisis de patrones de gasto a lo largo del tiempo</p>
                 <button class="btn btn-secondary">Ver Tendencias</button>
               </div>
               
               <div class="report-card">
-                <h3>🎯 Progreso de Objetivos</h3>
+                <h3><i class="ph ph-target" aria-hidden="true"></i> Progreso de Objetivos</h3>
                 <p>Estado actual de tus metas de ahorro</p>
                 <button class="btn btn-secondary">Ver Progreso</button>
               </div>
               
               <div class="report-card">
-                <h3>🤖 Reporte IA</h3>
+                <h3><i class="ph ph-robot" aria-hidden="true"></i> Reporte IA</h3>
                 <p>Análisis inteligente personalizado de tus finanzas</p>
                 <button id="reports-generate-ai-card-btn" class="btn btn-secondary">Generar</button>
               </div>
@@ -454,9 +466,13 @@
         <!-- Settings Section -->
         <section id="settings-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">⚙️ Configuración</span>
+            <span class="breadcrumb-item active">
+              <i class="ph ph-gear-six" aria-hidden="true"></i> Configuración
+            </span>
           </nav>
           
           <div class="section-content">
@@ -467,7 +483,7 @@
             <!-- Settings Categories -->
             <div class="settings-categories">
               <div class="settings-category">
-                <h3>👤 Cuenta y Perfil</h3>
+                <h3><i class="ph ph-user" aria-hidden="true"></i> Cuenta y Perfil</h3>
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Información Personal</h4>
@@ -484,7 +500,7 @@
               </div>
               
               <div class="settings-category">
-                <h3>🏷️ Personalización</h3>
+                <h3><i class="ph ph-tag" aria-hidden="true"></i> Personalización</h3>
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Categorías</h4>
@@ -503,7 +519,7 @@
               </div>
               
               <div class="settings-category">
-                <h3>📊 Datos y Respaldo</h3>
+                <h3><i class="ph ph-database" aria-hidden="true"></i> Datos y Respaldo</h3>
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Exportar Datos</h4>
@@ -537,9 +553,11 @@
         <!-- Budgets Section -->
         <section id="budgets-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">💰 Presupuestos</span>
+            <span class="breadcrumb-item active"><i class="ph ph-wallet" aria-hidden="true"></i> Presupuestos</span>
           </nav>
           
           <div class="section-content">
@@ -573,7 +591,7 @@
             <!-- Budgets List -->
             <div class="budgets-container">
               <div class="budgets-header">
-                <h3>📊 Presupuestos Activos</h3>
+                <h3><i class="ph ph-chart-pie" aria-hidden="true"></i> Presupuestos Activos</h3>
                 <div class="budgets-summary">
                   <span id="total-budgets-count">0</span> presupuestos configurados
                 </div>
@@ -588,9 +606,11 @@
         <!-- Calendar Section (New) -->
         <section id="calendar-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">📅 Calendario</span>
+            <span class="breadcrumb-item active"><i class="ph ph-calendar-blank" aria-hidden="true"></i> Calendario</span>
           </nav>
           
           <div class="section-content">
@@ -609,9 +629,13 @@
             <div class="calendar-container" style="margin-top: 0;">
               <!-- Calendar Navigation -->
               <div class="calendar-nav">
-                <button id="prev-month" class="calendar-nav-btn">‹</button>
+                <button id="prev-month" class="calendar-nav-btn">
+                  <i class="ph ph-caret-left" aria-hidden="true"></i>
+                </button>
                 <h3 id="current-month-year">Enero 2025</h3>
-                <button id="next-month" class="calendar-nav-btn">›</button>
+                <button id="next-month" class="calendar-nav-btn">
+                  <i class="ph ph-caret-right" aria-hidden="true"></i>
+                </button>
                 <div class="calendar-view-toggle">
                   <button class="view-btn active" data-view="month">Mes</button>
                   <button class="view-btn" data-view="week">Semana</button>
@@ -694,7 +718,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2><i class="ph ph-coins" aria-hidden="true"></i> Ingresos del Mes</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="all-incomes-list" class="all-incomes-list">
@@ -712,7 +738,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2><i class="ph ph-chart-bar" aria-hidden="true"></i> Cuotas Activas del Mes</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="installments-list" class="installments-list">
@@ -730,7 +758,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Límite de Gasto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-spending-limit-form" class="modal-form">
         <div class="form-group">
@@ -781,7 +811,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Gasto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-expense-form" class="modal-form">
         <div class="form-group">
@@ -856,7 +888,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Ingreso</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-income-form" class="modal-form">
         <div class="form-group">
@@ -898,7 +932,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Nuevo Objetivo de Ahorro</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-goal-form" class="modal-form">
         <div class="form-group">
@@ -926,7 +962,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Editar Objetivo de Ahorro</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="edit-goal-form" class="modal-form">
         <div class="form-group">
@@ -954,7 +992,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Dinero al Objetivo</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="goal-info">
@@ -981,8 +1021,10 @@
   <div id="manage-categories-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🏷️ Gestionar Categorías</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-tag" aria-hidden="true"></i> Gestionar Categorías</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="categories-management">
@@ -996,7 +1038,7 @@
   <div class="modal-actions">
     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
     <button type="submit" class="btn btn-primary">
-      <span>➕</span>
+      <i class="ph ph-plus" aria-hidden="true"></i>
       Agregar Categoría
     </button>
   </div>
@@ -1030,7 +1072,7 @@
           </div>
           <div class="modal-actions">
             <button type="submit" class="btn btn-primary">
-              <span>✅</span> Completar Perfil
+              <i class="ph ph-check-circle"></i> Completar Perfil
             </button>
           </div>
         </form>
@@ -1042,7 +1084,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>Editar Perfil</h3>
-          <button class="modal-close">&times;</button>
+          <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
         </div>
         <form id="edit-profile-form" class="modal-form">
           <div class="form-group">
@@ -1056,7 +1100,7 @@
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
             <button type="submit" class="btn btn-primary">
-              <span>💾</span> Guardar Cambios
+              <i class="ph ph-floppy-disk" aria-hidden="true"></i> Guardar Cambios
             </button>
           </div>
         </form>
@@ -1067,8 +1111,10 @@
   <div id="import-data-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📥 Importar Datos</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-upload-simple" aria-hidden="true"></i> Importar Datos</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="import-section">
@@ -1106,7 +1152,7 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
         <button type="button" id="process-import-btn" class="btn btn-primary">
-          <span>📥</span>
+          <i class="ph ph-download-simple" aria-hidden="true"></i>
           Importar Datos
         </button>
       </div>
@@ -1118,7 +1164,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2><i class="ph ph-robot" aria-hidden="true"></i> Generar Informe Financiero con IA</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="ai-report-options">
@@ -1150,17 +1198,17 @@
         </div>
         
         <div id="ai-report-result" class="ai-report-result hidden">
-          <h3>📊 Tu Informe Financiero Personalizado</h3>
+          <h3><i class="ph ph-chart-line" aria-hidden="true"></i> Tu Informe Financiero Personalizado</h3>
           <div id="ai-report-content" class="ai-report-content">
             <!-- El informe generado aparecerá aquí -->
           </div>
           <div class="ai-report-actions">
             <button id="download-report-btn" class="btn btn-secondary">
-              <span>📄</span>
+              <i class="ph ph-file-text" aria-hidden="true"></i>
               Descargar
             </button>
             <button id="share-report-btn" class="btn btn-secondary">
-              <span>📤</span>
+              <i class="ph ph-export" aria-hidden="true"></i>
               Compartir
             </button>
           </div>
@@ -1169,7 +1217,7 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
         <button type="button" id="generate-report-btn" class="btn btn-primary">
-          <span>🤖</span>
+          <i class="ph ph-robot" aria-hidden="true"></i>
           Generar Informe
         </button>
       </div>
@@ -1191,7 +1239,9 @@
             <p>Tu consejero financiero</p>
           </div>
         </div>
-        <button id="chat-close" class="chat-close">&times;</button>
+        <button id="chat-close" class="chat-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       
       <div id="chat-messages" class="chat-messages">
@@ -1213,7 +1263,9 @@
   <div class="modal-content">
     <div class="modal-header">
       <h2 id="add-event-title">Agregar Evento Financiero</h2>
-      <button type="button" class="modal-close" aria-label="Cerrar">✕</button>
+      <button type="button" class="modal-close" aria-label="Cerrar">
+        <i class="ph ph-x" aria-hidden="true"></i>
+      </button>
     </div>
 
     <form id="add-event-form" class="modal-form">
@@ -1264,7 +1316,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Editar Evento</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="edit-event-form" class="modal-form">
         <div class="form-group">
@@ -1274,11 +1328,11 @@
         <div class="form-group">
           <label for="edit-event-type">Tipo de Evento</label>
           <select id="edit-event-type" name="type" required>
-            <option value="payment">💳 Pago de Cuota</option>
-            <option value="income">💰 Cobro</option>
-            <option value="card-close">🏦 Cierre de Tarjeta</option>
-            <option value="reminder">⏰ Recordatorio</option>
-            <option value="deadline">📅 Vencimiento</option>
+            <option value="payment"><i class="ph ph-credit-card"></i> Pago de Cuota</option>
+            <option value="income"><i class="ph ph-money"></i> Cobro</option>
+            <option value="card-close"><i class="ph ph-bank"></i> Cierre de Tarjeta</option>
+            <option value="reminder"><i class="ph ph-clock"></i> Recordatorio</option>
+            <option value="deadline"><i class="ph ph-calendar"></i> Vencimiento</option>
           </select>
         </div>
         <div class="form-group">
@@ -1311,7 +1365,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="event-details-title">Detalles del Evento</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="event-details-content">
@@ -1330,7 +1386,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Crear Nuevo Presupuesto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-budget-form" class="modal-form">
         <div class="form-group">
@@ -1375,7 +1433,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Editar Presupuesto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="edit-budget-form" class="modal-form">
         <div class="form-group">
@@ -1419,8 +1479,10 @@
   <div id="budget-ai-insights-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🤖 Análisis IA de Presupuestos</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-robot"></i> Análisis IA de Presupuestos</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="budget-ai-analysis-content" class="budget-ai-analysis-content">
@@ -1430,7 +1492,7 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
         <button type="button" id="apply-ai-recommendations-btn" class="btn btn-primary">
-          <span>✨</span>
+          <i class="ph ph-sparkle" aria-hidden="true"></i>
           Aplicar Recomendaciones
         </button>
       </div>
