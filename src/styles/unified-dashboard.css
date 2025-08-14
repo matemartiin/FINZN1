@@ -7,13 +7,13 @@
 }
 
 .unified-balance-card {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 25%, rgba(255, 255, 255, 0.02) 100%);
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.2) 0%, rgba(139, 92, 246, 0.08) 30%, rgba(229, 231, 235, 0.15) 100%);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(156, 163, 175, 0.2);
   border-radius: 20px;
   padding: 1.5rem 3rem;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 32px rgba(156, 163, 175, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -50,7 +50,7 @@
 .balance-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(156, 163, 175, 0.2);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -60,24 +60,24 @@
 
 .balance-icon i {
   font-size: 1.5rem;
-  color: #8B5CF6;
+  color: #6B7280;
   font-weight: 600;
 }
 
 .balance-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #6D28D9;
+  color: #4B5563;
   opacity: 0.9;
 }
 
 .balance-amount {
   font-size: 2.75rem;
   font-weight: 700;
-  color: #5B21B6;
+  color: #374151;
   line-height: 1;
   margin: 0.25rem 0;
-  text-shadow: 0 1px 4px rgba(139, 92, 246, 0.1);
+  text-shadow: 0 1px 4px rgba(156, 163, 175, 0.1);
 }
 
 .balance-subtitle {
@@ -86,11 +86,11 @@
 }
 
 .installments-button {
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(156, 163, 175, 0.15);
+  border: 1px solid rgba(156, 163, 175, 0.25);
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  color: #7C3AED;
+  color: #6B7280;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -99,10 +99,10 @@
 }
 
 .installments-button:hover {
-  background: rgba(139, 92, 246, 0.15);
-  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(156, 163, 175, 0.2);
+  border-color: rgba(156, 163, 175, 0.35);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 2px 8px rgba(156, 163, 175, 0.15);
 }
 
 /* Income & Expenses Section (Right) */
@@ -119,6 +119,9 @@
   flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
 }
 
 .item-header {
