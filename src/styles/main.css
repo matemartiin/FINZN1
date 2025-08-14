@@ -168,10 +168,8 @@ body {
 .auth-title {
   font-size: 2.5rem;
   font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-color);
+  background: transparent;
   margin-bottom: var(--spacing-md);
 }
 
@@ -344,10 +342,8 @@ body {
 .logo {
   font-size: 1.8rem;
   font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-color);
+  background: transparent;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -781,17 +777,33 @@ body {
 
 .dashboard-section {
   display: none;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
 }
 
 .dashboard-section.active {
   display: block;
 }
 
+/* Ensure section content doesn't overflow */
 .section-content {
   background: var(--bg-primary);
   border-radius: var(--border-radius-xl);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Prevent any element from causing horizontal scroll */
+.section-content * {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -806,10 +818,8 @@ body {
 .section-header h1 {
   font-size: 1.8rem;
   font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-color);
+  background: transparent;
 }
 
 .section-actions {
@@ -910,10 +920,8 @@ body {
 }
 
 .balance-amount-new {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-color);
+  background: transparent;
 }
 
 .income-card {
@@ -1061,14 +1069,11 @@ body {
 
 .chart-card-new h3 {
   margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-weight: 900;
   font-size: 1.2rem;
   text-align: center;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: transparent;
 }
 
 .chart-content-with-mascot {
@@ -2756,13 +2761,10 @@ body {
 }
 
 .modal-header h2 {
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-weight: 900;
   font-size: 1.3rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: transparent;
 }
 
 .modal-close {
@@ -3809,6 +3811,11 @@ body {
 /* ===== DASHBOARD SECTIONS ===== */
 .dashboard-section {
   display: none;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
 }
 
 .dashboard-section.active {
@@ -4326,6 +4333,196 @@ body {
   
   .main-content {
     padding-bottom: 100px;
+  }
+}
+
+/* Enhanced Responsive Design for All Sections */
+
+/* Tablet and Mobile Improvements */
+@media (max-width: 1024px) {
+  .section-content {
+    padding: var(--spacing-lg);
+    margin: 0 var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .section-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  /* Grid layouts for better mobile experience */
+  .transactions-grid,
+  .goals-list,
+  .budgets-list,
+  .reports-grid,
+  .settings-categories {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  /* Card improvements */
+  .expense-item,
+  .goal-item,
+  .budget-card,
+  .report-card,
+  .settings-card {
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+  }
+  
+  /* Calendar responsive */
+  .calendar-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .calendar-grid {
+    min-width: 320px;
+  }
+}
+
+/* Mobile Specific Improvements */
+@media (max-width: 768px) {
+  .section-content {
+    padding: var(--spacing-md);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .section-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  /* Improved button layouts on mobile */
+  .section-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .section-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Better card layouts */
+  .expense-actions,
+  .goal-actions,
+  .budget-actions {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .expense-actions .btn,
+  .goal-actions .btn,
+  .budget-actions .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.875rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  /* Form improvements */
+  .form-group {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  /* Chart improvements */
+  .chart-container {
+    height: 250px;
+    margin: var(--spacing-md) 0;
+  }
+  
+  /* Settings grid improvements */
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  /* Reports grid improvements */
+  .reports-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  /* Calendar mobile improvements */
+  .calendar-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .calendar-nav {
+    justify-content: center;
+  }
+  
+  .calendar-day {
+    min-height: 60px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Small Mobile Improvements */
+@media (max-width: 480px) {
+  .section-header h1 {
+    font-size: 1.25rem;
+  }
+  
+  .breadcrumb-nav {
+    font-size: 0.875rem;
+    gap: var(--spacing-xs);
+  }
+  
+  /* Further compress button layouts */
+  .budget-actions,
+  .goal-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  
+  .budget-actions .btn,
+  .goal-actions .btn {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+  
+  /* Compact expense items */
+  .expense-item {
+    padding: var(--spacing-sm);
+  }
+  
+  .expense-meta {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .expense-amount {
+    font-size: 1rem;
+  }
+  
+  /* Calendar ultra-compact */
+  .calendar-day {
+    min-height: 50px;
+    font-size: 0.75rem;
+    padding: 2px;
   }
 }
 
