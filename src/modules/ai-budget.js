@@ -10,7 +10,7 @@ export class AIBudgetManager {
     this.lastTrainingData = null;
     this.modelVersion = 1;
     
-    console.log('🤖 AI Budget Manager initialized');
+    console.log('AI Budget Manager initialized');
   }
 
   // Obtener datos históricos para entrenamiento
@@ -20,7 +20,7 @@ export class AIBudgetManager {
 
     try {
       if (import.meta.env.DEV) {
-        console.log('📊 Collecting training data from Supabase...');
+        console.log('Collecting training data from Supabase...');
       }
       
       const { supabase } = await import('../config/supabase.js');
@@ -42,7 +42,7 @@ export class AIBudgetManager {
       }
 
       if (import.meta.env.DEV) {
-        console.log(`📊 Collected ${expenses.length} expense records for training`);
+        console.log(`Collected ${expenses.length} expense records for training`);
       }
       return this.preprocessData(expenses);
     } catch (error) {
@@ -127,7 +127,7 @@ export class AIBudgetManager {
     });
 
     if (import.meta.env.DEV) {
-      console.log(`📊 Preprocessed data: ${processedData.features.length} training samples`);
+      console.log(`Preprocessed data: ${processedData.features.length} training samples`);
     }
     return processedData;
   }
@@ -321,7 +321,7 @@ export class AIBudgetManager {
 
     try {
       if (import.meta.env.DEV) {
-        console.log('🤖 Generating Gemini AI recommendations...');
+        console.log('Generating Gemini AI recommendations...');
       }
       
       const prompt = this.buildGeminiPrompt(userData);
@@ -466,7 +466,7 @@ Genera las recomendaciones ahora:`;
     });
     
     if (import.meta.env.DEV) {
-      console.log(`🤖 Parsed ${recommendations.length} Gemini recommendations`);
+      console.log(`Parsed ${recommendations.length} Gemini recommendations`);
     }
     return recommendations;
   }

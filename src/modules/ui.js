@@ -48,7 +48,7 @@ export class UIManager {
       return;
     }
 
-    console.log('🐾 Initializing mascot hover behavior');
+    console.log('Initializing mascot hover behavior');
 
     mascotContainer.addEventListener('mouseenter', () => {
       this.showHoverMessage(dynamicMessage);
@@ -78,14 +78,14 @@ export class UIManager {
     messageElement.style.visibility = 'visible';
     messageElement.style.pointerEvents = 'none';
     
-    console.log('🐾 Mascot speaking on hover:', randomMessage.text);
+    console.log('Mascot speaking on hover:', randomMessage.text);
   }
 
   hideHoverMessage(messageElement) {
     if (!messageElement) return;
     
     this.clearMascotMessage(messageElement);
-    console.log('🐾 Mascot returning to silent state');
+    console.log('Mascot returning to silent state');
   }
 
   clearMascotMessage(messageElement) {
@@ -693,7 +693,7 @@ export class UIManager {
     categories.forEach(category => {
       const option = document.createElement('option');
       option.value = category.name;
-      option.textContent = `${category.icon} ${category.name}`;
+      option.innerHTML = `${category.icon} ${category.name}`;
       select.appendChild(option);
     });
   }
@@ -745,18 +745,18 @@ export class UIManager {
     }
     
     const defaultCategories = {
-      'Comida': { icon: '🍔', color: '#ef4444' },
-      'Transporte': { icon: '🚗', color: '#3b82f6' },
-      'Salud': { icon: '💊', color: '#8b5cf6' },
-      'Ocio': { icon: '🎉', color: '#f59e0b' },
-      'Supermercado': { icon: '🛒', color: '#10b981' },
-      'Servicios': { icon: '📱', color: '#6b7280' },
-      'Otros': { icon: '📦', color: '#9ca3af' }
+      'Comida': { icon: '<i class="ph ph-fork-knife"></i>', color: '#ef4444' },
+      'Transporte': { icon: '<i class="ph ph-car"></i>', color: '#3b82f6' },
+      'Salud': { icon: '<i class="ph ph-pill"></i>', color: '#8b5cf6' },
+      'Ocio': { icon: '<i class="ph ph-party-popper"></i>', color: '#f59e0b' },
+      'Supermercado': { icon: '<i class="ph ph-shopping-cart"></i>', color: '#10b981' },
+      'Servicios': { icon: '<i class="ph ph-device-mobile"></i>', color: '#6b7280' },
+      'Otros': { icon: '<i class="ph ph-package"></i>', color: '#9ca3af' }
     };
     
     return defaultCategories[categoryName] || { 
       name: categoryName, 
-      icon: '📦', 
+      icon: '<i class="ph ph-package"></i>', 
       color: '#9ca3af' 
     };
   }
@@ -827,7 +827,7 @@ export class UIManager {
           
           fixedItem.innerHTML = `
             <div class="income-item-details">
-              <div class="income-item-type">💰 Ingreso Fijo</div>
+              <div class="income-item-type"><i class="ph ph-coins"></i> Ingreso Fijo</div>
               <div class="income-item-description">Sueldo mensual</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
@@ -843,7 +843,7 @@ export class UIManager {
           
           item.innerHTML = `
             <div class="income-item-details">
-              <div class="income-item-type">💵 ${extraIncome.category}</div>
+              <div class="income-item-type"><i class="ph ph-money"></i> ${extraIncome.category}</div>
               <div class="income-item-description">${extraIncome.description}</div>
               <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
             </div>
@@ -890,7 +890,7 @@ export class UIManager {
       
       fixedItem.innerHTML = `
         <div class="income-item-details">
-          <div class="income-item-type">💰 Ingreso Fijo</div>
+          <div class="income-item-type"><i class="ph ph-coins"></i> Ingreso Fijo</div>
           <div class="income-item-description">Sueldo mensual</div>
         </div>
         <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
@@ -906,7 +906,7 @@ export class UIManager {
       
       item.innerHTML = `
         <div class="income-item-details">
-          <div class="income-item-type">💵 ${extraIncome.category}</div>
+          <div class="income-item-type"><i class="ph ph-money"></i> ${extraIncome.category}</div>
           <div class="income-item-description">${extraIncome.description}</div>
           <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
         </div>
@@ -1375,7 +1375,7 @@ getBudgetFormData(formId) {
       const iconMap = {
         'ai_recommendation': '🤖',
         'ml_recommendation': '🧠',
-        'pattern': '📊',
+        'pattern': '<i class="ph ph-chart-bar"></i>',
         'prediction': '🔮',
         'warning': '⚠️',
         'opportunity': '💡'
@@ -1434,7 +1434,7 @@ getBudgetFormData(formId) {
     insightsContainer.innerHTML = `
       <div class="insufficient-data-message">
         <div class="insufficient-data-header">
-          <div class="insufficient-data-icon">📊</div>
+          <div class="insufficient-data-icon"><i class="ph ph-chart-bar"></i></div>
           <h3>Datos Insuficientes para Análisis IA</h3>
         </div>
         
@@ -1528,7 +1528,7 @@ getBudgetFormData(formId) {
         'increasing': '📈',
         'decreasing': '📉',
         'stable': '➡️',
-        'volatile': '📊'
+        'volatile': '<i class="ph ph-chart-line"></i>'
       };
       
       const trendColors = {
@@ -1581,7 +1581,7 @@ getBudgetFormData(formId) {
     
     container.innerHTML = `
       <div class="patterns-header">
-        <h4>📊 Patrones de Gasto Detectados</h4>
+        <h4><i class="ph ph-chart-bar"></i> Patrones de Gasto Detectados</h4>
         <p>Insights automáticos sobre tu comportamiento financiero</p>
       </div>
     `;
@@ -1597,12 +1597,12 @@ getBudgetFormData(formId) {
         'day_pattern': '📅',
         'category_pattern': '🏷️',
         'time_pattern': '⏰',
-        'amount_pattern': '💰'
+        'amount_pattern': '<i class="ph ph-coins"></i>'
       };
       
       patternCard.innerHTML = `
         <div class="pattern-header">
-          <span class="pattern-icon">${typeIcons[pattern.type] || '📊'}</span>
+          <span class="pattern-icon">${typeIcons[pattern.type] || '<i class="ph ph-chart-bar"></i>'}</span>
           <span class="pattern-title">${pattern.title}</span>
         </div>
         

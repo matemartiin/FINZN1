@@ -154,10 +154,10 @@ export class NavigationManager {
       
       if (this.mobileMenuOpen) {
         navMenu.classList.add('mobile-open');
-        mobileToggle.innerHTML = '<div class="nav-icon">✕</div><span class="nav-label">Cerrar</span>';
+        mobileToggle.innerHTML = '<div class="nav-icon"><i class="ph ph-x"></i></div><span class="nav-label">Cerrar</span>';
       } else {
         navMenu.classList.remove('mobile-open');
-        mobileToggle.innerHTML = '<div class="nav-icon">📊</div><span class="nav-label">Menú</span>';
+        mobileToggle.innerHTML = '<div class="nav-icon"><i class="ph ph-list"></i></div><span class="nav-label">Menú</span>';
       }
     }
   }

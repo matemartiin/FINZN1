@@ -18,13 +18,13 @@ export class DataManager {
 
   getDefaultCategories() {
     return [
-      { id: '1', name: 'Comida', icon: '🍔', color: '#ef4444' },
-      { id: '2', name: 'Transporte', icon: '🚗', color: '#3b82f6' },
-      { id: '3', name: 'Salud', icon: '💊', color: '#8b5cf6' },
-      { id: '4', name: 'Ocio', icon: '🎉', color: '#f59e0b' },
-      { id: '5', name: 'Supermercado', icon: '🛒', color: '#10b981' },
-      { id: '6', name: 'Servicios', icon: '📱', color: '#6b7280' },
-      { id: '7', name: 'Otros', icon: '📦', color: '#9ca3af' }
+      { id: '1', name: 'Comida', icon: '<i class="ph ph-fork-knife"></i>', color: '#ef4444' },
+      { id: '2', name: 'Transporte', icon: '<i class="ph ph-car"></i>', color: '#3b82f6' },
+      { id: '3', name: 'Salud', icon: '<i class="ph ph-pill"></i>', color: '#8b5cf6' },
+      { id: '4', name: 'Ocio', icon: '<i class="ph ph-party-popper"></i>', color: '#f59e0b' },
+      { id: '5', name: 'Supermercado', icon: '<i class="ph ph-shopping-cart"></i>', color: '#10b981' },
+      { id: '6', name: 'Servicios', icon: '<i class="ph ph-device-mobile"></i>', color: '#6b7280' },
+      { id: '7', name: 'Otros', icon: '<i class="ph ph-package"></i>', color: '#9ca3af' }
     ];
   }
 
@@ -709,7 +709,7 @@ async updateExtraIncome(extraIncomeId, updates) {
       // Check if goal is completed
       if (newCurrentAmount >= targetAmount) {
         if (import.meta.env.DEV) {
-          console.log('🎉 Goal completed!');
+          console.log('✅ Goal completed!');
         }
         // You could add an achievement here
         return { success: true, completed: true, goal: data[0] };

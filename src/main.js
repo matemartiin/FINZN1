@@ -15,11 +15,11 @@ import { UserProfileManager } from './modules/user-profile.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
 
 
-console.log('🔥 FINZN App - Starting initialization');
+console.log('FINZN App - Starting initialization');
 
 class FinznApp {
   constructor() {
-    console.log('🏗️ Constructing FINZN App');
+    console.log('Constructing FINZN App');
     
     // Initialize all managers
     this.auth = new AuthManager();
@@ -1562,7 +1562,7 @@ async handleAddIncome(e) {
       this.ui.showAlert('Error al generar el informe', 'error');
     } finally {
       generateBtn.disabled = false;
-      generateBtn.innerHTML = '<span>🤖</span> Generar Informe';
+      generateBtn.innerHTML = '<i class="ph ph-robot"></i> Generar Informe';
     }
   }
   
