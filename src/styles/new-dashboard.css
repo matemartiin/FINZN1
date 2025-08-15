@@ -116,8 +116,8 @@
 }
 
 .new-balance-icon:hover i {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 8px rgba(200, 182, 255, 0.5));
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 4px rgba(200, 182, 255, 0.2));
 }
 
 .new-balance-title {
@@ -146,16 +146,16 @@
 
 @keyframes balanceShimmer {
   0%, 100% {
-    filter: drop-shadow(0 0 4px rgba(200, 182, 255, 0.2));
+    filter: drop-shadow(0 0 2px rgba(200, 182, 255, 0.1));
   }
   50% {
-    filter: drop-shadow(0 0 12px rgba(200, 182, 255, 0.4));
+    filter: drop-shadow(0 0 4px rgba(200, 182, 255, 0.15));
   }
 }
 
 .new-balance-amount:hover {
-  transform: scale(1.02);
-  filter: drop-shadow(0 0 16px rgba(200, 182, 255, 0.6));
+  transform: scale(1.01);
+  filter: drop-shadow(0 0 6px rgba(200, 182, 255, 0.25));
 }
 
 .new-installments-button {

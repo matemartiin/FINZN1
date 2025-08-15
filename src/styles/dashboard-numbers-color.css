@@ -10,7 +10,13 @@ body .new-balance-amount,
 body #balance-amount-new,
 .balance-amount,
 .balance-amount-new {
-  color: var(--primary-color, #C8B6FF) !important;
+  color: #C8B6FF !important;
+}
+
+/* Asegurar que el hover también use el color correcto */
+.new-balance-amount:hover,
+#balance-amount-new:hover {
+  color: #C8B6FF !important;
 }
 
 /* Amounts de tarjetas del dashboard */
