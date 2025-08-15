@@ -858,6 +858,67 @@ export class UIManager {
     console.log('✅ Income details updated successfully');
   }
 
+  // Update income list in transactions tab
+  updateIncomeList(extraIncomes, income) {
+    const incomeList = document.getElementById('income-list');
+    
+    if (!incomeList) return;
+    
+    console.log('💰 Updating income list in transactions tab:', {income, extraIncomes: extraIncomes.length});
+    
+    incomeList.innerHTML = '';
+    
+    let totalItems = 0;
+    if (income.fixed > 0) totalItems++;
+    totalItems += extraIncomes.length;
+    
+    if (totalItems === 0) {
+      incomeList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon"><i class="ph ph-money"></i></div>
+          <h3>No hay ingresos este mes</h3>
+          <p>Los ingresos que agregues aparecerán aquí</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Add fixed income if exists
+    if (income.fixed > 0) {
+      const fixedItem = document.createElement('div');
+      fixedItem.className = 'income-list-item fixed';
+      
+      fixedItem.innerHTML = `
+        <div class="income-item-details">
+          <div class="income-item-type">💰 Ingreso Fijo</div>
+          <div class="income-item-description">Sueldo mensual</div>
+        </div>
+        <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
+      `;
+      
+      incomeList.appendChild(fixedItem);
+    }
+    
+    // Add extra incomes
+    extraIncomes.forEach(extraIncome => {
+      const item = document.createElement('div');
+      item.className = 'income-list-item extra';
+      
+      item.innerHTML = `
+        <div class="income-item-details">
+          <div class="income-item-type">💵 ${extraIncome.category}</div>
+          <div class="income-item-description">${extraIncome.description}</div>
+          <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
+        </div>
+        <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
+      `;
+      
+      incomeList.appendChild(item);
+    });
+    
+    console.log('✅ Income list updated successfully');
+  }
+
   // NUEVO: Update installments list
   updateInstallmentsList(expenses) {
     const installmentsList = document.getElementById('installments-list');

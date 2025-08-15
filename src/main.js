@@ -671,6 +671,9 @@ setupDashboardEvents() {
       // Update income details (this will show the indicator and total)
       this.ui.updateIncomeDetails(income, extraIncomes);
       
+      // Update income list in transactions tab
+      this.ui.updateIncomeList(extraIncomes, income);
+      
       // Update installments list
       this.ui.updateInstallmentsList(expenses);
       
