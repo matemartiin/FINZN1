@@ -1,0 +1,96 @@
+/* ========================================
+   FINZN Dashboard - Números con color de marca
+   Aplicar color #C8B6FF (lavanda) a todos los números del dashboard
+   ======================================== */
+
+/* Balance principal */
+.balance-amount,
+.balance-amount-new,
+.new-balance-amount,
+#balance-amount-new {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Amounts de tarjetas del dashboard */
+.card-amount,
+.summary-card .card-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Income y expenses amounts */
+#income-summary,
+#monthly-expenses-summary,
+.income-item-amount,
+.extra-income-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Item amounts en general */
+.item-amount,
+.new-item-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Goal amounts */
+.goal-amount,
+.goal-current-amount,
+.goal-target-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Budget amounts */
+.budget-amount,
+.budget-limit-amount,
+.budget-spent-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Expense amounts */
+.expense-amount,
+.installment-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Overrides para asegurar que se apliquen */
+html body .unified-balance-card .item-amount#income-summary,
+html body .unified-balance-card .item-amount#monthly-expenses-summary,
+html body .unified-balance-card span#income-summary,
+html body .unified-balance-card span#monthly-expenses-summary,
+html body #income-summary.item-amount,
+html body #monthly-expenses-summary.item-amount {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Para el skin PRO también */
+body[data-skin="pro"] .card-amount,
+body[data-skin="pro"] .summary-card .card-amount,
+body[data-skin="pro"] .balance-amount,
+body[data-skin="pro"] .balance-amount-new {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Amounts específicos en las tarjetas */
+.summary-card #balance-amount-new,
+.summary-card #income-summary,
+.summary-card #monthly-expenses-summary {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Responsive - mantener el color en todos los tamaños */
+@media (max-width: 768px) {
+  .balance-amount,
+  .balance-amount-new,
+  .card-amount,
+  .item-amount {
+    color: var(--primary-color, #C8B6FF) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .balance-amount,
+  .balance-amount-new,
+  .card-amount,
+  .item-amount {
+    color: var(--primary-color, #C8B6FF) !important;
+  }
+}
