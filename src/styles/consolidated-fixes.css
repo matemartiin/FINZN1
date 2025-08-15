@@ -383,3 +383,40 @@ body[data-skin="pro"] .card-amount,
 body[data-skin="pro"] .item-amount {
   color: #C8B6FF !important;
 }
+
+/* ========= ESPACIADO REDUCIDO - SUBIR CONTENIDO ========= */
+/* Reducir padding del main-dashboard para subir todo el contenido */
+.main-dashboard {
+  padding-top: 12px !important;
+}
+
+/* Reducir margin del breadcrumb para acercar más al header */
+.breadcrumb-nav {
+  margin-bottom: 8px !important;
+}
+
+/* Reducir espacio superior de las secciones del dashboard */
+.dashboard-section {
+  padding-top: 0 !important;
+}
+
+/* Responsive - ajustes para móvil */
+@media (max-width: 768px) {
+  .main-dashboard {
+    padding-top: 8px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .breadcrumb-nav {
+    margin-bottom: 6px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-dashboard {
+    padding-top: 6px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}

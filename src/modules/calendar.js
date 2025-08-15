@@ -325,7 +325,7 @@ export class CalendarManager {
       console.log('📅 DEBUG: Modal classes:', modal.className);
     }
     
-    const dateInput = document.querySelector('#add-event-modal [name="date"]');
+    const dateInput = document.getElementById('add-event-date');
     console.log('📅 DEBUG: Date input found:', !!dateInput);
     
     if (date && dateInput) {
@@ -345,6 +345,7 @@ export class CalendarManager {
 
   async handleAddEvent(e) {
     e.preventDefault();
+    console.log('📅 DEBUG: handleAddEvent called');
     
     const formData = new FormData(e.target);
     const eventData = {
@@ -359,8 +360,21 @@ export class CalendarManager {
       notification: formData.get('notification') === 'on'
     };
 
+    console.log('📅 DEBUG: Event data to create:', eventData);
+
+    // Validation
+    if (!eventData.title || !eventData.type || !eventData.date) {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Por favor completa todos los campos requeridos', 'error');
+      }
+      return;
+    }
+
     try {
       await this.addEvent(eventData);
+      
+      // Clear the form
+      e.target.reset();
       
       if (window.app && window.app.modals) {
         window.app.modals.hide('add-event-modal');
@@ -376,18 +390,24 @@ export class CalendarManager {
     } catch (error) {
       console.error('Error adding event:', error);
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al agregar el evento', 'error');
+        window.app.ui.showAlert('Error al agregar el evento: ' + (error.message || 'Error desconocido'), 'error');
       }
     }
   }
 
   async addEvent(eventData) {
+    console.log('📅 DEBUG: addEvent called with:', eventData);
+    
     const userId = this.getCurrentUserId();
+    console.log('📅 DEBUG: Current user ID:', userId);
+    
     if (!userId) {
+      const error = new Error('Usuario no autenticado');
+      console.error('📅 ERROR: No authenticated user');
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Usuario no autenticado', 'error');
       }
-      throw new Error('Usuario no autenticado');
+      throw error;
     }
 
     try {
@@ -399,35 +419,45 @@ export class CalendarManager {
         time: eventData.time,
         amount: eventData.amount,
         description: eventData.description,
-        recurring: eventData.recurring,
+        recurring: eventData.recurring || false,
         frequency: eventData.frequency
       };
 
+      console.log('📅 DEBUG: Calling calendarService.createEvent with:', event);
+      
       const { data, error } = await calendarService.createEvent(event);
       
+      console.log('📅 DEBUG: calendarService.createEvent response:', { data, error });
+      
       if (error) {
-        console.error('Error creating calendar event:', error);
+        console.error('📅 ERROR: Creating calendar event:', error);
+        const errorMessage = error.message || 'Error desconocido al crear el evento';
         if (window.app && window.app.ui) {
-          window.app.ui.showAlert('Error al crear el evento', 'error');
+          window.app.ui.showAlert('Error al crear el evento: ' + errorMessage, 'error');
         }
-        throw error;
+        throw new Error(errorMessage);
+      }
+
+      if (!data) {
+        console.error('📅 ERROR: No data returned from createEvent');
+        throw new Error('No se pudo crear el evento - sin datos de respuesta');
       }
 
       // Add to local events array
       this.events.unshift(data);
+      console.log('📅 DEBUG: Event added to local array. Total events:', this.events.length);
       
       // If recurring, create additional events
       if (data.recurring && data.frequency) {
+        console.log('📅 DEBUG: Creating recurring events...');
         await this.createRecurringEventsInDB(data);
       }
 
       return data;
     } catch (error) {
-      console.error('Error in addEvent:', error);
-      if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al agregar el evento', 'error');
-      }
-      throw error;
+      console.error('📅 ERROR: Exception in addEvent:', error);
+      const errorMessage = error.message || 'Error desconocido';
+      throw new Error(errorMessage);
     }
   }
 
@@ -705,9 +735,6 @@ export class CalendarManager {
     }
   }
 
-  async deleteEvent(eventId) {
-    this.events = this.events.filter(e => e.id !== eventId);
-  }
 
   async loadEvents() {
     const userId = this.getCurrentUserId();
@@ -800,7 +827,18 @@ export class CalendarManager {
 
   // Utility methods
   getCurrentUserId() {
-    return window.app?.auth?.getCurrentUserId() || null;
+    console.log('📅 DEBUG: Getting current user ID...');
+    console.log('📅 DEBUG: window.app exists:', !!window.app);
+    console.log('📅 DEBUG: window.app.auth exists:', !!(window.app && window.app.auth));
+    
+    if (!window.app || !window.app.auth) {
+      console.error('📅 ERROR: window.app.auth not available');
+      return null;
+    }
+    
+    const userId = window.app.auth.getCurrentUserId();
+    console.log('📅 DEBUG: Retrieved user ID:', userId);
+    return userId;
   }
 
   generateId() {
