@@ -161,15 +161,9 @@ export class UIManager {
       balanceEl.textContent = this.formatCurrency(balance.available);
       console.log('💰 Balance amount updated:', balance.available);
       
-      // Color changes only for legacy card (unified and new cards use fixed color)
+      // Use FINZN brand color for all balance numbers
       if (balanceAmount) {
-        if (balance.available < 0) {
-          balanceAmount.style.color = '#ef4444';
-        } else if (balance.available < 1000) {
-          balanceAmount.style.color = '#f59e0b';
-        } else {
-          balanceAmount.style.color = '#C8B6FF';
-        }
+        balanceAmount.style.color = '#C8B6FF';
       }
     }
     
@@ -177,9 +171,9 @@ export class UIManager {
     const expensesEl = monthlyExpenses || unifiedExpensesAmount;
     if (expensesEl) {
       expensesEl.textContent = this.formatCurrency(balance.totalExpenses);
-      // Ensure unified card expense amounts use same color as balance
+      // Use FINZN brand color for all expense amounts
       if (unifiedExpensesAmount) {
-        expensesEl.style.setProperty('color', '#374151', 'important');
+        expensesEl.style.setProperty('color', '#C8B6FF', 'important');
         expensesEl.setAttribute('data-color-forced', 'true');
       }
       console.log('💳 Monthly expenses updated:', balance.totalExpenses);
@@ -189,9 +183,9 @@ export class UIManager {
     const incomeEl = incomeAmount || unifiedIncomeAmount;
     if (incomeEl) {
       incomeEl.textContent = this.formatCurrency(balance.totalIncome);
-      // Ensure unified card income amounts use same color as balance
+      // Use FINZN brand color for all income amounts
       if (unifiedIncomeAmount) {
-        incomeEl.style.setProperty('color', '#374151', 'important');
+        incomeEl.style.setProperty('color', '#C8B6FF', 'important');
         incomeEl.setAttribute('data-color-forced', 'true');
       }
       console.log('💵 Income amount updated:', balance.totalIncome);
