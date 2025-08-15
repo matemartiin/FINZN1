@@ -3,11 +3,13 @@
    Aplicar color #C8B6FF (lavanda) a todos los números del dashboard
    ======================================== */
 
-/* Balance principal */
+/* Balance principal - máxima especificidad */
+html body .new-balance-amount,
+html body #balance-amount-new,
+body .new-balance-amount,
+body #balance-amount-new,
 .balance-amount,
-.balance-amount-new,
-.new-balance-amount,
-#balance-amount-new {
+.balance-amount-new {
   color: var(--primary-color, #C8B6FF) !important;
 }
 
@@ -25,7 +27,13 @@
   color: var(--primary-color, #C8B6FF) !important;
 }
 
-/* Item amounts en general */
+/* Item amounts en general - máxima especificidad */
+html body .new-item-amount,
+html body #income-summary,
+html body #monthly-expenses-summary,
+body .new-item-amount,
+body #income-summary,
+body #monthly-expenses-summary,
 .item-amount,
 .new-item-amount {
   color: var(--primary-color, #C8B6FF) !important;
@@ -93,4 +101,22 @@ body[data-skin="pro"] .balance-amount-new {
   .item-amount {
     color: var(--primary-color, #C8B6FF) !important;
   }
+}
+
+/* REGLA FINAL - FUERZA MÁXIMA PARA SOBRESCRIBIR TODO */
+html body div .new-balance-amount,
+html body span.new-item-amount,
+html body span#income-summary,
+html body span#monthly-expenses-summary,
+html body div#balance-amount-new {
+  color: #C8B6FF !important;
+}
+
+/* PARA CUALQUIER CASO QUE SE ESCAPE */
+[id="balance-amount-new"],
+[id="income-summary"], 
+[id="monthly-expenses-summary"],
+[class*="balance-amount"],
+[class*="item-amount"] {
+  color: #C8B6FF !important;
 }

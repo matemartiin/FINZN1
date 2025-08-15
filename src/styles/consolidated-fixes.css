@@ -356,3 +356,30 @@ body[data-skin="pro"] * .btn-primary {
 #card-upcoming .upcoming-item:last-child {
   border-bottom: none;
 }
+
+/* ========= NÚMEROS DASHBOARD - COLOR FINZN ========= */
+/* OVERRIDE FINAL PARA ASEGURAR COLOR LAVANDA EN NÚMEROS */
+html body .new-balance-amount,
+html body .new-item-amount,
+html body #balance-amount-new,
+html body #income-summary,
+html body #monthly-expenses-summary,
+.balance-amount,
+.balance-amount-new,
+.card-amount,
+.item-amount {
+  color: #C8B6FF !important;
+}
+
+/* SKIN PRO OVERRIDE */
+body[data-skin="pro"] .new-balance-amount,
+body[data-skin="pro"] .new-item-amount,
+body[data-skin="pro"] #balance-amount-new,
+body[data-skin="pro"] #income-summary,
+body[data-skin="pro"] #monthly-expenses-summary,
+body[data-skin="pro"] .balance-amount,
+body[data-skin="pro"] .balance-amount-new,
+body[data-skin="pro"] .card-amount,
+body[data-skin="pro"] .item-amount {
+  color: #C8B6FF !important;
+}
