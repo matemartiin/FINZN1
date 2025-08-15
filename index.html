@@ -1403,6 +1403,32 @@
     </div>
   </div>
 
+  <!-- Day Events Modal -->
+  <div id="day-events-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="day-events-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="day-events-title">Eventos del Día</h2>
+        <button type="button" class="modal-close" aria-label="Cerrar">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div id="day-events-date" class="day-events-date"></div>
+        <div id="day-events-list" class="day-events-list">
+          <!-- Events for the day will be populated here -->
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" id="add-event-for-day" class="btn btn-primary">
+          <i class="ph ph-plus"></i> Agregar Evento
+        </button>
+        <button type="button" class="modal-cancel btn btn-secondary">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Budget Modal -->
   <div id="add-budget-modal" class="modal">
     <div class="modal-content">

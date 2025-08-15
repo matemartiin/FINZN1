@@ -6862,3 +6862,136 @@ body[data-skin="pro"] .chart-container-new{
 /* Resguardo de visibilidad de secciones (por si un CSS viejo pisa reglas) */
 .dashboard-section{ display:none; }
 .dashboard-section.active{ display:block; }
+
+/* Day Events Modal Styles */
+.day-events-date {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--lavanda) 10%, var(--azul-pastel) 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.day-events-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.day-event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.day-event-item:hover {
+  background: var(--bg-primary);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.day-event-item.payment {
+  border-left: 4px solid #FF6B6B;
+}
+
+.day-event-item.income {
+  border-left: 4px solid #4ECDC4;
+}
+
+.day-event-item.card-close {
+  border-left: 4px solid #45B7D1;
+}
+
+.day-event-item.reminder {
+  border-left: 4px solid #FFA726;
+}
+
+.day-event-item.deadline {
+  border-left: 4px solid #EF5350;
+}
+
+.day-event-details {
+  flex: 1;
+}
+
+.day-event-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.day-event-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.day-event-type {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.day-event-amount {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.day-event-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.day-event-actions .btn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.8rem;
+  min-width: auto;
+}
+
+.day-events-empty {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-muted);
+}
+
+.day-events-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .day-event-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .day-event-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .day-event-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+}

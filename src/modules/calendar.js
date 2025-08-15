@@ -54,6 +54,12 @@ export class CalendarManager {
       console.log('📅 DEBUG: Add event button listener attached');
     }
 
+    // Add event for specific day button (from day events modal)
+    const addEventForDayBtn = document.getElementById('add-event-for-day');
+    if (addEventForDayBtn) {
+      addEventForDayBtn.addEventListener('click', () => this.showAddEventModalForSelectedDate());
+    }
+
     // Google Calendar sync button
     const syncBtn = document.getElementById('sync-google-calendar-btn');
     if (syncBtn) {
@@ -202,11 +208,18 @@ export class CalendarManager {
       cell.appendChild(eventsContainer);
     }
 
-    // Click handler for adding events
+    // Click handler for viewing/adding events
     cell.addEventListener('click', () => {
       console.log('📅 DEBUG: Calendar cell clicked, date:', date);
       this.selectedDate = date;
-      this.showAddEventModal(date);
+      
+      if (dayEvents.length > 0) {
+        // If there are events for this day, show the day events modal
+        this.showDayEventsModal(date, dayEvents);
+      } else {
+        // If no events, directly show add event modal
+        this.showAddEventModal(date);
+      }
     });
 
     return cell;
@@ -883,5 +896,143 @@ export class CalendarManager {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
+  }
+
+  // Day Events Modal Methods
+  showDayEventsModal(date, events) {
+    console.log('📅 DEBUG: showDayEventsModal called', { date, events });
+    
+    const modal = document.getElementById('day-events-modal');
+    const dateElement = document.getElementById('day-events-date');
+    const listElement = document.getElementById('day-events-list');
+    
+    if (!modal || !dateElement || !listElement) {
+      console.error('📅 ERROR: Day events modal elements not found');
+      return;
+    }
+
+    // Format and display the date
+    const dateStr = date.toLocaleDateString('es-ES', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    dateElement.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+    // Populate events list
+    this.populateDayEventsList(listElement, events);
+
+    // Show the modal
+    if (window.app && window.app.modals) {
+      window.app.modals.show('day-events-modal');
+    }
+  }
+
+  populateDayEventsList(container, events) {
+    container.innerHTML = '';
+
+    if (events.length === 0) {
+      container.innerHTML = `
+        <div class="day-events-empty">
+          <div class="empty-icon">📅</div>
+          <h3>No hay eventos para este día</h3>
+          <p>Haz clic en "Agregar Evento" para crear uno nuevo</p>
+        </div>
+      `;
+      return;
+    }
+
+    events.forEach(event => {
+      const eventElement = document.createElement('div');
+      eventElement.className = `day-event-item ${event.type}`;
+      
+      eventElement.innerHTML = `
+        <div class="day-event-details">
+          <div class="day-event-title">${this.escapeHtml(event.title)}</div>
+          <div class="day-event-meta">
+            <span class="day-event-type">
+              ${this.getEventTypeIcon(event.type)} ${this.getEventTypeName(event.type)}
+            </span>
+            ${event.time ? `<span>🕐 ${event.time}</span>` : ''}
+            ${event.amount ? `<span class="day-event-amount">${this.formatCurrency(event.amount)}</span>` : ''}
+          </div>
+          ${event.description ? `<div class="day-event-description">${this.escapeHtml(event.description)}</div>` : ''}
+        </div>
+        <div class="day-event-actions">
+          <button class="btn btn-sm btn-secondary" onclick="window.app.calendar.showEventDetails('${event.id}')">
+            <i class="ph ph-eye"></i> Ver
+          </button>
+          <button class="btn btn-sm btn-primary" onclick="window.app.calendar.editEvent('${event.id}')">
+            <i class="ph ph-pencil"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="window.app.calendar.confirmDeleteEvent('${event.id}')">
+            <i class="ph ph-trash"></i>
+          </button>
+        </div>
+      `;
+
+      container.appendChild(eventElement);
+    });
+  }
+
+  showAddEventModalForSelectedDate() {
+    console.log('📅 DEBUG: showAddEventModalForSelectedDate called');
+    
+    // Hide the day events modal first
+    if (window.app && window.app.modals) {
+      window.app.modals.hide('day-events-modal');
+    }
+    
+    // Show add event modal with selected date
+    setTimeout(() => {
+      this.showAddEventModal(this.selectedDate);
+    }, 100);
+  }
+
+  confirmDeleteEvent(eventId) {
+    if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
+      this.deleteEventFromDay(eventId);
+    }
+  }
+
+  async deleteEventFromDay(eventId) {
+    try {
+      await this.deleteEvent(eventId);
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Evento eliminado exitosamente', 'success');
+      }
+      
+      // Refresh the calendar and day events modal
+      this.renderCalendar();
+      this.updateUpcomingEventsCount();
+      
+      // Refresh the day events modal if it's open
+      const modal = document.getElementById('day-events-modal');
+      if (modal && !modal.classList.contains('hidden')) {
+        const updatedEvents = this.getEventsForDate(this.selectedDate);
+        const listElement = document.getElementById('day-events-list');
+        this.populateDayEventsList(listElement, updatedEvents);
+        
+        // If no more events, close the modal
+        if (updatedEvents.length === 0) {
+          window.app.modals.hide('day-events-modal');
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al eliminar el evento', 'error');
+      }
+    }
+  }
+
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }
