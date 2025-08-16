@@ -12,6 +12,7 @@ import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
+import { AnimationManager } from './modules/animations.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
 
 
@@ -36,6 +37,7 @@ class FinznApp {
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
+    this.animations = new AnimationManager();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -59,6 +61,9 @@ class FinznApp {
 
       // 🔧 Agregar esta línea:
 this.setupModalEvents();
+      
+      // Initialize animations (before other UI elements)
+      this.animations.init();
       
       // Initialize chat
       this.chat.init();
@@ -779,6 +784,13 @@ try {
   console.log('Widgets skipped:', wErr);
 }
 
+      
+            // Trigger animations for updated content
+      if (this.animations) {
+        setTimeout(() => {
+          this.animations.refreshAnimations();
+        }, 100);
+      }
       
       console.log('✅ Dashboard updated successfully');
       

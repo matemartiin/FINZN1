@@ -208,28 +208,41 @@ export class NavigationManager {
     });
   }
 
-  showSection(sectionName) {
-    // Hide all sections
-    const sections = document.querySelectorAll('.dashboard-section');
-    sections.forEach(section => {
-      section.classList.remove('active');
-    });
-
-    // Show selected section
+  async showSection(sectionName) {
+    const currentActiveSection = document.querySelector('.dashboard-section.active');
     const targetSection = document.getElementById(`${sectionName}-section`);
-    if (targetSection) {
+    
+    if (!targetSection) return;
+    
+    // Animate section transition if animation manager is available
+    if (window.app && window.app.animations && currentActiveSection !== targetSection) {
+      await window.app.animations.animatePageTransition(currentActiveSection, targetSection);
+    } else {
+      // Fallback to instant transition
+      const sections = document.querySelectorAll('.dashboard-section');
+      sections.forEach(section => {
+        section.classList.remove('active');
+      });
       targetSection.classList.add('active');
-      this.currentSection = sectionName;
-      
-      // Update page title
-      this.updatePageTitle(sectionName);
-      
-      // Update contextual bar visibility
-      if (window.app && window.app.contextualBar) {
-        setTimeout(() => {
-          window.app.contextualBar.updateVisibility(sectionName);
-        }, 100);
-      }
+    }
+    
+    this.currentSection = sectionName;
+    
+    // Update page title
+    this.updatePageTitle(sectionName);
+    
+    // Trigger animation refresh for new section content
+    if (window.app && window.app.animations) {
+      setTimeout(() => {
+        window.app.animations.refreshAnimations();
+      }, 400);
+    }
+    
+    // Update contextual bar visibility
+    if (window.app && window.app.contextualBar) {
+      setTimeout(() => {
+        window.app.contextualBar.updateVisibility(sectionName);
+      }, 100);
     }
   }
   

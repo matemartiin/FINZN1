@@ -135,12 +135,16 @@ export class CalendarManager {
     container.innerHTML = '';
     container.className = 'calendar-grid month-view';
 
-    // Add day headers
+    // Add day headers with animation
     const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    dayHeaders.forEach(day => {
+    dayHeaders.forEach((day, index) => {
       const dayHeader = document.createElement('div');
       dayHeader.className = 'calendar-day-header';
       dayHeader.textContent = day;
+      dayHeader.style.setProperty('--animation-delay', index);
+      dayHeader.style.opacity = '0';
+      dayHeader.style.animation = `slideInFromLeft 0.3s ease-out forwards`;
+      dayHeader.style.animationDelay = `${index * 0.05}s`;
       container.appendChild(dayHeader);
     });
 
@@ -150,17 +154,22 @@ export class CalendarManager {
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-    // Render 42 days (6 weeks)
+    // Render 42 days (6 weeks) with staggered animation
     for (let i = 0; i < 42; i++) {
       const cellDate = new Date(startDate);
       cellDate.setDate(startDate.getDate() + i);
       
-      const dayCell = this.createDayCell(cellDate);
+      const dayCell = this.createDayCell(cellDate, i);
       container.appendChild(dayCell);
     }
+
+    // Trigger container animation
+    setTimeout(() => {
+      container.style.opacity = '1';
+    }, 50);
   }
 
-  createDayCell(date) {
+  createDayCell(date, index = 0) {
     const cell = document.createElement('div');
     cell.className = 'calendar-day';
     
@@ -176,24 +185,28 @@ export class CalendarManager {
       cell.classList.add('today');
     }
 
-    // Day number
+    // Add animation properties
+    cell.style.setProperty('--animation-delay', index);
+    
+    // Day number with animation
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-number';
     dayNumber.textContent = date.getDate();
     cell.appendChild(dayNumber);
 
-    // Events
+    // Events with staggered animation
     if (dayEvents.length > 0) {
       const eventsContainer = document.createElement('div');
       eventsContainer.className = 'day-events';
       
-      dayEvents.slice(0, 3).forEach(event => {
+      dayEvents.slice(0, 3).forEach((event, eventIndex) => {
         const eventElement = document.createElement('div');
         eventElement.className = `day-event ${event.type}`;
         eventElement.textContent = event.title;
+        eventElement.style.setProperty('--event-delay', eventIndex);
         eventElement.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.showEventDetails(event);
+          this.showEventDetails(event.id);
         });
         eventsContainer.appendChild(eventElement);
       });
@@ -202,6 +215,8 @@ export class CalendarManager {
         const moreEvents = document.createElement('div');
         moreEvents.className = 'more-events';
         moreEvents.textContent = `+${dayEvents.length - 3} más`;
+        moreEvents.style.setProperty('--event-delay', 3);
+        moreEvents.classList.add('day-event');
         eventsContainer.appendChild(moreEvents);
       }
 
@@ -212,6 +227,12 @@ export class CalendarManager {
     cell.addEventListener('click', () => {
       console.log('📅 DEBUG: Calendar cell clicked, date:', date);
       this.selectedDate = date;
+      
+      // Add click animation
+      cell.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        cell.style.transform = '';
+      }, 150);
       
       if (dayEvents.length > 0) {
         // If there are events for this day, show the day events modal
@@ -318,14 +339,20 @@ export class CalendarManager {
 
   previousMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-    this.renderCalendar();
-    this.loadEvents(); // Reload events for new month
+    this.animateCalendarRefresh();
+    setTimeout(() => {
+      this.renderCalendar();
+      this.loadEvents(); // Reload events for new month
+    }, 150);
   }
 
   nextMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-    this.renderCalendar();
-    this.loadEvents(); // Reload events for new month
+    this.animateCalendarRefresh();
+    setTimeout(() => {
+      this.renderCalendar();
+      this.loadEvents(); // Reload events for new month
+    }, 150);
   }
 
   showAddEventModal(date = null) {
@@ -843,8 +870,19 @@ export class CalendarManager {
       return eventDate >= today && eventDate <= nextWeek;
     });
 
-    badge.textContent = upcomingEvents.length;
-    badge.style.display = upcomingEvents.length > 0 ? 'flex' : 'none';
+    // Animate the count change
+    const oldCount = parseInt(badge.textContent) || 0;
+    const newCount = upcomingEvents.length;
+    
+    if (oldCount !== newCount) {
+      badge.classList.add('updated');
+      setTimeout(() => {
+        badge.classList.remove('updated');
+      }, 500);
+    }
+
+    badge.textContent = newCount;
+    badge.style.display = newCount > 0 ? 'flex' : 'none';
   }
 
   getEventsForDate(date) {
@@ -975,9 +1013,12 @@ export class CalendarManager {
       return;
     }
 
-    events.forEach(event => {
+    events.forEach((event, index) => {
       const eventElement = document.createElement('div');
       eventElement.className = `day-event-item ${event.type}`;
+      
+      // Add staggered animation
+      eventElement.style.setProperty('--item-delay', index);
       
       eventElement.innerHTML = `
         <div class="day-event-details">
@@ -1006,7 +1047,7 @@ export class CalendarManager {
 
       container.appendChild(eventElement);
       
-      // Add event listeners to the buttons
+      // Add event listeners to the buttons with micro-animations
       const viewBtn = eventElement.querySelector('.view-event-btn');
       const editBtn = eventElement.querySelector('.edit-event-btn');
       const deleteBtn = eventElement.querySelector('.delete-event-btn');
@@ -1014,6 +1055,7 @@ export class CalendarManager {
       if (viewBtn) {
         viewBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          this.animateButtonClick(viewBtn);
           console.log('📅 DEBUG: View button clicked for event:', event.id);
           this.showEventDetails(event.id);
         });
@@ -1022,6 +1064,7 @@ export class CalendarManager {
       if (editBtn) {
         editBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          this.animateButtonClick(editBtn);
           console.log('📅 DEBUG: Edit button clicked for event:', event.id);
           // Hide day events modal first
           if (window.app && window.app.modals) {
@@ -1036,6 +1079,7 @@ export class CalendarManager {
       if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          this.animateButtonClick(deleteBtn);
           console.log('📅 DEBUG: Delete button clicked for event:', event.id);
           this.confirmDeleteEvent(event.id);
         });
@@ -1101,5 +1145,50 @@ export class CalendarManager {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Animation helper methods
+  animateButtonClick(button) {
+    button.style.transform = 'scale(0.95)';
+    button.style.transition = 'transform 0.1s ease';
+    setTimeout(() => {
+      button.style.transform = '';
+    }, 100);
+  }
+
+  animateElementEntrance(element, animationType = 'fadeInUp', delay = 0) {
+    element.style.opacity = '0';
+    element.style.animation = `${animationType} 0.5s ease-out forwards`;
+    element.style.animationDelay = `${delay}s`;
+  }
+
+  animateCalendarRefresh() {
+    const calendarGrid = document.getElementById('calendar-grid');
+    if (calendarGrid) {
+      calendarGrid.style.opacity = '0';
+      calendarGrid.style.transform = 'translateY(10px)';
+      calendarGrid.style.transition = 'all 0.3s ease';
+      
+      setTimeout(() => {
+        calendarGrid.style.opacity = '1';
+        calendarGrid.style.transform = 'translateY(0)';
+      }, 50);
+    }
+  }
+
+  // Enhanced render method with loading animation
+  renderCalendarWithAnimation() {
+    const calendarGrid = document.getElementById('calendar-grid');
+    if (calendarGrid) {
+      calendarGrid.classList.add('calendar-loading');
+    }
+    
+    this.renderCalendar();
+    
+    setTimeout(() => {
+      if (calendarGrid) {
+        calendarGrid.classList.remove('calendar-loading');
+      }
+    }, 300);
   }
 }

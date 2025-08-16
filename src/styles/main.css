@@ -6995,3 +6995,847 @@ body[data-skin="pro"] .chart-container-new{
     gap: var(--spacing-xs);
   }
 }
+
+/* Calendar Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(200, 182, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(200, 182, 255, 0.6), 0 0 30px rgba(167, 199, 231, 0.4);
+  }
+}
+
+/* Calendar Grid Animations */
+.calendar-grid {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.calendar-day {
+  opacity: 0;
+  animation: fadeInScale 0.4s ease-out forwards;
+  animation-delay: calc(var(--animation-delay, 0) * 0.02s);
+}
+
+.calendar-day.today {
+  animation: bounceIn 0.6s ease-out forwards;
+  animation-delay: calc(var(--animation-delay, 0) * 0.02s);
+}
+
+.calendar-day:hover {
+  animation: pulseGlow 0.3s ease-in-out;
+}
+
+/* Calendar Navigation Animations */
+.calendar-header {
+  opacity: 0;
+  animation: slideInFromLeft 0.5s ease-out forwards;
+}
+
+.calendar-controls {
+  opacity: 0;
+  animation: slideInFromRight 0.5s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+/* Day Events Animations */
+.day-event {
+  opacity: 0;
+  animation: fadeInUp 0.3s ease-out forwards;
+  animation-delay: calc(var(--event-delay, 0) * 0.1s);
+}
+
+.day-event-item {
+  opacity: 0;
+  animation: slideInFromLeft 0.4s ease-out forwards;
+  animation-delay: calc(var(--item-delay, 0) * 0.1s);
+}
+
+.day-event-item:hover {
+  animation: none; /* Let CSS handle the hover effect */
+}
+
+/* Modal Animations Enhancement */
+.modal .modal-content {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.9);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal.active .modal-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Day Events Modal Specific Animations */
+.day-events-date {
+  opacity: 0;
+  animation: bounceIn 0.6s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.day-events-list {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+/* Calendar Navigation Button Animations */
+.calendar-nav-btn, .view-btn, #add-event-btn {
+  transition: all 0.2s ease;
+}
+
+.calendar-nav-btn:hover, .view-btn:hover, #add-event-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.calendar-nav-btn:active, .view-btn:active, #add-event-btn:active {
+  transform: translateY(0);
+}
+
+/* Event Type Icons Animation */
+.day-event-type {
+  transition: transform 0.2s ease;
+}
+
+.day-event-item:hover .day-event-type {
+  transform: scale(1.1);
+}
+
+/* Loading Animation for Calendar */
+.calendar-loading {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Stagger Animation Classes */
+.animate-stagger-1 { animation-delay: 0.1s; }
+.animate-stagger-2 { animation-delay: 0.2s; }
+.animate-stagger-3 { animation-delay: 0.3s; }
+.animate-stagger-4 { animation-delay: 0.4s; }
+.animate-stagger-5 { animation-delay: 0.5s; }
+
+/* Agenda View Animations */
+.agenda-event {
+  opacity: 0;
+  animation: slideInFromLeft 0.5s ease-out forwards;
+  animation-delay: calc(var(--agenda-delay, 0) * 0.1s);
+}
+
+/* Button Action Animations */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: width 0.3s ease, height 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Calendar Events Counter Animation */
+#upcoming-events {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#upcoming-events.updated {
+  animation: bounceIn 0.5s ease-out;
+}
+
+/* ========== COMPREHENSIVE ANIMATION SYSTEM ========== */
+
+/* Additional Keyframes */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes flipIn {
+  from {
+    opacity: 0;
+    transform: perspective(400px) rotateY(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(400px) rotateY(0deg);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes elastic {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--primary-color);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--primary-light);
+  }
+}
+
+/* ========== DASHBOARD CARDS ANIMATIONS ========== */
+.card, .dashboard-card, .metric-card, .summary-card {
+  opacity: 0;
+  animation: slideUpFade 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: calc(var(--card-delay, 0) * 0.1s);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover, .dashboard-card:hover, .metric-card:hover, .summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Number counter animation */
+.metric-number, .balance-amount, .total-amount {
+  opacity: 0;
+  animation: zoomIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  animation-delay: calc(var(--number-delay, 0) * 0.1s + 0.3s);
+}
+
+/* Progress bars and charts */
+.progress-bar, .chart-container {
+  opacity: 0;
+  animation: fadeInScale 0.8s ease-out forwards;
+  animation-delay: calc(var(--chart-delay, 0) * 0.1s + 0.5s);
+}
+
+/* ========== NAVIGATION ANIMATIONS ========== */
+.sidebar {
+  opacity: 0;
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.nav-item, .sidebar-item {
+  opacity: 0;
+  animation: slideInFromLeft 0.4s ease-out forwards;
+  animation-delay: calc(var(--nav-delay, 0) * 0.05s + 0.2s);
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover, .sidebar-item:hover {
+  transform: translateX(5px);
+  background: rgba(200, 182, 255, 0.1);
+}
+
+.nav-item.active, .sidebar-item.active {
+  animation: pulse 0.3s ease-out;
+}
+
+/* Top navigation */
+.top-nav, .header {
+  opacity: 0;
+  animation: slideInFromTop 0.5s ease-out forwards;
+}
+
+.user-profile, .notification-bell, .search-box {
+  opacity: 0;
+  animation: fadeInScale 0.4s ease-out forwards;
+  animation-delay: calc(var(--header-delay, 0) * 0.1s + 0.3s);
+}
+
+/* ========== SECTION ANIMATIONS ========== */
+.dashboard-section {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+.dashboard-section.active {
+  animation: slideUpFade 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.section-header, .section-title {
+  opacity: 0;
+  animation: slideInFromLeft 0.5s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.section-content {
+  opacity: 0;
+  animation: slideUpFade 0.6s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+/* ========== FORM ANIMATIONS ========== */
+.form-group, .input-group {
+  opacity: 0;
+  animation: slideUpFade 0.4s ease-out forwards;
+  animation-delay: calc(var(--form-delay, 0) * 0.1s);
+}
+
+.form-control, .input-field, input, select, textarea {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.form-control:focus, .input-field:focus, input:focus, select:focus, textarea:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 3px rgba(200, 182, 255, 0.3);
+}
+
+.btn {
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Button loading animation */
+.btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ========== TABLE ANIMATIONS ========== */
+.table-row, .expense-item, .transaction-item {
+  opacity: 0;
+  animation: slideInFromLeft 0.4s ease-out forwards;
+  animation-delay: calc(var(--row-delay, 0) * 0.05s);
+  transition: all 0.2s ease;
+}
+
+.table-row:hover, .expense-item:hover, .transaction-item:hover {
+  background: rgba(200, 182, 255, 0.05);
+  transform: translateX(5px);
+}
+
+/* ========== MODAL ANIMATIONS ========== */
+.modal {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.modal.active {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal .modal-content {
+  opacity: 0;
+  transform: translateY(-50px) scale(0.8);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.modal.active .modal-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  opacity: 0;
+  animation: slideInFromTop 0.4s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+.modal-body {
+  opacity: 0;
+  animation: slideUpFade 0.4s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.modal-actions {
+  opacity: 0;
+  animation: slideUpFade 0.4s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+/* ========== CHART ANIMATIONS ========== */
+.chart-card, .chart-container {
+  opacity: 0;
+  animation: scaleIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  animation-delay: calc(var(--chart-delay, 0) * 0.1s + 0.5s);
+}
+
+.chart-title {
+  opacity: 0;
+  animation: slideInFromLeft 0.5s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+.chart-legend {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+  animation-delay: 0.6s;
+}
+
+/* ========== NOTIFICATION ANIMATIONS ========== */
+.alert, .notification, .toast {
+  opacity: 0;
+  animation: slideInFromTop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.alert.success {
+  animation: bounceIn 0.6s ease-out forwards;
+}
+
+.alert.error {
+  animation: shake 0.5s ease-out forwards;
+}
+
+/* ========== LOADING ANIMATIONS ========== */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--bg-secondary) 25%, 
+    var(--bg-primary) 50%, 
+    var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ========== UTILITY ANIMATION CLASSES ========== */
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+.animate-slide-up { animation: slideUpFade 0.5s ease-out forwards; }
+.animate-slide-left { animation: slideInFromLeft 0.5s ease-out forwards; }
+.animate-slide-right { animation: slideInFromRight 0.5s ease-out forwards; }
+.animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
+.animate-bounce-in { animation: bounceIn 0.6s ease-out forwards; }
+.animate-zoom-in { animation: zoomIn 0.5s ease-out forwards; }
+.animate-rotate-in { animation: rotateIn 0.5s ease-out forwards; }
+.animate-flip-in { animation: flipIn 0.6s ease-out forwards; }
+.animate-elastic { animation: elastic 0.8s ease-out forwards; }
+
+/* Stagger delay classes */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+.stagger-7 { animation-delay: 0.7s; }
+.stagger-8 { animation-delay: 0.8s; }
+
+/* ========== RESPONSIVE ANIMATION ADJUSTMENTS ========== */
+@media (max-width: 768px) {
+  .card, .dashboard-card, .metric-card {
+    animation-duration: 0.4s;
+  }
+  
+  .sidebar {
+    animation: slideInFromBottom 0.4s ease-out forwards;
+  }
+  
+  .modal .modal-content {
+    animation-duration: 0.3s;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== ADDITIONAL SPECIFIC ELEMENT ANIMATIONS ========== */
+
+/* Dashboard sections */
+.dashboard-section {
+  transform: translateX(100px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.dashboard-section.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Cards grid animation */
+.dashboard-grid, .cards-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.dashboard-grid > *, .cards-grid > * {
+  opacity: 0;
+  animation: slideUpFade 0.6s ease-out forwards;
+  animation-delay: calc(var(--grid-item-delay, 0) * 0.1s);
+}
+
+/* Sidebar animation */
+.sidebar {
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+}
+
+.sidebar.visible {
+  transform: translateX(0);
+}
+
+/* Header elements */
+.header-user, .header-actions {
+  opacity: 0;
+  animation: slideInFromTop 0.5s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+/* Form elements enhance */
+.form-row {
+  opacity: 0;
+  animation: slideUpFade 0.4s ease-out forwards;
+  animation-delay: calc(var(--form-row-delay, 0) * 0.1s);
+}
+
+/* Table rows */
+.data-table tbody tr {
+  opacity: 0;
+  animation: slideInFromLeft 0.4s ease-out forwards;
+  animation-delay: calc(var(--table-row-delay, 0) * 0.05s);
+}
+
+/* Widget boxes */
+.widget-box, .stat-box, .info-box {
+  opacity: 0;
+  animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  animation-delay: calc(var(--widget-delay, 0) * 0.1s);
+}
+
+/* Charts and graphs specific */
+.chart-wrapper {
+  opacity: 0;
+  animation: fadeInScale 0.8s ease-out forwards;
+  animation-delay: 0.5s;
+}
+
+/* Lists and items */
+.list-item, .expense-list-item, .goal-item {
+  opacity: 0;
+  animation: slideInFromLeft 0.4s ease-out forwards;
+  animation-delay: calc(var(--list-item-delay, 0) * 0.05s);
+}
+
+/* Floating action buttons */
+.fab, .floating-btn {
+  opacity: 0;
+  animation: bounceIn 0.6s ease-out forwards;
+  animation-delay: 1s;
+}
+
+/* Progress indicators */
+.progress-circle, .progress-bar-fill {
+  animation: expandProgress 1s ease-out forwards;
+  animation-delay: 0.8s;
+}
+
+@keyframes expandProgress {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Notification badges */
+.badge, .notification-count {
+  opacity: 0;
+  animation: pulseIn 0.4s ease-out forwards;
+  animation-delay: 0.6s;
+}
+
+@keyframes pulseIn {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Page loading state */
+.page-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  animation: pageLoadProgress 1.5s ease-in-out infinite;
+  z-index: 1000;
+}
+
+@keyframes pageLoadProgress {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced hover states */
+.interactive-element, .clickable {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.interactive-element:hover, .clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced focus states */
+.focusable:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* Staggered grid animations */
+.staggered-grid > :nth-child(1) { animation-delay: 0.1s; }
+.staggered-grid > :nth-child(2) { animation-delay: 0.2s; }
+.staggered-grid > :nth-child(3) { animation-delay: 0.3s; }
+.staggered-grid > :nth-child(4) { animation-delay: 0.4s; }
+.staggered-grid > :nth-child(5) { animation-delay: 0.5s; }
+.staggered-grid > :nth-child(6) { animation-delay: 0.6s; }
+.staggered-grid > :nth-child(7) { animation-delay: 0.7s; }
+.staggered-grid > :nth-child(8) { animation-delay: 0.8s; }
