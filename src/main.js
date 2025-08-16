@@ -1442,10 +1442,14 @@ async handleAddIncome(e) {
     }
     
     try {
+      // Generate a random color for the category
+      const colors = ['#ef4444', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#6366f1', '#ec4899', '#06b6d4', '#84cc16', '#f97316'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
       const categoryData = {
         name: formData.name,
         icon: formData.icon,
-        color: formData.color || '#B7A6FF'
+        color: formData.color || randomColor
       };
       
       await this.data.addCategory(categoryData);
