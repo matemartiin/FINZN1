@@ -598,8 +598,19 @@ export class CalendarManager {
   }
 
   showEventDetails(eventId) {
+    console.log('📅 DEBUG: showEventDetails called with ID:', eventId);
+    
     const event = this.events.find(e => e.id === eventId);
-    if (!event) return;
+    if (!event) {
+      console.error('📅 ERROR: Event not found with ID:', eventId);
+      console.log('📅 DEBUG: Available events:', this.events.map(e => ({ id: e.id, title: e.title })));
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Evento no encontrado', 'error');
+      }
+      return;
+    }
+
+    console.log('📅 DEBUG: Found event:', event);
 
     const modal = document.getElementById('event-details-modal');
     const content = document.getElementById('event-details-content');
@@ -641,14 +652,35 @@ export class CalendarManager {
     // Store event ID for editing
     if (modal) modal.dataset.eventId = eventId;
     
+    // Hide day events modal first if it's open
+    const dayEventsModal = document.getElementById('day-events-modal');
+    if (dayEventsModal && !dayEventsModal.classList.contains('hidden')) {
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('day-events-modal');
+      }
+    }
+    
+    // Show event details modal
     if (window.app && window.app.modals) {
-      window.app.modals.show('event-details-modal');
+      setTimeout(() => {
+        window.app.modals.show('event-details-modal');
+      }, 100);
     }
   }
 
   editEvent(eventId) {
+    console.log('📅 DEBUG: editEvent called with ID:', eventId);
+    
     const event = this.events.find(e => e.id === eventId);
-    if (!event) return;
+    if (!event) {
+      console.error('📅 ERROR: Event not found for editing:', eventId);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Evento no encontrado', 'error');
+      }
+      return;
+    }
+
+    console.log('📅 DEBUG: Found event for editing:', event);
 
     // Populate edit form safely
     DOMHelpers.safeSetValue('edit-event-title', event.title);
@@ -960,19 +992,54 @@ export class CalendarManager {
           ${event.description ? `<div class="day-event-description">${this.escapeHtml(event.description)}</div>` : ''}
         </div>
         <div class="day-event-actions">
-          <button class="btn btn-sm btn-secondary" onclick="window.app.calendar.showEventDetails('${event.id}')">
+          <button class="btn btn-sm btn-secondary view-event-btn" data-event-id="${event.id}">
             <i class="ph ph-eye"></i> Ver
           </button>
-          <button class="btn btn-sm btn-primary" onclick="window.app.calendar.editEvent('${event.id}')">
+          <button class="btn btn-sm btn-primary edit-event-btn" data-event-id="${event.id}">
             <i class="ph ph-pencil"></i> Editar
           </button>
-          <button class="btn btn-sm btn-danger" onclick="window.app.calendar.confirmDeleteEvent('${event.id}')">
+          <button class="btn btn-sm btn-danger delete-event-btn" data-event-id="${event.id}">
             <i class="ph ph-trash"></i>
           </button>
         </div>
       `;
 
       container.appendChild(eventElement);
+      
+      // Add event listeners to the buttons
+      const viewBtn = eventElement.querySelector('.view-event-btn');
+      const editBtn = eventElement.querySelector('.edit-event-btn');
+      const deleteBtn = eventElement.querySelector('.delete-event-btn');
+      
+      if (viewBtn) {
+        viewBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('📅 DEBUG: View button clicked for event:', event.id);
+          this.showEventDetails(event.id);
+        });
+      }
+      
+      if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('📅 DEBUG: Edit button clicked for event:', event.id);
+          // Hide day events modal first
+          if (window.app && window.app.modals) {
+            window.app.modals.hide('day-events-modal');
+          }
+          setTimeout(() => {
+            this.editEvent(event.id);
+          }, 100);
+        });
+      }
+      
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          console.log('📅 DEBUG: Delete button clicked for event:', event.id);
+          this.confirmDeleteEvent(event.id);
+        });
+      }
     });
   }
 
