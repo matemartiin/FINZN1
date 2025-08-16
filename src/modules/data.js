@@ -44,6 +44,10 @@ export class DataManager {
       
       // Load data in correct order - categories first, then everything else
       await this.loadCategories();
+      
+      // Migrate category icons from emojis to Phosphor icons if needed
+      await this.migrateCategoryIconsToPhosphor();
+      
       await this.loadSpendingLimits();
       await this.loadGoals();
       await this.loadAchievements();
@@ -115,6 +119,8 @@ export class DataManager {
       // Fallback to default categories
       console.log('🔄 Using default categories as fallback');
       this.data.categories = this.getDefaultCategories();
+      // Also migrate local categories if they have emojis
+      this.migrateLocalCategoryIcons();
     }
   }
 
@@ -141,6 +147,111 @@ export class DataManager {
       }
     } catch (error) {
       console.error('Error in createDefaultCategories:', error);
+    }
+  }
+
+  async migrateCategoryIconsToPhosphor() {
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      console.log('🔄 Migrating category icons to Phosphor...');
+      
+      // Mapping of emoji icons to Phosphor icons
+      const iconMapping = {
+        '🍔': '<i class="ph ph-fork-knife"></i>',
+        '🚗': '<i class="ph ph-car"></i>',
+        '💊': '<i class="ph ph-heart-straight"></i>',
+        '🎉': '<i class="ph ph-game-controller"></i>',
+        '🛒': '<i class="ph ph-shopping-cart"></i>',
+        '📱': '<i class="ph ph-house"></i>',
+        '📦': '<i class="ph ph-dots-three"></i>',
+        '🍽️': '<i class="ph ph-fork-knife"></i>',
+        '🏥': '<i class="ph ph-heart-straight"></i>',
+        '🎮': '<i class="ph ph-game-controller"></i>',
+        '🏠': '<i class="ph ph-house"></i>',
+        '🏦': '<i class="ph ph-bank"></i>',
+        '🔧': '<i class="ph ph-wrench"></i>'
+      };
+
+      // Get all categories for this user
+      const { data: categories, error: fetchError } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (fetchError) {
+        console.error('Error fetching categories for migration:', fetchError);
+        return;
+      }
+
+      let migratedCount = 0;
+
+      for (const category of categories) {
+        // Check if the icon is an emoji that needs migration
+        const phosphorIcon = iconMapping[category.icon];
+        
+        if (phosphorIcon) {
+          // Update the category with the Phosphor icon
+          const { error: updateError } = await supabase
+            .from('categories')
+            .update({ icon: phosphorIcon })
+            .eq('id', category.id)
+            .eq('user_id', userId);
+
+          if (updateError) {
+            console.error(`Error updating category ${category.name}:`, updateError);
+          } else {
+            console.log(`✅ Migrated ${category.name}: ${category.icon} → ${phosphorIcon}`);
+            migratedCount++;
+          }
+        }
+      }
+
+      if (migratedCount > 0) {
+        console.log(`✅ Migration completed! Updated ${migratedCount} categories.`);
+        // Reload categories to update the local data
+        await this.loadCategories();
+      } else {
+        console.log('ℹ️ No categories needed migration.');
+      }
+
+    } catch (error) {
+      console.error('Error in migrateCategoryIconsToPhosphor:', error);
+    }
+  }
+
+  migrateLocalCategoryIcons() {
+    const iconMapping = {
+      '🍔': '<i class="ph ph-fork-knife"></i>',
+      '🚗': '<i class="ph ph-car"></i>',
+      '💊': '<i class="ph ph-heart-straight"></i>',
+      '🎉': '<i class="ph ph-game-controller"></i>',
+      '🛒': '<i class="ph ph-shopping-cart"></i>',
+      '📱': '<i class="ph ph-house"></i>',
+      '📦': '<i class="ph ph-dots-three"></i>',
+      '🍽️': '<i class="ph ph-fork-knife"></i>',
+      '🏥': '<i class="ph ph-heart-straight"></i>',
+      '🎮': '<i class="ph ph-game-controller"></i>',
+      '🏠': '<i class="ph ph-house"></i>',
+      '🏦': '<i class="ph ph-bank"></i>',
+      '🔧': '<i class="ph ph-wrench"></i>'
+    };
+
+    let migratedCount = 0;
+    
+    this.data.categories = this.data.categories.map(category => {
+      const phosphorIcon = iconMapping[category.icon];
+      if (phosphorIcon) {
+        console.log(`✅ Migrated local category ${category.name}: ${category.icon} → ${phosphorIcon}`);
+        migratedCount++;
+        return { ...category, icon: phosphorIcon };
+      }
+      return category;
+    });
+
+    if (migratedCount > 0) {
+      console.log(`✅ Local migration completed! Updated ${migratedCount} categories.`);
     }
   }
 
