@@ -6,12 +6,19 @@
   <title>FINZN - Tu Compañero Financiero Inteligente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./vendor/phosphor/regular/style.css">
+  <link rel="stylesheet" href="./vendor/phosphor/bold/style.css">
+  <link rel="stylesheet" href="./vendor/phosphor/light/style.css">
+  <link rel="stylesheet" href="./vendor/phosphor/thin/style.css">
+  <link rel="stylesheet" href="./vendor/phosphor/fill/style.css">
+  <link rel="stylesheet" href="./vendor/phosphor/duotone/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
-  <script type="module" crossorigin src="./assets/index-BbK4ak1x.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-E2iXmVdn.css">
+  <!-- Color override must be last to take precedence -->
+  <script type="module" crossorigin src="./assets/index-UcHgm0wy.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D-DGUwih.css">
 </head>
-<body>
+<body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
   <div id="alert-container" class="alert-container"></div>
   
@@ -21,7 +28,7 @@
       <div class="auth-header">
         <div class="auth-logo">
           <div class="finzn-logo-main">
-            <img src="/ChatGPT Image Jul 2, 2025, 10_45_30 PM.png" alt="FINZN Mascot" width="120" height="120" style="border-radius: 50%; box-shadow: 0 8px 32px rgba(183, 166, 255, 0.3);" />
+            <img src="isotipo.png" alt="FINZN Mascot" width="120" height="120" style="border-radius: 50%; box-shadow: 0 8px 32px rgba(183, 166, 255, 0.3);" />
           </div>
           <h1 class="auth-title">FINZN</h1>
         </div>
@@ -31,13 +38,15 @@
       
       <form id="login-form" class="auth-form">
         <div class="input-group">
-          <input type="email" id="login-user" name="username" placeholder="Email" required autocomplete="email" />
+          <label for="login-user" class="sr-only">Email</label>
+          <input type="email" id="login-user" name="username" placeholder="Email" required autocomplete="email" aria-label="Email" />
         </div>
         <div class="input-group">
-          <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" />
+          <label for="login-pass" class="sr-only">Contraseña</label>
+          <input type="password" id="login-pass" name="password" placeholder="Contraseña" required autocomplete="current-password" aria-label="Contraseña" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">
-          <span>✨</span>
+          <i class="ph ph-sparkle" aria-hidden="true"></i>
           Iniciar Sesión
         </button>
         <div id="login-error" class="error-message"></div>
@@ -65,20 +74,22 @@
       
       <form id="register-form" class="auth-form">
         <div class="input-group">
-          <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" />
-          <small class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
+          <label for="register-user" class="sr-only">Email</label>
+          <input type="email" id="register-user" name="username" placeholder="Email" required autocomplete="email" aria-label="Email" aria-describedby="email-hint" />
+          <small id="email-hint" class="input-hint">Usa un email único, por ejemplo: tu.nombre@gmail.com</small>
         </div>
         <div class="input-group">
-          <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" />
-          <small class="input-hint">Mínimo 6 caracteres</small>
+          <label for="register-pass" class="sr-only">Contraseña</label>
+          <input type="password" id="register-pass" name="password" placeholder="Contraseña" required autocomplete="new-password" aria-label="Contraseña" aria-describedby="password-hint" />
+          <small id="password-hint" class="input-hint">Mínimo 6 caracteres</small>
         </div>
         <div class="input-group">
           <button type="button" id="generate-test-email" class="btn btn-secondary btn-sm">
-            🎲 Generar email de prueba
+            <i class="ph ph-dice-six" aria-hidden="true"></i> Generar email de prueba
           </button>
         </div>
         <button type="submit" class="btn btn-primary btn-full">
-          <span>🚀</span>
+          <i class="ph ph-rocket-launch" aria-hidden="true"></i>
           Crear Cuenta
         </button>
         <div id="register-error" class="error-message"></div>
@@ -94,78 +105,124 @@
   <div id="app" class="app hidden">
     <!-- Header -->
     <header class="header">
-      <div class="header-content">
-        <div class="header-left">
-          <div class="logo-container">
-            <div class="finzn-logo-header">
-              <img src="./isotipo.png" alt="FINZN Logo" class="logo-icon" />
-            </div>
-            <h1 class="logo">FINZN</h1>
+  <div class="header-content">
+    <!-- IZQUIERDA: logo -->
+    <div class="header-left">
+      <div class="logo-container">
+        <div class="finzn-logo-header">
+          <img src="./isotipo.png" alt="FINZN Logo" class="logo-icon" />
+        </div>
+        <h1 class="logo">FINZN</h1>
+      </div>
+    </div>
+
+    <!-- DERECHA: usuario + tema + salir (desktop) -->
+    <div class="header-right">
+      <div class="user-info">
+        <span id="user-name"></span>
+      </div>
+
+      <!-- Botón tema (desktop) -->
+      <button id="theme-toggle" class="btn btn-icon theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
+  <i class="ph ph-moon-stars" aria-hidden="true"></i>
+</button>
+
+
+      <!-- Salir (desktop) -->
+      <button id="logout-btn" class="btn btn-secondary logout-btn" title="Cerrar sesión">
+  <i class="ph ph-sign-out" aria-hidden="true"></i>
+  <span class="logout-text">Salir</span>
+</button>
+
+      <!-- Hamburguesa (solo mobile) -->
+      <button id="header-menu-toggle" class="hamburger" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Menú móvil -->
+      <div id="header-menu" class="header-menu">
+        <div class="header-menu-header">
+          <div class="menu-user">
+            <div class="menu-user-avatar"><i class="ph ph-user"></i></div>
+            <div class="menu-user-name" id="menu-user-name">Usuario</div>
           </div>
-          <div class="user-info">
-            <span id="user-name"></span>
-          </div>
-          <button id="theme-toggle" class="btn btn-icon" title="Cambiar tema">
-            <span class="theme-icon">🌙</span>
-          </button>
-          <button id="logout-btn" class="btn btn-secondary logout-btn" title="Cerrar sesión">
-            <span>👋</span>
-            <span class="logout-text">Salir</span>
+          <button id="header-menu-close" class="menu-close" aria-label="Cerrar">
+            <i class="ph ph-x" aria-hidden="true"></i>
           </button>
         </div>
+
+        <nav class="header-menu-items">
+          <button class="menu-item" id="header-menu-settings">
+            <i class="ph ph-gear-six" aria-hidden="true"></i> Configuración
+          </button>
+
+          <label class="menu-item switch">
+            <input type="checkbox" id="header-theme-switch" />
+            <span class="slider"></span>
+            <span class="switch-label">Modo oscuro</span>
+          </label>
+
+          <button class="menu-item danger" id="header-menu-logout">
+            <i class="ph ph-sign-out" aria-hidden="true"></i> Salir
+          </button>
+        </nav>
       </div>
-    </header>
+    </div>
+  </div>
+</header>
+
 
     <!-- Dashboard with New Layout -->
-    <main class="dashboard-new">
+    <main id="layout-root" class="dashboard-new" role="main">
       <!-- Sidebar Navigation -->
-      <aside class="sidebar-nav">
+      <aside class="sidebar-nav" role="navigation" aria-label="Secciones">
         <nav class="nav-menu">
           <!-- Primary Navigation -->
           <div class="nav-group primary-nav">
             <div class="nav-item active" data-section="dashboard">
-              <div class="nav-icon">📊</div>
-              <span class="nav-label">Resumen</span>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-chart-pie" aria-hidden="true"></i></div>
+  <span class="nav-label">Resumen</span>
+</div>
+
             <div class="nav-item" data-section="transactions">
-              <div class="nav-icon">💳</div>
-              <span class="nav-label">Transacciones</span>
-              <div class="nav-badge" id="pending-transactions">0</div>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-credit-card" aria-hidden="true"></i></div>
+  <span class="nav-label">Transacciones</span>
+  <div class="nav-badge" id="pending-transactions">0</div>
+</div>
             <div class="nav-item" data-section="goals">
-              <div class="nav-icon">🎯</div>
-              <span class="nav-label">Objetivos</span>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-target" aria-hidden="true"></i></div>
+  <span class="nav-label">Objetivos</span>
+</div>
             <div class="nav-item" data-section="calendar">
-              <div class="nav-icon">📅</div>
-              <span class="nav-label">Calendario</span>
-              <div class="nav-badge" id="upcoming-events">0</div>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-calendar-blank" aria-hidden="true"></i></div>
+  <span class="nav-label">Calendario</span>
+  <div class="nav-badge" id="upcoming-events">0</div>
+</div>
             <div class="nav-item" data-section="budgets">
-              <div class="nav-icon">💰</div>
-              <span class="nav-label">Presupuestos</span>
-              <div class="nav-badge" id="active-budgets">0</div>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-wallet" aria-hidden="true"></i></div>
+  <span class="nav-label">Presupuestos</span>
+  <div class="nav-badge" id="active-budgets">0</div>
+</div>
           </div>
           
           <!-- Secondary Navigation -->
           <div class="nav-divider"></div>
           <div class="nav-group secondary-nav">
             <div class="nav-item" data-section="reports">
-              <div class="nav-icon">📈</div>
-              <span class="nav-label">Reportes</span>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-chart-line-up"></i></div>
+  <span class="nav-label">Reportes</span>
+</div>
             <div class="nav-item" data-section="settings">
-              <div class="nav-icon">⚙️</div>
-              <span class="nav-label">Configuración</span>
-            </div>
+  <div class="nav-icon icon"><i class="ph ph-gear-six"></i></div>
+  <span class="nav-label">Configuración</span>
+</div>
           </div>
           
           <!-- Mobile Menu Toggle -->
           <button class="mobile-menu-toggle" id="mobile-menu-toggle">
-            <div class="nav-icon">📊</div>
-            <span class="nav-label">Menú</span>
-          </button>
+  <div class="nav-icon icon"><i class="ph ph-list" aria-hidden="true"></i></div>
+  <span class="nav-label">Menú</span>
+</button>
         </nav>
         
       </aside>
@@ -176,85 +233,108 @@
         <section id="dashboard-section" class="dashboard-section active">
           <!-- Breadcrumb Navigation -->
           <nav class="breadcrumb-nav">
-            <span class="breadcrumb-item active">📊 Resumen General</span>
+            <span class="breadcrumb-item active">
+  <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen General
+</span>
           </nav>
-          
           <div class="dashboard-grid">
-            <!-- Primera fila: Balance, Ingresos, Gastos -->
-            <div class="summary-cards">
-              <div class="summary-card balance-card-new">
-                <div class="card-header-simple">
-                  <div class="card-icon-simple">💰</div>
-                  <span class="card-title">Balance</span>
+            <!-- New Unified Balance Card -->
+            <div class="new-unified-card">
+              <!-- Balance Section (Left) -->
+              <div class="new-balance-section">
+                <div class="new-balance-header">
+                  <div class="new-balance-icon">
+                    <i class="ph ph-wallet"></i>
+                  </div>
+                  <span class="new-balance-title">Balance Total</span>
                 </div>
-                <div class="card-amount balance-amount-new" id="balance-amount-new">$2,750</div>
-                <div class="installments-info">
-                  <button id="installments-btn" class="installments-button" onclick="window.app.showInstallmentsModal()">
+                <div class="new-balance-amount" id="balance-amount-new">$2,750</div>
+                <div class="new-balance-subtitle">
+                  <button id="installments-btn" class="new-installments-button">
                     <span id="installments-count">0</span> cuotas activas
                   </button>
                 </div>
               </div>
-
-              <div class="summary-card income-card">
-                <div class="card-header-simple">
-                  <div class="card-icon-simple">💵</div>
-                  <span class="card-title">
-                    Ingresos
-                    <button id="incomes-indicator" class="incomes-indicator" title="Ver historial de ingresos del mes">
+              
+              <!-- Income & Expenses Section (Right) -->
+              <div class="new-income-expenses-section">
+                <!-- Income -->
+                <div class="new-income-item">
+                  <div class="new-item-header">
+                    <div class="new-item-icon new-income-icon">
+                      <i class="ph ph-trend-up"></i>
+                    </div>
+                    <span class="new-item-title">Ingresos</span>
+                    <button id="incomes-indicator" class="new-incomes-indicator" title="Ver historial de ingresos del mes">
                       <span class="indicator-count">0</span>
                     </button>
-                  </span>
-                </div>
-                <div class="card-amount" id="income-summary">$3,500</div>
-                <div class="card-action">
-                  <button id="add-income-btn-dashboard" class="btn btn-primary">
-                    <span>➕</span>
-                    Agregar Ingreso
-                  </button>
-                </div>
-              </div>
-
-              <div class="summary-card expenses-card">
-                <div class="card-header-simple">
-                  <div class="card-icon-simple">💳</div>
-                  <span class="card-title">Gastos del Mes</span>
-                </div>
-                <div class="card-amount" id="monthly-expenses-summary">$1,200</div>
-                <div class="card-action">
-                  <button id="add-expense-btn-dashboard" class="btn btn-primary">
-                    <span>➕</span>
-                    Agregar Gasto
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Segunda fila: Gráfico ocupando toda la horizontal -->
-            <div class="chart-section">
-              <div class="chart-card-new">
-                <h3>📊 Distribución de Gastos del Mes</h3>
-                <div class="chart-content-with-mascot">
-                  <div class="chart-container-new">
-                    <canvas id="expenses-chart"></canvas>
                   </div>
-                  <div class="chart-mascot">
-                    <div class="chart-mascot-container">
-                      <img src="./mascota-finzn.png" alt="FINZN Mascota" class="chart-mascot-img" />
+                  <div class="new-item-amount-row">
+                    <span class="new-item-amount" id="income-summary">$3,500</span>
+                    <button id="add-income-btn-dashboard" class="new-action-btn new-income-action" title="Agregar Ingreso">
+                      <i class="ph ph-plus"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Expenses -->
+                <div class="new-expense-item">
+                  <div class="new-item-header">
+                    <div class="new-item-icon new-expense-icon">
+                      <i class="ph ph-trend-down"></i>
                     </div>
+                    <span class="new-item-title">Gastos</span>
+                  </div>
+                  <div class="new-item-amount-row">
+                    <span class="new-item-amount" id="monthly-expenses-summary">$1,200</span>
+                    <button id="add-expense-btn-dashboard" class="new-action-btn new-expense-action" title="Agregar Gasto">
+                      <i class="ph ph-minus"></i>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-            
-          </div>
+
+            <!-- Dashboard Second Row -->
+            <div class="dashboard-second-row">
+              <!-- Chart Section -->
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3>Distribución de Gastos</h3>
+                  <span class="chart-subtitle">Por categoría</span>
+                </div>
+                <div class="chart-container">
+                  <canvas id="dashboard-expenses-chart"></canvas>
+                </div>
+              </div>
+
+              <!-- Recent Transactions Card -->
+              <div class="recent-transactions-card">
+                <div class="card-header">
+                  <h3>Movimientos Recientes</h3>
+                  <button class="view-all-btn" data-section="transactions">
+                    <span>Ver todos</span>
+                    <i class="ph ph-arrow-right"></i>
+                  </button>
+                </div>
+                <div class="recent-transactions-list" id="recent-transactions-list">
+                  <!-- Se llenarán con JavaScript -->
+                </div>
+              </div>
+            </div>
+
         </section>
 
         <!-- Transactions Section (Renamed from Expenses) -->
         <section id="transactions-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">💳 Transacciones</span>
+            <span class="breadcrumb-item active">
+  <i class="ph ph-credit-card" aria-hidden="true"></i> Transacciones
+</span>
           </nav>
           
           <div class="section-content">
@@ -262,13 +342,11 @@
               <h1>Gestión de Transacciones</h1>
               <div class="section-actions">
                 <button id="add-expense-btn-transactions" class="btn btn-primary">
-                  <span>➕</span>
-                  Nuevo Gasto
-                </button>
+  <i class="ph ph-plus" aria-hidden="true"></i> Nuevo Gasto
+</button>
                 <button id="add-income-btn-transactions" class="btn btn-secondary">
-                  <span>💰</span>
-                  Nuevo Ingreso
-                </button>
+  <i class="ph ph-plus-circle" aria-hidden="true"></i> Nuevo Ingreso
+</button>
               </div>
             </div>
             
@@ -283,7 +361,7 @@
               <div class="tab-content active" id="expenses-tab">
                 <div class="expenses-section-card">
                   <div class="card-header">
-                    <h3>💳 Gastos del Mes</h3>
+                    <h3><i class="ph ph-credit-card" aria-hidden="true"></i> Gastos del Mes</h3>
                   </div>
                   <div id="expenses-list" class="expenses-list">
                     <!-- Expenses will be loaded here -->
@@ -294,7 +372,7 @@
               <div class="tab-content" id="income-tab">
                 <div class="income-section-card">
                   <div class="card-header">
-                    <h3>💰 Ingresos del Mes</h3>
+                    <h3><i class="ph ph-money" aria-hidden="true"></i> Ingresos del Mes</h3>
                   </div>
                   <div id="income-list" class="income-list">
                     <!-- Income will be loaded here -->
@@ -305,9 +383,9 @@
               <div class="tab-content" id="limits-tab">
                 <div class="expenses-section-card spending-limits-main-card">
                   <div class="card-header">
-                    <h3>🚦 Límites Presupuestarios</h3>
+                    <h3><i class="ph ph-traffic-sign" aria-hidden="true"></i> Límites Presupuestarios</h3>
                     <button id="add-spending-limit-btn-transactions" class="btn btn-primary btn-sm">
-                      <span>➕</span>
+                      <i class="ph ph-plus" aria-hidden="true"></i>
                       Nuevo Límite
                     </button>
                   </div>
@@ -324,9 +402,13 @@
         <!-- Goals Section (Renamed from Savings) -->
         <section id="goals-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">🎯 Objetivos</span>
+            <span class="breadcrumb-item active">
+              <i class="ph ph-target" aria-hidden="true"></i> Objetivos
+            </span>
           </nav>
           
           <div class="section-content">
@@ -334,7 +416,7 @@
               <h1>Objetivos de Ahorro</h1>
               <div class="section-actions">
                 <button id="add-goal-btn" class="btn btn-primary">
-                  <span>🎯</span>
+                  <i class="ph ph-target" aria-hidden="true"></i>
                   Nuevo Objetivo
                 </button>
               </div>
@@ -349,9 +431,13 @@
         <!-- Reports Section (Renamed from Achievements) -->
         <section id="reports-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">📈 Reportes</span>
+            <span class="breadcrumb-item active">
+              <i class="ph ph-chart-line-up" aria-hidden="true"></i> Reportes
+            </span>
           </nav>
           
           <div class="section-content">
@@ -359,35 +445,34 @@
               <h1>Reportes y Análisis</h1>
               <div class="section-actions">
                 <button id="generate-report-btn-section" class="btn btn-primary">
-                  <span>🤖</span>
-                  Generar Reporte IA
-                </button>
+  <i class="ph ph-robot" aria-hidden="true"></i> Generar Reporte IA
+</button>
               </div>
             </div>
             
             <div class="reports-grid">
               <div class="report-card">
-                <h3>📊 Análisis Mensual</h3>
+                <h3><i class="ph ph-chart-bar" aria-hidden="true"></i> Análisis Mensual</h3>
                 <p>Resumen detallado de ingresos y gastos del mes</p>
                 <button class="btn btn-secondary">Ver Reporte</button>
               </div>
               
               <div class="report-card">
-                <h3>📈 Tendencias</h3>
+                <h3><i class="ph ph-trend-up" aria-hidden="true"></i> Tendencias</h3>
                 <p>Análisis de patrones de gasto a lo largo del tiempo</p>
                 <button class="btn btn-secondary">Ver Tendencias</button>
               </div>
               
               <div class="report-card">
-                <h3>🎯 Progreso de Objetivos</h3>
+                <h3><i class="ph ph-target" aria-hidden="true"></i> Progreso de Objetivos</h3>
                 <p>Estado actual de tus metas de ahorro</p>
                 <button class="btn btn-secondary">Ver Progreso</button>
               </div>
               
               <div class="report-card">
-                <h3>🤖 Reporte IA</h3>
+                <h3><i class="ph ph-robot" aria-hidden="true"></i> Reporte IA</h3>
                 <p>Análisis inteligente personalizado de tus finanzas</p>
-                <button class="btn btn-secondary" onclick="window.app.showGenerateAiReportModal()">Generar</button>
+                <button id="reports-generate-ai-card-btn" class="btn btn-secondary">Generar</button>
               </div>
             </div>
           </div>
@@ -396,9 +481,13 @@
         <!-- Settings Section -->
         <section id="settings-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">⚙️ Configuración</span>
+            <span class="breadcrumb-item active">
+              <i class="ph ph-gear-six" aria-hidden="true"></i> Configuración
+            </span>
           </nav>
           
           <div class="section-content">
@@ -409,7 +498,7 @@
             <!-- Settings Categories -->
             <div class="settings-categories">
               <div class="settings-category">
-                <h3>👤 Cuenta y Perfil</h3>
+                <h3><i class="ph ph-user" aria-hidden="true"></i> Cuenta y Perfil</h3>
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Información Personal</h4>
@@ -426,15 +515,14 @@
               </div>
               
               <div class="settings-category">
-                <h3>🏷️ Personalización</h3>
+                <h3><i class="ph ph-tag" aria-hidden="true"></i> Personalización</h3>
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Categorías</h4>
                     <p>Gestiona tus categorías de gastos</p>
                     <button id="manage-categories-btn" class="btn btn-secondary btn-sm">
-                      <span>🏷️</span>
-                      Gestionar
-                    </button>
+  <i class="ph ph-tag" aria-hidden="true"></i> Gestionar
+</button>
                   </div>
                   
                   <div class="settings-card">
@@ -446,33 +534,30 @@
               </div>
               
               <div class="settings-category">
-                <h3>📊 Datos y Respaldo</h3>
+                <h3><i class="ph ph-database" aria-hidden="true"></i> Datos y Respaldo</h3>
                 <div class="settings-grid">
                   <div class="settings-card">
                     <h4>Exportar Datos</h4>
                     <p>Descarga tus datos financieros</p>
                     <button id="export-data-btn" class="btn btn-secondary btn-sm">
-                      <span>📊</span>
-                      Exportar
-                    </button>
+  <i class="ph ph-download-simple" aria-hidden="true"></i> Exportar
+</button>
                   </div>
                   
                   <div class="settings-card">
                     <h4>Importar Datos</h4>
                     <p>Carga tus datos desde archivo CSV</p>
                     <button id="import-data-btn" class="btn btn-secondary btn-sm">
-                      <span>📥</span>
-                      Importar
-                    </button>
+  <i class="ph ph-upload-simple" aria-hidden="true"></i> Importar
+</button>
                   </div>
                   
                   <div class="settings-card">
                     <h4>Respaldo de Datos</h4>
                     <p>Respalda y restaura tu información</p>
                     <button id="backup-data-btn" class="btn btn-secondary btn-sm">
-                      <span>☁️</span>
-                      Respaldar
-                    </button>
+  <i class="ph ph-cloud-arrow-up" aria-hidden="true"></i> Respaldar
+</button>
                   </div>
               </div>
               </div>
@@ -483,9 +568,11 @@
         <!-- Budgets Section -->
         <section id="budgets-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">💰 Presupuestos</span>
+            <span class="breadcrumb-item active"><i class="ph ph-wallet" aria-hidden="true"></i> Presupuestos</span>
           </nav>
           
           <div class="section-content">
@@ -493,13 +580,11 @@
               <h1>Gestión de Presupuestos</h1>
               <div class="section-actions">
                 <button id="add-budget-btn" class="btn btn-primary">
-                  <span>➕</span>
-                  Nuevo Presupuesto
-                </button>
+  <i class="ph ph-plus" aria-hidden="true"></i> Nuevo Presupuesto
+</button>
                 <button id="generate-budget-insights-btn" class="btn btn-secondary">
-                  <span>🤖</span>
-                  Análisis IA
-                </button>
+  <i class="ph ph-robot" aria-hidden="true"></i> Análisis IA
+</button>
               </div>
             </div>
             
@@ -521,7 +606,7 @@
             <!-- Budgets List -->
             <div class="budgets-container">
               <div class="budgets-header">
-                <h3>📊 Presupuestos Activos</h3>
+                <h3><i class="ph ph-chart-pie" aria-hidden="true"></i> Presupuestos Activos</h3>
                 <div class="budgets-summary">
                   <span id="total-budgets-count">0</span> presupuestos configurados
                 </div>
@@ -536,32 +621,36 @@
         <!-- Calendar Section (New) -->
         <section id="calendar-section" class="dashboard-section">
           <nav class="breadcrumb-nav">
-            <a href="#" class="breadcrumb-item" data-section="dashboard">📊 Resumen</a>
+            <a href="#" class="breadcrumb-item" data-section="dashboard">
+              <i class="ph ph-chart-pie" aria-hidden="true"></i> Resumen
+            </a>
             <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">📅 Calendario</span>
+            <span class="breadcrumb-item active"><i class="ph ph-calendar-blank" aria-hidden="true"></i> Calendario</span>
           </nav>
           
           <div class="section-content">
             <div class="section-header">
               <h1>Calendario Financiero</h1>
               <div class="section-actions">
-                <button id="add-event-btn" class="btn btn-primary">
-                  <span>➕</span>
-                  Nuevo Evento
-                </button>
+                <button type="button" id="add-event-btn" class="btn btn-primary">
+  <i class="ph ph-plus" aria-hidden="true"></i> Nuevo Evento
+</button>
                 <button id="sync-google-calendar-btn" class="btn btn-secondary">
-                  <span>🔄</span>
-                  Sincronizar Google
-                </button>
+  <i class="ph ph-arrows-clockwise" aria-hidden="true"></i> Sincronizar Google
+</button>
               </div>
             </div>
             
             <div class="calendar-container" style="margin-top: 0;">
               <!-- Calendar Navigation -->
               <div class="calendar-nav">
-                <button id="prev-month" class="calendar-nav-btn">‹</button>
+                <button id="prev-month" class="calendar-nav-btn">
+                  <i class="ph ph-caret-left" aria-hidden="true"></i>
+                </button>
                 <h3 id="current-month-year">Enero 2025</h3>
-                <button id="next-month" class="calendar-nav-btn">›</button>
+                <button id="next-month" class="calendar-nav-btn">
+                  <i class="ph ph-caret-right" aria-hidden="true"></i>
+                </button>
                 <div class="calendar-view-toggle">
                   <button class="view-btn active" data-view="month">Mes</button>
                   <button class="view-btn" data-view="week">Semana</button>
@@ -614,27 +703,27 @@
   </div>
 
   <!-- Mobile Navigation -->
-  <nav class="mobile-nav" style="display: none;">
-    <a href="#" class="mobile-nav-item" data-section="dashboard">
-      <div class="mobile-nav-icon">📊</div>
-      <div class="mobile-nav-label">Inicio</div>
-    </a>
-    <a href="#" class="mobile-nav-item" data-section="transactions">
-      <div class="mobile-nav-icon">💳</div>
-      <div class="mobile-nav-label">Gastos</div>
-    </a>
-    <a href="#" class="mobile-nav-item" data-section="budgets">
-      <div class="mobile-nav-icon">💰</div>
-      <div class="mobile-nav-label">Presupuestos</div>
-    </a>
-    <a href="#" class="mobile-nav-item" data-section="goals">
-      <div class="mobile-nav-icon">🎯</div>
-      <div class="mobile-nav-label">Objetivos</div>
-    </a>
-    <a href="#" class="mobile-nav-item" data-section="reports">
-      <div class="mobile-nav-icon">📈</div>
-      <div class="mobile-nav-label">Reportes</div>
-    </a>
+  <nav class="mobile-nav">
+<a href="#" class="mobile-nav-item" data-section="dashboard">
+  <div class="mobile-nav-icon"><i class="ph ph-chart-pie" aria-hidden="true"></i></div>
+  <div class="mobile-nav-label">Inicio</div>
+</a>
+<a href="#" class="mobile-nav-item" data-section="transactions">
+  <div class="mobile-nav-icon"><i class="ph ph-credit-card" aria-hidden="true"></i></div>
+  <div class="mobile-nav-label">Gastos</div>
+</a>
+<a href="#" class="mobile-nav-item" data-section="budgets">
+  <div class="mobile-nav-icon"><i class="ph ph-wallet" aria-hidden="true"></i></div>
+  <div class="mobile-nav-label">Presupuestos</div>
+</a>
+<a href="#" class="mobile-nav-item" data-section="goals">
+  <div class="mobile-nav-icon"><i class="ph ph-target" aria-hidden="true"></i></div>
+  <div class="mobile-nav-label">Objetivos</div>
+</a>
+<a href="#" class="mobile-nav-item" data-section="reports">
+  <div class="mobile-nav-icon"><i class="ph ph-chart-line-up" aria-hidden="true"></i></div>
+  <div class="mobile-nav-label">Reportes</div>
+</a>
   </nav>
 
   <!-- Modals -->
@@ -643,8 +732,10 @@
   <div id="view-incomes-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>💰 Ingresos del Mes</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-coins" aria-hidden="true"></i> Ingresos del Mes</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="all-incomes-list" class="all-incomes-list">
@@ -661,8 +752,10 @@
   <div id="view-installments-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📊 Cuotas Activas del Mes</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-chart-bar" aria-hidden="true"></i> Cuotas Activas del Mes</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="installments-list" class="installments-list">
@@ -680,7 +773,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Límite de Gasto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-spending-limit-form" class="modal-form">
         <div class="form-group">
@@ -705,13 +800,35 @@
       </form>
     </div>
   </div>
+
+  <!-- Modal: Editar Límite -->
+<div id="edit-limit-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Editar Límite de Gasto</h2>
+    <form id="edit-limit-form">
+      <label for="edit-limit-category">Categoría</label>
+      <select id="edit-limit-category" name="category" required></select>
+
+      <label for="edit-limit-amount">Monto límite</label>
+      <input id="edit-limit-amount" type="number" step="0.01" name="amount" required>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar cambios</button>
+        <button type="button" class="btn-secondary" onclick="window.app.modals.hide('edit-limit-modal')">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
   
   <!-- Add Expense Modal -->
   <div id="add-expense-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Gasto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-expense-form" class="modal-form">
         <div class="form-group">
@@ -729,19 +846,24 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="expense-date">Fecha</label>
-          <input type="date" id="expense-date" name="transactionDate" required />
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="expense-installments" name="hasInstallments" />
-            Pagar en cuotas
-          </label>
-        </div>
-        <div id="installments-group" class="form-group hidden">
-          <label for="expense-installments-count">Número de cuotas</label>
-          <input type="number" id="expense-installments-count" name="installmentsCount" min="2" max="24" />
-        </div>
+  <label for="expense-date">Fecha</label>
+  <input type="date" id="expense-date" name="transactionDate" required>
+</div>
+<div class="form-group">
+  <label>
+    <input type="checkbox" id="expense-installments" name="hasInstallments" />
+    Pagar en cuotas
+  </label>
+</div>
+
+<div id="installments-group" class="form-group hidden">
+  <label for="expense-installments-count">Número de cuotas</label>
+  <input type="number" id="expense-installments-count" name="installmentsCount" min="2" max="24" />
+
+  <label for="expense-installments-interest" style="margin-top:12px;">Interés total (%) <span class="text-muted">(opcional)</span></label>
+  <input type="number" id="expense-installments-interest" name="installmentsInterest" min="0" step="0.01" placeholder="Ej: 20" />
+  <small class="input-hint">Si lo dejás vacío o en 0%, se prorratea sin interés.</small>
+</div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Agregar Gasto</button>
@@ -750,12 +872,40 @@
     </div>
   </div>
 
+  <!-- Modal: Editar Gasto -->
+<div id="edit-expense-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Editar Gasto</h2>
+    <form id="edit-expense-form">
+      <label for="edit-expense-description">Descripción</label>
+      <input id="edit-expense-description" type="text" name="description" required>
+
+      <label for="edit-expense-amount">Monto</label>
+      <input id="edit-expense-amount" type="number" step="0.01" name="amount" required>
+
+      <label for="edit-expense-category">Categoría</label>
+      <select id="edit-expense-category" name="category" required></select>
+
+      <label for="edit-expense-date">Fecha</label>
+      <input id="edit-expense-date" type="date" name="transactionDate" required>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar cambios</button>
+        <button type="button" class="btn-secondary" onclick="window.app.modals.hide('edit-expense-modal')">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
   <!-- Add Income Modal -->
   <div id="add-income-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Ingreso</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-income-form" class="modal-form">
         <div class="form-group">
@@ -797,7 +947,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Nuevo Objetivo de Ahorro</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-goal-form" class="modal-form">
         <div class="form-group">
@@ -825,7 +977,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Editar Objetivo de Ahorro</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="edit-goal-form" class="modal-form">
         <div class="form-group">
@@ -853,7 +1007,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Agregar Dinero al Objetivo</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="goal-info">
@@ -880,22 +1036,28 @@
   <div id="manage-categories-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🏷️ Gestionar Categorías</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-tag" aria-hidden="true"></i> Gestionar Categorías</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="categories-management">
           <div class="add-category-section">
             <h3>Agregar Nueva Categoría</h3>
-            <form id="add-category-form" class="category-form">
-              <div class="form-group">
-                <label for="category-name">Nombre</label>
-                <input type="text" id="category-name" name="name" required />
-                <span>➕</span>
-                Agregar Categoría
-              </button>
-            </form>
-          </div>
+  <form id="add-category-form" class="category-form">
+  <div class="form-group">
+    <label for="category-name">Nombre</label>
+    <input type="text" id="category-name" name="name" required />
+  </div>
+  <div class="modal-actions">
+    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+    <button type="submit" class="btn btn-primary">
+      <i class="ph ph-plus" aria-hidden="true"></i>
+      Agregar Categoría
+    </button>
+  </div>
+</form>
           
           <div class="categories-list-section">
             <h3>Categorías Existentes</h3>
@@ -925,7 +1087,7 @@
           </div>
           <div class="modal-actions">
             <button type="submit" class="btn btn-primary">
-              <span>✅</span> Completar Perfil
+              <i class="ph ph-check-circle"></i> Completar Perfil
             </button>
           </div>
         </form>
@@ -937,7 +1099,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>Editar Perfil</h3>
-          <button class="modal-close">&times;</button>
+          <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
         </div>
         <form id="edit-profile-form" class="modal-form">
           <div class="form-group">
@@ -951,7 +1115,7 @@
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
             <button type="submit" class="btn btn-primary">
-              <span>💾</span> Guardar Cambios
+              <i class="ph ph-floppy-disk" aria-hidden="true"></i> Guardar Cambios
             </button>
           </div>
         </form>
@@ -962,8 +1126,10 @@
   <div id="import-data-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📥 Importar Datos</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-upload-simple" aria-hidden="true"></i> Importar Datos</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="import-section">
@@ -1001,7 +1167,7 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
         <button type="button" id="process-import-btn" class="btn btn-primary">
-          <span>📥</span>
+          <i class="ph ph-download-simple" aria-hidden="true"></i>
           Importar Datos
         </button>
       </div>
@@ -1012,8 +1178,10 @@
   <div id="generate-ai-report-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🤖 Generar Informe Financiero con IA</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-robot" aria-hidden="true"></i> Generar Informe Financiero con IA</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div class="ai-report-options">
@@ -1045,17 +1213,17 @@
         </div>
         
         <div id="ai-report-result" class="ai-report-result hidden">
-          <h3>📊 Tu Informe Financiero Personalizado</h3>
+          <h3><i class="ph ph-chart-line" aria-hidden="true"></i> Tu Informe Financiero Personalizado</h3>
           <div id="ai-report-content" class="ai-report-content">
             <!-- El informe generado aparecerá aquí -->
           </div>
           <div class="ai-report-actions">
             <button id="download-report-btn" class="btn btn-secondary">
-              <span>📄</span>
+              <i class="ph ph-file-text" aria-hidden="true"></i>
               Descargar
             </button>
             <button id="share-report-btn" class="btn btn-secondary">
-              <span>📤</span>
+              <i class="ph ph-export" aria-hidden="true"></i>
               Compartir
             </button>
           </div>
@@ -1064,7 +1232,7 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
         <button type="button" id="generate-report-btn" class="btn btn-primary">
-          <span>🤖</span>
+          <i class="ph ph-robot" aria-hidden="true"></i>
           Generar Informe
         </button>
       </div>
@@ -1086,7 +1254,9 @@
             <p>Tu consejero financiero</p>
           </div>
         </div>
-        <button id="chat-close" class="chat-close">&times;</button>
+        <button id="chat-close" class="chat-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       
       <div id="chat-messages" class="chat-messages">
@@ -1095,86 +1265,77 @@
       
       <form id="chat-form" class="chat-form">
         <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
-        <button type="submit" class="chat-send">
-          <span>📤</span>
-        </button>
+        <button type="submit" class="chat-send" aria-label="Enviar">
+  <i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>
+</button>
       </form>
     </div>
   </div>
 
-  <!-- Add Calendar Event Modal -->
-  <div id="add-event-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Agregar Evento Financiero</h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <form id="add-event-form" class="modal-form">
-        <div class="form-group">
-          <label for="event-title">Título del Evento</label>
-          <input type="text" id="event-title" name="title" required />
-        </div>
-        <div class="form-group">
-          <label for="event-type">Tipo de Evento</label>
-          <select id="event-type" name="type" required>
-            <option value="">Selecciona un tipo</option>
-            <option value="payment">💳 Pago de Cuota</option>
-            <option value="income">💰 Cobro</option>
-            <option value="card-close">🏦 Cierre de Tarjeta</option>
-            <option value="reminder">⏰ Recordatorio</option>
-            <option value="deadline">📅 Vencimiento</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="event-date">Fecha</label>
-          <input type="date" id="event-date" name="date" required />
-        </div>
-        <div class="form-group">
-          <label for="event-time">Hora (opcional)</label>
-          <input type="time" id="event-time" name="time" />
-        </div>
-        <div class="form-group">
-          <label for="event-amount">Monto (opcional)</label>
-          <input type="number" id="event-amount" name="amount" step="0.01" />
-        </div>
-        <div class="form-group">
-          <label for="event-description">Descripción</label>
-          <textarea id="event-description" name="description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="event-recurring" name="recurring" />
-            Evento recurrente
-          </label>
-        </div>
-        <div id="recurring-options" class="form-group hidden">
-          <label for="recurring-frequency">Frecuencia</label>
-          <select id="recurring-frequency" name="frequency">
-            <option value="weekly">Semanal</option>
-            <option value="monthly">Mensual</option>
-            <option value="yearly">Anual</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="event-notification" name="notification" checked />
-            Recordatorio por notificación
-          </label>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Crear Evento</button>
-        </div>
-      </form>
+  
+<!-- Modal: Agregar Evento -->
+<div id="add-event-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="add-event-title">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="add-event-title">Agregar Evento Financiero</h2>
+      <button type="button" class="modal-close" aria-label="Cerrar">
+        <i class="ph ph-x" aria-hidden="true"></i>
+      </button>
     </div>
+
+    <form id="add-event-form" class="modal-form">
+      <div class="form-group">
+        <label for="add-event-title-input">Título</label>
+        <input id="add-event-title-input" name="title" required />
+      </div>
+
+      <div class="form-group">
+        <label for="add-event-type">Tipo</label>
+        <select id="add-event-type" name="type" required>
+          <option value="payment">Pago de Cuota</option>
+          <option value="income">Cobro</option>
+          <option value="card-close">Cierre de Tarjeta</option>
+          <option value="reminder">Recordatorio</option>
+          <option value="deadline">Vencimiento</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="add-event-date">Fecha</label>
+        <input id="add-event-date" type="date" name="date" required />
+      </div>
+
+      <div class="form-group">
+        <label for="add-event-time">Hora (opcional)</label>
+        <input id="add-event-time" type="time" name="time" />
+      </div>
+
+      <div class="form-group">
+        <label for="add-event-amount">Monto (opcional)</label>
+        <input id="add-event-amount" type="number" step="0.01" name="amount" />
+      </div>
+
+      <div class="form-group">
+        <label for="add-event-description">Descripción</label>
+        <textarea id="add-event-description" name="description"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
   </div>
+</div>
 
   <!-- Edit Calendar Event Modal -->
   <div id="edit-event-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Editar Evento</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="edit-event-form" class="modal-form">
         <div class="form-group">
@@ -1184,11 +1345,11 @@
         <div class="form-group">
           <label for="edit-event-type">Tipo de Evento</label>
           <select id="edit-event-type" name="type" required>
-            <option value="payment">💳 Pago de Cuota</option>
-            <option value="income">💰 Cobro</option>
-            <option value="card-close">🏦 Cierre de Tarjeta</option>
-            <option value="reminder">⏰ Recordatorio</option>
-            <option value="deadline">📅 Vencimiento</option>
+            <option value="payment"><i class="ph ph-credit-card"></i> Pago de Cuota</option>
+            <option value="income"><i class="ph ph-money"></i> Cobro</option>
+            <option value="card-close"><i class="ph ph-bank"></i> Cierre de Tarjeta</option>
+            <option value="reminder"><i class="ph ph-clock"></i> Recordatorio</option>
+            <option value="deadline"><i class="ph ph-calendar"></i> Vencimiento</option>
           </select>
         </div>
         <div class="form-group">
@@ -1221,7 +1382,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="event-details-title">Detalles del Evento</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="event-details-content">
@@ -1235,12 +1398,40 @@
     </div>
   </div>
 
+  <!-- Day Events Modal -->
+  <div id="day-events-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="day-events-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="day-events-title">Eventos del Día</h2>
+        <button type="button" class="modal-close" aria-label="Cerrar">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div id="day-events-date" class="day-events-date"></div>
+        <div id="day-events-list" class="day-events-list">
+          <!-- Events for the day will be populated here -->
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" id="add-event-for-day" class="btn btn-primary">
+          <i class="ph ph-plus"></i> Agregar Evento
+        </button>
+        <button type="button" class="modal-cancel btn btn-secondary">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Budget Modal -->
   <div id="add-budget-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Crear Nuevo Presupuesto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="add-budget-form" class="modal-form">
         <div class="form-group">
@@ -1285,7 +1476,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Editar Presupuesto</h2>
-        <button class="modal-close">&times;</button>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <form id="edit-budget-form" class="modal-form">
         <div class="form-group">
@@ -1329,8 +1522,10 @@
   <div id="budget-ai-insights-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🤖 Análisis IA de Presupuestos</h2>
-        <button class="modal-close">&times;</button>
+        <h2><i class="ph ph-robot"></i> Análisis IA de Presupuestos</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="modal-body">
         <div id="budget-ai-analysis-content" class="budget-ai-analysis-content">
@@ -1340,7 +1535,7 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
         <button type="button" id="apply-ai-recommendations-btn" class="btn btn-primary">
-          <span>✨</span>
+          <i class="ph ph-sparkle" aria-hidden="true"></i>
           Aplicar Recomendaciones
         </button>
       </div>
@@ -1348,5 +1543,6 @@
   </div>
 
   <!-- Load main application -->
+  
 </body>
 </html>

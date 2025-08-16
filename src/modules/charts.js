@@ -32,17 +32,8 @@ export class ChartManager {
       return;
     }
     
-    // Apply category filter if available (only for main expenses chart)
+    // Use data as-is without contextual filtering
     let filteredData = data;
-    if (chartProperty === 'expensesChart' && window.app?.contextualBar) {
-      const categoryFilter = window.app.contextualBar.getCurrentCategory();
-      if (categoryFilter !== 'all') {
-        filteredData = {};
-        if (data[categoryFilter]) {
-          filteredData[categoryFilter] = data[categoryFilter];
-        }
-      }
-    }
     
     if (this[chartProperty]) {
       this[chartProperty].destroy();

@@ -247,12 +247,6 @@ export class NavigationManager {
       }, 400);
     }
     
-    // Update contextual bar visibility
-    if (window.app && window.app.contextualBar) {
-      setTimeout(() => {
-        window.app.contextualBar.updateVisibility(sectionName);
-      }, 100);
-    }
   }
   
   updatePageTitle(sectionName) {
