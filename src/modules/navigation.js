@@ -231,6 +231,15 @@ export class NavigationManager {
     // Update page title
     this.updatePageTitle(sectionName);
     
+    // Special handling for calendar section
+    if (sectionName === 'calendar' && window.app && window.app.calendar) {
+      setTimeout(async () => {
+        console.log('📅 Navigation: Calendar section activated, refreshing events...');
+        await window.app.calendar.loadEvents();
+        window.app.calendar.renderCalendar();
+      }, 100);
+    }
+    
     // Trigger animation refresh for new section content
     if (window.app && window.app.animations) {
       setTimeout(() => {

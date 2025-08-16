@@ -90,6 +90,11 @@ this.setupModalEvents();
         // Check if user needs to complete profile
         await this.checkProfileCompletion();
         
+        // Load calendar events after user data is loaded
+        if (this.calendar) {
+          await this.calendar.loadEvents();
+        }
+        
         this.updateDashboard();
       } else {
         this.showAuth();
@@ -529,6 +534,12 @@ setupDashboardEvents() {
       if (success) {
         this.showApp();
         await this.loadUserData();
+        
+        // Load calendar events after login
+        if (this.calendar) {
+          await this.calendar.loadEvents();
+        }
+        
         this.updateDashboard();
         this.ui.showAlert('¡Bienvenido de vuelta!', 'success');
       } else {

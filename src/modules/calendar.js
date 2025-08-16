@@ -135,16 +135,12 @@ export class CalendarManager {
     container.innerHTML = '';
     container.className = 'calendar-grid month-view';
 
-    // Add day headers with animation
+    // Add day headers
     const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    dayHeaders.forEach((day, index) => {
+    dayHeaders.forEach(day => {
       const dayHeader = document.createElement('div');
       dayHeader.className = 'calendar-day-header';
       dayHeader.textContent = day;
-      dayHeader.style.setProperty('--animation-delay', index);
-      dayHeader.style.opacity = '0';
-      dayHeader.style.animation = `slideInFromLeft 0.3s ease-out forwards`;
-      dayHeader.style.animationDelay = `${index * 0.05}s`;
       container.appendChild(dayHeader);
     });
 
@@ -154,22 +150,17 @@ export class CalendarManager {
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-    // Render 42 days (6 weeks) with staggered animation
+    // Render 42 days (6 weeks)
     for (let i = 0; i < 42; i++) {
       const cellDate = new Date(startDate);
       cellDate.setDate(startDate.getDate() + i);
       
-      const dayCell = this.createDayCell(cellDate, i);
+      const dayCell = this.createDayCell(cellDate);
       container.appendChild(dayCell);
     }
-
-    // Trigger container animation
-    setTimeout(() => {
-      container.style.opacity = '1';
-    }, 50);
   }
 
-  createDayCell(date, index = 0) {
+  createDayCell(date) {
     const cell = document.createElement('div');
     cell.className = 'calendar-day';
     
@@ -184,26 +175,22 @@ export class CalendarManager {
     if (isToday) {
       cell.classList.add('today');
     }
-
-    // Add animation properties
-    cell.style.setProperty('--animation-delay', index);
     
-    // Day number with animation
+    // Day number
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-number';
     dayNumber.textContent = date.getDate();
     cell.appendChild(dayNumber);
 
-    // Events with staggered animation
+    // Events
     if (dayEvents.length > 0) {
       const eventsContainer = document.createElement('div');
       eventsContainer.className = 'day-events';
       
-      dayEvents.slice(0, 3).forEach((event, eventIndex) => {
+      dayEvents.slice(0, 3).forEach(event => {
         const eventElement = document.createElement('div');
         eventElement.className = `day-event ${event.type}`;
         eventElement.textContent = event.title;
-        eventElement.style.setProperty('--event-delay', eventIndex);
         eventElement.addEventListener('click', (e) => {
           e.stopPropagation();
           this.showEventDetails(event.id);
@@ -215,8 +202,6 @@ export class CalendarManager {
         const moreEvents = document.createElement('div');
         moreEvents.className = 'more-events';
         moreEvents.textContent = `+${dayEvents.length - 3} más`;
-        moreEvents.style.setProperty('--event-delay', 3);
-        moreEvents.classList.add('day-event');
         eventsContainer.appendChild(moreEvents);
       }
 
@@ -227,12 +212,6 @@ export class CalendarManager {
     cell.addEventListener('click', () => {
       console.log('📅 DEBUG: Calendar cell clicked, date:', date);
       this.selectedDate = date;
-      
-      // Add click animation
-      cell.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        cell.style.transform = '';
-      }, 150);
       
       if (dayEvents.length > 0) {
         // If there are events for this day, show the day events modal
@@ -339,20 +318,14 @@ export class CalendarManager {
 
   previousMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-    this.animateCalendarRefresh();
-    setTimeout(() => {
-      this.renderCalendar();
-      this.loadEvents(); // Reload events for new month
-    }, 150);
+    this.renderCalendar();
+    this.loadEvents(); // Reload events for new month
   }
 
   nextMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-    this.animateCalendarRefresh();
-    setTimeout(() => {
-      this.renderCalendar();
-      this.loadEvents(); // Reload events for new month
-    }, 150);
+    this.renderCalendar();
+    this.loadEvents(); // Reload events for new month
   }
 
   showAddEventModal(date = null) {
@@ -424,7 +397,8 @@ export class CalendarManager {
         window.app.ui.showAlert('Evento agregado exitosamente', 'success');
       }
       
-      this.renderCalendar();
+      // Reload events to ensure persistence
+      await this.loadEvents();
       this.updateUpcomingEventsCount();
       
     } catch (error) {
@@ -486,12 +460,21 @@ export class CalendarManager {
       // Add to local events array
       this.events.unshift(data);
       console.log('📅 DEBUG: Event added to local array. Total events:', this.events.length);
+      console.log('📅 DEBUG: Local events array:', this.events.map(e => ({id: e.id, title: e.title, date: e.date})));
       
       // If recurring, create additional events
       if (data.recurring && data.frequency) {
         console.log('📅 DEBUG: Creating recurring events...');
         await this.createRecurringEventsInDB(data);
       }
+
+      // Force a reload from database to ensure persistence
+      console.log('📅 DEBUG: Reloading events after creation to verify persistence...');
+      await this.loadEvents();
+      
+      // Refresh calendar display
+      console.log('📅 DEBUG: Refreshing calendar display...');
+      this.renderCalendar();
 
       return data;
     } catch (error) {
@@ -819,8 +802,9 @@ export class CalendarManager {
 
     try {
       console.log('📅 Loading calendar events from Supabase...');
+      console.log('📅 DEBUG: User ID:', userId);
       
-      // Get date range for current month view
+      // Get date range for current month view (extended range)
       const startOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
       const endOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
       
@@ -833,27 +817,41 @@ export class CalendarManager {
       const monthStartISO = rangeStart.toISOString().split('T')[0];
       const monthEndISO = rangeEnd.toISOString().split('T')[0];
       
+      console.log('📅 DEBUG: Loading events from', monthStartISO, 'to', monthEndISO);
+      
       const { data, error } = await calendarService.listEvents(userId, monthStartISO, monthEndISO);
       
       if (error) {
-        console.error('Error loading calendar events:', error);
+        console.error('📅 ERROR: Loading calendar events:', error);
         if (window.app && window.app.ui) {
-          window.app.ui.showAlert('Error al cargar eventos del calendario', 'error');
+          window.app.ui.showAlert('Error al cargar eventos del calendario: ' + (error.message || 'Error desconocido'), 'error');
         }
         return;
       }
       
       this.events = data || [];
-      console.log('📅 Calendar events loaded:', this.events.length, 'items');
+      console.log('📅 SUCCESS: Calendar events loaded:', this.events.length, 'items');
+      console.log('📅 DEBUG: Events data:', this.events);
+      
+      if (this.events.length > 0) {
+        console.log('📅 DEBUG: First few events loaded:', this.events.slice(0, 3).map(e => ({
+          id: e.id, 
+          title: e.title, 
+          date: e.date, 
+          user_id: e.user_id
+        })));
+      } else {
+        console.log('📅 DEBUG: No events found for user in database');
+      }
       
       // Update UI
       this.renderCalendar();
       this.updateUpcomingEventsCount();
       
     } catch (error) {
-      console.error('Error in loadEvents:', error);
+      console.error('📅 ERROR: Exception in loadEvents:', error);
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al cargar eventos del calendario', 'error');
+        window.app.ui.showAlert('Error al cargar eventos del calendario: ' + (error.message || 'Error desconocido'), 'error');
       }
     }
   }
@@ -887,7 +885,14 @@ export class CalendarManager {
 
   getEventsForDate(date) {
     const dateStr = date.toISOString().split('T')[0];
-    return this.events.filter(event => event.date === dateStr);
+    const eventsForDate = this.events.filter(event => event.date === dateStr);
+    
+    if (eventsForDate.length > 0) {
+      console.log(`📅 DEBUG: Found ${eventsForDate.length} events for date ${dateStr}:`, 
+                  eventsForDate.map(e => e.title));
+    }
+    
+    return eventsForDate;
   }
 
   isToday(date) {
@@ -1013,12 +1018,9 @@ export class CalendarManager {
       return;
     }
 
-    events.forEach((event, index) => {
+    events.forEach(event => {
       const eventElement = document.createElement('div');
       eventElement.className = `day-event-item ${event.type}`;
-      
-      // Add staggered animation
-      eventElement.style.setProperty('--item-delay', index);
       
       eventElement.innerHTML = `
         <div class="day-event-details">
@@ -1047,7 +1049,7 @@ export class CalendarManager {
 
       container.appendChild(eventElement);
       
-      // Add event listeners to the buttons with micro-animations
+      // Add event listeners to the buttons
       const viewBtn = eventElement.querySelector('.view-event-btn');
       const editBtn = eventElement.querySelector('.edit-event-btn');
       const deleteBtn = eventElement.querySelector('.delete-event-btn');
@@ -1055,7 +1057,6 @@ export class CalendarManager {
       if (viewBtn) {
         viewBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.animateButtonClick(viewBtn);
           console.log('📅 DEBUG: View button clicked for event:', event.id);
           this.showEventDetails(event.id);
         });
@@ -1064,7 +1065,6 @@ export class CalendarManager {
       if (editBtn) {
         editBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.animateButtonClick(editBtn);
           console.log('📅 DEBUG: Edit button clicked for event:', event.id);
           // Hide day events modal first
           if (window.app && window.app.modals) {
@@ -1079,7 +1079,6 @@ export class CalendarManager {
       if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.animateButtonClick(deleteBtn);
           console.log('📅 DEBUG: Delete button clicked for event:', event.id);
           this.confirmDeleteEvent(event.id);
         });

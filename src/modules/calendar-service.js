@@ -11,8 +11,12 @@ export class CalendarService {
   async listEvents(userId, monthStartISO, monthEndISO) {
     try {
       if (!userId) {
+        console.error('CalendarService: No userId provided');
         return { data: null, error: { message: 'Usuario no autenticado' } };
       }
+
+      console.log('CalendarService: Querying events for user:', userId);
+      console.log('CalendarService: Date range:', monthStartISO, 'to', monthEndISO);
 
       const { data, error } = await supabase
         .from('calendar_events')
@@ -23,13 +27,14 @@ export class CalendarService {
         .order('date', { ascending: true });
 
       if (error) {
-        console.error('Error loading calendar events:', error);
+        console.error('CalendarService: Database error loading events:', error);
         return { data: null, error };
       }
 
+      console.log('CalendarService: Query successful, found', (data || []).length, 'events');
       return { data: data || [], error: null };
     } catch (error) {
-      console.error('Error in listEvents:', error);
+      console.error('CalendarService: Exception in listEvents:', error);
       return { data: null, error };
     }
   }
@@ -42,6 +47,7 @@ export class CalendarService {
   async createEvent(event) {
     try {
       if (!event.user_id) {
+        console.error('CalendarService: No user_id provided in event data');
         return { data: null, error: { message: 'Usuario no autenticado' } };
       }
 
@@ -58,6 +64,8 @@ export class CalendarService {
         parent_id: event.parent_id || null
       };
 
+      console.log('CalendarService: Creating event with data:', eventData);
+
       const { data, error } = await supabase
         .from('calendar_events')
         .insert([eventData])
@@ -65,13 +73,14 @@ export class CalendarService {
         .single();
 
       if (error) {
-        console.error('Error creating calendar event:', error);
+        console.error('CalendarService: Database error creating event:', error);
         return { data: null, error };
       }
 
+      console.log('CalendarService: Event created successfully:', data);
       return { data, error: null };
     } catch (error) {
-      console.error('Error in createEvent:', error);
+      console.error('CalendarService: Exception in createEvent:', error);
       return { data: null, error };
     }
   }
