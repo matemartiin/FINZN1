@@ -6,36 +6,45 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 let supabase;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Missing Supabase environment variables:', {
-    url: supabaseUrl,
+  console.warn('⚠️  Missing Supabase environment variables - using mock mode:', {
+    url: supabaseUrl ? 'Present' : 'Missing',
     key: supabaseAnonKey ? 'Present' : 'Missing'
   });
-  console.warn('⚠️ Creating mock Supabase client for development');
   
+  // Create mock client for development
   supabase = {
-    auth: {
-      signUp: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-      signInWithPassword: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-      signOut: () => Promise.resolve({ error: null }),
-      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      getUser: () => ({ data: { user: null } }),
-      onAuthStateChange: () => ({ data: { subscription: null } })
-    },
     from: () => ({
-      select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }),
-      insert: () => Promise.resolve({ error: null }),
-      update: () => Promise.resolve({ error: null }),
-      delete: () => Promise.resolve({ error: null })
-    })
+      select: () => ({ data: [], error: null }),
+      insert: () => ({ data: null, error: { message: 'Mock mode - no database' } }),
+      update: () => ({ data: null, error: { message: 'Mock mode - no database' } }),
+      delete: () => ({ data: null, error: { message: 'Mock mode - no database' } }),
+      eq: function() { return this; },
+      gte: function() { return this; },
+      lte: function() { return this; },
+      order: function() { return this; },
+      single: function() { return this; }
+    }),
+    auth: {
+      getUser: () => ({ data: { user: null }, error: null }),
+      signIn: () => ({ data: null, error: { message: 'Mock mode' } }),
+      signOut: () => ({ error: null })
+    }
   };
 } else {
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    }
-  });
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    });
+    console.log('✅ Supabase client initialized successfully');
+  } catch (error) {
+    console.error('❌ Error creating Supabase client:', error);
+    // Fallback to mock mode
+    supabase = null;
+  }
 }
 
 export { supabase };

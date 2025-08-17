@@ -15,11 +15,6 @@ export class CalendarService {
         return { data: null, error: { message: 'Usuario no autenticado' } };
       }
 
-      // Check if Supabase is properly configured
-      if (!supabase || !supabase.from) {
-        console.log('CalendarService: Supabase not configured, using fallback');
-        return { data: [], error: null };
-      }
 
       console.log('CalendarService: Querying events for user:', userId);
       console.log('CalendarService: Date range:', monthStartISO, 'to', monthEndISO);
@@ -34,11 +29,6 @@ export class CalendarService {
 
       if (error) {
         console.error('CalendarService: Database error loading events:', error);
-        // If it's a table not found error, return empty data instead of error
-        if (error.message && error.message.includes('calendar_events')) {
-          console.log('CalendarService: calendar_events table not found, using fallback');
-          return { data: [], error: null };
-        }
         return { data: null, error };
       }
 
