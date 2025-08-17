@@ -969,6 +969,9 @@ export class UIManager {
               <button class="btn btn-sm btn-secondary edit-income-btn" data-type="fixed">
                 <i class="ph ph-pencil"></i> Editar
               </button>
+              <button class="btn btn-sm btn-danger delete-income-btn" data-type="fixed">
+                <i class="ph ph-trash"></i> Eliminar
+              </button>
             </div>
           `;
           
@@ -1047,6 +1050,9 @@ export class UIManager {
         <div class="income-item-actions">
           <button class="btn btn-sm btn-secondary edit-income-btn" data-type="fixed">
             <i class="ph ph-pencil"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-danger delete-income-btn" data-type="fixed">
+            <i class="ph ph-trash"></i> Eliminar
           </button>
         </div>
       `;
@@ -2125,6 +2131,10 @@ bindBudgetForm() {
       if (confirm('¿Estás seguro de que quieres eliminar este ingreso?')) {
         this.deleteExtraIncome(incomeId);
       }
+    } else if (incomeType === 'fixed') {
+      if (confirm('¿Estás seguro de que quieres eliminar el ingreso fijo? Esto lo pondrá en $0.')) {
+        this.deleteFixedIncome();
+      }
     }
   }
 
@@ -2144,6 +2154,26 @@ bindBudgetForm() {
     } catch (error) {
       console.error('Error deleting income:', error);
       this.showAlert('Error eliminando el ingreso', 'error');
+    }
+  }
+
+  async deleteFixedIncome() {
+    try {
+      if (window.app && window.app.data && window.app.data.updateIncome) {
+        // Set fixed income to 0
+        await window.app.data.updateIncome(window.app.currentMonth, { fixed: 0 });
+        this.showAlert('Ingreso fijo eliminado (puesto en $0)', 'success');
+        
+        // Refresh the dashboard
+        if (window.app.updateDashboard) {
+          window.app.updateDashboard();
+        }
+      } else {
+        this.showAlert('Error: No se pudo eliminar el ingreso fijo', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting fixed income:', error);
+      this.showAlert('Error eliminando el ingreso fijo', 'error');
     }
   }
 

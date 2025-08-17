@@ -6603,7 +6603,6 @@ textarea:focus-visible{
   text-align: center;
   font-size: 13px;
   letter-spacing: .01em;
-  content: "Sin datos para mostrar";
 }
 
 /* F) Chips utilitarias listas para usar (cuando tus items las incluyan) */
