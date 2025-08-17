@@ -176,7 +176,7 @@ body[data-skin="pro"] .form-group textarea:focus {
 
 /* ========= UNIFIED GRID SYSTEM ========= */
 
-/* Consolidate summary cards grid definitions - prevent early vertical stacking */
+/* Consolidate summary cards grid definitions - MANTENER SIEMPRE 3 COLUMNAS */
 .summary-cards {
   display: grid;
   gap: 1rem;
@@ -185,14 +185,15 @@ body[data-skin="pro"] .form-group textarea:focus {
 
 @media (max-width: 900px) {
   .summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .summary-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
   }
 }
 

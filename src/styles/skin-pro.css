@@ -292,7 +292,7 @@ body[data-skin="pro"] .section-content .section-header{
   backdrop-filter: none;
 }
 
-/* 10) Responsivo fino: mantener 3 columnas hasta muy pequeño */
+/* 10) Responsivo fino: SIEMPRE 3 columnas, solo ajustar gaps */
 @media (max-width: 1200px){
   body[data-layout="v2"][data-skin="pro"] .summary-cards{
     grid-template-columns: repeat(3, minmax(0,1fr));
@@ -301,13 +301,14 @@ body[data-skin="pro"] .section-content .section-header{
 }
 @media (max-width: 900px){
   body[data-layout="v2"][data-skin="pro"] .summary-cards{
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
   }
 }
 @media (max-width: 480px){
   body[data-layout="v2"][data-skin="pro"] .summary-cards{
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 4px;
   }
   body[data-skin="pro"] .btn { height: 44px; }
 }
@@ -523,10 +524,10 @@ body[data-skin="pro"] .summary-cards{
   body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(3, 1fr); gap: 12px; }
 }
 @media (max-width: 900px){
-  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(3, 1fr); gap: 8px; }
 }
 @media (max-width: 480px){
-  body[data-skin="pro"] .summary-cards{ grid-template-columns: 1fr; }
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(3, 1fr); gap: 4px; }
 }
 body[data-skin="pro"] .summary-card{
   height:100%;
@@ -1211,7 +1212,7 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
   }
 }
 
-/* T2: 900–1199px (laptop) — mantener 3 columnas hasta 900px */
+/* T2: SIEMPRE mantener 3 columnas */
 @media (max-width: 1199px) and (min-width: 901px){
   body[data-skin="pro"] .summary-cards{
     grid-template-columns: repeat(3, minmax(0,1fr));
@@ -1220,8 +1221,8 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
 }
 @media (max-width: 900px) and (min-width: 481px){
   body[data-skin="pro"] .summary-cards{
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
   }
   /* la fila de 2 cards se apila una debajo de la otra */
   body[data-skin="pro"] .col-span-6 { grid-column: span 12; }
@@ -1230,12 +1231,12 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
   .pro-card-head h3 { font-size: 15px; }
 }
 
-/* T3: <=900px (tablet) — todo 1 columna, contenidos más compactos */
+/* T3: <=900px (tablet) — MANTENER 3 columnas, contenidos más compactos */
 @media (max-width: 900px){
   .dashboard-section{ padding-inline: 16px; }
   body[data-skin="pro"] .summary-cards{
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
   }
   .summary-card{ min-height: 150px; padding: 14px; }
   .card-header-simple{ padding: 8px 8px 4px; }
@@ -1426,8 +1427,8 @@ html, body {
   /* Sidebar out, navegación móvil in */
   .sidebar-nav{ display: none !important; }
 
-  /* Stacking limpio en móvil: 1 columna todo lo “grid” */
-  body[data-skin="pro"] .summary-cards{ grid-template-columns: 1fr !important; }
+  /* Mantener 3 columnas incluso en móvil */
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(3, minmax(0,1fr)) !important; gap: 4px !important; }
   body[data-skin="pro"] .grid-12{ grid-template-columns: 1fr !important; }
   /* cualquier .col-span-* ocupa el ancho completo en mobile */
   body[data-skin="pro"] .grid-12 > [class*="col-span-"]{ grid-column: 1 / -1 !important; }
