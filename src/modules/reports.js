@@ -127,7 +127,7 @@ export class ReportManager {
     let prompt = `Eres un experto asesor financiero personal. Analiza los siguientes datos financieros y genera un informe completo y personalizado en español.
 
 DATOS FINANCIEROS:
-- Período: ${this.escapeHtml(this.getPeriodText(data.period))} (${data.months} meses)
+- Período: ${this.getPeriodText(data.period)} (${data.months} meses)
 - Ingresos Totales: $${data.totalIncome.toLocaleString()}
 - Gastos Totales: $${data.totalExpenses.toLocaleString()}
 - Balance: $${balance.toLocaleString()}
@@ -181,7 +181,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
         <div class="report-metrics">
           <div class="metric">
             <span class="metric-label">Período:</span>
-            <span class="metric-value">${this.escapeHtml(this.getPeriodText(data.period))}</span>
+            <span class="metric-value">${this.getPeriodText(data.period)}</span>
           </div>
           <div class="metric">
             <span class="metric-label">Balance:</span>
@@ -231,7 +231,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
         <div class="report-metrics">
           <div class="metric">
             <span class="metric-label">Período:</span>
-            <span class="metric-value">${this.escapeHtml(this.getPeriodText(data.period))}</span>
+            <span class="metric-value">${this.getPeriodText(data.period)}</span>
           </div>
           <div class="metric">
             <span class="metric-label">Balance:</span>
@@ -264,7 +264,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
             <span class="category-name">${this.escapeHtml(category)}</span>
             <span class="category-amount">${this.formatCurrency(amount)} (${percentage}%)</span>
           </div>
-          <div class="category-insight">${this.escapeHtml(analysis)}</div>
+          <div class="category-insight">${analysis}</div>
         </div>
       `;
     });
@@ -802,7 +802,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
           <div class="date">Generado el ${dateStr}</div>
         </div>
         
-        ${this.sanitizeReportContent(reportContent)}
+        ${reportContent}
         
         <div class="pdf-footer">
           <p>Informe generado por FINZN - Tu compañero financiero inteligente</p>
