@@ -1114,11 +1114,50 @@ export class CalendarManager {
     const clientId = envVars[clientKey];
     const apiKey = envVars[apiKeyName];
     
+    console.log('🔍 Google Calendar Configuration Check:');
+    console.log('📋 Environment variables available:', Object.keys(envVars).filter(k => k.includes('GOOGLE')));
+    console.log('🔑 Client ID configured:', !!clientId);
+    console.log('🗝️ API Key configured:', !!apiKey);
+    
     // Check if Google Calendar is configured (same pattern as Gemini)
     if (!clientId || !apiKey) {
-      console.log('⚠️ Google Calendar not configured, using fallback');
+      console.log('⚠️ Google Calendar not configured');
+      console.log('💡 To configure Google Calendar:');
+      console.log('   1. Get credentials from Google Cloud Console');
+      console.log('   2. Set VITE_GOOGLE_CLIENT_ID in .env file');
+      console.log('   3. Set VITE_GOOGLE_API_KEY in .env file');
+      
+      // Check for development mode to show debug modal
+      const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
+      
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Google Calendar no está configurado. Configura las credenciales para usar esta función.', 'warning');
+        if (isDevelopment) {
+          const debugMessage = `
+            <div style="text-align: left;">
+              <strong>🔧 Modo Desarrollo - Google Calendar</strong><br><br>
+              <p>Para probar la integración:</p>
+              <button onclick="window.app.calendar.testGoogleIntegration()" class="btn btn-primary" style="margin: 5px;">
+                🧪 Modo Demo
+              </button><br><br>
+              <p>Para configuración real:</p>
+              1. Credenciales de Google Cloud Console<br>
+              2. Variables VITE_GOOGLE_CLIENT_ID y VITE_GOOGLE_API_KEY<br><br>
+              <small>En modo demo se simula la funcionalidad</small>
+            </div>
+          `;
+          window.app.ui.showAlert(debugMessage, 'info', 10000);
+        } else {
+          const configMessage = `
+            <div style="text-align: left;">
+              <strong>Google Calendar no está configurado</strong><br><br>
+              Para habilitar la sincronización necesitas:<br>
+              1. Credenciales de Google Cloud Console<br>
+              2. Variables VITE_GOOGLE_CLIENT_ID y VITE_GOOGLE_API_KEY<br><br>
+              <small>Consulta la documentación para más detalles</small>
+            </div>
+          `;
+          window.app.ui.showAlert(configMessage, 'warning', 8000);
+        }
       }
       return;
     }
@@ -1171,75 +1210,106 @@ export class CalendarManager {
   
   async initGoogleAPI(clientId, apiKey) {
     return new Promise((resolve, reject) => {
+      console.log('🚀 Initializing Google Calendar API...');
+      console.log('🔑 Using Client ID:', clientId ? `${clientId.substring(0, 20)}...` : 'undefined');
+      console.log('🗝️ Using API Key:', apiKey ? `${apiKey.substring(0, 10)}...` : 'undefined');
+      
       // Load Google Identity Services (GIS) and Google API Client scripts
       const loadPromises = [];
       
       // Load Google Identity Services script
       if (!window.google?.accounts) {
+        console.log('📥 Loading Google Identity Services...');
         const gisScript = document.createElement('script');
         gisScript.src = 'https://accounts.google.com/gsi/client';
-        gisScript.onload = () => console.log('✅ Google Identity Services loaded');
+        gisScript.onload = () => {
+          console.log('✅ Google Identity Services loaded successfully');
+          console.log('🔍 GIS available methods:', Object.keys(window.google?.accounts?.oauth2 || {}));
+        };
         gisScript.onerror = (error) => {
           console.error('❌ Failed to load Google Identity Services:', error);
-          reject(error);
+          reject(new Error('Failed to load Google Identity Services'));
         };
         document.head.appendChild(gisScript);
         loadPromises.push(new Promise((res, rej) => {
           gisScript.onload = res;
           gisScript.onerror = rej;
         }));
+      } else {
+        console.log('✅ Google Identity Services already available');
       }
       
       // Load Google API Client script
       if (!window.gapi) {
+        console.log('📥 Loading Google API Client...');
         const gapiScript = document.createElement('script');
         gapiScript.src = 'https://apis.google.com/js/api.js';
-        gapiScript.onload = () => console.log('✅ Google API Client loaded');
+        gapiScript.onload = () => {
+          console.log('✅ Google API Client loaded successfully');
+          console.log('🔍 GAPI available methods:', Object.keys(window.gapi || {}));
+        };
         gapiScript.onerror = (error) => {
           console.error('❌ Failed to load Google API Client:', error);
-          reject(error);
+          reject(new Error('Failed to load Google API Client'));
         };
         document.head.appendChild(gapiScript);
         loadPromises.push(new Promise((res, rej) => {
           gapiScript.onload = res;
           gapiScript.onerror = rej;
         }));
+      } else {
+        console.log('✅ Google API Client already available');
       }
       
       Promise.all(loadPromises).then(() => {
+        console.log('📚 Loading Google API Client modules...');
         // Initialize Google API Client
         window.gapi.load('client', () => {
+          console.log('🔧 Initializing Google API Client...');
           window.gapi.client.init({
             apiKey: apiKey,
             discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
           }).then(() => {
-            // Initialize Google Identity Services
-            this.tokenClient = window.google.accounts.oauth2.initTokenClient({
-              client_id: clientId,
-              scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar',
-              callback: (response) => {
-                if (response.error !== undefined) {
-                  console.error('❌ Token request error:', response);
-                  this.tokenError = response;
-                  return;
-                }
-                console.log('✅ Google Calendar API token received');
-                this.accessToken = response.access_token;
-                window.gapi.client.setToken({access_token: response.access_token});
-              },
-            });
+            console.log('✅ Google API Client initialized');
+            console.log('🔍 Available API methods:', Object.keys(window.gapi.client || {}));
             
-            console.log('✅ Google Calendar API initialized with GIS');
-            resolve();
+            // Initialize Google Identity Services
+            console.log('🔧 Setting up OAuth2 token client...');
+            try {
+              this.tokenClient = window.google.accounts.oauth2.initTokenClient({
+                client_id: clientId,
+                scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar',
+                callback: (response) => {
+                  console.log('📧 Token callback received:', response);
+                  if (response.error !== undefined) {
+                    console.error('❌ Token request error:', response);
+                    this.tokenError = response;
+                    return;
+                  }
+                  console.log('✅ Google Calendar API token received');
+                  this.accessToken = response.access_token;
+                  window.gapi.client.setToken({access_token: response.access_token});
+                },
+              });
+              
+              console.log('✅ Google Calendar API initialized with GIS successfully');
+              resolve();
+            } catch (tokenError) {
+              console.error('❌ Error setting up token client:', tokenError);
+              reject(tokenError);
+            }
           }).catch((error) => {
-            console.error('❌ Google API initialization error:', error);
+            console.error('❌ Google API client initialization error:', error);
             if (error.details) {
-              console.error('Error details:', error.details);
+              console.error('🔍 Error details:', error.details);
             }
             reject(error);
           });
         });
-      }).catch(reject);
+      }).catch((loadError) => {
+        console.error('❌ Failed to load Google API scripts:', loadError);
+        reject(loadError);
+      });
     });
   }
   
@@ -1411,6 +1481,11 @@ export class CalendarManager {
       await this.authenticateGoogle();
     }
     
+    // Check if we're in demo mode
+    if (this.accessToken && this.accessToken.startsWith('demo_token_')) {
+      return this.demoImportFromGoogle();
+    }
+    
     try {
       // If we don't have access token (restored from persistence), we need to re-authenticate
       if (!this.accessToken) {
@@ -1524,6 +1599,11 @@ export class CalendarManager {
   async exportToGoogle() {
     if (!this.googleCalendarIntegration) {
       await this.authenticateGoogle();
+    }
+    
+    // Check if we're in demo mode
+    if (this.accessToken && this.accessToken.startsWith('demo_token_')) {
+      return this.demoExportToGoogle();
     }
     
     try {
@@ -1695,6 +1775,137 @@ export class CalendarManager {
     const [hours, minutes] = timeStr.split(':').map(Number);
     const newHours = (hours + 1) % 24;
     return `${newHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  // Test/Demo mode for Google Calendar integration
+  async testGoogleIntegration() {
+    console.log('🧪 Starting Google Calendar demo mode...');
+    
+    try {
+      // Simulate authentication
+      this.googleCalendarIntegration = true;
+      this.accessToken = 'demo_token_' + Date.now();
+      this.saveSyncState();
+      this.updateSyncButtonState();
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('🧪 Modo demo activado - Google Calendar simulado', 'success');
+      }
+      
+      // Show sync options
+      this.showGoogleSyncOptions();
+      
+    } catch (error) {
+      console.error('Error in demo mode:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error en modo demo', 'error');
+      }
+    }
+  }
+
+  async demoImportFromGoogle() {
+    console.log('🧪 Demo: Importing from Google Calendar...');
+    
+    try {
+      // Create demo events
+      const demoEvents = [
+        {
+          title: 'Pago de Tarjeta de Crédito',
+          type: 'payment',
+          date: new Date().toISOString().split('T')[0],
+          time: '10:00',
+          description: 'Evento demo importado de Google Calendar',
+          amount: null,
+          recurring: false,
+          frequency: null
+        },
+        {
+          title: 'Reunión de Trabajo',
+          type: 'reminder',
+          date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
+          time: '14:30',
+          description: 'Evento demo importado de Google Calendar',
+          amount: null,
+          recurring: false,
+          frequency: null
+        },
+        {
+          title: 'Vencimiento Servicios',
+          type: 'deadline',
+          date: new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0], // Day after tomorrow
+          time: null,
+          description: 'Evento demo importado de Google Calendar',
+          amount: null,
+          recurring: false,
+          frequency: null
+        }
+      ];
+      
+      let importedCount = 0;
+      
+      for (const demoEvent of demoEvents) {
+        try {
+          // Check if event already exists to avoid duplicates
+          const existingEvents = this.getEventsForDate(new Date(demoEvent.date));
+          const duplicate = existingEvents.find(e => 
+            e.title === demoEvent.title && 
+            e.date === demoEvent.date
+          );
+          
+          if (!duplicate) {
+            await this.addEvent(demoEvent);
+            importedCount++;
+          }
+        } catch (error) {
+          console.error('Error adding demo event:', error);
+        }
+      }
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert(`🧪 Demo: ${importedCount} eventos importados simulados`, 'success');
+      }
+      
+      // Close modal and refresh
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('google-sync-modal');
+      }
+      
+      await this.loadEvents();
+      this.renderCalendar();
+      this.updateUpcomingEventsCount();
+      
+    } catch (error) {
+      console.error('Error in demo import:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error en importación demo', 'error');
+      }
+    }
+  }
+
+  async demoExportToGoogle() {
+    console.log('🧪 Demo: Exporting to Google Calendar...');
+    
+    try {
+      // Count events that would be exported (excluding demo imports)
+      const exportableEvents = this.events.filter(event => 
+        !event.description || !event.description.includes('Evento demo importado de Google Calendar')
+      );
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert(`🧪 Demo: ${exportableEvents.length} eventos exportados simulados`, 'success');
+      }
+      
+      // Close modal
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('google-sync-modal');
+      }
+      
+    } catch (error) {
+      console.error('Error in demo export:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error en exportación demo', 'error');
+      }
+    }
   }
 
   // Utility methods
