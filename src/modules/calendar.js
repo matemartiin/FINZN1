@@ -937,6 +937,8 @@ export class CalendarManager {
         errorMessage = 'El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.';
       } else if (error.error === 'access_denied') {
         errorMessage = 'Acceso denegado. Verifica que tengas permisos para Google Calendar.';
+      } else if (error.error === 'idpiframe_initialization_failed') {
+        errorMessage = 'Dominio no autorizado. Agrega este dominio en Google Cloud Console > Credenciales > OAuth 2.0';
       } else if (error.details && error.details.includes('API key')) {
         errorMessage = 'Error con la API key de Google. Verifica la configuración.';
       } else if (error.details && error.details.includes('Client ID')) {
