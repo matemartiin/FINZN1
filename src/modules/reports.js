@@ -3,6 +3,28 @@ export class ReportManager {
     this.reports = [];
   }
 
+  // Utility function to safely escape HTML
+  escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Safely handle report content that might contain user data
+  sanitizeReportContent(content) {
+    if (typeof content !== 'string') return '';
+    
+    // For reports, we want to preserve some formatting but escape user data
+    // This is a basic implementation - in production, use a library like DOMPurify
+    return content
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
+
   async generateAIReport(data, focus, questions) {
     if (import.meta.env.DEV) {
       console.log('🤖 Generating AI report with data:', data);
@@ -105,7 +127,7 @@ export class ReportManager {
     let prompt = `Eres un experto asesor financiero personal. Analiza los siguientes datos financieros y genera un informe completo y personalizado en español.
 
 DATOS FINANCIEROS:
-- Período: ${this.getPeriodText(data.period)} (${data.months} meses)
+- Período: ${this.escapeHtml(this.getPeriodText(data.period))} (${data.months} meses)
 - Ingresos Totales: $${data.totalIncome.toLocaleString()}
 - Gastos Totales: $${data.totalExpenses.toLocaleString()}
 - Balance: $${balance.toLocaleString()}
@@ -159,7 +181,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
         <div class="report-metrics">
           <div class="metric">
             <span class="metric-label">Período:</span>
-            <span class="metric-value">${this.getPeriodText(data.period)}</span>
+            <span class="metric-value">${this.escapeHtml(this.getPeriodText(data.period))}</span>
           </div>
           <div class="metric">
             <span class="metric-label">Balance:</span>
@@ -209,7 +231,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
         <div class="report-metrics">
           <div class="metric">
             <span class="metric-label">Período:</span>
-            <span class="metric-value">${this.getPeriodText(data.period)}</span>
+            <span class="metric-value">${this.escapeHtml(this.getPeriodText(data.period))}</span>
           </div>
           <div class="metric">
             <span class="metric-label">Balance:</span>
@@ -239,10 +261,10 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
         <div class="category-item">
           <div class="category-header">
             <span class="category-rank">#${index + 1}</span>
-            <span class="category-name">${category}</span>
+            <span class="category-name">${this.escapeHtml(category)}</span>
             <span class="category-amount">${this.formatCurrency(amount)} (${percentage}%)</span>
           </div>
-          <div class="category-insight">${analysis}</div>
+          <div class="category-insight">${this.escapeHtml(analysis)}</div>
         </div>
       `;
     });
@@ -780,7 +802,7 @@ Usa un tono profesional pero accesible. Incluye números específicos y porcenta
           <div class="date">Generado el ${dateStr}</div>
         </div>
         
-        ${reportContent}
+        ${this.sanitizeReportContent(reportContent)}
         
         <div class="pdf-footer">
           <p>Informe generado por FINZN - Tu compañero financiero inteligente</p>
