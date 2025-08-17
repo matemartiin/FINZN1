@@ -1087,8 +1087,14 @@ export class CalendarManager {
           id: e.id, 
           title: e.title, 
           date: e.date, 
-          user_id: e.user_id
+          user_id: e.user_id,
+          google_event_id: e.google_event_id,
+          sync_source: e.sync_source
         })));
+        
+        // Count events with Google IDs
+        const googleEvents = this.events.filter(e => e.google_event_id);
+        console.log('📅 DEBUG: Events with Google IDs:', googleEvents.length, 'out of', this.events.length);
       } else {
         console.log('📅 DEBUG: No events found for user in database');
       }

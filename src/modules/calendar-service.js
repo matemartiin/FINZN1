@@ -74,7 +74,13 @@ export class CalendarService {
         description: event.description || null,
         recurring: event.recurring || false,
         frequency: event.frequency || null,
-        parent_id: event.parent_id || null
+        parent_id: event.parent_id || null,
+        // Google Calendar sync fields
+        google_event_id: event.google_event_id || null,
+        google_calendar_id: event.google_calendar_id || null,
+        sync_source: event.sync_source || 'finzn',
+        last_synced_at: event.last_synced_at || null,
+        sync_version: event.sync_version || 1
       };
 
       console.log('CalendarService: Creating event with data:', eventData);
@@ -147,6 +153,13 @@ export class CalendarService {
       if (updates.description !== undefined) updateData.description = updates.description || null;
       if (updates.recurring !== undefined) updateData.recurring = updates.recurring;
       if (updates.frequency !== undefined) updateData.frequency = updates.frequency || null;
+      
+      // Google Calendar sync fields
+      if (updates.google_event_id !== undefined) updateData.google_event_id = updates.google_event_id;
+      if (updates.google_calendar_id !== undefined) updateData.google_calendar_id = updates.google_calendar_id;
+      if (updates.sync_source !== undefined) updateData.sync_source = updates.sync_source;
+      if (updates.last_synced_at !== undefined) updateData.last_synced_at = updates.last_synced_at;
+      if (updates.sync_version !== undefined) updateData.sync_version = updates.sync_version;
 
       const { data, error } = await supabase
         .from('calendar_events')

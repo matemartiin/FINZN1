@@ -11,17 +11,32 @@ export class CalendarSyncFix {
   // Enhanced delete method with Google Calendar sync
   async deleteEventWithSync(eventId) {
     console.log('🗑️ Starting delete with sync for event:', eventId);
+    console.log('🔍 DEBUG: Current events in calendar:', this.calendar.events.length);
+    console.log('🔍 DEBUG: Google integration status:', this.calendar.googleCalendarIntegration);
+    console.log('🔍 DEBUG: Access token available:', !!this.calendar.accessToken);
     
     try {
       // Find the event first
       const event = this.calendar.events.find(e => e.id === eventId);
+      console.log('🔍 DEBUG: Found event:', event ? {
+        id: event.id,
+        title: event.title,
+        google_event_id: event.google_event_id,
+        sync_source: event.sync_source
+      } : 'EVENT NOT FOUND');
+      
       if (!event) {
-        throw new Error('Event not found');
+        throw new Error('Event not found in local calendar.events array');
       }
 
       // If event has Google ID, delete from Google Calendar first
       if (event.google_event_id && this.calendar.googleCalendarIntegration) {
+        console.log('🔍 DEBUG: Attempting to delete from Google Calendar with ID:', event.google_event_id);
         await this.deleteFromGoogleCalendar(event.google_event_id);
+      } else {
+        console.log('🔍 DEBUG: Skipping Google deletion - missing google_event_id or integration disabled');
+        console.log('🔍 DEBUG: google_event_id:', event.google_event_id);
+        console.log('🔍 DEBUG: googleCalendarIntegration:', this.calendar.googleCalendarIntegration);
       }
 
       // Then delete from local/Supabase
