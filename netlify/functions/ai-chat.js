@@ -64,11 +64,12 @@ exports.handler = async (event, context) => {
     }
 
     // Get API key from environment (secure server-side)
-    const apiKey = process.env.VITE_GEMINI_API_KEY;
+    // Note: In Netlify Functions, use GEMINI_API_KEY (without VITE_ prefix)
+    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     
     console.log('API Key status:', apiKey ? 'Present' : 'Missing');
+    console.log('Available env vars:', Object.keys(process.env).filter(key => key.includes('GEMINI') || key.includes('API')));
     console.log('Origin:', origin);
-    console.log('Request body:', event.body);
     
     if (!apiKey) {
       console.error('Gemini API key not found in environment');
