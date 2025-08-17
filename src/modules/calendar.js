@@ -78,6 +78,12 @@ export class CalendarManager {
       addEventForDayBtn.addEventListener('click', () => this.showAddEventModalForSelectedDate());
     }
 
+    // Delete all events for day button (from day events modal)
+    const deleteAllDayEventsBtn = document.getElementById('delete-all-day-events');
+    if (deleteAllDayEventsBtn) {
+      deleteAllDayEventsBtn.addEventListener('click', () => this.confirmDeleteAllDayEvents());
+    }
+
     // Google Calendar sync button
     const syncBtn = document.getElementById('sync-google-calendar-btn');
     if (syncBtn) {
@@ -2287,6 +2293,9 @@ export class CalendarManager {
     // Populate events list
     this.populateDayEventsList(listElement, events);
 
+    // Show/hide delete all button based on events count
+    this.updateDeleteAllButtonVisibility(events.length > 0);
+
     // Show the modal
     if (window.app && window.app.modals) {
       window.app.modals.show('day-events-modal');
@@ -2395,6 +2404,98 @@ export class CalendarManager {
     }
   }
 
+  confirmDeleteAllDayEvents() {
+    if (!this.selectedDate) {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('No hay fecha seleccionada', 'error');
+      }
+      return;
+    }
+
+    const eventsForDay = this.getEventsForDate(this.selectedDate);
+    if (eventsForDay.length === 0) {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('No hay eventos para eliminar en este día', 'info');
+      }
+      return;
+    }
+
+    const dateStr = this.selectedDate.toLocaleDateString('es-ES', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
+    const eventCount = eventsForDay.length;
+    const message = `¿Estás seguro de que quieres eliminar TODOS los ${eventCount} evento${eventCount > 1 ? 's' : ''} del ${dateStr}?\n\nEsta acción no se puede deshacer.`;
+
+    if (confirm(message)) {
+      this.deleteAllEventsForDay(eventsForDay);
+    }
+  }
+
+  async deleteAllEventsForDay(events) {
+    if (!events || events.length === 0) return;
+
+    let deletedCount = 0;
+    let errorCount = 0;
+    const totalEvents = events.length;
+
+    // Show progress indicator
+    if (window.app && window.app.ui) {
+      window.app.ui.showAlert(`Eliminando ${totalEvents} eventos...`, 'info', 2000);
+    }
+
+    for (const event of events) {
+      try {
+        // Use the enhanced delete method that handles Google sync
+        await this.syncFix.deleteEventWithSync(event.id);
+        deletedCount++;
+      } catch (error) {
+        console.error('Error deleting event:', event.id, error);
+        errorCount++;
+      }
+    }
+
+    // Show results
+    if (deletedCount > 0) {
+      this.renderCalendar();
+      this.updateUpcomingEventsCount();
+      
+      let message = `${deletedCount} evento${deletedCount > 1 ? 's' : ''} eliminado${deletedCount > 1 ? 's' : ''} exitosamente`;
+      if (errorCount > 0) {
+        message += `. ${errorCount} evento${errorCount > 1 ? 's' : ''} no pudo${errorCount > 1 ? 'n' : ''} ser eliminado${errorCount > 1 ? 's' : ''}.`;
+      }
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert(message, errorCount > 0 ? 'warning' : 'success');
+      }
+      
+      // Close the day events modal since all events are deleted
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('day-events-modal');
+      }
+    } else {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('No se pudo eliminar ningún evento', 'error');
+      }
+    }
+  }
+
+  updateDeleteAllButtonVisibility(hasEvents) {
+    const deleteAllBtn = document.getElementById('delete-all-day-events');
+    if (deleteAllBtn) {
+      if (hasEvents) {
+        deleteAllBtn.style.display = 'inline-flex';
+        deleteAllBtn.style.opacity = '1';
+      } else {
+        deleteAllBtn.style.display = 'none';
+        deleteAllBtn.style.opacity = '0';
+      }
+    }
+  }
+
   async deleteEventFromDay(eventId) {
     try {
       // Use the enhanced delete method that handles Google sync
@@ -2414,6 +2515,9 @@ export class CalendarManager {
         const updatedEvents = this.getEventsForDate(this.selectedDate);
         const listElement = document.getElementById('day-events-list');
         this.populateDayEventsList(listElement, updatedEvents);
+        
+        // Update delete all button visibility
+        this.updateDeleteAllButtonVisibility(updatedEvents.length > 0);
         
         // If no more events, close the modal
         if (updatedEvents.length === 0) {

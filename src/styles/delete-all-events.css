@@ -1,0 +1,109 @@
+/* Delete All Day Events Button Styles */
+
+/* Delete all events button styling */
+#delete-all-day-events {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  border: none;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#delete-all-day-events:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+#delete-all-day-events:active {
+  transform: translateY(0);
+}
+
+#delete-all-day-events i {
+  margin-right: 0.5rem;
+}
+
+/* Day events modal specific styling */
+#day-events-modal .modal-actions {
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Group primary actions on the left */
+#day-events-modal .modal-actions #add-event-for-day,
+#day-events-modal .modal-actions #delete-all-day-events {
+  margin-right: auto;
+}
+
+/* Close button on the right */
+#day-events-modal .modal-actions .modal-cancel {
+  margin-left: auto;
+}
+
+/* Responsive styling for modal actions */
+@media (max-width: 768px) {
+  #day-events-modal .modal-actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  #delete-all-day-events {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  #add-event-for-day {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .modal-cancel {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  #delete-all-day-events {
+    padding: 10px;
+    font-size: 13px;
+  }
+  
+  #delete-all-day-events i {
+    margin-right: 0.25rem;
+  }
+}
+
+/* Animation for button appearance */
+@keyframes dangerPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  }
+}
+
+#delete-all-day-events:focus {
+  animation: dangerPulse 2s ease-in-out infinite;
+  outline: none;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] #delete-all-day-events {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+[data-theme="dark"] #delete-all-day-events:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
