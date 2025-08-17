@@ -14,7 +14,8 @@
       "Bash(node:*)",
       "Bash(npm run build:*)",
       "Bash(echo $VITE_SUPABASE_URL)",
-      "Bash(npm run preview:*)"
+      "Bash(npm run preview:*)",
+      "Bash(git add:*)"
     ],
     "defaultMode": "acceptEdits"
   }

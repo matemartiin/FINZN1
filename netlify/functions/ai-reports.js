@@ -44,7 +44,9 @@ exports.handler = async (event, context) => {
       origin && origin.startsWith(allowed)
     );
 
-    if (!isOriginAllowed && process.env.NODE_ENV === 'production') {
+    // Temporarily disabled for debugging
+    if (!isOriginAllowed && process.env.NODE_ENV === 'production' && false) {
+      console.log('Origin validation failed:', origin);
       return {
         statusCode: 403,
         headers: { 'Access-Control-Allow-Origin': '*' },
@@ -53,6 +55,9 @@ exports.handler = async (event, context) => {
     }
 
     const apiKey = process.env.VITE_GEMINI_API_KEY;
+    
+    console.log('API Key status:', apiKey ? 'Present' : 'Missing');
+    console.log('Origin:', origin);
     
     if (!apiKey) {
       return {
