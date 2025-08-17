@@ -452,3 +452,115 @@ body[data-skin="pro"] .item-amount {
     margin-top: -16px !important;
   }
 }
+
+/* ========= ANIMACIONES MODALES MEJORADAS ========= */
+/* Asegurar que modal y formulario aparezcan simultáneamente sin demora */
+
+/* Override modal timing para sincronización perfecta */
+:root {
+  --modal-duration-fast: 180ms;
+  --modal-ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Modal backdrop - animación instantánea */
+.modal {
+  transition: 
+    opacity var(--modal-duration-fast) var(--modal-ease-smooth),
+    visibility 0ms linear; /* sin delay para visibility */
+}
+
+.modal.active {
+  transition: 
+    opacity var(--modal-duration-fast) var(--modal-ease-smooth),
+    visibility 0ms linear;
+}
+
+/* Modal content - aparece inmediatamente con el modal */
+.modal-content {
+  transform: translateY(12px) scale(0.95);
+  opacity: 0;
+  transition: 
+    transform var(--modal-duration-fast) var(--modal-ease-smooth),
+    opacity var(--modal-duration-fast) var(--modal-ease-smooth);
+}
+
+.modal.active .modal-content {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  transition: 
+    transform var(--modal-duration-fast) var(--modal-ease-smooth),
+    opacity var(--modal-duration-fast) var(--modal-ease-smooth);
+}
+
+/* Formulario dentro del modal - aparece al mismo tiempo */
+.modal-form {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Elementos del formulario - sin animaciones individuales que causen delay */
+.modal-form .form-group,
+.modal-form .form-group input,
+.modal-form .form-group select,
+.modal-form .form-group textarea,
+.modal-form .form-group label {
+  animation: none !important;
+  transition-delay: 0ms !important;
+}
+
+/* Animación de entrada suave para contenido del formulario */
+.modal.active .modal-form .form-group {
+  animation: modalFormSlideIn var(--modal-duration-fast) var(--modal-ease-smooth) forwards;
+}
+
+@keyframes modalFormSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación escalonada sutil para los campos del formulario */
+.modal.active .modal-form .form-group:nth-child(1) { animation-delay: 0ms; }
+.modal.active .modal-form .form-group:nth-child(2) { animation-delay: 15ms; }
+.modal.active .modal-form .form-group:nth-child(3) { animation-delay: 30ms; }
+.modal.active .modal-form .form-group:nth-child(4) { animation-delay: 45ms; }
+.modal.active .modal-form .form-group:nth-child(5) { animation-delay: 60ms; }
+
+/* Modal actions - aparecen con el resto */
+.modal-actions {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.modal.active .modal-actions {
+  animation: modalFormSlideIn var(--modal-duration-fast) var(--modal-ease-smooth) 75ms forwards;
+}
+
+/* Optimización de rendimiento para animaciones */
+.modal,
+.modal-content,
+.modal-form {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Cierre del modal más rápido */
+.modal.closing {
+  transition: opacity 120ms ease-out;
+}
+
+.modal.closing .modal-content {
+  transform: translateY(8px) scale(0.96);
+  opacity: 0;
+  transition: 
+    transform 120ms ease-out,
+    opacity 120ms ease-out;
+}
