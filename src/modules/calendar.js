@@ -8,6 +8,9 @@ export class CalendarManager {
     this.events = [];
     this.selectedDate = null;
     this.googleCalendarIntegration = false;
+    this.tokenClient = null;
+    this.accessToken = null;
+    this.tokenError = null;
   }
 
   init() {
@@ -1059,49 +1062,75 @@ export class CalendarManager {
   
   async initGoogleAPI(clientId, apiKey) {
     return new Promise((resolve, reject) => {
-      // Load Google API script
-      if (!window.gapi) {
-        const script = document.createElement('script');
-        script.src = 'https://apis.google.com/js/api.js';
-        script.onload = () => {
-          window.gapi.load('auth2:client', () => {
-            window.gapi.client.init({
-              apiKey: apiKey,
-              clientId: clientId,
-              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-              scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar'
-            }).then(() => {
-              console.log('✅ Google Calendar API initialized');
-              resolve();
-            }).catch((error) => {
-              console.error('❌ Google API initialization error:', error);
-              if (error.details) {
-                console.error('Error details:', error.details);
-              }
-              reject(error);
-            });
-          });
-        };
-        script.onerror = (error) => {
-          console.error('❌ Failed to load Google API script:', error);
+      // Load Google Identity Services (GIS) and Google API Client scripts
+      const loadPromises = [];
+      
+      // Load Google Identity Services script
+      if (!window.google?.accounts) {
+        const gisScript = document.createElement('script');
+        gisScript.src = 'https://accounts.google.com/gsi/client';
+        gisScript.onload = () => console.log('✅ Google Identity Services loaded');
+        gisScript.onerror = (error) => {
+          console.error('❌ Failed to load Google Identity Services:', error);
           reject(error);
         };
-        document.head.appendChild(script);
-      } else {
-        // API already loaded, just initialize
-        window.gapi.client.init({
-          apiKey: apiKey,
-          clientId: clientId,
-          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-          scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar'
-        }).then(() => {
-          console.log('✅ Google Calendar API re-initialized');
-          resolve();
-        }).catch((error) => {
-          console.error('❌ Google API re-initialization error:', error);
-          reject(error);
-        });
+        document.head.appendChild(gisScript);
+        loadPromises.push(new Promise((res, rej) => {
+          gisScript.onload = res;
+          gisScript.onerror = rej;
+        }));
       }
+      
+      // Load Google API Client script
+      if (!window.gapi) {
+        const gapiScript = document.createElement('script');
+        gapiScript.src = 'https://apis.google.com/js/api.js';
+        gapiScript.onload = () => console.log('✅ Google API Client loaded');
+        gapiScript.onerror = (error) => {
+          console.error('❌ Failed to load Google API Client:', error);
+          reject(error);
+        };
+        document.head.appendChild(gapiScript);
+        loadPromises.push(new Promise((res, rej) => {
+          gapiScript.onload = res;
+          gapiScript.onerror = rej;
+        }));
+      }
+      
+      Promise.all(loadPromises).then(() => {
+        // Initialize Google API Client
+        window.gapi.load('client', () => {
+          window.gapi.client.init({
+            apiKey: apiKey,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
+          }).then(() => {
+            // Initialize Google Identity Services
+            this.tokenClient = window.google.accounts.oauth2.initTokenClient({
+              client_id: clientId,
+              scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar',
+              callback: (response) => {
+                if (response.error !== undefined) {
+                  console.error('❌ Token request error:', response);
+                  this.tokenError = response;
+                  return;
+                }
+                console.log('✅ Google Calendar API token received');
+                this.accessToken = response.access_token;
+                window.gapi.client.setToken({access_token: response.access_token});
+              },
+            });
+            
+            console.log('✅ Google Calendar API initialized with GIS');
+            resolve();
+          }).catch((error) => {
+            console.error('❌ Google API initialization error:', error);
+            if (error.details) {
+              console.error('Error details:', error.details);
+            }
+            reject(error);
+          });
+        });
+      }).catch(reject);
     });
   }
   
@@ -1130,21 +1159,48 @@ export class CalendarManager {
   
   async authenticateGoogle() {
     try {
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      const user = await authInstance.signIn();
-      
-      if (user.isSignedIn()) {
-        console.log('✅ Google authentication successful');
-        if (window.app && window.app.ui) {
-          window.app.ui.showAlert('¡Conectado con Google Calendar exitosamente!', 'success');
-        }
-        this.googleCalendarIntegration = true;
+      if (!this.tokenClient) {
+        throw new Error('Token client not initialized');
       }
+      
+      // Reset token states
+      this.accessToken = null;
+      this.tokenError = null;
+      
+      // Request access token
+      this.tokenClient.requestAccessToken();
+      
+      // Wait for the callback to process
+      return new Promise((resolve, reject) => {
+        const checkToken = () => {
+          if (this.accessToken) {
+            console.log('✅ Google authentication successful');
+            if (window.app && window.app.ui) {
+              window.app.ui.showAlert('¡Conectado con Google Calendar exitosamente!', 'success');
+            }
+            this.googleCalendarIntegration = true;
+            resolve();
+          } else if (this.tokenError) {
+            reject(this.tokenError);
+          } else {
+            setTimeout(checkToken, 100);
+          }
+        };
+        checkToken();
+        
+        // Timeout after 30 seconds
+        setTimeout(() => {
+          if (!this.accessToken && !this.tokenError) {
+            reject(new Error('Authentication timeout'));
+          }
+        }, 30000);
+      });
     } catch (error) {
       console.error('Google authentication error:', error);
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Error al autenticar con Google', 'error');
       }
+      throw error;
     }
   }
   
