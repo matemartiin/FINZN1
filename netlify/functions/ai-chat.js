@@ -112,9 +112,9 @@ Pregunta del usuario: ${message}
 
 Responde de manera clara, útil y profesional. Mantén las respuestas concisas pero informativas. Usa emojis apropiados para hacer las respuestas más amigables.`;
 
-    // Call Gemini API
+    // Call Gemini API with current model
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {

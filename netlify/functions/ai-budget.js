@@ -83,9 +83,9 @@ exports.handler = async (event, context) => {
     // Build Gemini prompt for budget recommendations
     const prompt = buildBudgetPrompt(userData);
 
-    // Call Gemini API
+    // Call Gemini API with current model
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
