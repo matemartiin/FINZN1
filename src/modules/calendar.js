@@ -938,6 +938,19 @@ export class CalendarManager {
       return;
     }
     
+    // Check if we're on the correct domain for Google OAuth
+    const currentHost = window.location.host;
+    const allowedHosts = ['localhost', '127.0.0.1', 'finzn.netlify.app'];
+    const isAllowedHost = allowedHosts.some(host => currentHost.includes(host));
+    
+    if (!isAllowedHost) {
+      console.log('⚠️ Current domain not authorized for Google Calendar');
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Google Calendar solo está disponible en el dominio autorizado.', 'warning');
+      }
+      return;
+    }
+    
     try {
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Conectando con Google Calendar...', 'info');

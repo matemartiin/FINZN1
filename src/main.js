@@ -66,16 +66,13 @@ this.setupModalEvents();
       // Initialize chat
       this.chat.init();
       
-      // Initialize calendar
-      this.calendar.init();
-      
       // Initialize user profile
       this.userProfile.init();
       
       // Setup month selector
       this.setupMonthSelector();
       
-      // Check authentication
+      // Check authentication FIRST
       await this.auth.initializeAuth();
       const currentUser = this.auth.getCurrentUser();
       console.log('Current user:', currentUser);
@@ -87,14 +84,14 @@ this.setupModalEvents();
         // Check if user needs to complete profile
         await this.checkProfileCompletion();
         
-        // Load calendar events after user data is loaded
-        if (this.calendar) {
-          await this.calendar.loadEvents();
-        }
+        // Initialize calendar AFTER authentication
+        this.calendar.init();
         
         this.updateDashboard();
       } else {
         this.showAuth();
+        // Initialize calendar in view-only mode for unauthenticated users
+        this.calendar.init();
       }
       
       this.setupEventListeners();
