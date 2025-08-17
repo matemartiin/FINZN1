@@ -17,7 +17,8 @@
       "Bash(npm run preview:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(echo $VITE_GOOGLE_CLIENT_ID)"
     ],
     "defaultMode": "acceptEdits"
   }

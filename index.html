@@ -1316,44 +1316,62 @@
 
     <form id="add-event-form" class="modal-form">
       <div class="form-group">
-        <label for="add-event-title-input">Título</label>
-        <input id="add-event-title-input" name="title" required />
+        <label for="add-event-title-input">Título del Evento</label>
+        <input id="add-event-title-input" name="title" type="text" class="form-control" required />
+        <small class="input-hint">Ingresa un título descriptivo para el evento</small>
       </div>
 
       <div class="form-group">
-        <label for="add-event-type">Tipo</label>
-        <select id="add-event-type" name="type" required>
-          <option value="payment">Pago de Cuota</option>
-          <option value="income">Cobro</option>
-          <option value="card-close">Cierre de Tarjeta</option>
-          <option value="reminder">Recordatorio</option>
-          <option value="deadline">Vencimiento</option>
+        <label for="add-event-type">Tipo de Evento</label>
+        <select id="add-event-type" name="type" class="form-control" required>
+          <option value="">Selecciona un tipo</option>
+          <option value="payment">💳 Pago de Cuota</option>
+          <option value="income">💰 Cobro</option>
+          <option value="card-close">🏦 Cierre de Tarjeta</option>
+          <option value="reminder">⏰ Recordatorio</option>
+          <option value="deadline">📅 Vencimiento</option>
         </select>
       </div>
 
-      <div class="form-group">
-        <label for="add-event-date">Fecha</label>
-        <input id="add-event-date" type="date" name="date" required />
-      </div>
-
-      <div class="form-group">
-        <label for="add-event-time">Hora (opcional)</label>
-        <input id="add-event-time" type="time" name="time" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="add-event-date">Fecha</label>
+          <input id="add-event-date" type="date" name="date" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="add-event-time">Hora (opcional)</label>
+          <input id="add-event-time" type="time" name="time" class="form-control" />
+        </div>
       </div>
 
       <div class="form-group">
         <label for="add-event-amount">Monto (opcional)</label>
-        <input id="add-event-amount" type="number" step="0.01" name="amount" />
+        <input id="add-event-amount" type="number" step="0.01" name="amount" class="form-control" placeholder="0.00" />
+        <small class="input-hint">Monto asociado al evento financiero</small>
       </div>
 
       <div class="form-group">
         <label for="add-event-description">Descripción</label>
-        <textarea id="add-event-description" name="description"></textarea>
+        <textarea id="add-event-description" name="description" class="form-control" rows="3" placeholder="Detalles adicionales del evento..."></textarea>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="add-event-recurring" name="recurring" />
+        <label for="add-event-recurring">Evento recurrente</label>
+      </div>
+
+      <div id="recurring-options" class="form-group hidden">
+        <label for="add-event-frequency">Frecuencia</label>
+        <select id="add-event-frequency" name="frequency" class="form-control">
+          <option value="weekly">Semanal</option>
+          <option value="monthly">Mensual</option>
+          <option value="yearly">Anual</option>
+        </select>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="modal-cancel">Cancelar</button>
-        <button type="submit">Guardar</button>
+        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Evento</button>
       </div>
     </form>
   </div>
@@ -1371,38 +1389,45 @@
       <form id="edit-event-form" class="modal-form">
         <div class="form-group">
           <label for="edit-event-title">Título del Evento</label>
-          <input type="text" id="edit-event-title" name="title" required />
+          <input type="text" id="edit-event-title" name="title" class="form-control" required />
         </div>
+        
         <div class="form-group">
           <label for="edit-event-type">Tipo de Evento</label>
-          <select id="edit-event-type" name="type" required>
-            <option value="payment"><i class="ph ph-credit-card"></i> Pago de Cuota</option>
-            <option value="income"><i class="ph ph-money"></i> Cobro</option>
-            <option value="card-close"><i class="ph ph-bank"></i> Cierre de Tarjeta</option>
-            <option value="reminder"><i class="ph ph-clock"></i> Recordatorio</option>
-            <option value="deadline"><i class="ph ph-calendar"></i> Vencimiento</option>
+          <select id="edit-event-type" name="type" class="form-control" required>
+            <option value="payment">💳 Pago de Cuota</option>
+            <option value="income">💰 Cobro</option>
+            <option value="card-close">🏦 Cierre de Tarjeta</option>
+            <option value="reminder">⏰ Recordatorio</option>
+            <option value="deadline">📅 Vencimiento</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="edit-event-date">Fecha</label>
-          <input type="date" id="edit-event-date" name="date" required />
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-event-date">Fecha</label>
+            <input type="date" id="edit-event-date" name="date" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="edit-event-time">Hora</label>
+            <input type="time" id="edit-event-time" name="time" class="form-control" />
+          </div>
         </div>
-        <div class="form-group">
-          <label for="edit-event-time">Hora</label>
-          <input type="time" id="edit-event-time" name="time" />
-        </div>
+        
         <div class="form-group">
           <label for="edit-event-amount">Monto</label>
-          <input type="number" id="edit-event-amount" name="amount" step="0.01" />
+          <input type="number" id="edit-event-amount" name="amount" step="0.01" class="form-control" placeholder="0.00" />
         </div>
+        
         <div class="form-group">
           <label for="edit-event-description">Descripción</label>
-          <textarea id="edit-event-description" name="description" rows="3"></textarea>
+          <textarea id="edit-event-description" name="description" rows="3" class="form-control" placeholder="Detalles del evento..."></textarea>
         </div>
+        
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-          <button type="button" id="delete-event-btn" class="btn btn-danger">Eliminar</button>
+          <button type="button" id="delete-event-btn" class="btn btn-danger">Eliminar Evento</button>
         </div>
       </form>
     </div>

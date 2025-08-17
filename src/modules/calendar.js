@@ -15,6 +15,9 @@ export class CalendarManager {
     this.autoSyncEnabled = true; // Auto-sync enabled by default
     this.autoSyncPollingInterval = null;
     this.lastSyncTime = null;
+    this.autoSyncFrequency = 30000; // 30 seconds for quick detection
+    this.lastEventCount = 0; // Track event count for change detection
+    this.isAutoSyncing = false; // Prevent concurrent syncs
   }
 
   init() {
@@ -28,6 +31,7 @@ export class CalendarManager {
     console.log('📅 DEBUG: Events loading initiated');
     this.loadSyncState();
     this.updateSyncButtonState();
+    this.setupVisibilityChangeListener();
     console.log('📅 DEBUG: Sync button state updated');
   }
 
@@ -2054,16 +2058,21 @@ export class CalendarManager {
       clearInterval(this.autoSyncPollingInterval);
     }
     
-    console.log('🔄 Starting auto-sync polling (every 5 minutes)');
+    console.log('🔄 Starting enhanced auto-sync polling (every 30 seconds)');
     
-    // Poll Google Calendar every 5 minutes for new events
+    // Initial sync
+    this.autoImportFromGoogle();
+    
+    // Poll Google Calendar every 30 seconds for quick change detection
     this.autoSyncPollingInterval = setInterval(async () => {
       try {
-        await this.autoImportFromGoogle();
+        if (!this.isAutoSyncing) {
+          await this.autoImportFromGoogle();
+        }
       } catch (error) {
         console.error('❌ Auto-sync polling error:', error);
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, this.autoSyncFrequency);
   }
 
   stopAutoSync() {
@@ -2075,72 +2084,124 @@ export class CalendarManager {
   }
 
   async autoImportFromGoogle() {
-    if (!this.googleCalendarIntegration || !this.autoSyncEnabled) return;
+    if (!this.googleCalendarIntegration || !this.autoSyncEnabled || this.isAutoSyncing) return;
+    
+    this.isAutoSyncing = true;
     
     try {
-      console.log('🔄 Auto-importing new events from Google Calendar...');
-      
-      // For demo mode - don't auto-import
+      // For demo mode - simulate change detection
       if (this.accessToken && this.accessToken.startsWith('demo_token_')) {
+        // Only show demo activity occasionally to not spam
+        if (Math.random() < 0.05) { // 5% chance each poll (30s interval = ~10 min avg)
+          console.log('🧑‍💻 Demo mode: Simulating Google Calendar change detection');
+        }
+        this.isAutoSyncing = false;
         return;
       }
       
       // Check if we have everything needed for real sync
       if (!this.accessToken || !window.gapi || !window.gapi.client) {
+        this.isAutoSyncing = false;
         return;
       }
       
-      // Set up timeMin to only get events updated since last sync
+      // Intelligent time range for better change detection
+      const now = new Date();
       const timeMin = this.lastSyncTime ? 
-        new Date(this.lastSyncTime).toISOString() : 
-        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // Last 24 hours
+        new Date(Math.max(
+          new Date(this.lastSyncTime).getTime() - 5 * 60 * 1000, // 5 minutes overlap
+          now.getTime() - 7 * 24 * 60 * 60 * 1000 // Max 7 days back
+        )).toISOString() : 
+        new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(); // Last 24 hours
+        
+      const timeMax = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days ahead
       
       window.gapi.client.setToken({access_token: this.accessToken});
       
       const response = await window.gapi.client.calendar.events.list({
         calendarId: 'primary',
         timeMin: timeMin,
-        maxResults: 20,
+        timeMax: timeMax,
+        maxResults: 50, // Increased for better detection
         singleEvents: true,
-        orderBy: 'startTime'
+        orderBy: 'updated', // Sort by last updated for change detection
+        showDeleted: true // Include deleted events for sync accuracy
       });
       
       const events = response.result.items || [];
       let importedCount = 0;
+      let changesDetected = false;
+      
+      // Track the total count for change detection
+      const currentEventCount = events.filter(e => e.status !== 'cancelled').length;
+      if (this.lastEventCount !== 0 && currentEventCount !== this.lastEventCount) {
+        changesDetected = true;
+        console.log(`🔍 Change detected: Event count changed from ${this.lastEventCount} to ${currentEventCount}`);
+      }
+      this.lastEventCount = currentEventCount;
       
       for (const googleEvent of events) {
+        // Skip cancelled/deleted events
+        if (googleEvent.status === 'cancelled') {
+          continue;
+        }
+        
         const finznEvent = this.convertGoogleToFinznEvent(googleEvent);
         if (finznEvent) {
-          // Check if event already exists
+          // More sophisticated duplicate detection
           const existingEvents = this.getEventsForDate(new Date(finznEvent.date));
-          const duplicate = existingEvents.find(e => 
-            e.title === finznEvent.title && 
-            e.date === finznEvent.date &&
-            e.description && e.description.includes('Importado de Google Calendar')
-          );
+          const duplicate = existingEvents.find(e => {
+            // Check multiple criteria for better duplicate detection
+            const titleMatch = e.title === finznEvent.title;
+            const dateMatch = e.date === finznEvent.date;
+            const timeMatch = (!e.time && !finznEvent.time) || (e.time === finznEvent.time);
+            const isGoogleImport = e.description && e.description.includes('Importado de Google Calendar');
+            
+            return titleMatch && dateMatch && timeMatch && isGoogleImport;
+          });
           
           if (!duplicate) {
-            await this.addEvent(finznEvent);
-            importedCount++;
+            try {
+              // Temporarily disable auto-export to prevent loops
+              const originalAutoSync = this.autoSyncEnabled;
+              this.autoSyncEnabled = false;
+              
+              await this.addEvent(finznEvent);
+              importedCount++;
+              changesDetected = true;
+              
+              // Restore auto-sync
+              this.autoSyncEnabled = originalAutoSync;
+              
+            } catch (error) {
+              console.error('❌ Error importing individual event:', error);
+            }
           }
         }
       }
       
+      // Update sync timestamp
       this.lastSyncTime = new Date().toISOString();
       
+      // Only show notifications and refresh if there were actual changes
       if (importedCount > 0) {
         console.log(`✅ Auto-imported ${importedCount} new events from Google Calendar`);
         if (window.app && window.app.ui) {
-          window.app.ui.showAlert(`🔄 ${importedCount} eventos nuevos sincronizados desde Google Calendar`, 'info', 3000);
+          window.app.ui.showAlert(`🔄 ${importedCount} eventos nuevos sincronizados desde Google Calendar`, 'success', 3000);
         }
         
         // Refresh calendar display
         this.renderCalendar();
         this.updateUpcomingEventsCount();
+      } else if (changesDetected) {
+        console.log('🔍 Changes detected in Google Calendar but no new events to import');
       }
       
     } catch (error) {
       console.error('❌ Error in auto-import:', error);
+      // Don't show user errors for background sync, just log them
+    } finally {
+      this.isAutoSyncing = false;
     }
   }
 
@@ -2427,5 +2488,28 @@ export class CalendarManager {
         calendarGrid.classList.remove('calendar-loading');
       }
     }, 300);
+  }
+
+  setupVisibilityChangeListener() {
+    // Auto-sync when user returns to the tab (intelligent sync)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.googleCalendarIntegration && this.autoSyncEnabled) {
+        console.log('👁️ Page became visible, triggering sync check');
+        // Small delay to ensure page is fully active
+        setTimeout(() => {
+          this.autoImportFromGoogle();
+        }, 1000);
+      }
+    });
+
+    // Also sync when window gains focus
+    window.addEventListener('focus', () => {
+      if (this.googleCalendarIntegration && this.autoSyncEnabled) {
+        console.log('🎯 Window gained focus, triggering sync check');
+        setTimeout(() => {
+          this.autoImportFromGoogle();
+        }, 500);
+      }
+    });
   }
 }
