@@ -280,13 +280,29 @@ setupDashboardEvents() {
 
   // ---- Botones principales ----
   const addExpenseBtn = document.getElementById('add-expense-btn-dashboard');
-  if (addExpenseBtn) addExpenseBtn.addEventListener('click', () => this.showAddExpenseModal());
+  if (addExpenseBtn) {
+    console.log('✅ Add expense button found and event listener added');
+    addExpenseBtn.addEventListener('click', () => {
+      console.log('🔧 Add expense button clicked!');
+      this.showAddExpenseModal();
+    });
+  } else {
+    console.warn('⚠️ Add expense button not found!');
+  }
 
   const addExpenseBtnTransactions = document.getElementById('add-expense-btn-transactions');
   if (addExpenseBtnTransactions) addExpenseBtnTransactions.addEventListener('click', () => this.showAddExpenseModal());
 
   const addIncomeBtn = document.getElementById('add-income-btn-dashboard');
-  if (addIncomeBtn) addIncomeBtn.addEventListener('click', () => this.showAddIncomeModal());
+  if (addIncomeBtn) {
+    console.log('✅ Add income button found and event listener added');
+    addIncomeBtn.addEventListener('click', () => {
+      console.log('🔧 Add income button clicked!');
+      this.showAddIncomeModal();
+    });
+  } else {
+    console.warn('⚠️ Add income button not found!');
+  }
 
   const addIncomeBtnTransactions = document.getElementById('add-income-btn-transactions');
   if (addIncomeBtnTransactions) addIncomeBtnTransactions.addEventListener('click', () => this.showAddIncomeModal());
@@ -502,13 +518,31 @@ setupDashboardEvents() {
   }
 
   showAddIncomeModal() {
-    console.log('💰 Show add income modal');
+    console.log('💰 Show add income modal - START');
+    
+    // Verificar que el ModalManager existe
+    if (!this.modals) {
+      console.error('❌ ModalManager not available!');
+      return;
+    }
+    
+    // Verificar que el modal existe
+    const modal = document.getElementById('add-income-modal');
+    if (!modal) {
+      console.error('❌ add-income-modal element not found in DOM!');
+      return;
+    }
+    
+    console.log('✅ Income modal element found, calling modals.show()');
     
     // Set default date to today
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('income-date');
     if (dateInput) {
       dateInput.value = today;
+      console.log('✅ Income date set to:', today);
+    } else {
+      console.warn('⚠️ Income date input not found');
     }
     
     this.modals.show('add-income-modal');
@@ -813,12 +847,32 @@ try {
 
   // Modal methods
 showAddExpenseModal() {
-  console.log('💳 Show add expense modal');
+  console.log('💳 Show add expense modal - START');
+  
+  // Verificar que el ModalManager existe
+  if (!this.modals) {
+    console.error('❌ ModalManager not available!');
+    return;
+  }
+  
+  // Verificar que el modal existe
+  const modal = document.getElementById('add-expense-modal');
+  if (!modal) {
+    console.error('❌ add-expense-modal element not found in DOM!');
+    return;
+  }
+  
+  console.log('✅ Modal element found, calling modals.show()');
 
   // Fecha por defecto = hoy
   const today = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('expense-date');
-  if (dateInput) dateInput.value = today;
+  if (dateInput) {
+    dateInput.value = today;
+    console.log('✅ Date set to:', today);
+  } else {
+    console.warn('⚠️ Expense date input not found');
+  }
 
   // Abrir modal
   this.modals.show('add-expense-modal');

@@ -97,12 +97,19 @@ export class ModalManager {
 
 
   show(modalId) {
-  console.log('ModalManager: Showing modal', modalId);
+  console.log('🔧 ModalManager: Showing modal', modalId);
   const modal = this.modals.get(modalId) || document.getElementById(modalId);
-  if (!modal) return console.warn('ModalManager: modal not found ->', modalId);
+  if (!modal) {
+    console.error('❌ ModalManager: modal not found ->', modalId);
+    console.log('🔧 Available modals:', Array.from(this.modals.keys()));
+    return;
+  }
+
+  console.log('✅ Modal found:', modal.id, modal.className);
 
   if (modal.parentNode !== document.body) {
     document.body.appendChild(modal);
+    console.log('🔧 Modal moved to body');
   }
 
   // Estado base (sin cierre)
@@ -110,6 +117,7 @@ export class ModalManager {
 
   // 1) quitar display:none (hidden)
   modal.classList.remove('hidden');
+  console.log('🔧 Removed hidden class');
 
   // 2) forzar reflow para que se apliquen los estilos iniciales
   //    (opacity 0 / translateY) antes de activar la animación
@@ -118,14 +126,25 @@ export class ModalManager {
 
   // 3) ahora sí, activar (dispara transición de .modal-content)
   modal.classList.add('active');
+  console.log('🔧 Added active class, modal classes now:', modal.className);
 
   // llevar al frente y bloquear scroll
   modal.style.zIndex = '2147483647';
   document.body.style.overflow = 'hidden';
 
+  // Verificar si el modal es visible
+  const isVisible = modal.offsetParent !== null;
+  console.log('👁️ Modal visible?', isVisible);
+  console.log('📐 Modal dimensions:', modal.offsetWidth, 'x', modal.offsetHeight);
+
   // focus inicial
   const firstInput = modal.querySelector('input, select, textarea, button');
-  if (firstInput) setTimeout(() => firstInput.focus(), 50);
+  if (firstInput) {
+    setTimeout(() => {
+      firstInput.focus();
+      console.log('🎯 Focus set to:', firstInput.id || firstInput.tagName);
+    }, 50);
+  }
 
   // Escape por modal
   const escHandler = (e) => {
