@@ -289,6 +289,9 @@ Pregunta del usuario: ${message}`
 
     messagesContainer.appendChild(typingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Add fade-in animation
+    setTimeout(() => typingDiv.classList.add('fade-in'), 100);
   }
 
   hideTypingIndicator() {
