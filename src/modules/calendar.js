@@ -22,6 +22,8 @@ export class CalendarManager {
     console.log('📅 DEBUG: Calendar rendered');
     this.loadEvents();
     console.log('📅 DEBUG: Events loading initiated');
+    this.updateSyncButtonState();
+    console.log('📅 DEBUG: Sync button state updated');
   }
 
   setupEventListeners() {
@@ -66,7 +68,15 @@ export class CalendarManager {
     // Google Calendar sync button
     const syncBtn = document.getElementById('sync-google-calendar-btn');
     if (syncBtn) {
-      syncBtn.addEventListener('click', () => this.syncWithGoogleCalendar());
+      syncBtn.addEventListener('click', () => {
+        if (this.googleCalendarIntegration) {
+          // If already connected, show sync options directly
+          this.showGoogleSyncOptions();
+        } else {
+          // If not connected, start sync process
+          this.syncWithGoogleCalendar();
+        }
+      });
     }
 
     // Event forms
@@ -109,6 +119,27 @@ export class CalendarManager {
     }
     
     console.log('📅 DEBUG: Event listeners setup completed');
+  }
+
+  updateSyncButtonState() {
+    const syncBtn = document.getElementById('sync-google-calendar-btn');
+    if (!syncBtn) return;
+
+    if (this.googleCalendarIntegration) {
+      // Update button to show connected state
+      syncBtn.classList.add('connected');
+      syncBtn.innerHTML = `
+        <i class="ph ph-check-circle" aria-hidden="true"></i> Sincronizado con Google
+      `;
+      syncBtn.title = 'Conectado con Google Calendar - Haz clic para ver opciones';
+    } else {
+      // Reset to default state
+      syncBtn.classList.remove('connected');
+      syncBtn.innerHTML = `
+        <i class="ph ph-arrows-clockwise" aria-hidden="true"></i> Sincronizar Google
+      `;
+      syncBtn.title = 'Sincronizar con Google Calendar';
+    }
   }
 
   renderCalendar() {
@@ -1192,6 +1223,8 @@ export class CalendarManager {
               window.app.ui.showAlert('¡Conectado con Google Calendar exitosamente!', 'success');
             }
             this.googleCalendarIntegration = true;
+            // Update sync button to show connected state
+            this.updateSyncButtonState();
             // Close the Google sync modal
             if (window.app && window.app.modals) {
               window.app.modals.hide('google-sync-modal');
