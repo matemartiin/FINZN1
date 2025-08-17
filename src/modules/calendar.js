@@ -1,5 +1,6 @@
 import { calendarService } from './calendar-service.js';
 import { DOMHelpers } from '../utils/dom-helpers.js';
+import { CalendarSyncFix } from './calendar-sync-fix.js';
 
 export class CalendarManager {
   constructor() {
@@ -18,6 +19,9 @@ export class CalendarManager {
     this.autoSyncFrequency = 30000; // 30 seconds for quick detection
     this.lastEventCount = 0; // Track event count for change detection
     this.isAutoSyncing = false; // Prevent concurrent syncs
+    
+    // Initialize sync fix
+    this.syncFix = new CalendarSyncFix(this);
   }
 
   init() {
@@ -1562,6 +1566,12 @@ export class CalendarManager {
       return this.demoImportFromGoogle();
     }
     
+    // Use the enhanced import method
+    return this.syncFix.enhancedImportFromGoogle();
+  }
+
+  // Legacy import method - now disabled
+  async legacyImportFromGoogle() {
     try {
       // If we don't have access token (restored from persistence), we need to re-authenticate
       if (!this.accessToken) {
@@ -1803,7 +1813,9 @@ export class CalendarManager {
       description: description,
       amount: null,
       recurring: false,
-      frequency: null
+      frequency: null,
+      google_event_id: googleEvent.id,
+      sync_source: 'google'
     };
   }
   
@@ -2053,34 +2065,12 @@ export class CalendarManager {
   startAutoSync() {
     if (!this.googleCalendarIntegration || !this.autoSyncEnabled) return;
     
-    // Clear existing interval
-    if (this.autoSyncPollingInterval) {
-      clearInterval(this.autoSyncPollingInterval);
-    }
-    
-    console.log('🔄 Starting enhanced auto-sync polling (every 30 seconds)');
-    
-    // Initial sync
-    this.autoImportFromGoogle();
-    
-    // Poll Google Calendar every 30 seconds for quick change detection
-    this.autoSyncPollingInterval = setInterval(async () => {
-      try {
-        if (!this.isAutoSyncing) {
-          await this.autoImportFromGoogle();
-        }
-      } catch (error) {
-        console.error('❌ Auto-sync polling error:', error);
-      }
-    }, this.autoSyncFrequency);
+    // Use the safer auto-sync from sync fix
+    this.syncFix.startSaferAutoSync();
   }
 
   stopAutoSync() {
-    if (this.autoSyncPollingInterval) {
-      clearInterval(this.autoSyncPollingInterval);
-      this.autoSyncPollingInterval = null;
-      console.log('🛑 Auto-sync polling stopped');
-    }
+    this.syncFix.stopAutoSync();
   }
 
   async autoImportFromGoogle() {
@@ -2407,7 +2397,8 @@ export class CalendarManager {
 
   async deleteEventFromDay(eventId) {
     try {
-      await this.deleteEvent(eventId);
+      // Use the enhanced delete method that handles Google sync
+      await this.syncFix.deleteEventWithSync(eventId);
       
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Evento eliminado exitosamente', 'success');
