@@ -1455,6 +1455,46 @@
     </div>
   </div>
 
+  <!-- Google Calendar Sync Modal -->
+  <div id="google-sync-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="google-sync-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="google-sync-title">Sincronización con Google Calendar</h2>
+        <button type="button" class="modal-close" aria-label="Cerrar">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-description">¿Qué deseas hacer con Google Calendar?</p>
+        
+        <div class="sync-action-buttons">
+          <button id="connect-google-btn" class="btn btn-primary sync-action-btn">
+            <i class="ph ph-key"></i>
+            <span>Conectar con Google</span>
+            <small>Autorizar acceso a tu calendario</small>
+          </button>
+          
+          <button id="import-google-btn" class="btn btn-secondary sync-action-btn">
+            <i class="ph ph-download"></i>
+            <span>Importar eventos</span>
+            <small>Traer eventos desde Google Calendar</small>
+          </button>
+          
+          <button id="export-google-btn" class="btn btn-accent sync-action-btn">
+            <i class="ph ph-upload"></i>
+            <span>Exportar eventos</span>
+            <small>Enviar eventos a Google Calendar</small>
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Budget Modal -->
   <div id="add-budget-modal" class="modal">
     <div class="modal-content">

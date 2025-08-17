@@ -1135,25 +1135,38 @@ export class CalendarManager {
   }
   
   showGoogleSyncOptions() {
-    if (window.app && window.app.ui) {
-      const html = `
-        <div class="google-sync-options">
-          <h3>Sincronización con Google Calendar</h3>
-          <p>¿Qué deseas hacer?</p>
-          <div class="sync-action-buttons">
-            <button onclick="window.app.calendar.authenticateGoogle()" class="btn btn-primary">
-              🔑 Conectar con Google
-            </button>
-            <button onclick="window.app.calendar.importFromGoogle()" class="btn btn-secondary">
-              📥 Importar eventos
-            </button>
-            <button onclick="window.app.calendar.exportToGoogle()" class="btn btn-accent">
-              📤 Exportar eventos
-            </button>
-          </div>
-        </div>
-      `;
-      window.app.ui.showAlert(html, 'info', 8000);
+    // Setup event listeners for the modal buttons
+    this.setupGoogleSyncModalListeners();
+    
+    // Show the modal
+    if (window.app && window.app.modals) {
+      window.app.modals.show('google-sync-modal');
+    }
+  }
+
+  setupGoogleSyncModalListeners() {
+    // Connect Google button
+    const connectBtn = document.getElementById('connect-google-btn');
+    if (connectBtn) {
+      connectBtn.removeEventListener('click', this.handleConnectGoogle); // Remove existing listener
+      this.handleConnectGoogle = () => this.authenticateGoogle();
+      connectBtn.addEventListener('click', this.handleConnectGoogle);
+    }
+    
+    // Import button
+    const importBtn = document.getElementById('import-google-btn');
+    if (importBtn) {
+      importBtn.removeEventListener('click', this.handleImportGoogle); // Remove existing listener
+      this.handleImportGoogle = () => this.importFromGoogle();
+      importBtn.addEventListener('click', this.handleImportGoogle);
+    }
+    
+    // Export button
+    const exportBtn = document.getElementById('export-google-btn');
+    if (exportBtn) {
+      exportBtn.removeEventListener('click', this.handleExportGoogle); // Remove existing listener
+      this.handleExportGoogle = () => this.exportToGoogle();
+      exportBtn.addEventListener('click', this.handleExportGoogle);
     }
   }
   
@@ -1179,6 +1192,10 @@ export class CalendarManager {
               window.app.ui.showAlert('¡Conectado con Google Calendar exitosamente!', 'success');
             }
             this.googleCalendarIntegration = true;
+            // Close the Google sync modal
+            if (window.app && window.app.modals) {
+              window.app.modals.hide('google-sync-modal');
+            }
             resolve();
           } else if (this.tokenError) {
             reject(this.tokenError);
@@ -1238,6 +1255,11 @@ export class CalendarManager {
         window.app.ui.showAlert(`${importedCount} eventos importados de Google Calendar`, 'success');
       }
       
+      // Close the Google sync modal
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('google-sync-modal');
+      }
+      
       // Refresh calendar
       await this.loadEvents();
       this.renderCalendar();
@@ -1275,6 +1297,11 @@ export class CalendarManager {
       
       if (window.app && window.app.ui) {
         window.app.ui.showAlert(`${exportedCount} eventos exportados a Google Calendar`, 'success');
+      }
+      
+      // Close the Google sync modal
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('google-sync-modal');
       }
       
     } catch (error) {

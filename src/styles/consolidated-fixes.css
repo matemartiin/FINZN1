@@ -897,3 +897,112 @@ body[data-skin="pro"] .google-sync-options p {
   justify-content: center;
   border: 2px solid white;
 }
+
+/* Estilos específicos para el modal de Google Calendar */
+#google-sync-modal .modal-content {
+  max-width: 500px;
+}
+
+#google-sync-modal .modal-description {
+  color: var(--text-secondary, #718096);
+  margin-bottom: 24px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+#google-sync-modal .sync-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+#google-sync-modal .sync-action-btn {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  position: relative;
+}
+
+#google-sync-modal .sync-action-btn i {
+  font-size: 1.2rem;
+  min-width: 20px;
+}
+
+#google-sync-modal .sync-action-btn span {
+  font-weight: 600;
+  font-size: 1rem;
+  display: block;
+}
+
+#google-sync-modal .sync-action-btn small {
+  font-weight: 400;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  display: block;
+  margin-top: 2px;
+}
+
+#google-sync-modal .sync-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+#google-sync-modal .sync-action-btn:active {
+  transform: translateY(0);
+}
+
+/* Colores específicos para botones del modal */
+#google-sync-modal .btn-primary {
+  background: linear-gradient(135deg, #4285f4, #3367d6);
+  color: white;
+}
+
+#google-sync-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #3367d6, #2854c7);
+}
+
+#google-sync-modal .btn-secondary {
+  background: linear-gradient(135deg, #34a853, #2d8f47);
+  color: white;
+}
+
+#google-sync-modal .btn-secondary:hover {
+  background: linear-gradient(135deg, #2d8f47, #25783c);
+}
+
+#google-sync-modal .btn-accent {
+  background: linear-gradient(135deg, #ea4335, #d33b2c);
+  color: white;
+}
+
+#google-sync-modal .btn-accent:hover {
+  background: linear-gradient(135deg, #d33b2c, #b52d20);
+}
+
+/* Dark theme para modal de Google Calendar */
+body[data-skin="pro"] #google-sync-modal .modal-description {
+  color: var(--pro-text-2, #9CA3AF);
+}
+
+/* Responsive para modal de Google */
+@media (max-width: 768px) {
+  #google-sync-modal .sync-action-btn {
+    padding: 14px 16px;
+  }
+  
+  #google-sync-modal .sync-action-btn span {
+    font-size: 0.95rem;
+  }
+  
+  #google-sync-modal .sync-action-btn small {
+    font-size: 0.8rem;
+  }
+}
