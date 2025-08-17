@@ -25,29 +25,23 @@ export class ReportManager {
       .replace(/\//g, '&#x2F;');
   }
 
+  // Note: All API calls now use secure server-side functions
+  // No API keys are exposed in client code
+
   async generateAIReport(data, focus, questions) {
     if (import.meta.env.DEV) {
       console.log('🤖 Generating AI report with data:', data);
     }
     
     try {
-      // Get API key
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        console.warn('⚠️ No Gemini API key found, using enhanced fallback');
-        return this.generateEnhancedFallbackReport(data, focus, questions);
-      }
-
-      // Prepare comprehensive prompt for AI
-      const prompt = this.buildAIPrompt(data, focus, questions);
+      // Use secure server-side function - no API keys in client
       
       if (import.meta.env.DEV) {
-        console.log('🤖 Sending request to Gemini API...');
+        console.log('🤖 Sending request to secure AI reports API...');
       }
       
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      // Call secure Netlify function with simple data structure
+      const response = await fetch('/api/ai-reports',
         {
           method: "POST",
           headers: { 
@@ -55,31 +49,9 @@ export class ReportManager {
             "Accept": "application/json"
           },
           body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: prompt
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 2048,
-            },
-            safetySettings: [
-              {
-                category: "HARM_CATEGORY_HARASSMENT",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              },
-              {
-                category: "HARM_CATEGORY_HATE_SPEECH",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
+            data,
+            focus,
+            questions
           }),
         }
       );
@@ -94,20 +66,23 @@ export class ReportManager {
         console.log('✅ Gemini API response received');
       }
 
-      if (!result.candidates || result.candidates.length === 0) {
-        console.warn('⚠️ No candidates in Gemini response, using fallback');
-        return this.generateEnhancedFallbackReport(data, focus, questions);
+      // Handle secure server response format
+      if (result.fallback) {
+        console.log('📴 Using server fallback response');
+        return result.report || this.generateEnhancedFallbackReport(data, focus, questions);
       }
 
-      const aiContent = result.candidates[0]?.content?.parts?.[0]?.text || '';
-      
-      if (!aiContent.trim()) {
-        console.warn('⚠️ Empty AI response, using fallback');
-        return this.generateEnhancedFallbackReport(data, focus, questions);
+      if (result.success && result.report) {
+        if (import.meta.env.DEV) {
+          console.log('✅ Successfully got secure AI report');
+        }
+        // Server already returns formatted HTML content
+        return this.formatAIReport(result.report, data, focus, questions);
       }
 
-      // Format AI response with additional data
-      return this.formatAIReport(aiContent, data, focus, questions);
+      // If response format is unexpected, use fallback
+      console.warn('⚠️ Unexpected response format, using fallback');
+      return this.generateEnhancedFallbackReport(data, focus, questions);
 
     } catch (error) {
       console.error('❌ Error generating AI report:', error);

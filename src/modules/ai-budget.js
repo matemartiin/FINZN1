@@ -13,6 +13,9 @@ export class AIBudgetManager {
     console.log('AI Budget Manager initialized');
   }
 
+  // Note: All AI API calls now use secure server-side functions
+  // No API keys are exposed in client code
+
   // Obtener datos históricos para entrenamiento
   async getTrainingData() {
     const userId = this.getCurrentUserId();
@@ -310,115 +313,108 @@ export class AIBudgetManager {
     }
   }
 
-  // Generar recomendaciones con Gemini AI
+  // Generar recomendaciones con Gemini AI using secure server-side function
   async generateGeminiRecommendations(userData) {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      console.warn('⚠️ Gemini API key not found');
-      return this.getFallbackRecommendations(userData);
-    }
-
     try {
       if (import.meta.env.DEV) {
-        console.log('Generating Gemini AI recommendations...');
+        console.log('🤖 Generating secure AI budget recommendations...');
       }
       
-      const prompt = this.buildGeminiPrompt(userData);
-      
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: prompt
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 1500,
-            }
-          }),
-        }
-      );
+      // Call secure Netlify function instead of direct API
+      const response = await fetch('/api/ai-budget', {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          totalIncome: userData.totalIncome || 0,
+          totalExpenses: userData.totalExpenses || 0,
+          categories: userData.categories || {},
+          goals: userData.goals || [],
+          categoryStats: Object.fromEntries(userData.categoryStats || new Map()),
+          predictions: Object.fromEntries(userData.predictions || new Map())
+        })
+      });
 
       if (!response.ok) {
-        console.error('❌ Gemini API error:', response.status);
+        console.error('❌ Secure budget API error:', response.status);
         return this.getFallbackRecommendations(userData);
       }
 
       const result = await response.json();
-      const aiContent = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
       
-      if (!aiContent.trim()) {
-        return this.getFallbackRecommendations(userData);
+      // Handle server fallback response
+      if (result.fallback) {
+        console.log('📴 Using server fallback recommendations');
+        return this.adaptServerRecommendations(result.recommendations);
       }
 
-      return this.parseGeminiRecommendations(aiContent, userData);
+      if (result.success && result.recommendations) {
+        if (import.meta.env.DEV) {
+          console.log('✅ Successfully got secure AI budget recommendations');
+        }
+        return this.adaptServerRecommendations(result.recommendations);
+      }
+
+      // If response format is unexpected, use fallback
+      console.warn('⚠️ Unexpected response format, using fallback');
+      return this.getFallbackRecommendations(userData);
     } catch (error) {
-      console.error('❌ Error with Gemini API:', error);
+      console.error('❌ Error with secure budget API:', error);
       return this.getFallbackRecommendations(userData);
     }
   }
 
-  // Construir prompt para Gemini
-  buildGeminiPrompt(userData) {
-    const { expenses, predictions, categoryStats } = userData;
-    
-    let prompt = `Eres un asesor financiero experto. Analiza los siguientes datos de gastos y genera recomendaciones específicas para optimizar el presupuesto.
-
-DATOS DEL USUARIO:
-- Total de gastos registrados: ${expenses.length}
-- Categorías principales: ${Array.from(categoryStats.keys()).join(', ')}
-
-ANÁLISIS POR CATEGORÍA:`;
-
-    categoryStats.forEach((stats, category) => {
-      const prediction = predictions.get(category);
-      prompt += `
-- ${category}: 
-  * Promedio: $${stats.avg.toFixed(2)}
-  * Máximo: $${stats.max.toFixed(2)}
-  * Predicción ML: $${prediction?.predicted.toFixed(2) || 'N/A'}
-  * Tendencia: ${prediction?.trend || 'estable'}`;
-    });
-
-    prompt += `
-
-INSTRUCCIONES:
-1. Genera exactamente 5 recomendaciones específicas y accionables
-2. Cada recomendación debe incluir:
-   - Categoría específica
-   - Acción concreta (ej: "Reduce delivery los miércoles")
-   - Monto sugerido para el presupuesto
-   - Justificación basada en los datos
-3. Prioriza las categorías con mayor impacto potencial
-4. Usa un tono amigable pero profesional
-5. Formato de respuesta:
-
-RECOMENDACIÓN 1:
-Categoría: [nombre]
-Acción: [acción específica]
-Presupuesto sugerido: $[monto]
-Justificación: [razón basada en datos]
-
-[Repite para las 5 recomendaciones]
-
-Genera las recomendaciones ahora:`;
-
-    return prompt;
+  // Adapt server recommendations to client format
+  adaptServerRecommendations(serverRecommendations) {
+    try {
+      // If server returns structured recommendations array
+      if (Array.isArray(serverRecommendations.budgetRecommendations)) {
+        return serverRecommendations.budgetRecommendations.map((rec, index) => ({
+          id: `server_rec_${Date.now()}_${index}`,
+          category: rec.category,
+          action: `Ajustar presupuesto a $${rec.recommendedAmount}`,
+          suggestedBudget: rec.recommendedAmount,
+          justification: rec.reasoning,
+          type: 'ai_recommendation',
+          confidence: 0.85,
+          source: 'server_gemini',
+          applicable: true,
+          priority: rec.priority || 'medium'
+        }));
+      }
+      
+      // If server returns direct recommendations object
+      if (serverRecommendations.overallAssessment) {
+        const recommendations = [];
+        
+        if (serverRecommendations.budgetRecommendations) {
+          serverRecommendations.budgetRecommendations.forEach((rec, index) => {
+            recommendations.push({
+              id: `server_rec_${Date.now()}_${index}`,
+              category: rec.category,
+              action: `Ajustar presupuesto a $${rec.recommendedAmount}`,
+              suggestedBudget: rec.recommendedAmount,
+              justification: rec.reasoning,
+              type: 'ai_recommendation',
+              confidence: 0.85,
+              source: 'server_gemini',
+              applicable: true,
+              priority: rec.priority || 'medium'
+            });
+          });
+        }
+        
+        return recommendations;
+      }
+      
+      // Fallback for unexpected format
+      return [];
+    } catch (error) {
+      console.error('Error adapting server recommendations:', error);
+      return [];
+    }
   }
 
   // Parsear respuesta de Gemini

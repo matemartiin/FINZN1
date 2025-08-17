@@ -4,6 +4,9 @@ export class ChatManager {
     this.messages = [];
   }
 
+  // Security: All API calls now go through secure server-side functions
+  // No API keys are exposed in client code
+
   init() {
     console.log('💬 Initializing Chat Manager...');
     this.setupEventListeners();
@@ -123,26 +126,19 @@ export class ChatManager {
   }
 
   async getAIResponse(message, retryCount = 0) {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    // Use secure server-side proxy - NO API keys in client
     const maxRetries = 2;
     
     if (import.meta.env.DEV) {
-      console.log('🤖 Attempting Gemini API call...', { attempt: retryCount + 1, maxRetries: maxRetries + 1 });
-      console.log('🔑 API Key check:', apiKey ? 'Present' : 'Missing');
-    }
-
-    // If no API key, use fallback responses
-    if (!apiKey) {
-      console.log('⚠️ No API key found, using fallback responses');
-      return this.getFallbackResponse(message);
+      console.log('🤖 Attempting secure AI call...', { attempt: retryCount + 1, maxRetries: maxRetries + 1 });
     }
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
       
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      // Call our secure Netlify function instead of direct API
+      const response = await fetch('/api/ai-chat',
         {
           method: "POST",
           headers: { 
@@ -150,33 +146,8 @@ export class ChatManager {
             "Accept": "application/json"
           },
           body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `Eres FINZN, un asistente financiero amigable y experto. Responde en español de manera clara y útil. Máximo 150 palabras. Si la pregunta no es sobre finanzas, redirige amablemente hacia temas financieros.
-
-Pregunta del usuario: ${message}`
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 200,
-            },
-            safetySettings: [
-              {
-                category: "HARM_CATEGORY_HARASSMENT",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              },
-              {
-                category: "HARM_CATEGORY_HATE_SPEECH",
-                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
+            message,
+            context: 'Usuario de aplicación financiera FINZN'
           }),
           signal: controller.signal
         }
@@ -184,69 +155,40 @@ Pregunta del usuario: ${message}`
       
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        let errorMessage = "Error en el servicio de IA";
-        
-        if (response.status === 429) {
-          errorMessage = "¡Muchas consultas! Esperá un minuto y volvé a intentarlo 😊";
-        } else if (response.status === 403) {
-          errorMessage = "Problema con la API key. Contactá al administrador.";
-        } else if (response.status === 400) {
-          errorMessage = "Tu mensaje no pudo ser procesado. Intentá reformularlo.";
-        } else if (response.status === 503) {
-          // Service unavailable - retry if we haven't exceeded max retries
-          if (retryCount < maxRetries) {
-            console.log(`⚠️ Gemini API 503 error, retrying in ${(retryCount + 1) * 2} seconds... (attempt ${retryCount + 2}/${maxRetries + 1})`);
-            await this.delay((retryCount + 1) * 2000); // Progressive delay: 2s, 4s
-            return this.getAIResponse(message, retryCount + 1);
-          }
-          errorMessage = "El servicio de IA está temporalmente no disponible. Intentá en unos minutos.";
-        } else if (response.status >= 500) {
-          // Other server errors
-          if (retryCount < maxRetries) {
-            console.log(`⚠️ Gemini API server error ${response.status}, retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
-            await this.delay(1000 * (retryCount + 1)); // Progressive delay
-            return this.getAIResponse(message, retryCount + 1);
-          }
-          errorMessage = "Error del servidor. Por favor intentá más tarde.";
-        }
-        
-        console.error("❌ Error de Gemini API:", response.status, response.statusText);
-        return errorMessage;
+      if (import.meta.env.DEV) {
+        console.log('🤖 Secure API response status:', response.status);
       }
 
       const data = await response.json();
-      console.log('✅ Gemini API response received');
 
-      if (!data.candidates || data.candidates.length === 0) {
-        return "No pude generar una respuesta. ¿Podrías reformular tu pregunta?";
+      if (data.fallback) {
+        console.log('📴 Using fallback response from server');
+        return data.message;
       }
 
-      const reply = data.candidates[0]?.content?.parts?.[0]?.text || 
-                    "No tengo una respuesta clara, ¿podés reformularlo?";
+      if (data.success && data.message) {
+        if (import.meta.env.DEV) {
+          console.log('✅ Successfully got secure AI response');
+        }
+        return data.message;
+      }
 
-      return reply.trim();
+      // If response format is unexpected, use fallback
+      console.warn('🤖 Unexpected response format, using local fallback');
+      return this.getFallbackResponse(message);
 
     } catch (error) {
-      console.error("❌ Error en la API de Gemini:", error);
+      console.error('🤖 Secure API call error:', error);
       
-      // Handle network errors and timeouts
       if (error.name === 'AbortError') {
-        if (retryCount < maxRetries) {
-          console.log(`⚠️ Request timeout, retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
-          await this.delay(1000 * (retryCount + 1));
-          return this.getAIResponse(message, retryCount + 1);
-        }
-        return "La consulta tomó demasiado tiempo. Intentá con un mensaje más corto.";
+        console.log('🕐 Request timed out, using fallback');
       }
       
-      if (error.message.includes('Failed to fetch') && retryCount < maxRetries) {
-        console.log(`⚠️ Network error, retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
-        await this.delay(2000 * (retryCount + 1));
+      if (retryCount < maxRetries && error.name !== 'AbortError') {
+        console.log(`🔄 Retrying secure API call due to error (${retryCount + 1}/${maxRetries})...`);
+        await this.delay(1000 * (retryCount + 1)); // Exponential backoff
         return this.getAIResponse(message, retryCount + 1);
       }
-      
-      // Fallback response for other errors
       return this.getFallbackResponse(message);
     }
   }
