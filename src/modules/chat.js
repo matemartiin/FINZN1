@@ -66,15 +66,23 @@ export class ChatManager {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${sender}`;
     
-    messageDiv.innerHTML = `
-      <div class="chat-avatar">
-        ${sender === 'user' ? 
-          '<div class="user-avatar"><span class="user-avatar-icon"><i class="ph ph-user"></i></span></div>' : 
-          '<img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />'
-        }
-      </div>
-      <div class="chat-text ${sender}-text">${text}</div>
-    `;
+    // Create avatar section safely
+    const chatAvatar = document.createElement('div');
+    chatAvatar.className = 'chat-avatar';
+    
+    if (sender === 'user') {
+      chatAvatar.innerHTML = '<div class="user-avatar"><span class="user-avatar-icon"><i class="ph ph-user"></i></span></div>';
+    } else {
+      chatAvatar.innerHTML = '<img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />';
+    }
+    
+    // Create text section safely
+    const chatText = document.createElement('div');
+    chatText.className = `chat-text ${sender}-text`;
+    chatText.textContent = text; // Safe - prevents XSS
+    
+    messageDiv.appendChild(chatAvatar);
+    messageDiv.appendChild(chatText);
 
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -120,7 +128,7 @@ export class ChatManager {
     
     if (import.meta.env.DEV) {
       console.log('🤖 Attempting Gemini API call...', { attempt: retryCount + 1, maxRetries: maxRetries + 1 });
-      console.log('🔑 API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'Missing');
+      console.log('🔑 API Key check:', apiKey ? 'Present' : 'Missing');
     }
 
     // If no API key, use fallback responses
@@ -251,19 +259,33 @@ Pregunta del usuario: ${message}`
     typingDiv.className = 'chat-message bot typing-indicator';
     typingDiv.id = 'typing-indicator';
     
-    typingDiv.innerHTML = `
-      <div class="chat-avatar">
-        <img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />
-      </div>
-      <div class="chat-text bot-text">
-        <div class="typing-animation">
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-        </div>
-        <div class="typing-text">Escribiendo...</div>
-      </div>
-    `;
+    // Create typing indicator safely
+    const chatAvatar = document.createElement('div');
+    chatAvatar.className = 'chat-avatar';
+    chatAvatar.innerHTML = '<img src="/robot-chat.png" alt="Bot" class="chat-avatar-img" />';
+    
+    const chatText = document.createElement('div');
+    chatText.className = 'chat-text bot-text';
+    
+    const typingAnimation = document.createElement('div');
+    typingAnimation.className = 'typing-animation';
+    
+    // Create typing dots
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'typing-dot';
+      typingAnimation.appendChild(dot);
+    }
+    
+    const typingText = document.createElement('div');
+    typingText.className = 'typing-text';
+    typingText.textContent = 'Escribiendo...';
+    
+    chatText.appendChild(typingAnimation);
+    chatText.appendChild(typingText);
+    
+    typingDiv.appendChild(chatAvatar);
+    typingDiv.appendChild(chatText);
 
     messagesContainer.appendChild(typingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
