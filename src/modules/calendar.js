@@ -1412,32 +1412,81 @@ export class CalendarManager {
     }
     
     try {
+      // If we don't have access token (restored from persistence), we need to re-authenticate
+      if (!this.accessToken) {
+        console.log('📥 No access token found, re-authenticating...');
+        await this.authenticateGoogle();
+      }
+      
+      // Verify we have access token and gapi is loaded
+      if (!this.accessToken || !window.gapi || !window.gapi.client) {
+        throw new Error('Google API not properly initialized or no access token');
+      }
+
+      // Ensure the token is set in gapi client
+      if (this.accessToken) {
+        window.gapi.client.setToken({access_token: this.accessToken});
+      }
+
+      console.log('📥 Starting import from Google Calendar...');
+      
+      // Get current month date range for better filtering
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 3, 0); // Import 3 months ahead
+      
       const response = await window.gapi.client.calendar.events.list({
         calendarId: 'primary',
-        timeMin: new Date().toISOString(),
-        maxResults: 50,
+        timeMin: startOfMonth.toISOString(),
+        timeMax: endOfMonth.toISOString(),
+        maxResults: 100,
         singleEvents: true,
         orderBy: 'startTime'
       });
       
+      console.log('📥 Google Calendar API response:', response);
+      
       const events = response.result.items || [];
+      console.log(`📥 Found ${events.length} events in Google Calendar`);
+      
       let importedCount = 0;
+      let skippedCount = 0;
       
       for (const googleEvent of events) {
+        console.log('📥 Processing Google event:', googleEvent.summary);
+        
         // Convert Google event to FINZN format
         const finznEvent = this.convertGoogleToFinznEvent(googleEvent);
         if (finznEvent) {
           try {
-            await this.addEvent(finznEvent);
-            importedCount++;
+            // Check if event already exists to avoid duplicates
+            const existingEvents = this.getEventsForDate(new Date(finznEvent.date));
+            const duplicate = existingEvents.find(e => 
+              e.title === finznEvent.title && 
+              e.date === finznEvent.date &&
+              e.description && e.description.includes('Importado de Google Calendar')
+            );
+            
+            if (!duplicate) {
+              await this.addEvent(finznEvent);
+              importedCount++;
+              console.log(`✅ Imported: ${finznEvent.title}`);
+            } else {
+              skippedCount++;
+              console.log(`⏭️ Skipped duplicate: ${finznEvent.title}`);
+            }
           } catch (error) {
-            console.error('Error importing event:', error);
+            console.error('Error importing individual event:', error);
           }
         }
       }
       
+      const message = skippedCount > 0 
+        ? `${importedCount} eventos importados, ${skippedCount} omitidos (duplicados)`
+        : `${importedCount} eventos importados de Google Calendar`;
+      
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert(`${importedCount} eventos importados de Google Calendar`, 'success');
+        window.app.ui.showAlert(message, 'success');
       }
       
       // Close the Google sync modal
@@ -1448,11 +1497,26 @@ export class CalendarManager {
       // Refresh calendar
       await this.loadEvents();
       this.renderCalendar();
+      this.updateUpcomingEventsCount();
       
     } catch (error) {
       console.error('Error importing from Google Calendar:', error);
+      let errorMessage = 'Error al importar eventos';
+      
+      if (error.message.includes('not properly initialized')) {
+        errorMessage = 'Google Calendar no está configurado correctamente. Intenta reconectarte.';
+      } else if (error.status === 401) {
+        errorMessage = 'Sesión expirada. Intenta reconectarte con Google.';
+        // Clear the sync state so user can reconnect
+        this.googleCalendarIntegration = false;
+        this.clearSyncState();
+        this.updateSyncButtonState();
+      } else if (error.status === 403) {
+        errorMessage = 'Sin permisos para acceder a Google Calendar. Verifica los permisos.';
+      }
+      
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al importar eventos', 'error');
+        window.app.ui.showAlert(errorMessage, 'error');
       }
     }
   }
@@ -1463,25 +1527,60 @@ export class CalendarManager {
     }
     
     try {
+      // If we don't have access token (restored from persistence), we need to re-authenticate
+      if (!this.accessToken) {
+        console.log('📤 No access token found, re-authenticating...');
+        await this.authenticateGoogle();
+      }
+      
+      // Verify we have access token and gapi is loaded
+      if (!this.accessToken || !window.gapi || !window.gapi.client) {
+        throw new Error('Google API not properly initialized or no access token');
+      }
+
+      // Ensure the token is set in gapi client
+      if (this.accessToken) {
+        window.gapi.client.setToken({access_token: this.accessToken});
+      }
+
+      console.log('📤 Starting export to Google Calendar...');
+      console.log(`📤 Found ${this.events.length} local events to potentially export`);
+      
       let exportedCount = 0;
+      let skippedCount = 0;
       
       for (const event of this.events) {
         try {
+          // Skip events that were imported from Google Calendar to avoid duplicates
+          if (event.description && event.description.includes('Importado de Google Calendar')) {
+            skippedCount++;
+            console.log(`⏭️ Skipped Google-imported event: ${event.title}`);
+            continue;
+          }
+          
+          console.log('📤 Processing local event:', event.title);
+          
           const googleEvent = this.convertFinznToGoogleEvent(event);
           
-          await window.gapi.client.calendar.events.insert({
+          const response = await window.gapi.client.calendar.events.insert({
             calendarId: 'primary',
             resource: googleEvent
           });
           
+          console.log(`✅ Exported: ${event.title}`, response);
           exportedCount++;
         } catch (error) {
-          console.error('Error exporting event:', error);
+          console.error('Error exporting individual event:', error);
+          // Continue with other events even if one fails
         }
       }
       
+      const message = skippedCount > 0 
+        ? `${exportedCount} eventos exportados, ${skippedCount} omitidos (importados de Google)`
+        : `${exportedCount} eventos exportados a Google Calendar`;
+      
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert(`${exportedCount} eventos exportados a Google Calendar`, 'success');
+        window.app.ui.showAlert(message, 'success');
       }
       
       // Close the Google sync modal
@@ -1491,27 +1590,61 @@ export class CalendarManager {
       
     } catch (error) {
       console.error('Error exporting to Google Calendar:', error);
+      let errorMessage = 'Error al exportar eventos';
+      
+      if (error.message.includes('not properly initialized')) {
+        errorMessage = 'Google Calendar no está configurado correctamente. Intenta reconectarte.';
+      } else if (error.status === 401) {
+        errorMessage = 'Sesión expirada. Intenta reconectarte con Google.';
+        // Clear the sync state so user can reconnect
+        this.googleCalendarIntegration = false;
+        this.clearSyncState();
+        this.updateSyncButtonState();
+      } else if (error.status === 403) {
+        errorMessage = 'Sin permisos para escribir en Google Calendar. Verifica los permisos.';
+      }
+      
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al exportar eventos', 'error');
+        window.app.ui.showAlert(errorMessage, 'error');
       }
     }
   }
   
   convertGoogleToFinznEvent(googleEvent) {
-    if (!googleEvent.summary) return null;
+    if (!googleEvent.summary) {
+      console.log('⚠️ Skipping Google event without summary:', googleEvent);
+      return null;
+    }
     
     const startDate = googleEvent.start?.dateTime || googleEvent.start?.date;
-    if (!startDate) return null;
+    if (!startDate) {
+      console.log('⚠️ Skipping Google event without start date:', googleEvent);
+      return null;
+    }
     
     const date = new Date(startDate);
     
+    // Clean the title and add proper description
+    const cleanTitle = googleEvent.summary.replace(/💰\s?/, ''); // Remove FINZN emoji if it exists
+    const originalDescription = googleEvent.description || '';
+    const description = originalDescription.includes('Exportado desde FINZN') 
+      ? originalDescription 
+      : `${originalDescription}\n\nImportado de Google Calendar`.trim();
+    
+    console.log('📥 Converting Google event:', {
+      original: googleEvent.summary,
+      cleaned: cleanTitle,
+      date: date.toISOString().split('T')[0],
+      hasTime: !!googleEvent.start?.dateTime
+    });
+    
     return {
-      title: googleEvent.summary,
-      type: this.detectEventType(googleEvent.summary, googleEvent.description),
+      title: cleanTitle,
+      type: this.detectEventType(cleanTitle, description),
       date: date.toISOString().split('T')[0],
       time: googleEvent.start?.dateTime ? 
         date.toTimeString().split(' ')[0].slice(0, 5) : null,
-      description: googleEvent.description || 'Importado de Google Calendar',
+      description: description,
       amount: null,
       recurring: false,
       frequency: null
@@ -1542,11 +1675,19 @@ export class CalendarManager {
   detectEventType(title = '', description = '') {
     const text = (title + ' ' + description).toLowerCase();
     
-    if (text.includes('pago') || text.includes('cuota')) return 'payment';
-    if (text.includes('cobro') || text.includes('ingreso')) return 'income';
-    if (text.includes('tarjeta') || text.includes('cierre')) return 'card-close';
-    if (text.includes('vencimiento')) return 'deadline';
+    // Financial payment related
+    if (text.includes('pago') || text.includes('cuota') || text.includes('factura') || text.includes('bill')) return 'payment';
     
+    // Income related
+    if (text.includes('cobro') || text.includes('ingreso') || text.includes('sueldo') || text.includes('salary')) return 'income';
+    
+    // Credit card related
+    if (text.includes('tarjeta') || text.includes('cierre') || text.includes('credit card') || text.includes('card')) return 'card-close';
+    
+    // Deadline related
+    if (text.includes('vencimiento') || text.includes('deadline') || text.includes('due') || text.includes('plazo')) return 'deadline';
+    
+    // Default to reminder for other events
     return 'reminder';
   }
   
