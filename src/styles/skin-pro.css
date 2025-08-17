@@ -292,13 +292,20 @@ body[data-skin="pro"] .section-content .section-header{
   backdrop-filter: none;
 }
 
-/* 10) Responsivo fino: 3 → 2 → 1 columnas */
-@media (max-width: 1280px){
+/* 10) Responsivo fino: mantener 3 columnas hasta muy pequeño */
+@media (max-width: 1200px){
   body[data-layout="v2"][data-skin="pro"] .summary-cards{
-    grid-template-columns: repeat(2, minmax(0,1fr));
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
   }
 }
-@media (max-width: 720px){
+@media (max-width: 900px){
+  body[data-layout="v2"][data-skin="pro"] .summary-cards{
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+  }
+}
+@media (max-width: 480px){
   body[data-layout="v2"][data-skin="pro"] .summary-cards{
     grid-template-columns: 1fr;
   }
@@ -513,9 +520,12 @@ body[data-skin="pro"] .summary-cards{
   align-items: stretch;
 }
 @media (max-width: 1200px){
-  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(2, 1fr); }
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(3, 1fr); gap: 12px; }
 }
-@media (max-width: 680px){
+@media (max-width: 900px){
+  body[data-skin="pro"] .summary-cards{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+@media (max-width: 480px){
   body[data-skin="pro"] .summary-cards{ grid-template-columns: 1fr; }
 }
 body[data-skin="pro"] .summary-card{
@@ -1201,10 +1211,17 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
   }
 }
 
-/* T2: 900–1199px (laptop) — KPIs en 2 columnas, fila 2 apilada */
-@media (max-width: 1199px){
+/* T2: 900–1199px (laptop) — mantener 3 columnas hasta 900px */
+@media (max-width: 1199px) and (min-width: 901px){
+  body[data-skin="pro"] .summary-cards{
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
+  }
+}
+@media (max-width: 900px) and (min-width: 481px){
   body[data-skin="pro"] .summary-cards{
     grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
   }
   /* la fila de 2 cards se apila una debajo de la otra */
   body[data-skin="pro"] .col-span-6 { grid-column: span 12; }

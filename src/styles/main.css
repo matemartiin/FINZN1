@@ -4693,7 +4693,45 @@ table,
 }
 
 /* Tablets (769px to 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 750px) and (max-width: 900px) {
+  .header {
+    padding: 0.5rem 1.5rem;
+    min-height: 52px;
+  }
+  
+  .header-content {
+    padding: 0 var(--spacing-md);
+    gap: 0.5rem;
+  }
+  
+  .header-left {
+    gap: 0.5rem;
+  }
+  
+  .header-right {
+    gap: 0.25rem;
+  }
+  
+  .user-info {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+  }
+  
+  .mobile-nav {
+    display: none;
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1024px) {
   .header {
     padding: 0.75rem 2rem;
     min-height: 56px;
@@ -5272,6 +5310,35 @@ select:focus-visible {
 }
 
 /* ====== Responsive ====== */
+/* Tablet/Medium screen adjustments (750px-1020px) */
+@media (max-width: 1020px) and (min-width: 750px) {
+  .main-dashboard {
+    padding: var(--spacing-md);
+  }
+  
+  .section-content {
+    padding: var(--spacing-lg);
+  }
+  
+  .summary-card {
+    padding: var(--spacing-md);
+    min-height: 160px;
+  }
+  
+  .card-amount {
+    font-size: 1.6rem;
+  }
+  
+  .sidebar-nav {
+    padding: var(--spacing-sm) var(--spacing-lg);
+  }
+  
+  .nav-item {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
 @media (max-width: 900px) {
   /* escondemos los botones de desktop */
   .header-right .user-info,
@@ -5579,11 +5646,14 @@ body[data-layout="v2"] .main-dashboard {
 .dashboard-new .chart-mascot-img{ max-width: 180px; opacity:.9 }
 
 
-/* Responsivo: 2 columnas (>=768) y 1 columna (móvil) */
+/* Responsivo: mantener 3 columnas hasta muy pequeño, luego 2, luego 1 */
 @media (max-width: 1200px){
-  .dashboard-new .summary-cards{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .dashboard-new .summary-cards{ grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
 }
-@media (max-width: 720px){
+@media (max-width: 900px){
+  .dashboard-new .summary-cards{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+}
+@media (max-width: 480px){
   .dashboard-new .summary-cards{ grid-template-columns: 1fr; }
   .dashboard-new .chart-content-with-mascot{
     grid-template-columns: 1fr;      /* apilar */
