@@ -236,7 +236,7 @@ export class UIManager {
       // Create elements safely without innerHTML
       const expenseIcon = document.createElement('div');
       expenseIcon.className = 'expense-icon';
-      expenseIcon.textContent = category.icon;
+      expenseIcon.innerHTML = category.icon; // Safe - controlled content from getCategoryInfo
 
       const expenseDetails = document.createElement('div');
       expenseDetails.className = 'expense-details';
