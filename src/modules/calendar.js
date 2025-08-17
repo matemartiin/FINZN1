@@ -423,6 +423,17 @@ export class CalendarManager {
       }
       throw error;
     }
+    
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      const error = new Error('ID de usuario inválido');
+      console.error('📅 ERROR: Invalid UUID format for user ID:', userId);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('ID de usuario inválido', 'error');
+      }
+      throw error;
+    }
 
     try {
       const event = {
@@ -795,6 +806,15 @@ export class CalendarManager {
     const userId = this.getCurrentUserId();
     if (!userId) {
       console.log('📅 No user authenticated, skipping event loading');
+      this.events = [];
+      this.updateUpcomingEventsCount();
+      return;
+    }
+    
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.warn('📅 Invalid UUID format for user ID:', userId);
       this.events = [];
       this.updateUpcomingEventsCount();
       return;
@@ -1190,18 +1210,18 @@ export class CalendarManager {
     
     if (!window.app || !window.app.auth) {
       console.warn('📅 WARNING: window.app.auth not available, using fallback');
-      // Fallback: try to get user ID from localStorage or use 'anonymous'
+      // Fallback: try to get user ID from localStorage or return null
       const savedUserId = localStorage.getItem('finzn_user_id');
-      return savedUserId || 'anonymous_user';
+      return savedUserId || null;
     }
     
     try {
       const userId = window.app.auth.getCurrentUserId();
       console.log('📅 DEBUG: Retrieved user ID:', userId);
-      return userId || 'anonymous_user';
+      return userId || null;
     } catch (error) {
       console.error('📅 ERROR: Failed to get user ID:', error);
-      return 'anonymous_user';
+      return null;
     }
   }
 
