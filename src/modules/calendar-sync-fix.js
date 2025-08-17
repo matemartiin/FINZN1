@@ -82,21 +82,68 @@ export class CalendarSyncFix {
   // Improved duplicate detection
   findDuplicateEvent(newEvent, existingEvents) {
     return existingEvents.find(existing => {
-      // If both have Google IDs, compare them
+      // Primary check: If both have Google IDs, compare them
       if (newEvent.google_event_id && existing.google_event_id) {
         return newEvent.google_event_id === existing.google_event_id;
       }
 
-      // Otherwise use enhanced matching
-      const titleMatch = existing.title === newEvent.title;
+      // Secondary check: If new event has Google ID, check if it already exists
+      if (newEvent.google_event_id && existing.google_event_id === newEvent.google_event_id) {
+        console.log('🔄 Found existing event with same Google ID:', newEvent.google_event_id);
+        return true;
+      }
+
+      // Tertiary check: Enhanced content matching
+      const titleMatch = existing.title?.trim() === newEvent.title?.trim();
       const dateMatch = existing.date === newEvent.date;
-      const timeMatch = (!existing.time && !newEvent.time) || (existing.time === newEvent.time);
       
-      // Be more strict about duplicates
+      // More flexible time matching
+      const timeMatch = this.areTimesSimilar(existing.time, newEvent.time);
+      
+      // Enhanced description comparison
       const descriptionSimilar = this.areDescriptionsSimilar(existing.description, newEvent.description);
       
-      return titleMatch && dateMatch && timeMatch && descriptionSimilar;
+      // Additional checks for better accuracy
+      const typeMatch = !existing.type || !newEvent.type || existing.type === newEvent.type;
+      
+      const isMatch = titleMatch && dateMatch && timeMatch && descriptionSimilar && typeMatch;
+      
+      if (isMatch) {
+        console.log('🔄 Found duplicate by content:', {
+          title: existing.title,
+          date: existing.date,
+          existingId: existing.id,
+          newGoogleId: newEvent.google_event_id
+        });
+      }
+      
+      return isMatch;
     });
+  }
+
+  // Check if times are similar (for duplicate detection)
+  areTimesSimilar(time1, time2) {
+    // If both are null/undefined, they match
+    if (!time1 && !time2) return true;
+    
+    // If only one is null/undefined, check if the other is a whole day event indicator
+    if (!time1 || !time2) {
+      const nonNullTime = time1 || time2;
+      // Consider times like "00:00" or empty as all-day events
+      return !nonNullTime || nonNullTime === "00:00" || nonNullTime.trim() === "";
+    }
+    
+    // Direct comparison for exact matches
+    if (time1 === time2) return true;
+    
+    // Normalize time formats (remove seconds, handle 24h vs 12h)
+    const normalizeTime = (time) => {
+      if (!time) return "";
+      // Remove seconds and normalize format
+      return time.replace(/:\d{2}$/, "").trim();
+    };
+    
+    return normalizeTime(time1) === normalizeTime(time2);
   }
 
   // Check if descriptions are similar (for duplicate detection)

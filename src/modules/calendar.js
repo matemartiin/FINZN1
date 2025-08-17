@@ -1007,7 +1007,8 @@ export class CalendarManager {
 
     if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
       try {
-        await this.deleteEvent(eventId);
+        // Use the enhanced delete method that handles Google sync
+        await this.syncFix.deleteEventWithSync(eventId);
         
         if (window.app && window.app.modals) {
           window.app.modals.hide('edit-event-modal');
@@ -2075,10 +2076,9 @@ export class CalendarManager {
   }
 
   startAutoSync() {
-    if (!this.googleCalendarIntegration || !this.autoSyncEnabled) return;
-    
-    // Use the safer auto-sync from sync fix
-    this.syncFix.startSaferAutoSync();
+    // Auto-sync disabled - sync only on demand
+    console.log('⚠️ Auto-sync is disabled. Use manual sync only.');
+    return;
   }
 
   stopAutoSync() {
@@ -2606,21 +2606,20 @@ export class CalendarManager {
   handleAutoSyncToggle(enabled) {
     console.log('🔄 Auto-sync toggle changed:', enabled);
     
-    this.autoSyncEnabled = enabled;
-    this.saveSyncState();
-    
-    if (enabled && this.googleCalendarIntegration) {
-      // Start auto-sync
-      this.startAutoSync();
-      if (window.app && window.app.ui) {
-        window.app.ui.showAlert('✅ Sincronización automática activada (cada 5 minutos)', 'success', 3000);
+    // Auto-sync is disabled - inform user
+    if (enabled) {
+      if (window.app?.ui) {
+        window.app.ui.showAlert('La sincronización automática está deshabilitada. Usa el botón de sincronización manual.', 'info');
       }
-    } else {
-      // Stop auto-sync
-      this.stopAutoSync();
-      if (window.app && window.app.ui) {
-        window.app.ui.showAlert('🛑 Sincronización automática desactivada', 'info', 3000);
+      // Reset the toggle
+      const autoSyncToggle = document.getElementById('auto-sync-toggle');
+      if (autoSyncToggle) {
+        autoSyncToggle.checked = false;
       }
+      return;
     }
+    
+    this.autoSyncEnabled = false;
+    this.saveSyncState();
   }
 }
