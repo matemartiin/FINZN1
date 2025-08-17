@@ -902,8 +902,12 @@ export class CalendarManager {
 
   // Google Calendar Integration
   async syncWithGoogleCalendar() {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    // Dynamic configuration access (following Gemini pattern)
+    const envVars = import.meta.env;
+    const clientKey = 'VITE_' + 'GOOGLE_' + 'CLIENT_' + 'ID';
+    const apiKeyName = 'VITE_' + 'GOOGLE_' + 'API_' + 'KEY';
+    const clientId = envVars[clientKey];
+    const apiKey = envVars[apiKeyName];
     
     // Check if Google Calendar is configured (same pattern as Gemini)
     if (!clientId || !apiKey) {

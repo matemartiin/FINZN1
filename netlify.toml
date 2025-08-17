@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  SECRETS_SCAN_OMIT_KEYS = "VITE_GOOGLE_API_KEY,VITE_GOOGLE_CLIENT_ID"
 
 [[headers]]
   for = "/*"
