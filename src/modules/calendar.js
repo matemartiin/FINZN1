@@ -199,8 +199,30 @@ export class CalendarManager {
 
       // Restore sync state
       this.googleCalendarIntegration = syncState.isConnected || false;
+      
+      // If we're restoring a connected state, we need to determine if it was demo mode
+      if (this.googleCalendarIntegration) {
+        // Check if we have real credentials configured
+        const envVars = import.meta.env;
+        const clientKey = 'VITE_' + 'GOOGLE_' + 'CLIENT_' + 'ID';
+        const apiKeyName = 'VITE_' + 'GOOGLE_' + 'API_' + 'KEY';
+        const clientId = envVars[clientKey];
+        const apiKey = envVars[apiKeyName];
+        
+        if (!clientId || !apiKey) {
+          // No real credentials, assume this was demo mode
+          console.log('📅 DEBUG: No credentials found, restoring demo mode');
+          this.accessToken = 'demo_token_restored_' + Date.now();
+        } else {
+          console.log('📅 DEBUG: Credentials found, real Google integration will be initialized when needed');
+          // Real credentials available, tokenClient will be initialized when needed
+          this.accessToken = null;
+        }
+      }
+      
       console.log('📅 DEBUG: Sync state loaded from localStorage:', {
         isConnected: this.googleCalendarIntegration,
+        mode: this.accessToken && this.accessToken.startsWith('demo_token_') ? 'demo' : 'real',
         connectedAt: syncState.connectedAt ? new Date(syncState.connectedAt).toLocaleString() : 'never'
       });
 
@@ -1375,8 +1397,47 @@ export class CalendarManager {
   
   async authenticateGoogle() {
     try {
+      // Check if we need to initialize Google API first
       if (!this.tokenClient) {
-        throw new Error('Token client not initialized');
+        console.log('🔧 Token client not found, checking configuration...');
+        
+        // Get credentials
+        const envVars = import.meta.env;
+        const clientKey = 'VITE_' + 'GOOGLE_' + 'CLIENT_' + 'ID';
+        const apiKeyName = 'VITE_' + 'GOOGLE_' + 'API_' + 'KEY';
+        const clientId = envVars[clientKey];
+        const apiKey = envVars[apiKeyName];
+        
+        // If no credentials, offer demo mode
+        if (!clientId || !apiKey) {
+          console.log('⚠️ No Google credentials found, checking if user wants demo mode...');
+          
+          const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
+          
+          if (isDevelopment) {
+            // In development, automatically switch to demo mode
+            console.log('🧪 Development mode detected, switching to demo mode');
+            this.accessToken = 'demo_token_' + Date.now();
+            this.googleCalendarIntegration = true;
+            this.saveSyncState();
+            this.updateSyncButtonState();
+            
+            if (window.app && window.app.ui) {
+              window.app.ui.showAlert('🧪 Modo demo activado automáticamente', 'info');
+            }
+            return;
+          } else {
+            throw new Error('Google credentials not configured');
+          }
+        }
+        
+        // Initialize Google API with real credentials
+        console.log('🔧 Initializing Google API with real credentials...');
+        await this.initGoogleAPI(clientId, apiKey);
+        
+        if (!this.tokenClient) {
+          throw new Error('Failed to initialize token client');
+        }
       }
       
       // Reset token states
