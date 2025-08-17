@@ -275,18 +275,53 @@ export class CalendarManager {
         day: 'numeric' 
       });
 
-      eventElement.innerHTML = `
-        <div class="agenda-event-date">${dateStr}</div>
-        <div class="agenda-event-details">
-          <div class="agenda-event-title">${this.getEventTypeIcon(event.type)} ${event.title}</div>
-          <div class="agenda-event-description">${event.description || ''}</div>
-          ${event.amount ? `<div class="agenda-event-amount">${this.formatCurrency(event.amount)}</div>` : ''}
-        </div>
-        <div class="agenda-event-actions">
-          <button class="btn btn-sm btn-secondary" onclick="window.app.calendar.showEventDetails('${event.id}')">Ver</button>
-          <button class="btn btn-sm btn-primary" onclick="window.app.calendar.editEvent('${event.id}')">Editar</button>
-        </div>
-      `;
+      // Create agenda event safely
+      const eventDateElement = document.createElement('div');
+      eventDateElement.className = 'agenda-event-date';
+      eventDateElement.textContent = dateStr;
+
+      const eventDetails = document.createElement('div');
+      eventDetails.className = 'agenda-event-details';
+
+      const eventTitle = document.createElement('div');
+      eventTitle.className = 'agenda-event-title';
+      eventTitle.innerHTML = this.getEventTypeIcon(event.type) + ' '; // Safe icon
+      const titleText = document.createTextNode(event.title); // Safe user text
+      eventTitle.appendChild(titleText);
+
+      const eventDescription = document.createElement('div');
+      eventDescription.className = 'agenda-event-description';
+      eventDescription.textContent = event.description || ''; // Safe user text
+
+      eventDetails.appendChild(eventTitle);
+      eventDetails.appendChild(eventDescription);
+
+      if (event.amount) {
+        const eventAmount = document.createElement('div');
+        eventAmount.className = 'agenda-event-amount';
+        eventAmount.textContent = this.formatCurrency(event.amount);
+        eventDetails.appendChild(eventAmount);
+      }
+
+      const eventActions = document.createElement('div');
+      eventActions.className = 'agenda-event-actions';
+
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'btn btn-sm btn-secondary';
+      viewBtn.textContent = 'Ver';
+      viewBtn.addEventListener('click', () => window.app.calendar.showEventDetails(event.id));
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-sm btn-primary';
+      editBtn.textContent = 'Editar';
+      editBtn.addEventListener('click', () => window.app.calendar.editEvent(event.id));
+
+      eventActions.appendChild(viewBtn);
+      eventActions.appendChild(editBtn);
+
+      eventElement.appendChild(eventDateElement);
+      eventElement.appendChild(eventDetails);
+      eventElement.appendChild(eventActions);
 
       agendaEvents.appendChild(eventElement);
     });
@@ -648,18 +683,56 @@ export class CalendarManager {
         day: 'numeric' 
       });
 
-      content.innerHTML = `
-        <div class="event-detail-item">
-          <strong>Tipo:</strong> ${this.getEventTypeIcon(event.type)} ${this.getEventTypeName(event.type)}
-        </div>
-        <div class="event-detail-item">
-          <strong>Fecha:</strong> ${dateStr}
-        </div>
-        ${event.time ? `<div class="event-detail-item"><strong>Hora:</strong> ${event.time}</div>` : ''}
-        ${event.amount ? `<div class="event-detail-item"><strong>Monto:</strong> ${this.formatCurrency(event.amount)}</div>` : ''}
-        ${event.description ? `<div class="event-detail-item"><strong>Descripción:</strong> <span class="event-description-text"></span></div>` : ''}
-        ${event.recurring ? `<div class="event-detail-item"><strong>Recurrencia:</strong> ${this.getFrequencyName(event.frequency)}</div>` : ''}
-      `;
+      // Create event details safely
+      content.innerHTML = '';
+
+      // Type section
+      const typeItem = document.createElement('div');
+      typeItem.className = 'event-detail-item';
+      typeItem.innerHTML = `<strong>Tipo:</strong> ${this.getEventTypeIcon(event.type)} ${this.getEventTypeName(event.type)}`;
+      content.appendChild(typeItem);
+
+      // Date section
+      const dateItem = document.createElement('div');
+      dateItem.className = 'event-detail-item';
+      dateItem.innerHTML = `<strong>Fecha:</strong> ${dateStr}`;
+      content.appendChild(dateItem);
+
+      // Time section (user input - needs escaping)
+      if (event.time) {
+        const timeItem = document.createElement('div');
+        timeItem.className = 'event-detail-item';
+        const timeLabel = document.createElement('strong');
+        timeLabel.textContent = 'Hora: ';
+        const timeValue = document.createTextNode(event.time);
+        timeItem.appendChild(timeLabel);
+        timeItem.appendChild(timeValue);
+        content.appendChild(timeItem);
+      }
+
+      // Amount section
+      if (event.amount) {
+        const amountItem = document.createElement('div');
+        amountItem.className = 'event-detail-item';
+        amountItem.innerHTML = `<strong>Monto:</strong> ${this.formatCurrency(event.amount)}`;
+        content.appendChild(amountItem);
+      }
+
+      // Description section (user input - handled separately)
+      if (event.description) {
+        const descItem = document.createElement('div');
+        descItem.className = 'event-detail-item';
+        descItem.innerHTML = '<strong>Descripción:</strong> <span class="event-description-text"></span>';
+        content.appendChild(descItem);
+      }
+
+      // Recurring section
+      if (event.recurring) {
+        const recurringItem = document.createElement('div');
+        recurringItem.className = 'event-detail-item';
+        recurringItem.innerHTML = `<strong>Recurrencia:</strong> ${this.getFrequencyName(event.frequency)}`;
+        content.appendChild(recurringItem);
+      }
       
       // Safely set user-provided description
       if (event.description) {
@@ -1338,7 +1411,7 @@ export class CalendarManager {
             <span class="day-event-type">
               ${this.getEventTypeIcon(event.type)} ${this.getEventTypeName(event.type)}
             </span>
-            ${event.time ? `<span>🕐 ${event.time}</span>` : ''}
+            ${event.time ? `<span>🕐 ${this.escapeHtml(event.time)}</span>` : ''}
             ${event.amount ? `<span class="day-event-amount">${this.formatCurrency(event.amount)}</span>` : ''}
           </div>
           ${event.description ? `<div class="day-event-description">${this.escapeHtml(event.description)}</div>` : ''}
