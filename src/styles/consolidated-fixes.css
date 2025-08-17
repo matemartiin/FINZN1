@@ -1087,3 +1087,192 @@ body[data-skin="pro"] #google-sync-modal .modal-description {
     font-size: 0.75rem;
   }
 }
+
+/* ========= CALENDAR EVENT MODAL IMPROVEMENTS ========= */
+
+/* Better layout for calendar event modals */
+#add-event-modal .modal-content,
+#edit-event-modal .modal-content {
+  max-width: 550px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Ensure form groups have proper spacing */
+#add-event-modal .modal-form,
+#edit-event-modal .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0;
+}
+
+/* Form groups in calendar modals */
+#add-event-modal .form-group,
+#edit-event-modal .form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels in calendar modals */
+#add-event-modal .form-group label,
+#edit-event-modal .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #2D3748);
+  font-size: 0.9rem;
+}
+
+/* Inputs in calendar modals */
+#add-event-modal .form-group input,
+#add-event-modal .form-group select,
+#add-event-modal .form-group textarea,
+#edit-event-modal .form-group input,
+#edit-event-modal .form-group select,
+#edit-event-modal .form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #E2E8F0);
+  border-radius: 8px;
+  background: var(--bg-primary, #FFFFFF);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Focus states for calendar modal inputs */
+#add-event-modal .form-group input:focus,
+#add-event-modal .form-group select:focus,
+#add-event-modal .form-group textarea:focus,
+#edit-event-modal .form-group input:focus,
+#edit-event-modal .form-group select:focus,
+#edit-event-modal .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #C8B6FF);
+  box-shadow: 0 0 0 3px rgba(200, 182, 255, 0.1);
+}
+
+/* Special styling for form rows */
+#add-event-modal .form-row,
+#edit-event-modal .form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#add-event-modal .form-row .form-group,
+#edit-event-modal .form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Textarea specific styling */
+#add-event-modal textarea,
+#edit-event-modal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Checkbox styling in calendar modals */
+#add-event-modal .form-group input[type="checkbox"],
+#edit-event-modal .form-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+#add-event-modal .checkbox-group,
+#edit-event-modal .checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#add-event-modal .checkbox-group label,
+#edit-event-modal .checkbox-group label {
+  margin-bottom: 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Modal actions styling */
+#add-event-modal .modal-actions,
+#edit-event-modal .modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #E2E8F0);
+}
+
+/* Button styling in calendar modals */
+#add-event-modal .modal-actions .btn,
+#edit-event-modal .modal-actions .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Input hints */
+#add-event-modal .input-hint,
+#edit-event-modal .input-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #718096);
+  margin-top: 0.25rem;
+}
+
+/* Dark theme for calendar modals */
+body[data-skin="pro"] #add-event-modal .form-group label,
+body[data-skin="pro"] #edit-event-modal .form-group label {
+  color: var(--pro-text, #E5E7EB);
+}
+
+body[data-skin="pro"] #add-event-modal .form-group input,
+body[data-skin="pro"] #add-event-modal .form-group select,
+body[data-skin="pro"] #add-event-modal .form-group textarea,
+body[data-skin="pro"] #edit-event-modal .form-group input,
+body[data-skin="pro"] #edit-event-modal .form-group select,
+body[data-skin="pro"] #edit-event-modal .form-group textarea {
+  background: var(--pro-elev, #1b2430);
+  border-color: var(--pro-border, rgba(255,255,255,.08));
+  color: var(--pro-text, #E5E7EB);
+}
+
+body[data-skin="pro"] #add-event-modal .input-hint,
+body[data-skin="pro"] #edit-event-modal .input-hint {
+  color: var(--pro-text-2, #9CA3AF);
+}
+
+/* Responsive design for calendar modals */
+@media (max-width: 768px) {
+  #add-event-modal .modal-content,
+  #edit-event-modal .modal-content {
+    max-width: 95%;
+    width: 95%;
+    margin: 1rem auto;
+  }
+  
+  #add-event-modal .form-row,
+  #edit-event-modal .form-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  #add-event-modal .modal-actions,
+  #edit-event-modal .modal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  #add-event-modal .modal-actions .btn,
+  #edit-event-modal .modal-actions .btn {
+    width: 100%;
+  }
+}

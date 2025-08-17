@@ -12,6 +12,9 @@ export class CalendarManager {
     this.accessToken = null;
     this.tokenError = null;
     this.storageKey = 'finzn-google-calendar-sync';
+    this.autoSyncEnabled = true; // Auto-sync enabled by default
+    this.autoSyncPollingInterval = null;
+    this.lastSyncTime = null;
   }
 
   init() {
@@ -655,6 +658,11 @@ export class CalendarManager {
       // Refresh calendar display
       console.log('📅 DEBUG: Refreshing calendar display...');
       this.renderCalendar();
+
+      // Auto-sync to Google Calendar if connected
+      if (this.autoSyncEnabled && this.googleCalendarIntegration) {
+        this.autoExportEventToGoogle(data);
+      }
 
       return data;
     } catch (error) {
@@ -1421,6 +1429,7 @@ export class CalendarManager {
             this.googleCalendarIntegration = true;
             this.saveSyncState();
             this.updateSyncButtonState();
+            this.startAutoSync();
             
             if (window.app && window.app.ui) {
               window.app.ui.showAlert('🧪 Modo demo activado automáticamente', 'info');
@@ -1460,6 +1469,8 @@ export class CalendarManager {
             this.saveSyncState();
             // Update sync button to show connected state
             this.updateSyncButtonState();
+            // Start automatic bidirectional sync
+            this.startAutoSync();
             // Close the Google sync modal
             if (window.app && window.app.modals) {
               window.app.modals.hide('google-sync-modal');
@@ -1848,6 +1859,7 @@ export class CalendarManager {
       this.accessToken = 'demo_token_' + Date.now();
       this.saveSyncState();
       this.updateSyncButtonState();
+      this.startAutoSync();
       
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('🧪 Modo demo activado - Google Calendar simulado', 'success');
@@ -1966,6 +1978,169 @@ export class CalendarManager {
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('Error en exportación demo', 'error');
       }
+    }
+  }
+
+  // Auto-sync methods
+  async autoExportEventToGoogle(event) {
+    if (!this.googleCalendarIntegration || !event) return;
+    
+    try {
+      console.log('🔄 Auto-exporting event to Google Calendar:', event.title);
+      
+      // Check if it's already a demo/Google event to avoid loops
+      if (event.description && (
+        event.description.includes('Importado de Google Calendar') ||
+        event.description.includes('Evento demo importado de Google Calendar')
+      )) {
+        console.log('⏭️ Skipping auto-export of Google-imported event');
+        return;
+      }
+      
+      // For demo mode
+      if (this.accessToken && this.accessToken.startsWith('demo_token_')) {
+        console.log('🧪 Demo mode: Simulating auto-export to Google Calendar');
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert(`🔄 Auto-sincronizado: "${event.title}" enviado a Google Calendar`, 'info', 3000);
+        }
+        return;
+      }
+      
+      // Real Google Calendar export
+      try {
+        // If we don't have access token, skip auto-sync (user can manually sync later)
+        if (!this.accessToken) {
+          console.log('⏭️ No access token for auto-sync, skipping');
+          return;
+        }
+        
+        // Verify we have access token and gapi is loaded
+        if (!window.gapi || !window.gapi.client) {
+          console.log('⏭️ Google API not loaded for auto-sync, skipping');
+          return;
+        }
+        
+        // Ensure the token is set in gapi client
+        window.gapi.client.setToken({access_token: this.accessToken});
+        
+        const googleEvent = this.convertFinznToGoogleEvent(event);
+        
+        const response = await window.gapi.client.calendar.events.insert({
+          calendarId: 'primary',
+          resource: googleEvent
+        });
+        
+        console.log('✅ Auto-exported event to Google Calendar:', response);
+        
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert(`🔄 Auto-sincronizado: "${event.title}" enviado a Google Calendar`, 'success', 3000);
+        }
+        
+      } catch (error) {
+        console.error('❌ Error in auto-export:', error);
+        // Don't show error to user for auto-sync failures, just log them
+      }
+      
+    } catch (error) {
+      console.error('❌ Error in autoExportEventToGoogle:', error);
+    }
+  }
+
+  startAutoSync() {
+    if (!this.googleCalendarIntegration || !this.autoSyncEnabled) return;
+    
+    // Clear existing interval
+    if (this.autoSyncPollingInterval) {
+      clearInterval(this.autoSyncPollingInterval);
+    }
+    
+    console.log('🔄 Starting auto-sync polling (every 5 minutes)');
+    
+    // Poll Google Calendar every 5 minutes for new events
+    this.autoSyncPollingInterval = setInterval(async () => {
+      try {
+        await this.autoImportFromGoogle();
+      } catch (error) {
+        console.error('❌ Auto-sync polling error:', error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  stopAutoSync() {
+    if (this.autoSyncPollingInterval) {
+      clearInterval(this.autoSyncPollingInterval);
+      this.autoSyncPollingInterval = null;
+      console.log('🛑 Auto-sync polling stopped');
+    }
+  }
+
+  async autoImportFromGoogle() {
+    if (!this.googleCalendarIntegration || !this.autoSyncEnabled) return;
+    
+    try {
+      console.log('🔄 Auto-importing new events from Google Calendar...');
+      
+      // For demo mode - don't auto-import
+      if (this.accessToken && this.accessToken.startsWith('demo_token_')) {
+        return;
+      }
+      
+      // Check if we have everything needed for real sync
+      if (!this.accessToken || !window.gapi || !window.gapi.client) {
+        return;
+      }
+      
+      // Set up timeMin to only get events updated since last sync
+      const timeMin = this.lastSyncTime ? 
+        new Date(this.lastSyncTime).toISOString() : 
+        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // Last 24 hours
+      
+      window.gapi.client.setToken({access_token: this.accessToken});
+      
+      const response = await window.gapi.client.calendar.events.list({
+        calendarId: 'primary',
+        timeMin: timeMin,
+        maxResults: 20,
+        singleEvents: true,
+        orderBy: 'startTime'
+      });
+      
+      const events = response.result.items || [];
+      let importedCount = 0;
+      
+      for (const googleEvent of events) {
+        const finznEvent = this.convertGoogleToFinznEvent(googleEvent);
+        if (finznEvent) {
+          // Check if event already exists
+          const existingEvents = this.getEventsForDate(new Date(finznEvent.date));
+          const duplicate = existingEvents.find(e => 
+            e.title === finznEvent.title && 
+            e.date === finznEvent.date &&
+            e.description && e.description.includes('Importado de Google Calendar')
+          );
+          
+          if (!duplicate) {
+            await this.addEvent(finznEvent);
+            importedCount++;
+          }
+        }
+      }
+      
+      this.lastSyncTime = new Date().toISOString();
+      
+      if (importedCount > 0) {
+        console.log(`✅ Auto-imported ${importedCount} new events from Google Calendar`);
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert(`🔄 ${importedCount} eventos nuevos sincronizados desde Google Calendar`, 'info', 3000);
+        }
+        
+        // Refresh calendar display
+        this.renderCalendar();
+        this.updateUpcomingEventsCount();
+      }
+      
+    } catch (error) {
+      console.error('❌ Error in auto-import:', error);
     }
   }
 
