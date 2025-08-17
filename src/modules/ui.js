@@ -2159,21 +2159,28 @@ bindBudgetForm() {
 
   async deleteFixedIncome() {
     try {
-      if (window.app && window.app.data && window.app.data.updateIncome) {
-        // Set fixed income to 0
-        await window.app.data.updateIncome(window.app.currentMonth, { fixed: 0 });
-        this.showAlert('Ingreso fijo eliminado (puesto en $0)', 'success');
+      if (window.app && window.app.data && window.app.data.addFixedIncome) {
+        console.log('🗑️ Deleting fixed income by setting to 0');
+        // Set fixed income to 0 using addFixedIncome (which does upsert)
+        const success = await window.app.data.addFixedIncome(window.app.currentMonth, 0);
         
-        // Refresh the dashboard
-        if (window.app.updateDashboard) {
-          window.app.updateDashboard();
+        if (success) {
+          this.showAlert('Ingreso fijo eliminado (puesto en $0)', 'success');
+          
+          // Refresh the dashboard
+          if (window.app.updateDashboard) {
+            window.app.updateDashboard();
+          }
+        } else {
+          this.showAlert('Error: No se pudo eliminar el ingreso fijo', 'error');
         }
       } else {
-        this.showAlert('Error: No se pudo eliminar el ingreso fijo', 'error');
+        console.error('addFixedIncome method not found');
+        this.showAlert('Error: Método addFixedIncome no disponible', 'error');
       }
     } catch (error) {
       console.error('Error deleting fixed income:', error);
-      this.showAlert('Error eliminando el ingreso fijo', 'error');
+      this.showAlert('Error eliminando el ingreso fijo: ' + error.message, 'error');
     }
   }
 

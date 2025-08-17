@@ -5,8 +5,31 @@
   gap: 0.5rem;
   align-items: center;
   flex-shrink: 0; /* Prevent buttons from shrinking */
+  min-width: 140px; /* Fixed minimum width for buttons */
 }
 
+/* Modal income list specific overrides */
+#view-incomes-modal .modal-content {
+  max-width: 600px; /* Fixed max width for modal */
+  width: 90vw; /* Responsive width */
+}
+
+#view-incomes-modal .all-incomes-list {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+#view-incomes-modal .income-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  gap: var(--spacing-md);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Regular income list items (override main.css) */
 .income-list-item {
   display: flex;
   align-items: center;
@@ -17,6 +40,8 @@
   border-left: 4px solid var(--celeste-suave);
   transition: all var(--transition-normal);
   gap: var(--spacing-md);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .income-list-item:hover {
@@ -35,6 +60,14 @@
 .income-item-details {
   flex: 1;
   min-width: 0; /* Allow text to truncate */
+  max-width: calc(100% - 200px); /* Leave space for amount and buttons */
+}
+
+.income-item-type,
+.income-item-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .income-item-type {
