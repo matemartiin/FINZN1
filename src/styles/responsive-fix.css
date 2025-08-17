@@ -1,0 +1,426 @@
+/* RESPONSIVE FIX - LAYOUT HORIZONTAL PARA TODAS LAS SECCIONES */
+
+/* ===== REPORTS SECTION ===== */
+@media (max-width: 768px) {
+  .reports-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .report-card {
+    padding: 16px !important;
+  }
+  
+  .report-card h3 {
+    font-size: 14px !important;
+  }
+  
+  .report-card p {
+    font-size: 12px !important;
+  }
+  
+  .report-card .btn {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  
+  .report-card {
+    padding: 12px !important;
+  }
+  
+  .report-card h3 {
+    font-size: 12px !important;
+  }
+  
+  .report-card p {
+    font-size: 10px !important;
+  }
+  
+  .report-card .btn {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+/* ===== SETTINGS SECTION ===== */
+@media (max-width: 768px) {
+  .settings-category .settings-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .settings-card {
+    padding: 16px !important;
+  }
+  
+  .settings-card h4 {
+    font-size: 14px !important;
+  }
+  
+  .settings-card p {
+    font-size: 12px !important;
+  }
+  
+  .settings-card .btn {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-category .settings-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  
+  .settings-card {
+    padding: 12px !important;
+  }
+  
+  .settings-card h4 {
+    font-size: 12px !important;
+  }
+  
+  .settings-card p {
+    font-size: 10px !important;
+  }
+  
+  .settings-card .btn {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+/* ===== GOALS SECTION ===== */
+@media (max-width: 768px) {
+  .goals-list {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .goal-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 16px !important;
+    min-height: 80px !important;
+  }
+  
+  .goal-info {
+    flex: 1 !important;
+  }
+  
+  .goal-name {
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .goal-progress {
+    margin: 8px 0 !important;
+  }
+  
+  .goal-amounts {
+    font-size: 12px !important;
+  }
+  
+  .goal-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .goal-actions .btn {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    min-width: 80px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .goal-item {
+    padding: 12px !important;
+    min-height: 70px !important;
+    gap: 12px !important;
+  }
+  
+  .goal-name {
+    font-size: 12px !important;
+  }
+  
+  .goal-amounts {
+    font-size: 11px !important;
+  }
+  
+  .goal-actions .btn {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+    min-width: 70px !important;
+  }
+}
+
+/* ===== BUDGETS SECTION ===== */
+@media (max-width: 768px) {
+  .budgets-list {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .budget-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 16px !important;
+    min-height: 80px !important;
+  }
+  
+  .budget-info {
+    flex: 1 !important;
+  }
+  
+  .budget-name {
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .budget-progress {
+    margin: 8px 0 !important;
+  }
+  
+  .budget-amounts {
+    font-size: 12px !important;
+  }
+  
+  .budget-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .budget-actions .btn {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    min-width: 80px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .budget-card {
+    padding: 12px !important;
+    min-height: 70px !important;
+    gap: 12px !important;
+  }
+  
+  .budget-name {
+    font-size: 12px !important;
+  }
+  
+  .budget-amounts {
+    font-size: 11px !important;
+  }
+  
+  .budget-actions .btn {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+    min-width: 70px !important;
+  }
+}
+
+/* ===== TRANSACTIONS SECTION ===== */
+@media (max-width: 768px) {
+  .expenses-list,
+  .income-list {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .expense-item,
+  .income-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px !important;
+    min-height: 60px !important;
+  }
+  
+  .expense-info,
+  .income-info {
+    flex: 1 !important;
+  }
+  
+  .expense-description,
+  .income-description {
+    font-size: 14px !important;
+  }
+  
+  .expense-amount,
+  .income-amount {
+    font-size: 14px !important;
+  }
+  
+  .expense-actions,
+  .income-actions {
+    display: flex !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .expense-actions .btn,
+  .income-actions .btn {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .expense-item,
+  .income-item {
+    padding: 10px !important;
+    min-height: 50px !important;
+    gap: 10px !important;
+  }
+  
+  .expense-description,
+  .income-description {
+    font-size: 12px !important;
+  }
+  
+  .expense-amount,
+  .income-amount {
+    font-size: 12px !important;
+  }
+  
+  .expense-actions .btn,
+  .income-actions .btn {
+    font-size: 10px !important;
+    padding: 4px 6px !important;
+  }
+}
+
+/* ===== CALENDAR SECTION ===== */
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 2px !important;
+  }
+  
+  .calendar-day {
+    min-height: 50px !important;
+    padding: 4px 2px !important;
+    font-size: 12px !important;
+  }
+  
+  .calendar-nav h3 {
+    font-size: 16px !important;
+  }
+  
+  .calendar-view-toggle .view-btn {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-day {
+    min-height: 40px !important;
+    padding: 3px 1px !important;
+    font-size: 10px !important;
+  }
+  
+  .calendar-nav h3 {
+    font-size: 14px !important;
+  }
+  
+  .calendar-view-toggle .view-btn {
+    font-size: 10px !important;
+    padding: 4px 6px !important;
+  }
+}
+
+/* ===== GENERAL SECTION HEADERS ===== */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+  }
+  
+  .section-header h1 {
+    font-size: 20px !important;
+  }
+  
+  .section-actions {
+    display: flex !important;
+    gap: 12px !important;
+    justify-content: center !important;
+  }
+  
+  .section-actions .btn {
+    flex: 1 !important;
+    font-size: 12px !important;
+    padding: 10px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header h1 {
+    font-size: 18px !important;
+  }
+  
+  .section-actions .btn {
+    font-size: 11px !important;
+    padding: 8px 10px !important;
+  }
+}
+
+/* ===== OVERRIDE EXISTING VERTICAL STACKING ===== */
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 4px !important;
+  }
+}
+
+/* ===== TABS RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .transaction-tabs {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+  
+  .tab-btn {
+    flex: 1 !important;
+    font-size: 12px !important;
+    padding: 8px 4px !important;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-btn {
+    font-size: 11px !important;
+    padding: 6px 2px !important;
+  }
+}

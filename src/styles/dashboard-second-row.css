@@ -225,35 +225,114 @@
   font-size: 14px;
 }
 
-/* Responsive Design */
+/* Responsive Design - Mantener layout horizontal */
 @media (max-width: 768px) {
   .dashboard-second-row {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
   
   .chart-card,
   .recent-transactions-card {
-    padding: 20px;
+    padding: 16px;
   }
   
   .chart-container {
-    height: 240px;
+    height: 200px;
   }
   
   .card-header h3,
   .chart-header h3 {
-    font-size: 16px;
+    font-size: 14px;
+  }
+  
+  .chart-subtitle {
+    font-size: 12px;
   }
   
   .recent-transaction-item {
-    padding: 10px 12px;
+    padding: 8px 10px;
+    gap: 12px;
   }
   
   .transaction-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .transaction-description {
+    font-size: 12px;
+  }
+  
+  .transaction-date {
+    font-size: 10px;
+  }
+  
+  .transaction-amount {
+    font-size: 12px;
+  }
+  
+  .view-all-btn {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-second-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .chart-card,
+  .recent-transactions-card {
+    padding: 12px;
+  }
+  
+  .chart-container {
+    height: 160px;
+  }
+  
+  .card-header h3,
+  .chart-header h3 {
+    font-size: 12px;
+  }
+  
+  .chart-subtitle {
+    font-size: 10px;
+  }
+  
+  .recent-transaction-item {
+    padding: 6px 8px;
+    gap: 8px;
+  }
+  
+  .transaction-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .transaction-description {
+    font-size: 11px;
+  }
+  
+  .transaction-date {
+    font-size: 9px;
+  }
+  
+  .transaction-amount {
+    font-size: 11px;
+  }
+  
+  .view-all-btn {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+  
+  .recent-transactions-list {
+    max-height: 160px;
   }
 }
 
