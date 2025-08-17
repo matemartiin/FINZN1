@@ -931,8 +931,20 @@ export class CalendarManager {
       
     } catch (error) {
       console.error('Error connecting to Google Calendar:', error);
+      let errorMessage = 'Error al conectar con Google Calendar';
+      
+      if (error.error === 'popup_blocked_by_browser') {
+        errorMessage = 'El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.';
+      } else if (error.error === 'access_denied') {
+        errorMessage = 'Acceso denegado. Verifica que tengas permisos para Google Calendar.';
+      } else if (error.details && error.details.includes('API key')) {
+        errorMessage = 'Error con la API key de Google. Verifica la configuración.';
+      } else if (error.details && error.details.includes('Client ID')) {
+        errorMessage = 'Error con el Client ID de Google. Verifica la configuración.';
+      }
+      
       if (window.app && window.app.ui) {
-        window.app.ui.showAlert('Error al conectar con Google Calendar', 'error');
+        window.app.ui.showAlert(errorMessage, 'error');
       }
     }
   }
@@ -949,17 +961,38 @@ export class CalendarManager {
               apiKey: apiKey,
               clientId: clientId,
               discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-              scope: 'https://www.googleapis.com/auth/calendar'
+              scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar'
             }).then(() => {
               console.log('✅ Google Calendar API initialized');
               resolve();
-            }).catch(reject);
+            }).catch((error) => {
+              console.error('❌ Google API initialization error:', error);
+              if (error.details) {
+                console.error('Error details:', error.details);
+              }
+              reject(error);
+            });
           });
         };
-        script.onerror = reject;
+        script.onerror = (error) => {
+          console.error('❌ Failed to load Google API script:', error);
+          reject(error);
+        };
         document.head.appendChild(script);
       } else {
-        resolve();
+        // API already loaded, just initialize
+        window.gapi.client.init({
+          apiKey: apiKey,
+          clientId: clientId,
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+          scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar'
+        }).then(() => {
+          console.log('✅ Google Calendar API re-initialized');
+          resolve();
+        }).catch((error) => {
+          console.error('❌ Google API re-initialization error:', error);
+          reject(error);
+        });
       }
     });
   }
