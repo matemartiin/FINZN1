@@ -233,28 +233,59 @@ export class UIManager {
           })
         : 'Sin fecha';
       
-      item.innerHTML = `
-        <div class="expense-icon">${category.icon}</div>
-        <div class="expense-details">
-          <div class="expense-description">${expense.description}</div>
-          <div class="expense-category">${category.name} • ${transactionDate}</div>
-          ${expense.total_installments > 1 ? `<div class="expense-installment">Cuota ${expense.installment} de ${expense.total_installments}</div>` : ''}
-        </div>
-        <div class="expense-amount">${this.formatCurrency(expense.amount)}</div>
-        <div class="expense-actions">
-  <button class="expense-action-btn edit-btn js-expense-edit" 
-          data-id="${expense.id}" 
-          title="Editar">
-    <i class="ph ph-pencil-simple" aria-hidden="true"></i>
-  </button>
-  <button class="expense-action-btn delete-btn js-expense-delete" 
-          data-id="${expense.id}" 
-          data-description="${this.escapeHtml(expense.description)}" 
-          title="Eliminar">
-    <i class="ph ph-trash" aria-hidden="true"></i>
-  </button>
-</div>
-      `;
+      // Create elements safely without innerHTML
+      const expenseIcon = document.createElement('div');
+      expenseIcon.className = 'expense-icon';
+      expenseIcon.textContent = category.icon;
+
+      const expenseDetails = document.createElement('div');
+      expenseDetails.className = 'expense-details';
+
+      const expenseDescription = document.createElement('div');
+      expenseDescription.className = 'expense-description';
+      expenseDescription.textContent = expense.description;
+
+      const expenseCategory = document.createElement('div');
+      expenseCategory.className = 'expense-category';
+      expenseCategory.textContent = `${category.name} • ${transactionDate}`;
+
+      expenseDetails.appendChild(expenseDescription);
+      expenseDetails.appendChild(expenseCategory);
+
+      if (expense.total_installments > 1) {
+        const expenseInstallment = document.createElement('div');
+        expenseInstallment.className = 'expense-installment';
+        expenseInstallment.textContent = `Cuota ${expense.installment} de ${expense.total_installments}`;
+        expenseDetails.appendChild(expenseInstallment);
+      }
+
+      const expenseAmount = document.createElement('div');
+      expenseAmount.className = 'expense-amount';
+      expenseAmount.textContent = this.formatCurrency(expense.amount);
+
+      const expenseActions = document.createElement('div');
+      expenseActions.className = 'expense-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'expense-action-btn edit-btn js-expense-edit';
+      editBtn.setAttribute('data-id', expense.id);
+      editBtn.setAttribute('title', 'Editar');
+      editBtn.innerHTML = '<i class="ph ph-pencil-simple" aria-hidden="true"></i>';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'expense-action-btn delete-btn js-expense-delete';
+      deleteBtn.setAttribute('data-id', expense.id);
+      deleteBtn.setAttribute('data-description', expense.description);
+      deleteBtn.setAttribute('title', 'Eliminar');
+      deleteBtn.innerHTML = '<i class="ph ph-trash" aria-hidden="true"></i>';
+
+      expenseActions.appendChild(editBtn);
+      expenseActions.appendChild(deleteBtn);
+
+      item.appendChild(expenseIcon);
+      item.appendChild(expenseDetails);
+      item.appendChild(expenseAmount);
+      item.appendChild(expenseActions);
       
       item.style.borderLeftColor = category.color;
       container.appendChild(item);
@@ -335,18 +366,33 @@ export class UIManager {
         month: 'short' 
       });
       
-      item.innerHTML = `
-        <div class="transaction-icon" style="color: ${categoryInfo.color}">
-          ${categoryInfo.icon}
-        </div>
-        <div class="transaction-details">
-          <div class="transaction-description">${transaction.description}</div>
-          <div class="transaction-date">${formattedDate}</div>
-        </div>
-        <div class="transaction-amount ${isIncome ? 'income' : 'expense'}">
-          ${isIncome ? '+' : ''}${this.formatCurrency(Math.abs(transaction.amount))}
-        </div>
-      `;
+      // Create elements safely
+      const transactionIcon = document.createElement('div');
+      transactionIcon.className = 'transaction-icon';
+      transactionIcon.style.color = categoryInfo.color;
+      transactionIcon.innerHTML = categoryInfo.icon; // Icon HTML is safe (controlled content)
+
+      const transactionDetails = document.createElement('div');
+      transactionDetails.className = 'transaction-details';
+
+      const transactionDescription = document.createElement('div');
+      transactionDescription.className = 'transaction-description';
+      transactionDescription.textContent = transaction.description; // Safe text content
+
+      const transactionDate = document.createElement('div');
+      transactionDate.className = 'transaction-date';
+      transactionDate.textContent = formattedDate;
+
+      transactionDetails.appendChild(transactionDescription);
+      transactionDetails.appendChild(transactionDate);
+
+      const transactionAmount = document.createElement('div');
+      transactionAmount.className = `transaction-amount ${isIncome ? 'income' : 'expense'}`;
+      transactionAmount.textContent = `${isIncome ? '+' : ''}${this.formatCurrency(Math.abs(transaction.amount))}`;
+
+      item.appendChild(transactionIcon);
+      item.appendChild(transactionDetails);
+      item.appendChild(transactionAmount);
       
       container.appendChild(item);
     });
@@ -378,29 +424,71 @@ export class UIManager {
       const item = document.createElement('div');
       item.className = 'goal-item fade-in';
       
-      item.innerHTML = `
-        <div class="goal-header">
-          <div class="goal-name">${goal.name}</div>
-          <div class="goal-amount">${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}</div>
-        </div>
-        <div class="goal-progress">
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
-          </div>
-          <div class="progress-text">${progress.toFixed(1)}%</div>
-        </div>
-        <div class="goal-actions">
-          <button class="btn btn-secondary btn-sm" data-action="add-money" data-goal-id="${goal.id}">
-            <i class="ph ph-plus-circle" aria-hidden="true"></i> Agregar
-          </button>
-          <button class="btn btn-secondary btn-sm" data-action="edit-goal" data-goal-id="${goal.id}">
-            <i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar
-          </button>
-          <button class="btn btn-danger btn-sm" data-action="delete-goal" data-goal-id="${goal.id}" data-goal-name="${goal.name}">
-            <i class="ph ph-trash" aria-hidden="true"></i> Eliminar
-          </button>
-        </div>
-      `;
+      // Create goal header
+      const goalHeader = document.createElement('div');
+      goalHeader.className = 'goal-header';
+
+      const goalName = document.createElement('div');
+      goalName.className = 'goal-name';
+      goalName.textContent = goal.name; // Safe text content
+
+      const goalAmount = document.createElement('div');
+      goalAmount.className = 'goal-amount';
+      goalAmount.textContent = `${this.formatCurrency(goal.current_amount)} / ${this.formatCurrency(goal.target_amount)}`;
+
+      goalHeader.appendChild(goalName);
+      goalHeader.appendChild(goalAmount);
+
+      // Create progress section
+      const goalProgress = document.createElement('div');
+      goalProgress.className = 'goal-progress';
+
+      const progressBar = document.createElement('div');
+      progressBar.className = 'progress-bar';
+
+      const progressFill = document.createElement('div');
+      progressFill.className = 'progress-fill';
+      progressFill.style.width = `${Math.min(progress, 100)}%`;
+
+      const progressText = document.createElement('div');
+      progressText.className = 'progress-text';
+      progressText.textContent = `${progress.toFixed(1)}%`;
+
+      progressBar.appendChild(progressFill);
+      goalProgress.appendChild(progressBar);
+      goalProgress.appendChild(progressText);
+
+      // Create actions section
+      const goalActions = document.createElement('div');
+      goalActions.className = 'goal-actions';
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn btn-secondary btn-sm';
+      addBtn.setAttribute('data-action', 'add-money');
+      addBtn.setAttribute('data-goal-id', goal.id);
+      addBtn.innerHTML = '<i class="ph ph-plus-circle" aria-hidden="true"></i> Agregar';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-secondary btn-sm';
+      editBtn.setAttribute('data-action', 'edit-goal');
+      editBtn.setAttribute('data-goal-id', goal.id);
+      editBtn.innerHTML = '<i class="ph ph-pencil-simple" aria-hidden="true"></i> Editar';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-danger btn-sm';
+      deleteBtn.setAttribute('data-action', 'delete-goal');
+      deleteBtn.setAttribute('data-goal-id', goal.id);
+      deleteBtn.setAttribute('data-goal-name', goal.name);
+      deleteBtn.innerHTML = '<i class="ph ph-trash" aria-hidden="true"></i> Eliminar';
+
+      goalActions.appendChild(addBtn);
+      goalActions.appendChild(editBtn);
+      goalActions.appendChild(deleteBtn);
+
+      // Assemble the item
+      item.appendChild(goalHeader);
+      item.appendChild(goalProgress);
+      item.appendChild(goalActions);
       
       container.appendChild(item);
     });
