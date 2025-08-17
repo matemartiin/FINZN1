@@ -1023,6 +1023,15 @@ body[data-skin="pro"] .google-sync-options p {
   background: linear-gradient(135deg, #d33b2c, #b52d20);
 }
 
+#google-sync-modal .btn-danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+}
+
+#google-sync-modal .btn-danger:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+}
+
 /* Dark theme para modal de Google Calendar */
 body[data-skin="pro"] #google-sync-modal .modal-description {
   color: var(--pro-text-2, #9CA3AF);

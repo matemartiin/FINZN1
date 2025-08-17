@@ -239,6 +239,14 @@ export class AuthManager {
         localStorage.removeItem(key);
       }
     });
+    
+    // Clear Google Calendar sync state when user logs out
+    try {
+      localStorage.removeItem('finzn-google-calendar-sync');
+      console.log('🔌 Google Calendar sync state cleared on logout');
+    } catch (error) {
+      console.error('Error clearing Google Calendar sync state:', error);
+    }
   }
 
   // Helper method to generate a random email for testing

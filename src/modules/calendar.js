@@ -11,6 +11,7 @@ export class CalendarManager {
     this.tokenClient = null;
     this.accessToken = null;
     this.tokenError = null;
+    this.storageKey = 'finzn-google-calendar-sync';
   }
 
   init() {
@@ -22,6 +23,7 @@ export class CalendarManager {
     console.log('📅 DEBUG: Calendar rendered');
     this.loadEvents();
     console.log('📅 DEBUG: Events loading initiated');
+    this.loadSyncState();
     this.updateSyncButtonState();
     console.log('📅 DEBUG: Sync button state updated');
   }
@@ -139,6 +141,82 @@ export class CalendarManager {
         <i class="ph ph-arrows-clockwise" aria-hidden="true"></i> Sincronizar Google
       `;
       syncBtn.title = 'Sincronizar con Google Calendar';
+    }
+  }
+
+  // Persistent sync state management
+  saveSyncState() {
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) return;
+
+      const syncState = {
+        userId: userId,
+        isConnected: this.googleCalendarIntegration,
+        connectedAt: this.googleCalendarIntegration ? Date.now() : null,
+        version: '1.0'
+      };
+
+      localStorage.setItem(this.storageKey, JSON.stringify(syncState));
+      console.log('📅 DEBUG: Sync state saved to localStorage:', syncState);
+    } catch (error) {
+      console.error('📅 ERROR: Failed to save sync state:', error);
+    }
+  }
+
+  loadSyncState() {
+    try {
+      const currentUserId = this.getCurrentUserId();
+      if (!currentUserId) {
+        console.log('📅 DEBUG: No user logged in, skipping sync state load');
+        return;
+      }
+
+      const savedState = localStorage.getItem(this.storageKey);
+      if (!savedState) {
+        console.log('📅 DEBUG: No saved sync state found');
+        return;
+      }
+
+      const syncState = JSON.parse(savedState);
+      
+      // Verify the saved state is for the current user
+      if (syncState.userId !== currentUserId) {
+        console.log('📅 DEBUG: Saved sync state is for different user, clearing');
+        this.clearSyncState();
+        return;
+      }
+
+      // Check if state is not too old (optional: expire after 30 days)
+      if (syncState.connectedAt) {
+        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+        if (syncState.connectedAt < thirtyDaysAgo) {
+          console.log('📅 DEBUG: Sync state expired, clearing');
+          this.clearSyncState();
+          return;
+        }
+      }
+
+      // Restore sync state
+      this.googleCalendarIntegration = syncState.isConnected || false;
+      console.log('📅 DEBUG: Sync state loaded from localStorage:', {
+        isConnected: this.googleCalendarIntegration,
+        connectedAt: syncState.connectedAt ? new Date(syncState.connectedAt).toLocaleString() : 'never'
+      });
+
+    } catch (error) {
+      console.error('📅 ERROR: Failed to load sync state:', error);
+      this.clearSyncState();
+    }
+  }
+
+  clearSyncState() {
+    try {
+      localStorage.removeItem(this.storageKey);
+      this.googleCalendarIntegration = false;
+      console.log('📅 DEBUG: Sync state cleared');
+    } catch (error) {
+      console.error('📅 ERROR: Failed to clear sync state:', error);
     }
   }
 
@@ -1176,11 +1254,35 @@ export class CalendarManager {
   }
 
   setupGoogleSyncModalListeners() {
-    // Connect Google button
+    // Connect/Disconnect Google button
     const connectBtn = document.getElementById('connect-google-btn');
     if (connectBtn) {
       connectBtn.removeEventListener('click', this.handleConnectGoogle); // Remove existing listener
-      this.handleConnectGoogle = () => this.authenticateGoogle();
+      
+      if (this.googleCalendarIntegration) {
+        // Show disconnect option if already connected
+        connectBtn.innerHTML = `
+          <i class="ph ph-x-circle"></i>
+          <div class="btn-content">
+            <span>Desconectar Google</span>
+            <small>Desactivar sincronización con Google Calendar</small>
+          </div>
+        `;
+        connectBtn.className = 'btn btn-danger sync-action-btn';
+        this.handleConnectGoogle = () => this.disconnectGoogle();
+      } else {
+        // Show connect option if not connected
+        connectBtn.innerHTML = `
+          <i class="ph ph-key"></i>
+          <div class="btn-content">
+            <span>Conectar con Google</span>
+            <small>Autorizar acceso a tu calendario</small>
+          </div>
+        `;
+        connectBtn.className = 'btn btn-primary sync-action-btn';
+        this.handleConnectGoogle = () => this.authenticateGoogle();
+      }
+      
       connectBtn.addEventListener('click', this.handleConnectGoogle);
     }
     
@@ -1223,6 +1325,8 @@ export class CalendarManager {
               window.app.ui.showAlert('¡Conectado con Google Calendar exitosamente!', 'success');
             }
             this.googleCalendarIntegration = true;
+            // Save sync state to persist across sessions
+            this.saveSyncState();
             // Update sync button to show connected state
             this.updateSyncButtonState();
             // Close the Google sync modal
@@ -1251,6 +1355,54 @@ export class CalendarManager {
         window.app.ui.showAlert('Error al autenticar con Google', 'error');
       }
       throw error;
+    }
+  }
+
+  async disconnectGoogle() {
+    try {
+      console.log('🔌 Disconnecting from Google Calendar...');
+      
+      // Clear Google tokens if available
+      if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+        try {
+          // Revoke token if we have one
+          if (this.accessToken) {
+            window.google.accounts.oauth2.revoke(this.accessToken);
+          }
+        } catch (revokeError) {
+          console.warn('Could not revoke token:', revokeError);
+        }
+      }
+      
+      // Clear local state
+      this.googleCalendarIntegration = false;
+      this.accessToken = null;
+      this.tokenError = null;
+      this.tokenClient = null;
+      
+      // Clear persistent state
+      this.clearSyncState();
+      
+      // Update UI
+      this.updateSyncButtonState();
+      
+      // Close modal
+      if (window.app && window.app.modals) {
+        window.app.modals.hide('google-sync-modal');
+      }
+      
+      // Show success message
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Desconectado de Google Calendar exitosamente', 'success');
+      }
+      
+      console.log('✅ Successfully disconnected from Google Calendar');
+      
+    } catch (error) {
+      console.error('Error disconnecting from Google Calendar:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al desconectar de Google Calendar', 'error');
+      }
     }
   }
   
