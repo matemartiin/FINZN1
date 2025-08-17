@@ -469,7 +469,13 @@ body[data-skin="pro"] .item-amount {
     visibility 0ms linear; /* sin delay para visibility */
 }
 
+/* FORCE MODAL VISIBILITY - CRITICAL FIX */
 .modal.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  z-index: 2147483647 !important;
   transition: 
     opacity var(--modal-duration-fast) var(--modal-ease-smooth),
     visibility 0ms linear;
@@ -484,9 +490,12 @@ body[data-skin="pro"] .item-amount {
     opacity var(--modal-duration-fast) var(--modal-ease-smooth);
 }
 
+/* FORCE MODAL CONTENT VISIBILITY - CRITICAL FIX */
 .modal.active .modal-content {
-  transform: translateY(0) scale(1);
-  opacity: 1;
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
   transition: 
     transform var(--modal-duration-fast) var(--modal-ease-smooth),
     opacity var(--modal-duration-fast) var(--modal-ease-smooth);
@@ -497,6 +506,15 @@ body[data-skin="pro"] .item-amount {
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
+}
+
+/* ADDITIONAL MODAL VISIBILITY FIXES */
+.modal.active .modal-form,
+.modal.active .form-group,
+.modal.active .modal-header,
+.modal.active .modal-actions {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Elementos del formulario - sin animaciones individuales que causen delay */
