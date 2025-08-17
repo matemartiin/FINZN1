@@ -22,6 +22,58 @@ export class UIManager {
     }
   }
 
+  // Utility function to format dates safely without timezone issues
+  formatDateSafe(dateStr, options = {}) {
+    if (!dateStr) return 'Sin fecha';
+    
+    // If it's already in YYYY-MM-DD format, parse it manually to avoid timezone issues
+    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const [year, month, day] = dateStr.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      
+      const defaultOptions = {
+        day: 'numeric', 
+        month: 'short' 
+      };
+      
+      const formatOptions = { ...defaultOptions, ...options };
+      return date.toLocaleDateString('es-ES', formatOptions);
+    }
+    
+    // Fallback to Date constructor with timezone fix
+    try {
+      const date = new Date(dateStr + 'T12:00:00'); // Add time to avoid timezone issues
+      const defaultOptions = {
+        day: 'numeric', 
+        month: 'short' 
+      };
+      
+      const formatOptions = { ...defaultOptions, ...options };
+      return date.toLocaleDateString('es-ES', formatOptions);
+    } catch (e) {
+      console.warn('Could not format date:', dateStr, e);
+      return 'Sin fecha';
+    }
+  }
+
+  parseDateSafe(dateStr) {
+    if (!dateStr) return new Date();
+    
+    // If it's already in YYYY-MM-DD format, parse it manually to avoid timezone issues
+    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const [year, month, day] = dateStr.split('-');
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    // Fallback to Date constructor with timezone fix
+    try {
+      return new Date(dateStr + 'T12:00:00'); // Add time to avoid timezone issues
+    } catch (e) {
+      console.warn('Could not parse date:', dateStr, e);
+      return new Date();
+    }
+  }
+
   setupMascotHoverBehavior() {
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', () => {
@@ -227,7 +279,7 @@ export class UIManager {
       const category = this.getCategoryInfo(expense.category);
       
       const transactionDate = expense.transaction_date 
-        ? new Date(expense.transaction_date).toLocaleDateString('es-ES', { 
+        ? this.formatDateSafe(expense.transaction_date, { 
             day: 'numeric', 
             month: 'short' 
           })
@@ -308,7 +360,7 @@ export class UIManager {
         id: expense.id,
         description: expense.description,
         amount: -expense.amount,
-        date: new Date(expense.transaction_date),
+        date: this.parseDateSafe(expense.transaction_date),
         category: expense.category
       });
     });
@@ -1033,7 +1085,7 @@ export class UIManager {
       
       const category = this.getCategoryInfo(installment.category);
       const transactionDate = installment.transaction_date 
-        ? new Date(installment.transaction_date).toLocaleDateString('es-ES', { 
+        ? this.formatDateSafe(installment.transaction_date, { 
             day: 'numeric', 
             month: 'short' 
           })
@@ -1869,7 +1921,7 @@ initExpensesChart() {
   const expenses = (window.app?.data?.getCurrentMonthExpenses?.() || getAll())
     .filter(e => {
       if (!e?.transaction_date) return true; // si no viene fecha, lo contamos
-      const d = new Date(e.transaction_date);
+      const d = this.parseDateSafe(e.transaction_date);
       return d.getFullYear() === y && d.getMonth() === m;
     });
 

@@ -293,12 +293,17 @@ export class DataManager {
         console.log('💳 Adding expense with data:', expenseData);
       }
       
+      // Use parseFormDate for dates that come directly from form inputs
+      const transactionDate = expenseData.transactionDate ? 
+        this.parseFormDate(expenseData.transactionDate) : 
+        this.parseFormDate();
+
       const expense = {
         user_id: userId,
         description: expenseData.description,
         amount: parseFloat(expenseData.amount),
         category: expenseData.category,
-        transaction_date: expenseData.transactionDate,
+        transaction_date: transactionDate,
         month: expenseData.month,
         installment: expenseData.installment || 1,
         total_installments: expenseData.totalInstallments || 1,
@@ -374,7 +379,7 @@ async updateExpense(expenseId, updates) {
     if (updates.description !== undefined) payload.description = updates.description;
     if (updates.amount !== undefined) payload.amount = parseFloat(updates.amount);
     if (updates.category !== undefined) payload.category = updates.category;
-    if (updates.transaction_date !== undefined) payload.transaction_date = updates.transaction_date;
+    if (updates.transaction_date !== undefined) payload.transaction_date = this.parseFormDate(updates.transaction_date);
     if (updates.month !== undefined) payload.month = updates.month;
     if (updates.installment !== undefined) payload.installment = updates.installment;
     if (updates.total_installments !== undefined) payload.total_installments = updates.total_installments;
@@ -964,7 +969,7 @@ async updateExpense(expenseId, updates) {
         description: updates.description,
         amount: parseFloat(updates.amount),
         category: updates.category,
-        transaction_date: updates.transaction_date
+        transaction_date: this.parseFormDate(updates.transaction_date)
       })
       .eq('id', expenseId)
       .eq('user_id', userId)
@@ -1538,43 +1543,120 @@ async updateSpendingLimit(limitId, updates) {
     }
   }
   
+  // Method specifically for form dates (already in YYYY-MM-DD format)
+  parseFormDate(dateStr) {
+    if (!dateStr) {
+      // Return current date in local timezone
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    const cleaned = dateStr.toString().trim();
+    
+    // HTML date inputs always return YYYY-MM-DD format, so just validate and return
+    if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
+      const [year, month, day] = cleaned.split('-');
+      const yearNum = parseInt(year);
+      const monthNum = parseInt(month);
+      const dayNum = parseInt(day);
+      
+      if (yearNum >= 1900 && yearNum <= 2100 && 
+          monthNum >= 1 && monthNum <= 12 && 
+          dayNum >= 1 && dayNum <= 31) {
+        return cleaned;
+      }
+    }
+    
+    // Fallback to current date if validation fails
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   parseDate(dateStr) {
     if (!dateStr) {
-      return new Date().toISOString().split('T')[0];
+      // Return current date in local timezone
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
+    
+    // Clean the input string
+    const cleaned = dateStr.toString().trim();
     
     // Try different date formats
     const formats = [
-      /(\d{4})-(\d{2})-(\d{2})/, // YYYY-MM-DD
-      /(\d{2})\/(\d{2})\/(\d{4})/, // DD/MM/YYYY
-      /(\d{2})-(\d{2})-(\d{4})/, // DD-MM-YYYY
-      /(\d{4})\/(\d{2})\/(\d{2})/, // YYYY/MM/DD
+      /^(\d{4})-(\d{2})-(\d{2})$/, // YYYY-MM-DD
+      /^(\d{2})\/(\d{2})\/(\d{4})$/, // DD/MM/YYYY
+      /^(\d{2})-(\d{2})-(\d{4})$/, // DD-MM-YYYY
+      /^(\d{4})\/(\d{2})\/(\d{2})$/, // YYYY/MM/DD
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // D/M/YYYY or DD/M/YYYY etc
+      /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // D-M-YYYY or DD-M-YYYY etc
     ];
     
-    for (const format of formats) {
-      const match = dateStr.match(format);
+    for (let i = 0; i < formats.length; i++) {
+      const format = formats[i];
+      const match = cleaned.match(format);
       if (match) {
-        if (format === formats[0] || format === formats[3]) {
+        let year, month, day;
+        
+        if (i === 0 || i === 3) {
           // YYYY-MM-DD or YYYY/MM/DD
-          return `${match[1]}-${match[2]}-${match[3]}`;
+          year = match[1];
+          month = match[2].padStart(2, '0');
+          day = match[3].padStart(2, '0');
         } else {
-          // DD/MM/YYYY or DD-MM-YYYY
-          return `${match[3]}-${match[2]}-${match[1]}`;
+          // DD/MM/YYYY or DD-MM-YYYY formats
+          day = match[1].padStart(2, '0');
+          month = match[2].padStart(2, '0');
+          year = match[3];
+        }
+        
+        // Validate the date components
+        const yearNum = parseInt(year);
+        const monthNum = parseInt(month);
+        const dayNum = parseInt(day);
+        
+        if (yearNum >= 1900 && yearNum <= 2100 && 
+            monthNum >= 1 && monthNum <= 12 && 
+            dayNum >= 1 && dayNum <= 31) {
+          return `${year}-${month}-${day}`;
         }
       }
     }
     
-    // If no format matches, try to parse as Date
+    // If no regex format matches, try to parse as Date but fix timezone issues
     try {
-      const date = new Date(dateStr);
+      // If it's already in YYYY-MM-DD format, don't use Date constructor to avoid timezone issues
+      if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
+        return cleaned;
+      }
+      
+      // For other formats, create date in local timezone
+      const date = new Date(cleaned + 'T12:00:00'); // Add time to avoid timezone issues
       if (!isNaN(date.getTime())) {
-        return date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       }
     } catch (e) {
-      console.warn('Could not parse date:', dateStr);
+      console.warn('Could not parse date:', dateStr, e);
     }
     
-    return new Date().toISOString().split('T')[0];
+    // Fallback to current date if parsing fails
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
   
   categorizeTransaction(description) {
