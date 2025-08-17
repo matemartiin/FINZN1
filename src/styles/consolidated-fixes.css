@@ -387,12 +387,13 @@ body[data-skin="pro"] .item-amount {
 /* ========= ESPACIADO REDUCIDO - SUBIR CONTENIDO ========= */
 /* Reducir padding del main-dashboard para subir todo el contenido */
 .main-dashboard {
-  padding-top: 12px !important;
+  padding-top: 4px !important;
 }
 
 /* Reducir margin del breadcrumb para acercar más al header */
 .breadcrumb-nav {
-  margin-bottom: 8px !important;
+  margin-top: -8px !important;
+  margin-bottom: 4px !important;
 }
 
 /* Reducir espacio superior de las secciones del dashboard */
@@ -400,23 +401,54 @@ body[data-skin="pro"] .item-amount {
   padding-top: 0 !important;
 }
 
+/* Subir más las cards del dashboard */
+.summary-cards {
+  margin-top: -8px !important;
+}
+
+/* Subir las cards de contenido en todas las secciones */
+.expenses-section-card,
+.income-section-card,
+.spending-limits-main-card,
+.settings-card,
+.report-card,
+.budgets-container,
+.chart-card-new,
+.pro-card {
+  margin-top: -4px !important;
+}
+
 /* Responsive - ajustes para móvil */
 @media (max-width: 768px) {
   .main-dashboard {
-    padding-top: 8px !important;
+    padding-top: 2px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
   
   .breadcrumb-nav {
-    margin-bottom: 6px !important;
+    margin-top: -10px !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .summary-cards {
+    margin-top: -12px !important;
   }
 }
 
 @media (max-width: 480px) {
   .main-dashboard {
-    padding-top: 6px !important;
+    padding-top: 0px !important;
     padding-left: 12px !important;
     padding-right: 12px !important;
+  }
+  
+  .breadcrumb-nav {
+    margin-top: -12px !important;
+    margin-bottom: 0px !important;
+  }
+  
+  .summary-cards {
+    margin-top: -16px !important;
   }
 }
