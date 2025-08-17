@@ -2876,6 +2876,11 @@ table,
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+.chat-toggle:active {
+  transform: scale(1.05) translateY(0px);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+}
+
 .chat-toggle .chat-icon {
   font-size: 1.6rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
@@ -4829,7 +4834,8 @@ table,
     transform: none;
   }
   
-  .chat-toggle:hover {
+  .chat-toggle:hover,
+  .chat-toggle:active {
     transform: none;
   }
 }
