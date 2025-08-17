@@ -13,7 +13,7 @@ export class CalendarManager {
     this.accessToken = null;
     this.tokenError = null;
     this.storageKey = 'finzn-google-calendar-sync';
-    this.autoSyncEnabled = true; // Auto-sync enabled by default
+    this.autoSyncEnabled = false; // Auto-sync disabled by default
     this.autoSyncPollingInterval = null;
     this.lastSyncTime = null;
     this.autoSyncFrequency = 30000; // 30 seconds for quick detection
@@ -170,8 +170,9 @@ export class CalendarManager {
       const syncState = {
         userId: userId,
         isConnected: this.googleCalendarIntegration,
+        autoSyncEnabled: this.autoSyncEnabled,
         connectedAt: this.googleCalendarIntegration ? Date.now() : null,
-        version: '1.0'
+        version: '1.1'
       };
 
       localStorage.setItem(this.storageKey, JSON.stringify(syncState));
@@ -216,6 +217,7 @@ export class CalendarManager {
 
       // Restore sync state
       this.googleCalendarIntegration = syncState.isConnected || false;
+      this.autoSyncEnabled = syncState.autoSyncEnabled !== undefined ? syncState.autoSyncEnabled : false;
       
       // If we're restoring a connected state, we need to determine if it was demo mode
       if (this.googleCalendarIntegration) {
@@ -673,10 +675,7 @@ export class CalendarManager {
       console.log('📅 DEBUG: Refreshing calendar display...');
       this.renderCalendar();
 
-      // Auto-sync to Google Calendar if connected
-      if (this.autoSyncEnabled && this.googleCalendarIntegration) {
-        this.autoExportEventToGoogle(data);
-      }
+      // Auto-export disabled - user must manually sync to Google Calendar
 
       return data;
     } catch (error) {
@@ -1415,6 +1414,14 @@ export class CalendarManager {
       this.handleExportGoogle = () => this.exportToGoogle();
       exportBtn.addEventListener('click', this.handleExportGoogle);
     }
+
+    // Auto-sync toggle
+    const autoSyncToggle = document.getElementById('auto-sync-toggle');
+    if (autoSyncToggle) {
+      autoSyncToggle.addEventListener('change', (e) => this.handleAutoSyncToggle(e.target.checked));
+      // Set initial state
+      this.updateAutoSyncToggleState();
+    }
   }
   
   async authenticateGoogle() {
@@ -1443,7 +1450,7 @@ export class CalendarManager {
             this.googleCalendarIntegration = true;
             this.saveSyncState();
             this.updateSyncButtonState();
-            this.startAutoSync();
+            // Auto-sync disabled - user must manually sync
             
             if (window.app && window.app.ui) {
               window.app.ui.showAlert('🧪 Modo demo activado automáticamente', 'info');
@@ -1483,8 +1490,7 @@ export class CalendarManager {
             this.saveSyncState();
             // Update sync button to show connected state
             this.updateSyncButtonState();
-            // Start automatic bidirectional sync
-            this.startAutoSync();
+            // Auto-sync disabled - user must manually sync
             // Close the Google sync modal
             if (window.app && window.app.modals) {
               window.app.modals.hide('google-sync-modal');
@@ -1881,7 +1887,7 @@ export class CalendarManager {
       this.accessToken = 'demo_token_' + Date.now();
       this.saveSyncState();
       this.updateSyncButtonState();
-      this.startAutoSync();
+      // Auto-sync disabled - user must manually sync
       
       if (window.app && window.app.ui) {
         window.app.ui.showAlert('🧪 Modo demo activado - Google Calendar simulado', 'success');
@@ -2586,25 +2592,35 @@ export class CalendarManager {
   }
 
   setupVisibilityChangeListener() {
-    // Auto-sync when user returns to the tab (intelligent sync)
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.googleCalendarIntegration && this.autoSyncEnabled) {
-        console.log('👁️ Page became visible, triggering sync check');
-        // Small delay to ensure page is fully active
-        setTimeout(() => {
-          this.autoImportFromGoogle();
-        }, 1000);
-      }
-    });
+    // Auto-sync disabled - no automatic sync on visibility changes
+    console.log('👁️ Auto-sync disabled - sync manually when needed');
+  }
 
-    // Also sync when window gains focus
-    window.addEventListener('focus', () => {
-      if (this.googleCalendarIntegration && this.autoSyncEnabled) {
-        console.log('🎯 Window gained focus, triggering sync check');
-        setTimeout(() => {
-          this.autoImportFromGoogle();
-        }, 500);
+  updateAutoSyncToggleState() {
+    const autoSyncToggle = document.getElementById('auto-sync-toggle');
+    if (autoSyncToggle) {
+      autoSyncToggle.checked = this.autoSyncEnabled;
+    }
+  }
+
+  handleAutoSyncToggle(enabled) {
+    console.log('🔄 Auto-sync toggle changed:', enabled);
+    
+    this.autoSyncEnabled = enabled;
+    this.saveSyncState();
+    
+    if (enabled && this.googleCalendarIntegration) {
+      // Start auto-sync
+      this.startAutoSync();
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('✅ Sincronización automática activada (cada 5 minutos)', 'success', 3000);
       }
-    });
+    } else {
+      // Stop auto-sync
+      this.stopAutoSync();
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('🛑 Sincronización automática desactivada', 'info', 3000);
+      }
+    }
   }
 }
