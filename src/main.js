@@ -732,6 +732,9 @@ setupDashboardEvents() {
       // Update installments list
       this.ui.updateInstallmentsList(expenses);
       
+      // Update navigation badges
+      this.ui.updateNavigationBadges(expenses, extraIncomes, income);
+      
       // Update goals
       const goals = this.data.getGoals();
       this.ui.updateGoalsList(goals);

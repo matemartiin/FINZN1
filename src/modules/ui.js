@@ -965,6 +965,11 @@ export class UIManager {
               <div class="income-item-description">Sueldo mensual</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
+            <div class="income-item-actions">
+              <button class="btn btn-sm btn-secondary edit-income-btn" data-type="fixed">
+                <i class="ph ph-pencil"></i> Editar
+              </button>
+            </div>
           `;
           
           allIncomesList.appendChild(fixedItem);
@@ -982,12 +987,23 @@ export class UIManager {
               <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
             </div>
             <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
+            <div class="income-item-actions">
+              <button class="btn btn-sm btn-secondary edit-income-btn" data-id="${extraIncome.id}" data-type="extra">
+                <i class="ph ph-pencil"></i> Editar
+              </button>
+              <button class="btn btn-sm btn-danger delete-income-btn" data-id="${extraIncome.id}" data-type="extra">
+                <i class="ph ph-trash"></i> Eliminar
+              </button>
+            </div>
           `;
           
           allIncomesList.appendChild(item);
         });
       }
     }
+    
+    // Setup event listeners for income buttons
+    this.setupIncomeActionListeners();
     
     console.log('✅ Income details updated successfully');
   }
@@ -1028,6 +1044,11 @@ export class UIManager {
           <div class="income-item-description">Sueldo mensual</div>
         </div>
         <div class="income-item-amount">${this.formatCurrency(income.fixed)}</div>
+        <div class="income-item-actions">
+          <button class="btn btn-sm btn-secondary edit-income-btn" data-type="fixed">
+            <i class="ph ph-pencil"></i> Editar
+          </button>
+        </div>
       `;
       
       incomeList.appendChild(fixedItem);
@@ -1045,10 +1066,21 @@ export class UIManager {
           <div class="income-item-date">${new Date(extraIncome.created_at).toLocaleDateString('es-ES')}</div>
         </div>
         <div class="income-item-amount">${this.formatCurrency(extraIncome.amount)}</div>
+        <div class="income-item-actions">
+          <button class="btn btn-sm btn-secondary edit-income-btn" data-id="${extraIncome.id}" data-type="extra">
+            <i class="ph ph-pencil"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-danger delete-income-btn" data-id="${extraIncome.id}" data-type="extra">
+            <i class="ph ph-trash"></i> Eliminar
+          </button>
+        </div>
       `;
       
       incomeList.appendChild(item);
     });
+    
+    // Setup event listeners for income buttons in transactions section
+    this.setupIncomeActionListeners();
     
     console.log('✅ Income list updated successfully');
   }
@@ -2022,4 +2054,109 @@ bindBudgetForm() {
     }
   });
 }
+
+  updateNavigationBadges(expenses, extraIncomes, income) {
+    console.log('🏷️ Updating navigation badges...');
+    
+    // Update transactions counter (expenses + extra incomes)
+    const totalTransactions = expenses.length + extraIncomes.length;
+    const transactionsBadge = document.getElementById('pending-transactions');
+    if (transactionsBadge) {
+      transactionsBadge.textContent = totalTransactions;
+      console.log('🏷️ Updated transactions badge:', totalTransactions);
+    }
+    
+    // Update other badges as needed (placeholder for future enhancements)
+    const upcomingEventsBadge = document.getElementById('upcoming-events');
+    if (upcomingEventsBadge) {
+      // For now, we'll keep this as is, but could be enhanced with calendar data
+      console.log('🏷️ Upcoming events badge: keeping current value');
+    }
+    
+    const activeBudgetsBadge = document.getElementById('active-budgets');
+    if (activeBudgetsBadge) {
+      // Could be enhanced with budget data
+      console.log('🏷️ Active budgets badge: keeping current value');
+    }
+  }
+
+  setupIncomeActionListeners() {
+    // Remove previous listeners to avoid duplicates
+    document.querySelectorAll('.edit-income-btn').forEach(btn => {
+      btn.removeEventListener('click', this.handleEditIncome);
+    });
+    document.querySelectorAll('.delete-income-btn').forEach(btn => {
+      btn.removeEventListener('click', this.handleDeleteIncome);
+    });
+
+    // Add new listeners
+    document.querySelectorAll('.edit-income-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleEditIncome(e));
+    });
+    document.querySelectorAll('.delete-income-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleDeleteIncome(e));
+    });
+  }
+
+  handleEditIncome(e) {
+    const btn = e.target.closest('.edit-income-btn');
+    const incomeType = btn.dataset.type;
+    const incomeId = btn.dataset.id;
+    
+    console.log('✏️ Edit income:', { type: incomeType, id: incomeId });
+    
+    if (incomeType === 'fixed') {
+      // Show edit fixed income modal
+      this.showEditFixedIncomeModal();
+    } else if (incomeType === 'extra') {
+      // Show edit extra income modal
+      this.showEditExtraIncomeModal(incomeId);
+    }
+  }
+
+  handleDeleteIncome(e) {
+    const btn = e.target.closest('.delete-income-btn');
+    const incomeType = btn.dataset.type;
+    const incomeId = btn.dataset.id;
+    
+    console.log('🗑️ Delete income:', { type: incomeType, id: incomeId });
+    
+    if (incomeType === 'extra') {
+      if (confirm('¿Estás seguro de que quieres eliminar este ingreso?')) {
+        this.deleteExtraIncome(incomeId);
+      }
+    }
+  }
+
+  async deleteExtraIncome(incomeId) {
+    try {
+      if (window.app && window.app.data && window.app.data.deleteExtraIncome) {
+        await window.app.data.deleteExtraIncome(incomeId);
+        this.showAlert('Ingreso eliminado correctamente', 'success');
+        
+        // Refresh the dashboard
+        if (window.app.updateDashboard) {
+          window.app.updateDashboard();
+        }
+      } else {
+        this.showAlert('Error: No se pudo eliminar el ingreso', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting income:', error);
+      this.showAlert('Error eliminando el ingreso', 'error');
+    }
+  }
+
+  showEditFixedIncomeModal() {
+    // For now, we'll redirect to add income to change the fixed income
+    this.showAlert('Para editar el ingreso fijo, agrega un nuevo ingreso y se actualizará automáticamente', 'info');
+    if (window.app && window.app.showAddIncomeModal) {
+      window.app.showAddIncomeModal();
+    }
+  }
+
+  showEditExtraIncomeModal(incomeId) {
+    // For now, we'll show an alert - this could be enhanced with a proper edit modal
+    this.showAlert('Función de edición de ingresos en desarrollo. Por ahora puedes eliminar y crear uno nuevo.', 'info');
+  }
 }
