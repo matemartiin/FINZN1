@@ -900,17 +900,247 @@ export class CalendarManager {
     return date.toDateString() === today.toDateString();
   }
 
-  // Google Calendar Integration (Future)
+  // Google Calendar Integration
   async syncWithGoogleCalendar() {
-    if (window.app && window.app.ui) {
-      window.app.ui.showAlert('Integración con Google Calendar próximamente', 'info');
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    
+    // Check if Google Calendar is configured (same pattern as Gemini)
+    if (!clientId || !apiKey) {
+      console.log('⚠️ Google Calendar not configured, using fallback');
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Google Calendar no está configurado. Configura las credenciales para usar esta función.', 'warning');
+      }
+      return;
     }
     
-    // Future implementation:
-    // 1. Authenticate with Google Calendar API
-    // 2. Fetch events from Google Calendar
-    // 3. Sync with local events
-    // 4. Handle conflicts and duplicates
+    try {
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Conectando con Google Calendar...', 'info');
+      }
+      
+      // Initialize Google API
+      await this.initGoogleAPI(clientId, apiKey);
+      
+      // Show sync options
+      this.showGoogleSyncOptions();
+      
+    } catch (error) {
+      console.error('Error connecting to Google Calendar:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al conectar con Google Calendar', 'error');
+      }
+    }
+  }
+  
+  async initGoogleAPI(clientId, apiKey) {
+    return new Promise((resolve, reject) => {
+      // Load Google API script
+      if (!window.gapi) {
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = () => {
+          window.gapi.load('auth2:client', () => {
+            window.gapi.client.init({
+              apiKey: apiKey,
+              clientId: clientId,
+              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+              scope: 'https://www.googleapis.com/auth/calendar'
+            }).then(() => {
+              console.log('✅ Google Calendar API initialized');
+              resolve();
+            }).catch(reject);
+          });
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+      } else {
+        resolve();
+      }
+    });
+  }
+  
+  showGoogleSyncOptions() {
+    if (window.app && window.app.ui) {
+      const html = `
+        <div class="google-sync-options">
+          <h3>Sincronización con Google Calendar</h3>
+          <p>¿Qué deseas hacer?</p>
+          <div class="sync-action-buttons">
+            <button onclick="window.app.calendar.authenticateGoogle()" class="btn btn-primary">
+              🔑 Conectar con Google
+            </button>
+            <button onclick="window.app.calendar.importFromGoogle()" class="btn btn-secondary">
+              📥 Importar eventos
+            </button>
+            <button onclick="window.app.calendar.exportToGoogle()" class="btn btn-accent">
+              📤 Exportar eventos
+            </button>
+          </div>
+        </div>
+      `;
+      window.app.ui.showAlert(html, 'info', 8000);
+    }
+  }
+  
+  async authenticateGoogle() {
+    try {
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      const user = await authInstance.signIn();
+      
+      if (user.isSignedIn()) {
+        console.log('✅ Google authentication successful');
+        if (window.app && window.app.ui) {
+          window.app.ui.showAlert('¡Conectado con Google Calendar exitosamente!', 'success');
+        }
+        this.googleCalendarIntegration = true;
+      }
+    } catch (error) {
+      console.error('Google authentication error:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al autenticar con Google', 'error');
+      }
+    }
+  }
+  
+  async importFromGoogle() {
+    if (!this.googleCalendarIntegration) {
+      await this.authenticateGoogle();
+    }
+    
+    try {
+      const response = await window.gapi.client.calendar.events.list({
+        calendarId: 'primary',
+        timeMin: new Date().toISOString(),
+        maxResults: 50,
+        singleEvents: true,
+        orderBy: 'startTime'
+      });
+      
+      const events = response.result.items || [];
+      let importedCount = 0;
+      
+      for (const googleEvent of events) {
+        // Convert Google event to FINZN format
+        const finznEvent = this.convertGoogleToFinznEvent(googleEvent);
+        if (finznEvent) {
+          try {
+            await this.addEvent(finznEvent);
+            importedCount++;
+          } catch (error) {
+            console.error('Error importing event:', error);
+          }
+        }
+      }
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert(`${importedCount} eventos importados de Google Calendar`, 'success');
+      }
+      
+      // Refresh calendar
+      await this.loadEvents();
+      this.renderCalendar();
+      
+    } catch (error) {
+      console.error('Error importing from Google Calendar:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al importar eventos', 'error');
+      }
+    }
+  }
+  
+  async exportToGoogle() {
+    if (!this.googleCalendarIntegration) {
+      await this.authenticateGoogle();
+    }
+    
+    try {
+      let exportedCount = 0;
+      
+      for (const event of this.events) {
+        try {
+          const googleEvent = this.convertFinznToGoogleEvent(event);
+          
+          await window.gapi.client.calendar.events.insert({
+            calendarId: 'primary',
+            resource: googleEvent
+          });
+          
+          exportedCount++;
+        } catch (error) {
+          console.error('Error exporting event:', error);
+        }
+      }
+      
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert(`${exportedCount} eventos exportados a Google Calendar`, 'success');
+      }
+      
+    } catch (error) {
+      console.error('Error exporting to Google Calendar:', error);
+      if (window.app && window.app.ui) {
+        window.app.ui.showAlert('Error al exportar eventos', 'error');
+      }
+    }
+  }
+  
+  convertGoogleToFinznEvent(googleEvent) {
+    if (!googleEvent.summary) return null;
+    
+    const startDate = googleEvent.start?.dateTime || googleEvent.start?.date;
+    if (!startDate) return null;
+    
+    const date = new Date(startDate);
+    
+    return {
+      title: googleEvent.summary,
+      type: this.detectEventType(googleEvent.summary, googleEvent.description),
+      date: date.toISOString().split('T')[0],
+      time: googleEvent.start?.dateTime ? 
+        date.toTimeString().split(' ')[0].slice(0, 5) : null,
+      description: googleEvent.description || 'Importado de Google Calendar',
+      amount: null,
+      recurring: false,
+      frequency: null
+    };
+  }
+  
+  convertFinznToGoogleEvent(finznEvent) {
+    const startDateTime = finznEvent.time ? 
+      `${finznEvent.date}T${finznEvent.time}:00` : 
+      finznEvent.date;
+    
+    const endDateTime = finznEvent.time ? 
+      `${finznEvent.date}T${this.addHour(finznEvent.time)}:00` : 
+      finznEvent.date;
+    
+    return {
+      summary: `💰 ${finznEvent.title}`,
+      description: `${finznEvent.description || ''}\n\nExportado desde FINZN`,
+      start: finznEvent.time ? 
+        { dateTime: startDateTime, timeZone: 'America/Argentina/Buenos_Aires' } :
+        { date: finznEvent.date },
+      end: finznEvent.time ?
+        { dateTime: endDateTime, timeZone: 'America/Argentina/Buenos_Aires' } :
+        { date: finznEvent.date }
+    };
+  }
+  
+  detectEventType(title = '', description = '') {
+    const text = (title + ' ' + description).toLowerCase();
+    
+    if (text.includes('pago') || text.includes('cuota')) return 'payment';
+    if (text.includes('cobro') || text.includes('ingreso')) return 'income';
+    if (text.includes('tarjeta') || text.includes('cierre')) return 'card-close';
+    if (text.includes('vencimiento')) return 'deadline';
+    
+    return 'reminder';
+  }
+  
+  addHour(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const newHours = (hours + 1) % 24;
+    return `${newHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
   // Utility methods
