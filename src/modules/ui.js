@@ -1,3 +1,5 @@
+import { inputValidator } from './input-validation.js';
+
 export class UIManager {
   constructor() {
     this.alertContainer = document.getElementById('alert-container');
@@ -827,7 +829,7 @@ export class UIManager {
     categories.forEach(category => {
       const option = document.createElement('option');
       option.value = category.name;
-      option.innerHTML = `${category.icon} ${category.name}`;
+      option.textContent = `${category.name}`;
       select.appendChild(option);
     });
   }

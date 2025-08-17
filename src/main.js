@@ -14,6 +14,7 @@ import { UserProfileManager } from './modules/user-profile.js';
 import { AnimationManager } from './modules/animations.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
 import { loadingManager } from './modules/loading.js';
+import { inputValidator } from './modules/input-validation.js';
 
 
 console.log('FINZN App - Starting initialization');
@@ -1045,22 +1046,29 @@ async handleAddExpense(e) {
 
   const formData = this.ui.getFormData('add-expense-form');
 
-  if (!formData.description || !formData.amount || !formData.category || !formData.transactionDate) {
-    this.ui.showAlert('Por favor completa todos los campos', 'error');
+  // Validate form data using the new validation system
+  const validation = inputValidator.validateExpenseForm(formData);
+  
+  if (!validation.isValid) {
+    const errorMessage = validation.errors.join('\n');
+    this.ui.showAlert(errorMessage, 'error');
     return;
   }
+
+  // Use sanitized data instead of raw form data
+  const sanitizedData = validation.sanitizedData;
 
   const modal = document.getElementById('add-expense-modal');
   const isEditing = modal?.dataset.editing === 'true';
   const editingId = modal?.dataset.expenseId;
 
   try {
-    // datos base
+    // datos base usando datos sanitizados
     const expenseBase = {
-      description: formData.description,
-      amount: parseFloat(formData.amount),
-      category: formData.category,
-      transactionDate: formData.transactionDate,
+      description: sanitizedData.description,
+      amount: sanitizedData.amount,
+      category: sanitizedData.category,
+      transactionDate: sanitizedData.transactionDate,
       month: this.currentMonth,
       installment: 1,
       totalInstallments: 1,
@@ -1093,15 +1101,11 @@ async handleAddExpense(e) {
 
     // --- ALTA normal (cuotas opcionales con interés) ---
     const hasInstallments = !!formData.hasInstallments;
-    const installmentsCount = parseInt(formData.installmentsCount || '0', 10);
+    const installmentsCount = sanitizedData.installmentsCount || 1;
 
     if (hasInstallments && installmentsCount >= 2) {
-      // interés opcional (%)
-      let interestPct = 0;
-      if (formData.installmentsInterest !== undefined && formData.installmentsInterest !== '') {
-        const parsed = parseFloat(formData.installmentsInterest);
-        if (!Number.isNaN(parsed) && parsed >= 0) interestPct = parsed;
-      }
+      // interés opcional (%) - ya validado y sanitizado
+      const interestPct = sanitizedData.installmentsInterest || 0;
 
       const baseTotal = expenseBase.amount;
       const totalWithInterest = baseTotal * (1 + (interestPct / 100));
@@ -1165,27 +1169,25 @@ async handleAddBudget(e) {
 
   const formData = this.ui.getBudgetFormData('add-budget-form');
 
-  // OJO: aquí usamos start_date y end_date (con guión bajo), que es como están en el HTML
-  if (!formData.name || !formData.category || !formData.amount || !formData.start_date || !formData.end_date) {
-    this.ui.showAlert('Por favor completa todos los campos', 'error');
+  // Validate form data using the new validation system
+  const validation = inputValidator.validateBudgetForm(formData);
+  
+  if (!validation.isValid) {
+    const errorMessage = validation.errors.join('\n');
+    this.ui.showAlert(errorMessage, 'error');
     return;
   }
 
-  const startDate = new Date(formData.start_date);
-  const endDate = new Date(formData.end_date);
-
-  if (endDate <= startDate) {
-    this.ui.showAlert('La fecha de fin debe ser posterior a la fecha de inicio', 'error');
-    return;
-  }
+  // Use sanitized data
+  const sanitizedData = validation.sanitizedData;
 
   try {
     const budgetData = {
-      name: formData.name,
-      category: formData.category,
-      amount: parseFloat(formData.amount),
-      start_date: formData.start_date,
-      end_date: formData.end_date,
+      name: sanitizedData.name,
+      category: sanitizedData.category,
+      amount: sanitizedData.amount,
+      start_date: sanitizedData.start_date,
+      end_date: sanitizedData.end_date,
       ai_recommended: formData.ai_recommended || false
     };
 
@@ -1406,24 +1408,25 @@ async handleAddIncome(e) {
 
   const formData = this.ui.getFormData('add-income-form');
 
-  if (!formData.amount || !formData.type) {
-    this.ui.showAlert('Por favor completa todos los campos', 'error');
+  // Validate form data using the new validation system
+  const validation = inputValidator.validateIncomeForm(formData);
+  
+  if (!validation.isValid) {
+    const errorMessage = validation.errors.join('\n');
+    this.ui.showAlert(errorMessage, 'error');
     return;
   }
 
-  const amount = parseFloat(formData.amount);
-  if (Number.isNaN(amount)) {
-    this.ui.showAlert('Monto inválido', 'error');
-    return;
-  }
+  // Use sanitized data
+  const sanitizedData = validation.sanitizedData;
 
   try {
-    if (formData.type === 'fixed') {
-      await this.data.addFixedIncome(this.currentMonth, amount);
+    if (sanitizedData.type === 'fixed') {
+      await this.data.addFixedIncome(this.currentMonth, sanitizedData.amount);
     } else {
       const extraIncomeData = {
-        description: formData.description || 'Ingreso extra',
-        amount: amount,
+        description: sanitizedData.description || 'Ingreso extra',
+        amount: sanitizedData.amount,
         category: formData.category || 'other'
       };
       await this.data.addExtraIncome(this.currentMonth, extraIncomeData);
@@ -1445,16 +1448,24 @@ async handleAddIncome(e) {
     
     const formData = this.ui.getFormData('add-goal-form');
     
-    if (!formData.name || !formData.targetAmount) {
-      this.ui.showAlert('Por favor completa todos los campos', 'error');
+    // Validate form data using the new validation system
+    const validation = inputValidator.validateGoalForm(formData);
+    
+    if (!validation.isValid) {
+      const errorMessage = validation.errors.join('\n');
+      this.ui.showAlert(errorMessage, 'error');
       return;
     }
+
+    // Use sanitized data
+    const sanitizedData = validation.sanitizedData;
     
     try {
       const goalData = {
-        name: formData.name,
-        targetAmount: parseFloat(formData.targetAmount),
-        currentAmount: parseFloat(formData.currentAmount) || 0
+        name: sanitizedData.name,
+        targetAmount: sanitizedData.targetAmount,
+        currentAmount: sanitizedData.currentAmount,
+        targetDate: sanitizedData.targetDate
       };
       
       await this.data.addGoal(goalData);

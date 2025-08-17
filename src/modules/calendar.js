@@ -1,6 +1,7 @@
 import { calendarService } from './calendar-service.js';
 import { DOMHelpers } from '../utils/dom-helpers.js';
 import { CalendarSyncFix } from './calendar-sync-fix.js';
+import { inputValidator } from './input-validation.js';
 
 export class CalendarManager {
   constructor() {
@@ -844,13 +845,24 @@ export class CalendarManager {
       // Type section
       const typeItem = document.createElement('div');
       typeItem.className = 'event-detail-item';
-      typeItem.innerHTML = `<strong>Tipo:</strong> ${this.getEventTypeIcon(event.type)} ${this.getEventTypeName(event.type)}`;
+      const typeLabel = document.createElement('strong');
+      typeLabel.textContent = 'Tipo: ';
+      const typeIcon = document.createElement('span');
+      typeIcon.innerHTML = this.getEventTypeIcon(event.type); // Safe - controlled content
+      const typeName = document.createTextNode(' ' + this.getEventTypeName(event.type));
+      typeItem.appendChild(typeLabel);
+      typeItem.appendChild(typeIcon);
+      typeItem.appendChild(typeName);
       content.appendChild(typeItem);
 
       // Date section
       const dateItem = document.createElement('div');
       dateItem.className = 'event-detail-item';
-      dateItem.innerHTML = `<strong>Fecha:</strong> ${dateStr}`;
+      const dateLabel = document.createElement('strong');
+      dateLabel.textContent = 'Fecha: ';
+      const dateValue = document.createTextNode(dateStr);
+      dateItem.appendChild(dateLabel);
+      dateItem.appendChild(dateValue);
       content.appendChild(dateItem);
 
       // Time section (user input - needs escaping)
@@ -869,7 +881,11 @@ export class CalendarManager {
       if (event.amount) {
         const amountItem = document.createElement('div');
         amountItem.className = 'event-detail-item';
-        amountItem.innerHTML = `<strong>Monto:</strong> ${this.formatCurrency(event.amount)}`;
+        const amountLabel = document.createElement('strong');
+        amountLabel.textContent = 'Monto: ';
+        const amountValue = document.createTextNode(this.formatCurrency(event.amount));
+        amountItem.appendChild(amountLabel);
+        amountItem.appendChild(amountValue);
         content.appendChild(amountItem);
       }
 
@@ -885,7 +901,11 @@ export class CalendarManager {
       if (event.recurring) {
         const recurringItem = document.createElement('div');
         recurringItem.className = 'event-detail-item';
-        recurringItem.innerHTML = `<strong>Recurrencia:</strong> ${this.getFrequencyName(event.frequency)}`;
+        const recurringLabel = document.createElement('strong');
+        recurringLabel.textContent = 'Recurrencia: ';
+        const recurringValue = document.createTextNode(this.getFrequencyName(event.frequency));
+        recurringItem.appendChild(recurringLabel);
+        recurringItem.appendChild(recurringValue);
         content.appendChild(recurringItem);
       }
       
