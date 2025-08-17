@@ -704,18 +704,22 @@ setupDashboardEvents() {
         this.ui.showAlert(alert.message, alert.type);
       });
       
-      // Update charts
-      try {
-        const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
-        this.charts.updateExpensesChart(expensesByCategory);
-        this.charts.updateDashboardExpensesChart(expensesByCategory);
-        
-        // Update trend chart
-        const trendData = await this.data.getTrendData();
-        this.charts.updateTrendChart(trendData);
-      } catch (chartError) {
-        console.log('ℹ️ Charts not available in current view:', chartError.message);
-      }
+      // Update charts with delay to ensure DOM is ready
+      setTimeout(() => {
+        try {
+          const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
+          console.log('📊 Updating charts with expenses data:', expensesByCategory);
+          this.charts.updateExpensesChart(expensesByCategory);
+          this.charts.updateDashboardExpensesChart(expensesByCategory);
+          
+          // Update trend chart
+          this.data.getTrendData().then(trendData => {
+            this.charts.updateTrendChart(trendData);
+          });
+        } catch (chartError) {
+          console.error('❌ Charts error:', chartError);
+        }
+      }, 100);
       
       // Update budgets with AI insights
       const budgets = await this.budget.loadBudgets();

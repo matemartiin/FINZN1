@@ -1189,13 +1189,20 @@ export class CalendarManager {
     console.log('📅 DEBUG: window.app.auth exists:', !!(window.app && window.app.auth));
     
     if (!window.app || !window.app.auth) {
-      console.error('📅 ERROR: window.app.auth not available');
-      return null;
+      console.warn('📅 WARNING: window.app.auth not available, using fallback');
+      // Fallback: try to get user ID from localStorage or use 'anonymous'
+      const savedUserId = localStorage.getItem('finzn_user_id');
+      return savedUserId || 'anonymous_user';
     }
     
-    const userId = window.app.auth.getCurrentUserId();
-    console.log('📅 DEBUG: Retrieved user ID:', userId);
-    return userId;
+    try {
+      const userId = window.app.auth.getCurrentUserId();
+      console.log('📅 DEBUG: Retrieved user ID:', userId);
+      return userId || 'anonymous_user';
+    } catch (error) {
+      console.error('📅 ERROR: Failed to get user ID:', error);
+      return 'anonymous_user';
+    }
   }
 
   generateId() {

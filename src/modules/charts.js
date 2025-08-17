@@ -16,20 +16,31 @@ export class ChartManager {
   }
 
   updateDashboardExpensesChart(data) {
+    console.log('📊 updateDashboardExpensesChart called with data:', data);
+    
     const ctx = document.getElementById('dashboard-expenses-chart');
     if (!ctx) {
-      console.log('ℹ️ Dashboard expenses chart canvas not found');
+      console.error('❌ Dashboard expenses chart canvas not found');
       return;
     }
-
+    
+    console.log('📊 Canvas found, calling renderChart');
     this.renderChart(ctx, data, 'dashboardExpensesChart');
   }
 
   renderChart(ctx, data, chartProperty) {
+    console.log('📊 renderChart called:', { chartProperty, data, visible: ctx.offsetParent !== null });
+    
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+      console.error('❌ Chart.js not loaded!');
+      return;
+    }
+    
     // Verify canvas is visible and ready
     if (ctx.offsetParent === null) {
-      console.log('ℹ️ Chart canvas not visible - skipping update');
-      return;
+      console.log('⚠️ Chart canvas not visible - will render anyway');
+      // Don't return, try to render anyway
     }
     
     // Use data as-is without contextual filtering
@@ -42,8 +53,11 @@ export class ChartManager {
     const labels = Object.keys(filteredData);
     const values = Object.values(filteredData);
     
+    console.log('📊 Chart data prepared:', { labels, values });
+    
     // If no data, show empty state
     if (labels.length === 0 || values.every(v => v === 0)) {
+      console.log('📊 No data available, showing empty state');
       try {
         const context = ctx.getContext('2d');
         context.clearRect(0, 0, ctx.width, ctx.height);
@@ -59,47 +73,53 @@ export class ChartManager {
     
     const colors = this.generateColors(labels.length);
 
-    this[chartProperty] = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          backgroundColor: colors,
-          borderWidth: 0,
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        devicePixelRatio: window.devicePixelRatio || 1,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 20,
-              usePointStyle: true,
-              font: {
-                size: window.innerWidth < 768 ? 11 : 12
+    try {
+      this[chartProperty] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: window.devicePixelRatio || 1,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: window.innerWidth < 768 ? 11 : 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                }
               }
             }
           },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const label = context.label || '';
-                const value = context.raw || 0;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: $${value.toLocaleString()} (${percentage}%)`;
-              }
-            }
-          }
-        },
-        cutout: window.innerWidth < 768 ? '50%' : '60%'
-      }
-    });
+          cutout: window.innerWidth < 768 ? '50%' : '60%'
+        }
+      });
+      
+      console.log('✅ Chart created successfully:', chartProperty);
+    } catch (error) {
+      console.error('❌ Error creating chart:', error);
+    }
   }
 
   updateTrendChart(data) {
