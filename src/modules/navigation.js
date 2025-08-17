@@ -8,7 +8,6 @@ export class NavigationManager {
     this.setupNavigationEvents();
     this.setupMobileMenu();
     this.setupTabNavigation();
-    this.setupBreadcrumbs();
     this.setupHeaderMenu();
     this.showSection('dashboard');
   }
@@ -71,20 +70,6 @@ export class NavigationManager {
     });
   }
   
-  setupBreadcrumbs() {
-    const breadcrumbItems = document.querySelectorAll('.breadcrumb-item[data-section]');
-    
-    breadcrumbItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = item.getAttribute('data-section');
-        if (section) {
-          this.showSection(section);
-          this.updateActiveNavigation(section);
-        }
-      });
-    });
-  }
 
   setupHeaderMenu() {
   const btn = document.getElementById('header-menu-toggle');

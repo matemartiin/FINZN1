@@ -614,37 +614,6 @@ body {
   font-weight: 700;
 }
 
-/* Breadcrumb Navigation */
-.breadcrumb-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-xl);
-  padding: var(--spacing-sm) 0;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.breadcrumb-item {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color var(--transition-fast);
-}
-
-.breadcrumb-item:hover {
-  color: var(--primary-color);
-}
-
-.breadcrumb-item.active {
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-.breadcrumb-separator {
-  color: var(--text-muted);
-  font-weight: 400;
-}
 
 /* Transaction Tabs */
 .transaction-tabs {
@@ -4503,10 +4472,6 @@ table,
     font-size: 1.25rem;
   }
   
-  .breadcrumb-nav {
-    font-size: 0.875rem;
-    gap: var(--spacing-xs);
-  }
   
   /* SMALL MOBILE - All Cards */
   .expense-item,
@@ -5347,10 +5312,6 @@ body[data-layout="v2"] .main-dashboard {
   min-width: 0;            /* importante para que no se desborde */
 }
 
-/* Breadcrumb */
-body[data-layout="v2"] .breadcrumb-nav {
-  margin-bottom: 16px;
-}
 
 /* ====== GRID de la sección dashboard ====== */
 body[data-layout="v2"] #dashboard-section .dashboard-grid {
@@ -5503,8 +5464,6 @@ body[data-layout="v2"] .main-dashboard {
 .dashboard-section.active{display:block}
 @keyframes fadeIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
 
-/* Migas */
-.breadcrumb-nav{display:flex; align-items:center; gap:8px; margin:4px 0 16px}
 
 /* Responsivo */
 @media (max-width: 1024px){
@@ -5613,11 +5572,6 @@ body[data-layout="v2"] .main-dashboard {
 .dashboard-new .chart-mascot{ display:flex; align-items:center; justify-content:center; }
 .dashboard-new .chart-mascot-img{ max-width: 180px; opacity:.9 }
 
-/* Migas un poco más compactas */
-.dashboard-new .breadcrumb-nav{
-  padding: 2px 0 2px;
-  opacity: .9;
-}
 
 /* Responsivo: 2 columnas (>=768) y 1 columna (móvil) */
 @media (max-width: 1200px){
@@ -5668,7 +5622,6 @@ body[data-layout="v2"] .main-dashboard {
   letter-spacing: -0.01em;
 }
 
-.dashboard-new .breadcrumb-nav,
 .dashboard-new .section-header p,
 .text-muted{
   color: var(--text-2);
@@ -5790,13 +5743,10 @@ textarea:focus-visible{
 /* Botones dentro de headers/secciones: mantener compactos */
 .section-actions .btn{ margin-left: 8px; }
 
-/* ---------- Header y breadcrumb más finos ---------- */
+/* ---------- Header más fino ---------- */
 .header .logout-btn .logout-text{ opacity:.9 }
 .header .theme-toggle{ opacity:.95 }
 .header .theme-toggle:hover{ opacity:1 }
-
-.breadcrumb-item.active{ color: var(--text-1); font-weight: 700; }
-.breadcrumb-separator{ opacity:.6 }
 
 /* ---------- Tabs de Transacciones: ligera mejora de contraste ---------- */
 .transaction-tabs .tab-btn{

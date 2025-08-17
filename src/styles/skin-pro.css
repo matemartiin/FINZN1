@@ -90,7 +90,6 @@ body[data-skin="pro"] .card-amount{
   font-weight: 800;
 }
 body[data-skin="pro"] .card-title,
-body[data-skin="pro"] .breadcrumb-nav,
 body[data-skin="pro"] .nav-label{
   color: var(--pro-text-2);
 }
@@ -255,16 +254,6 @@ body[data-skin="pro"] .nav-badge{
   box-shadow: 0 6px 16px rgba(97,218,251,.35);
 }
 
-/* 6) Breadcrumb limpio y sutil */
-body[data-skin="pro"] .breadcrumb-nav{
-  display:flex; align-items:center; gap: var(--space-2);
-  color: var(--text-muted); margin: 2px 0 var(--space-4);
-  font-weight: 600;
-}
-body[data-skin="pro"] .breadcrumb-item.active{
-  color:#fff; background: rgba(255,255,255,.04);
-  padding: 6px 10px; border-radius: 10px;
-}
 
 /* 7) Gráfico: alto fluido y marco */
 body[data-skin="pro"] .chart-card-new{
