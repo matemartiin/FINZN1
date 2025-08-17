@@ -13,6 +13,7 @@ import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
 import { AnimationManager } from './modules/animations.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
+import { loadingManager } from './modules/loading.js';
 
 
 console.log('FINZN App - Starting initialization');
@@ -46,6 +47,9 @@ class FinznApp {
 
   async init() {
     console.log('🚀 Initializing FINZN App...');
+    
+    // Show loading screen immediately
+    loadingManager.show();
     
     try {
       // Initialize theme first
@@ -88,10 +92,16 @@ this.setupModalEvents();
         this.calendar.init();
         
         this.updateDashboard();
+        
+        // Hide loading screen after all data is loaded
+        this.hideLoadingScreen();
       } else {
         this.showAuth();
         // Initialize calendar in view-only mode for unauthenticated users
         this.calendar.init();
+        
+        // Hide loading screen even if not authenticated
+        this.hideLoadingScreen();
       }
       
       this.setupEventListeners();
@@ -100,6 +110,8 @@ this.setupModalEvents();
       console.error('❌ Error initializing app:', error);
       this.showAuth();
       this.setupEventListeners();
+      // Hide loading screen even on error
+      this.hideLoadingScreen();
     }
   }
 
@@ -1945,6 +1957,14 @@ showEditExpenseModal(expenseId) {
   getCurrentMonth() {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+  }
+
+  // Loading screen management
+  hideLoadingScreen() {
+    // Add small delay to ensure smooth transition after data loads
+    setTimeout(() => {
+      loadingManager.hide();
+    }, 300);
   }
 }
 
