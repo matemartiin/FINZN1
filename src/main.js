@@ -498,6 +498,17 @@ setupDashboardEvents() {
         }
       });
     }
+
+    // Category delete buttons using event delegation
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.delete-category-btn')) {
+        const button = e.target.closest('.delete-category-btn');
+        const categoryId = button.getAttribute('data-category-id');
+        if (categoryId) {
+          this.deleteCategory(categoryId);
+        }
+      }
+    });
   }
 
   setupMonthSelector() {

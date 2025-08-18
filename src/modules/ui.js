@@ -1179,7 +1179,7 @@ export class UIManager {
           <div class="category-name-display">${category.name}</div>
         </div>
         <div class="category-actions">
-          <button class="expense-action-btn delete-btn" onclick="window.app.deleteCategory('${category.id}')" title="Eliminar">
+          <button class="expense-action-btn delete-btn delete-category-btn" data-category-id="${category.id}" title="Eliminar">
             <i class="ph ph-trash" aria-hidden="true"></i>
           </button>
         </div>
