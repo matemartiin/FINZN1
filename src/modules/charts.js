@@ -5,17 +5,17 @@ export class ChartManager {
     this.trendChart = null;
   }
 
-  updateExpensesChart(data) {
+  updateExpensesChart(data, categories) {
     const ctx = document.getElementById('expenses-chart');
     if (!ctx) {
       console.log('ℹ️ Expenses chart canvas not found - not in charts view');
       return;
     }
 
-    this.renderChart(ctx, data, 'expensesChart');
+    this.renderChart(ctx, data, 'expensesChart', categories);
   }
 
-  updateDashboardExpensesChart(data) {
+  updateDashboardExpensesChart(data, categories) {
     console.log('📊 updateDashboardExpensesChart called with data:', data);
     
     const ctx = document.getElementById('dashboard-expenses-chart');
@@ -25,11 +25,11 @@ export class ChartManager {
     }
     
     console.log('📊 Canvas found, calling renderChart');
-    this.renderChart(ctx, data, 'dashboardExpensesChart');
+    this.renderChart(ctx, data, 'dashboardExpensesChart', categories);
   }
 
-  renderChart(ctx, data, chartProperty) {
-    console.log('📊 renderChart called:', { chartProperty, data, visible: ctx.offsetParent !== null });
+  renderChart(ctx, data, chartProperty, categories = null) {
+    console.log('📊 renderChart called:', { chartProperty, data, categories, visible: ctx.offsetParent !== null });
     
     // Check if Chart.js is available
     if (typeof Chart === 'undefined') {
@@ -71,7 +71,7 @@ export class ChartManager {
       return;
     }
     
-    const colors = this.generateColors(labels.length);
+    const colors = this.getCategoryColors(labels, categories);
 
     try {
       this[chartProperty] = new Chart(ctx, {
@@ -213,6 +213,26 @@ export class ChartManager {
         }
       }
     });
+  }
+
+  getCategoryColors(labels, categories) {
+    if (!categories) {
+      // Fallback to old method if categories not provided
+      return this.generateColors(labels.length);
+    }
+    
+    const colors = [];
+    labels.forEach(categoryName => {
+      const category = categories.find(cat => cat.name === categoryName);
+      if (category) {
+        colors.push(category.color);
+      } else {
+        // Fallback color if category not found
+        colors.push('#9ca3af');
+      }
+    });
+    
+    return colors;
   }
 
   generateColors(count) {

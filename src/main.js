@@ -766,9 +766,10 @@ setupDashboardEvents() {
       setTimeout(() => {
         try {
           const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
+          const categories = this.data.getCategories();
           console.log('📊 Updating charts with expenses data:', expensesByCategory);
-          this.charts.updateExpensesChart(expensesByCategory);
-          this.charts.updateDashboardExpensesChart(expensesByCategory);
+          this.charts.updateExpensesChart(expensesByCategory, categories);
+          this.charts.updateDashboardExpensesChart(expensesByCategory, categories);
           
           // Update trend chart
           this.data.getTrendData().then(trendData => {

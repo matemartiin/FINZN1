@@ -290,6 +290,8 @@ export class UIManager {
       // Create elements safely without innerHTML
       const expenseIcon = document.createElement('div');
       expenseIcon.className = 'expense-icon';
+      expenseIcon.style.backgroundColor = `${category.color}20`; // Semi-transparent background
+      expenseIcon.style.color = category.color; // Icon color
       expenseIcon.innerHTML = category.icon; // Safe - controlled content from getCategoryInfo
 
       const expenseDetails = document.createElement('div');
@@ -423,6 +425,7 @@ export class UIManager {
       // Create elements safely
       const transactionIcon = document.createElement('div');
       transactionIcon.className = 'transaction-icon';
+      transactionIcon.style.backgroundColor = `${categoryInfo.color}20`; // Semi-transparent background
       transactionIcon.style.color = categoryInfo.color;
       transactionIcon.innerHTML = categoryInfo.icon; // Icon HTML is safe (controlled content)
 
@@ -1133,7 +1136,10 @@ export class UIManager {
       
       item.innerHTML = `
         <div class="installment-details">
-          <div class="installment-description">${category.icon} ${installment.description}</div>
+          <div class="installment-description">
+            <span class="installment-icon" style="color: ${category.color}; background-color: ${category.color}20; padding: 4px; border-radius: 4px; display: inline-block; margin-right: 8px;">${category.icon}</span>
+            ${installment.description}
+          </div>
           <div class="installment-info">${category.name} • ${transactionDate}</div>
           <div class="installment-progress">Cuota ${installment.installment} de ${installment.total_installments}</div>
         </div>
