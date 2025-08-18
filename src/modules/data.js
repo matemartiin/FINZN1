@@ -29,7 +29,7 @@ export class DataManager {
       { id: '9', name: 'Tecnología', icon: '<i class="ph ph-laptop"></i>', color: '#06b6d4' },
       { id: '10', name: 'Deportes', icon: '<i class="ph ph-soccer-ball"></i>', color: '#84cc16' },
       { id: '11', name: 'Viajes', icon: '<i class="ph ph-airplane"></i>', color: '#f97316' },
-      { id: '12', name: 'PedidosYa', icon: '<i class="ph ph-motorcycle"></i>', color: '#ff6b35' },
+      { id: '12', name: 'PedidosYa', icon: '<img src="/assets/svg/pedidosya-logo.svg" alt="PedidosYa" width="20" height="20" style="display: inline-block;">', color: '#ff6b35' },
       { id: '13', name: 'Otros', icon: '<i class="ph ph-dots-three"></i>', color: '#9ca3af' }
     ];
   }
