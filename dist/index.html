@@ -13,10 +13,10 @@
   <link rel="stylesheet" href="./vendor/phosphor/thin/style.css">
   <link rel="stylesheet" href="./vendor/phosphor/fill/style.css">
   <link rel="stylesheet" href="./vendor/phosphor/duotone/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
   <!-- Color override must be last to take precedence -->
-  <script type="module" crossorigin src="./assets/index-CHZrLyyd.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CL1qeWO3.css">
+  <script type="module" crossorigin src="./assets/index-C4Ecsiyl.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-C-xdwBKw.css">
 </head>
 <body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
@@ -1009,6 +1009,7 @@
       <option value='<i class="ph ph-laptop"></i>'>Tecnología</option>
       <option value='<i class="ph ph-soccer-ball"></i>'>Deportes</option>
       <option value='<i class="ph ph-airplane"></i>'>Viajes</option>
+      <option value='<img src="/assets/svg/pedidosya-logo.svg" alt="PedidosYa" width="20" height="20" style="display: inline-block;">'>PedidosYa</option>
       <option value='<i class="ph ph-coffee"></i>'>Café</option>
       <option value='<i class="ph ph-music-note"></i>'>Música</option>
       <option value='<i class="ph ph-camera"></i>'>Fotografía</option>
@@ -1413,6 +1414,9 @@
         <button type="button" id="add-event-for-day" class="btn btn-primary">
           <i class="ph ph-plus"></i> Agregar Evento
         </button>
+        <button type="button" id="delete-all-day-events" class="btn btn-danger">
+          <i class="ph ph-trash"></i> Eliminar Todos
+        </button>
         <button type="button" class="modal-cancel btn btn-secondary">Cerrar</button>
       </div>
     </div>
@@ -1455,6 +1459,19 @@
               <small>Enviar eventos a Google Calendar</small>
             </div>
           </button>
+        </div>
+
+        <div class="sync-settings">
+          <div class="sync-setting-item">
+            <label class="sync-toggle-label">
+              <input type="checkbox" id="auto-sync-toggle" class="sync-toggle">
+              <span class="sync-toggle-slider"></span>
+              <div class="sync-toggle-content">
+                <span class="sync-toggle-title">Sincronización Automática</span>
+                <small class="sync-toggle-description">Sincronizar cambios automáticamente cada 5 minutos</small>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
       

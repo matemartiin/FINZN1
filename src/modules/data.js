@@ -242,9 +242,10 @@ export class DataManager {
       // Get default categories with updated colors
       const defaultCategories = this.getDefaultCategories();
       
-      // Check if any color needs updating
+      // Check if any color needs updating - Force check for specific problematic colors
       let needsUpdate = false;
       const updatesNeeded = [];
+      const problematicColors = ['#ef4444', '#10b981']; // Colors that were duplicated
 
       currentCategories.forEach(currentCat => {
         const defaultCat = defaultCategories.find(defCat => defCat.name === currentCat.name);
@@ -255,6 +256,36 @@ export class DataManager {
             name: currentCat.name,
             oldColor: currentCat.color,
             newColor: defaultCat.color
+          });
+        }
+        // Force update for Salud if it still has the wrong color (#ef4444)
+        else if (currentCat.name === 'Salud' && currentCat.color === '#ef4444') {
+          needsUpdate = true;
+          updatesNeeded.push({
+            id: currentCat.id,
+            name: currentCat.name,
+            oldColor: currentCat.color,
+            newColor: '#10b981'
+          });
+        }
+        // Force update for Supermercado if it has old green color
+        else if (currentCat.name === 'Supermercado' && currentCat.color === '#10b981') {
+          needsUpdate = true;
+          updatesNeeded.push({
+            id: currentCat.id,
+            name: currentCat.name,
+            oldColor: currentCat.color,
+            newColor: '#14b8a6'
+          });
+        }
+        // Force update for PedidosYa if it has old color
+        else if (currentCat.name === 'PedidosYa' && (currentCat.color === '#ff6b35' || currentCat.color === '#ef4444')) {
+          needsUpdate = true;
+          updatesNeeded.push({
+            id: currentCat.id,
+            name: currentCat.name,
+            oldColor: currentCat.color,
+            newColor: '#dc2626'
           });
         }
       });
