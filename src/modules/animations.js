@@ -5,14 +5,25 @@ export class AnimationManager {
     this.observers = [];
     this.animationQueue = [];
     this.isAnimating = false;
+    this.isTransitioning = false;
+    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.activeAnimations = new Map();
   }
 
   init() {
     console.log('🎬 Initializing Animation Manager...');
+    
+    // Listen for reduced motion preference changes
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+      this.prefersReducedMotion = e.matches;
+      console.log('🎬 Reduced motion preference changed:', this.prefersReducedMotion);
+    });
+
     this.setupIntersectionObserver();
     this.animateInitialElements();
     this.setupMutationObserver();
     this.setupEventListeners();
+    this.preloadAnimations();
   }
 
   // Setup Intersection Observer for scroll-triggered animations
@@ -213,8 +224,10 @@ export class AnimationManager {
 
   // Add hover effects to elements
   addHoverEffects(element) {
+    if (this.prefersReducedMotion) return;
+    
     element.addEventListener('mouseenter', () => {
-      element.style.transform = 'translateY(-5px)';
+      element.style.transform = 'translateY(-3px)';
     });
 
     element.addEventListener('mouseleave', () => {
@@ -287,17 +300,30 @@ export class AnimationManager {
     });
   }
 
-  // Button click animation
-  animateButtonClick(button) {
+  // Button press animation
+  animateButtonPress(button) {
+    if (!button || this.prefersReducedMotion) return;
+
+    const originalTransform = button.style.transform;
+    button.style.transition = 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)';
     button.style.transform = 'scale(0.95)';
-    button.style.transition = 'transform 0.1s ease';
     
     setTimeout(() => {
-      button.style.transform = '';
-    }, 100);
+      button.style.transform = originalTransform;
+      setTimeout(() => {
+        button.style.transition = '';
+      }, 150);
+    }, 150);
+  }
 
-    // Ripple effect
-    this.createRippleEffect(button);
+  // Button click animation (legacy)
+  animateButtonClick(button) {
+    this.animateButtonPress(button);
+    
+    if (!this.prefersReducedMotion) {
+      // Ripple effect
+      this.createRippleEffect(button);
+    }
   }
 
   // Create ripple effect
@@ -348,39 +374,376 @@ export class AnimationManager {
     navItem.classList.add('active');
   }
 
-  // Animate page transitions
-  animatePageTransition(fromSection, toSection) {
-    return new Promise((resolve) => {
-      if (fromSection) {
-        fromSection.style.animation = 'slideInFromLeft 0.3s ease-out reverse';
-        setTimeout(() => {
-          fromSection.classList.remove('active');
-          fromSection.style.display = 'none';
-        }, 300);
+  // Preload critical animations
+  preloadAnimations() {
+    if (this.prefersReducedMotion) return;
+    
+    // Force browser to create animation contexts
+    const testElement = document.createElement('div');
+    testElement.style.cssText = `
+      position: fixed;
+      top: -1000px;
+      left: -1000px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      transform: translateX(0);
+      transition: all 0.3s ease-out;
+      will-change: transform, opacity;
+    `;
+    document.body.appendChild(testElement);
+    
+    // Trigger a small animation to warm up the engine
+    requestAnimationFrame(() => {
+      testElement.style.transform = 'translateX(1px)';
+      setTimeout(() => {
+        document.body.removeChild(testElement);
+      }, 350);
+    });
+  }
+
+  // Main page transition animation
+  async animatePageTransition(fromSection, toSection) {
+    if (this.isTransitioning) {
+      return;
+    }
+
+    this.isTransitioning = true;
+    
+    try {
+      if (this.prefersReducedMotion) {
+        // Instant transition for reduced motion
+        this.instantTransition(fromSection, toSection);
+        return;
+      }
+
+      // Prepare sections for animation
+      this.prepareSectionForAnimation(fromSection, toSection);
+      
+      // Animate out current section and in new section
+      await Promise.all([
+        this.animateOut(fromSection),
+        this.animateIn(toSection)
+      ]);
+
+      // Cleanup
+      this.cleanupSectionAnimation(fromSection, toSection);
+      
+    } finally {
+      this.isTransitioning = false;
+    }
+  }
+
+  prepareSectionForAnimation(fromSection, toSection) {
+    if (!fromSection || !toSection) return;
+
+    // Prepare outgoing section
+    fromSection.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      opacity: 1;
+      transform: translateX(0);
+      will-change: transform, opacity;
+      z-index: 1;
+    `;
+
+    // Prepare incoming section
+    toSection.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      opacity: 0;
+      transform: translateX(20px);
+      will-change: transform, opacity;
+      z-index: 2;
+    `;
+    
+    // Make incoming section active and visible
+    toSection.classList.add('active');
+  }
+
+  async animateOut(section) {
+    if (!section) return Promise.resolve();
+
+    return new Promise(resolve => {
+      const duration = this.prefersReducedMotion ? 0 : 200;
+      
+      section.style.transition = `all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+      section.style.opacity = '0';
+      section.style.transform = 'translateX(-20px)';
+      
+      setTimeout(() => {
+        section.classList.remove('active');
+        resolve();
+      }, duration);
+    });
+  }
+
+  async animateIn(section) {
+    if (!section) return Promise.resolve();
+
+    return new Promise(resolve => {
+      const duration = this.prefersReducedMotion ? 0 : 300;
+      
+      // Small delay to ensure smooth transition
+      requestAnimationFrame(() => {
+        section.style.transition = `all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        section.style.opacity = '1';
+        section.style.transform = 'translateX(0)';
+        
+        setTimeout(resolve, duration);
+      });
+    });
+  }
+
+  cleanupSectionAnimation(fromSection, toSection) {
+    // Reset styles for both sections
+    [fromSection, toSection].forEach(section => {
+      if (section) {
+        section.style.cssText = '';
+        section.style.position = '';
+        section.style.opacity = '';
+        section.style.transform = '';
+        section.style.transition = '';
+        section.style.willChange = '';
+        section.style.zIndex = '';
+      }
+    });
+  }
+
+  instantTransition(fromSection, toSection) {
+    if (fromSection) {
+      fromSection.classList.remove('active');
+    }
+    if (toSection) {
+      toSection.classList.add('active');
+    }
+  }
+
+  // Modal animation methods
+  animateModalIn(modalElement, backdropElement) {
+    if (!modalElement) return Promise.resolve();
+
+    return new Promise(resolve => {
+      const duration = this.prefersReducedMotion ? 0 : 300;
+      
+      // Set initial state
+      modalElement.style.cssText = `
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+        transition: all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1);
+      `;
+      
+      if (backdropElement) {
+        backdropElement.style.cssText = `
+          opacity: 0;
+          backdrop-filter: blur(0px);
+          transition: all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1);
+        `;
+      }
+
+      requestAnimationFrame(() => {
+        modalElement.style.opacity = '1';
+        modalElement.style.transform = 'scale(1) translateY(0)';
+        
+        if (backdropElement) {
+          backdropElement.style.opacity = '1';
+          backdropElement.style.backdropFilter = 'blur(8px)';
+        }
+        
+        setTimeout(resolve, duration);
+      });
+    });
+  }
+
+  animateModalOut(modalElement, backdropElement) {
+    if (!modalElement) return Promise.resolve();
+
+    return new Promise(resolve => {
+      const duration = this.prefersReducedMotion ? 0 : 250;
+      
+      modalElement.style.transition = `all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+      modalElement.style.opacity = '0';
+      modalElement.style.transform = 'scale(0.95) translateY(-20px)';
+      
+      if (backdropElement) {
+        backdropElement.style.transition = `all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        backdropElement.style.opacity = '0';
+        backdropElement.style.backdropFilter = 'blur(0px)';
       }
       
-      if (toSection) {
-        setTimeout(() => {
-          toSection.style.display = 'block';
-          toSection.classList.add('active');
-          toSection.style.animation = 'slideInFromRight 0.3s ease-out forwards';
-          resolve();
-        }, fromSection ? 300 : 0);
+      setTimeout(resolve, duration);
+    });
+  }
+
+  // Enhanced card hover animations
+  enhanceCardHovers() {
+    const cards = document.querySelectorAll('.expense-card, .goal-card, .budget-card, .card, .dashboard-card');
+    
+    cards.forEach(card => {
+      if (this.activeAnimations.has(card)) return;
+      
+      card.style.transition = 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1)';
+      
+      const handleMouseEnter = () => {
+        if (!this.prefersReducedMotion) {
+          card.style.transform = 'translateY(-2px)';
+          card.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
+        }
+      };
+      
+      const handleMouseLeave = () => {
+        card.style.transform = '';
+        card.style.boxShadow = '';
+      };
+      
+      card.addEventListener('mouseenter', handleMouseEnter);
+      card.addEventListener('mouseleave', handleMouseLeave);
+      
+      this.activeAnimations.set(card, { handleMouseEnter, handleMouseLeave });
+    });
+  }
+
+  // Stagger animation for lists
+  animateListItems(container, itemSelector = '.list-item') {
+    if (!container || this.prefersReducedMotion) return;
+
+    const items = container.querySelectorAll(itemSelector);
+    items.forEach((item, index) => {
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(20px)';
+      item.style.transition = `all 300ms cubic-bezier(0.4, 0, 0.2, 1)`;
+      item.style.transitionDelay = `${index * 50}ms`;
+      
+      requestAnimationFrame(() => {
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+      });
+    });
+  }
+
+  // Loading animation
+  showLoadingAnimation(element, text = 'Cargando...') {
+    if (!element) return;
+
+    const loadingHTML = `
+      <div class="loading-animation">
+        <div class="loading-spinner"></div>
+        <span class="loading-text">${text}</span>
+      </div>
+    `;
+    
+    element.innerHTML = loadingHTML;
+    
+    if (!this.prefersReducedMotion) {
+      const spinner = element.querySelector('.loading-spinner');
+      if (spinner) {
+        spinner.style.animation = 'spin 1s linear infinite';
       }
+    }
+  }
+
+  // Success/Error feedback animations
+  showFeedbackAnimation(element, type = 'success', message = '') {
+    if (!element) return;
+
+    const icons = {
+      success: '✅',
+      error: '❌',
+      warning: '⚠️',
+      info: 'ℹ️'
+    };
+
+    const colors = {
+      success: '#22c55e',
+      error: '#ef4444',
+      warning: '#f59e0b',
+      info: '#3b82f6'
+    };
+
+    element.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 8px;
+      background: ${colors[type]}20;
+      border: 1px solid ${colors[type]}40;
+      color: ${colors[type]};
+      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(10px);
+      opacity: 0;
+    `;
+    
+    element.innerHTML = `
+      <span style="font-size: 16px;">${icons[type]}</span>
+      <span>${message}</span>
+    `;
+
+    requestAnimationFrame(() => {
+      element.style.transform = 'translateY(0)';
+      element.style.opacity = '1';
     });
   }
 
   // Re-animate elements (useful for dynamic content updates)
   refreshAnimations() {
+    if (this.prefersReducedMotion) return;
+
+    // Re-enhance card hovers for newly added elements
+    this.enhanceCardHovers();
+    
+    // Animate any new list items
+    const containers = document.querySelectorAll('.expenses-list, .goals-list, .budgets-list');
+    containers.forEach(container => {
+      const newItems = container.querySelectorAll('[data-new="true"]');
+      newItems.forEach(item => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        item.style.transition = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        requestAnimationFrame(() => {
+          item.style.opacity = '1';
+          item.style.transform = 'translateY(0)';
+          item.removeAttribute('data-new');
+        });
+      });
+    });
+    
+    // Re-run initial animations for any missed elements
     this.animatedElements.clear();
     this.animateInitialElements();
   }
 
+  // Cleanup method
+  cleanup() {
+    this.activeAnimations.forEach((listeners, element) => {
+      if (listeners.handleMouseEnter) {
+        element.removeEventListener('mouseenter', listeners.handleMouseEnter);
+      }
+      if (listeners.handleMouseLeave) {
+        element.removeEventListener('mouseleave', listeners.handleMouseLeave);
+      }
+    });
+    
+    this.activeAnimations.clear();
+    this.animationQueue.length = 0;
+  }
+
   // Clean up observers
   destroy() {
+    this.cleanup();
     this.observers.forEach(observer => observer.disconnect());
     this.observers = [];
     this.animatedElements.clear();
+  }
+
+  // Utility method to check if animations are enabled
+  get animationsEnabled() {
+    return !this.prefersReducedMotion;
   }
 
   // Utility method to add custom animations
@@ -391,18 +754,3 @@ export class AnimationManager {
   }
 }
 
-// CSS for ripple effect
-const rippleStyle = document.createElement('style');
-rippleStyle.textContent = `
-  @keyframes ripple {
-    from {
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 1;
-    }
-    to {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 0;
-    }
-  }
-`;
-document.head.appendChild(rippleStyle);
