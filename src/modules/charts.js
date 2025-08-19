@@ -81,26 +81,50 @@ export class ChartManager {
           datasets: [{
             data: values,
             backgroundColor: colors,
-            borderWidth: 0,
-            hoverOffset: 4
+            borderWidth: 3,
+            borderColor: '#ffffff',
+            hoverOffset: 8,
+            hoverBorderWidth: 4,
+            borderRadius: 8,
+            borderSkipped: false
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           devicePixelRatio: window.devicePixelRatio || 1,
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 800,
+            easing: 'easeOutCubic'
+          },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
-                padding: 20,
+                padding: 24,
                 usePointStyle: true,
+                pointStyle: 'circle',
                 font: {
-                  size: window.innerWidth < 768 ? 11 : 12
-                }
+                  size: window.innerWidth < 768 ? 12 : 13,
+                  weight: '500'
+                },
+                color: '#374151',
+                boxWidth: 12,
+                boxHeight: 12
               }
             },
             tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#374151',
+              borderWidth: 1,
+              cornerRadius: 8,
+              padding: 12,
+              displayColors: true,
+              boxPadding: 6,
               callbacks: {
                 label: (context) => {
                   const label = context.label || '';
@@ -112,7 +136,16 @@ export class ChartManager {
               }
             }
           },
-          cutout: window.innerWidth < 768 ? '50%' : '60%'
+          cutout: window.innerWidth < 768 ? '55%' : '65%',
+          interaction: {
+            intersect: false
+          },
+          elements: {
+            arc: {
+              borderWidth: 3,
+              borderRadius: 8
+            }
+          }
         }
       });
       
@@ -237,8 +270,10 @@ export class ChartManager {
 
   generateColors(count) {
     const colors = [
-      '#ef4444', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981',
-      '#6b7280', '#9ca3af', '#f97316', '#06b6d4', '#84cc16'
+      '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#84cc16', 
+      '#6366f1', '#ec4899', '#8b5cf6', '#06b6d4', '#22c55e',
+      '#f97316', '#ff6b35', '#9ca3af', '#14b8a6', '#f43f5e',
+      '#7c3aed', '#0ea5e9', '#eab308', '#16a34a', '#dc2626'
     ];
     
     const result = [];
