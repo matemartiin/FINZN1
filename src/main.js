@@ -730,6 +730,22 @@ setupDashboardEvents() {
       const balance = this.data.calculateBalance(this.currentMonth);
       console.log('💰 Balance calculated:', balance);
       
+      // Calculate totals for animations
+      const totalIncome = income + (extraIncomes?.reduce((sum, inc) => sum + (inc.amount || 0), 0) || 0);
+      const totalExpenses = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+      const installmentsCount = expenses.filter(exp => exp.total_installments > 1).length;
+      
+      // Prepare animation data
+      const animationData = {
+        balance: balance,
+        income: totalIncome,
+        expenses: totalExpenses,
+        installmentsCount: installmentsCount
+      };
+      
+      // Animate financial data entry with staggered timing
+      this.animations.animateFinancialData(animationData);
+      
       // Update UI
       this.ui.updateBalance(balance);
       this.ui.updateExpensesList(expenses, this);
@@ -762,23 +778,42 @@ setupDashboardEvents() {
         this.ui.showAlert(alert.message, alert.type);
       });
       
-      // Update charts with delay to ensure DOM is ready
+      // Update charts with enhanced timing and animations
       setTimeout(() => {
         try {
           const expensesByCategory = this.data.getExpensesByCategory(this.currentMonth);
           const categories = this.data.getCategories();
           console.log('📊 Updating charts with expenses data:', expensesByCategory);
-          this.charts.updateExpensesChart(expensesByCategory, categories);
-          this.charts.updateDashboardExpensesChart(expensesByCategory, categories);
           
-          // Update trend chart
-          this.data.getTrendData().then(trendData => {
-            this.charts.updateTrendChart(trendData);
+          // Animate chart containers first
+          const chartContainers = document.querySelectorAll('.chart-container');
+          chartContainers.forEach((container, index) => {
+            if (container) {
+              container.style.opacity = '0';
+              container.style.transform = 'scale(0.95)';
+              setTimeout(() => {
+                container.style.transition = 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)';
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+              }, index * 200 + 300);
+            }
           });
+          
+          // Update charts after animation starts
+          setTimeout(() => {
+            this.charts.updateExpensesChart(expensesByCategory, categories);
+            this.charts.updateDashboardExpensesChart(expensesByCategory, categories);
+            
+            // Update trend chart
+            this.data.getTrendData().then(trendData => {
+              this.charts.updateTrendChart(trendData);
+            });
+          }, 400);
+          
         } catch (chartError) {
           console.error('❌ Charts error:', chartError);
         }
-      }, 100);
+      }, 800); // Increased delay to allow financial data animations to complete first
       
       // Update budgets with AI insights
       const budgets = await this.budget.loadBudgets();

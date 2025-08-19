@@ -248,31 +248,61 @@ export class AnimationManager {
     });
   }
 
-  // Count up animation for numbers
-  animateCountUp(element, start, end, duration) {
+  // Count up animation for numbers with enhanced formatting
+  animateCountUp(element, start, end, duration = 1200, options = {}) {
+    if (this.prefersReducedMotion) {
+      element.textContent = this.formatCurrency(end, options);
+      return;
+    }
+
     const startTime = performance.now();
     const originalText = element.textContent;
-    const prefix = originalText.replace(/[\d.-]/g, '').split(end.toString())[0] || '';
-    const suffix = originalText.replace(/[\d.-]/g, '').split(end.toString())[1] || '';
-
+    const isNegative = end < 0;
+    const absoluteEnd = Math.abs(end);
+    const absoluteStart = Math.abs(start);
+    
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Easing function
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-      const currentValue = Math.floor(start + (end - start) * easedProgress);
+      // Smooth easing function for professional feel
+      const easedProgress = progress < 0.5 
+        ? 2 * progress * progress
+        : -1 + (4 - 2 * progress) * progress;
       
-      element.textContent = prefix + currentValue.toLocaleString() + suffix;
+      const currentValue = absoluteStart + (absoluteEnd - absoluteStart) * easedProgress;
+      const displayValue = isNegative ? -currentValue : currentValue;
+      
+      element.textContent = this.formatCurrency(displayValue, options);
       
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        element.textContent = originalText; // Restore original formatting
+        // Final value with proper formatting
+        element.textContent = this.formatCurrency(end, options);
       }
     };
 
     requestAnimationFrame(animate);
+  }
+
+  // Enhanced number formatting
+  formatCurrency(value, options = {}) {
+    const {
+      currency = '$',
+      decimals = 0,
+      showCurrency = true
+    } = options;
+    
+    const formattedNumber = Math.abs(value).toLocaleString('es-AR', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+    
+    const prefix = showCurrency ? currency : '';
+    const sign = value < 0 ? '-' : '';
+    
+    return `${sign}${prefix}${formattedNumber}`;
   }
 
   // Setup event listeners for interactions
@@ -432,6 +462,14 @@ export class AnimationManager {
         toSection.classList.add('active');
         await new Promise(resolve => setTimeout(resolve, 180)); // Wait for smooth fade in
         toSection.classList.remove('transitioning-in');
+        
+        // STEP 3: Start coordinated animations for the new section
+        if (toSection.id === 'dashboard-section') {
+          this.orchestrateDashboardAnimations();
+        } else {
+          // For other sections, just animate content
+          this.animateActiveSection();
+        }
       }
       
     } finally {
@@ -507,9 +545,9 @@ export class AnimationManager {
     });
   }
 
-  // Enhanced card hover animations
+  // Enhanced card hover animations with data entry effects
   enhanceCardHovers() {
-    const cards = document.querySelectorAll('.expense-card, .goal-card, .budget-card, .card, .dashboard-card');
+    const cards = document.querySelectorAll('.expense-card, .goal-card, .budget-card, .card, .dashboard-card, .new-unified-card');
     
     cards.forEach(card => {
       if (this.activeAnimations.has(card)) return;
@@ -532,6 +570,97 @@ export class AnimationManager {
       card.addEventListener('mouseleave', handleMouseLeave);
       
       this.activeAnimations.set(card, { handleMouseEnter, handleMouseLeave });
+    });
+  }
+
+  // Animate financial data entry with slide-in effects
+  animateFinancialData(data = {}) {
+    if (this.prefersReducedMotion) return;
+
+    const animations = [];
+
+    // Animate balance amount
+    if (data.balance !== undefined) {
+      const balanceElement = document.getElementById('balance-amount-new');
+      if (balanceElement) {
+        animations.push(this.animateDataEntry(balanceElement, data.balance, {
+          type: 'balance',
+          duration: 1500,
+          showCurrency: true,
+          decimals: 0
+        }));
+      }
+    }
+
+    // Animate income amount
+    if (data.income !== undefined) {
+      const incomeElement = document.getElementById('income-summary');
+      if (incomeElement) {
+        animations.push(this.animateDataEntry(incomeElement, data.income, {
+          type: 'income',
+          duration: 1200,
+          showCurrency: true,
+          decimals: 0
+        }));
+      }
+    }
+
+    // Animate expenses amount
+    if (data.expenses !== undefined) {
+      const expensesElement = document.getElementById('monthly-expenses-summary');
+      if (expensesElement) {
+        animations.push(this.animateDataEntry(expensesElement, data.expenses, {
+          type: 'expenses',
+          duration: 1200,
+          showCurrency: true,
+          decimals: 0
+        }));
+      }
+    }
+
+    // Animate installments count
+    if (data.installmentsCount !== undefined) {
+      const installmentsElement = document.getElementById('installments-count');
+      if (installmentsElement) {
+        animations.push(this.animateDataEntry(installmentsElement, data.installmentsCount, {
+          type: 'count',
+          duration: 800,
+          showCurrency: false
+        }));
+      }
+    }
+
+    return Promise.all(animations);
+  }
+
+  // Generic data entry animation
+  animateDataEntry(element, newValue, options = {}) {
+    return new Promise(resolve => {
+      if (!element || this.prefersReducedMotion) {
+        if (element) {
+          element.textContent = this.formatCurrency(newValue, options);
+        }
+        resolve();
+        return;
+      }
+
+      const { type = 'default', duration = 1000, delay = 0 } = options;
+      
+      // Add entrance animation class
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(20px)';
+      element.style.transition = `all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)`;
+      
+      setTimeout(() => {
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+        
+        // Start count-up animation after slide-in
+        setTimeout(() => {
+          this.animateCountUp(element, 0, newValue, duration, options);
+          setTimeout(resolve, duration + 100);
+        }, 300);
+      }, delay);
     });
   }
 
@@ -656,6 +785,31 @@ export class AnimationManager {
     }, 350); // Wait for section transition to complete
   }
 
+  // Coordinate all dashboard animations with proper timing
+  orchestrateDashboardAnimations() {
+    if (this.prefersReducedMotion) return;
+
+    // Phase 1: Section transition (already handled by existing system)
+    // Phase 2: Main cards entrance (300ms after section is active)
+    setTimeout(() => {
+      this.animateDashboardCards();
+    }, 300);
+    
+    // Phase 3: Financial data count-up (600ms after cards)
+    // This is handled by animateFinancialData() in main.js
+    
+    // Phase 4: Charts entrance (after financial data animations)
+    // This is handled by the enhanced chart timing in main.js
+    
+    // Phase 5: Transaction lists (final phase)
+    setTimeout(() => {
+      const activeSection = document.querySelector('.dashboard-section.active');
+      if (activeSection) {
+        this.animateTransactionsInSection(activeSection);
+      }
+    }, 2000);
+  }
+
   // Animate only the currently active section
   animateActiveSection() {
     const activeSection = document.querySelector('.dashboard-section.active');
@@ -669,6 +823,58 @@ export class AnimationManager {
 
     // Re-run animations for active section only
     this.animateDashboardCards();
+    
+    // Animate charts if present
+    this.animateChartsInSection(activeSection);
+    
+    // Animate transaction lists
+    this.animateTransactionsInSection(activeSection);
+  }
+
+  // Animate charts with smooth entrance
+  animateChartsInSection(section) {
+    if (!section || this.prefersReducedMotion) return;
+
+    const chartContainers = section.querySelectorAll('.chart-container, .chart-card');
+    chartContainers.forEach((container, index) => {
+      if (this.animatedElements.has(container)) return;
+      
+      container.style.opacity = '0';
+      container.style.transform = 'scale(0.95)';
+      container.style.transition = 'all 400ms cubic-bezier(0.34, 1.56, 0.64, 1)';
+      
+      setTimeout(() => {
+        container.style.opacity = '1';
+        container.style.transform = 'scale(1)';
+      }, index * 150 + 300);
+      
+      this.animatedElements.add(container);
+    });
+  }
+
+  // Animate transaction lists with stagger effect
+  animateTransactionsInSection(section) {
+    if (!section || this.prefersReducedMotion) return;
+
+    const transactionLists = section.querySelectorAll('.recent-transactions-list, .expenses-list, .income-list');
+    transactionLists.forEach(list => {
+      const transactions = list.querySelectorAll('.transaction-item, .expense-item, .income-item');
+      
+      transactions.forEach((transaction, index) => {
+        if (this.animatedElements.has(transaction)) return;
+        
+        transaction.style.opacity = '0';
+        transaction.style.transform = 'translateX(-30px)';
+        transaction.style.transition = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        setTimeout(() => {
+          transaction.style.opacity = '1';
+          transaction.style.transform = 'translateX(0)';
+        }, index * 80 + 400);
+        
+        this.animatedElements.add(transaction);
+      });
+    });
   }
 
   // Cleanup method
