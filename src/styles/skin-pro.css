@@ -186,7 +186,7 @@ body[data-skin="pro"] .summary-card {
   transition: transform .14s ease, box-shadow .14s ease;
 }
 body[data-skin="pro"] .summary-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 12px 28px rgba(0,0,0,.28);
 }
 body[data-skin="pro"] .card-header-simple {
@@ -542,12 +542,12 @@ body[data-skin="pro"] .summary-card{
 }
 @media (hover:hover){
   body[data-skin="pro"] .summary-card:hover{
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 8px 20px rgba(20,20,40,.08);
     border-color: color-mix(in oklab, var(--border-subtle), transparent 25%);
   }
   body[data-skin="pro"] .chart-card-new:hover{
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 8px 20px rgba(20,20,40,.08);
     border-color: color-mix(in oklab, var(--border-subtle), transparent 25%);
   }
@@ -691,7 +691,7 @@ body[data-skin="pro"] .dashboard-section.active{ display:block; }
 }
 
 .summary-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: var(--pro3-stroke-strong);
   box-shadow: var(--pro3-glow);
   background:

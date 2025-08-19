@@ -22,8 +22,8 @@
   
   /* Subtle Transform Values */
   --lift-subtle: translateY(-1px);
-  --lift-gentle: translateY(-2px);
-  --lift-normal: translateY(-3px);
+  --lift-gentle: translateY(-1px);
+  --lift-normal: translateY(-1.5px);
   --scale-subtle: scale(1.005);
   --scale-gentle: scale(1.01);
   --scale-normal: scale(1.015);

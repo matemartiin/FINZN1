@@ -247,7 +247,7 @@ body {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 15px 30px rgba(200, 182, 255, 0.4);
 }
 
@@ -259,7 +259,7 @@ body {
 
 .btn-secondary:hover {
   background: var(--border-color);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .btn-full {
@@ -671,7 +671,7 @@ body {
 }
 
 .report-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1062,7 +1062,7 @@ table,
 }
 
 .installment-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
@@ -1402,7 +1402,7 @@ table,
 }
 
 .category-limit-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1799,7 +1799,7 @@ table,
 }
 
 .expense-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1887,7 +1887,7 @@ table,
 }
 
 .goal-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-xl);
 }
 
@@ -1958,7 +1958,7 @@ table,
 }
 
 .settings-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-xl);
 }
 
@@ -2404,7 +2404,7 @@ table,
 }
 
 .ai-insight-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -2561,7 +2561,7 @@ table,
 
 .ml-prediction-card:hover,
 .pattern-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -3752,7 +3752,7 @@ table,
   .mobile-nav-item.active {
     background: var(--primary-color);
     color: white;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
   
   .mobile-nav-icon {
@@ -6119,7 +6119,7 @@ textarea:focus-visible{
 
 /* Micro-interacción (sutil) */
 .summary-card:hover{
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: color-mix(in oklab, var(--brand-500, #8a78ff), white 12%);
   box-shadow: 0 12px 28px rgba(0,0,0,.24), 0 0 0 1px rgba(138,120,255,.18) inset;
 }
@@ -6342,7 +6342,7 @@ textarea:focus-visible{
   min-height: 160px;
 }
 .summary-card:hover{
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 10px 28px rgba(0,0,0,.22) inset, 0 12px 22px rgba(0,0,0,.22);
   border-color: rgba(137,116,255,.28);
 }
@@ -6762,7 +6762,7 @@ body[data-skin="pro"] .summary-card{
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 body[data-skin="pro"] .summary-card:hover{
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--elevation-6), inset 0 1px 0 rgba(255,255,255,.06);
   border-color: rgba(137,116,255,.28);
 }
@@ -7007,7 +7007,7 @@ body[data-skin="pro"] .chart-container-new{
 }
 
 .calendar-day:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -7059,7 +7059,7 @@ body[data-skin="pro"] .chart-container-new{
 }
 
 .calendar-nav-btn:hover, .view-btn:hover, #add-event-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -7390,7 +7390,7 @@ body[data-skin="pro"] .chart-container-new{
 }
 
 .btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -7730,7 +7730,7 @@ html {
 }
 
 .interactive-element:hover, .clickable:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 

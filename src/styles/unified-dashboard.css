@@ -287,7 +287,7 @@ body[data-skin="pro"] .unified-balance-card .income-item:hover {
 
 .income-action:hover {
   background: #10B981;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
@@ -298,7 +298,7 @@ body[data-skin="pro"] .unified-balance-card .income-item:hover {
 
 .expense-action:hover {
   background: #EF4444;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 

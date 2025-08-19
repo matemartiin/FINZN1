@@ -976,7 +976,7 @@ body[data-skin="pro"] .google-sync-options p {
 }
 
 #google-sync-modal .sync-action-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
