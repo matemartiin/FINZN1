@@ -254,8 +254,10 @@ export class ChartManager {
   }
 
   getCategoryColors(labels, categories) {
+    console.log('🎨 getCategoryColors called with:', { labels, categories: categories?.map(c => ({ name: c.name, color: c.color })) });
+    
     if (!categories) {
-      // Fallback to old method if categories not provided
+      console.log('⚠️ No categories provided, using fallback colors');
       return this.generateColors(labels.length);
     }
     
@@ -263,12 +265,23 @@ export class ChartManager {
     labels.forEach(categoryName => {
       const category = categories.find(cat => cat.name === categoryName);
       if (category) {
+        console.log(`✅ Color for ${categoryName}: ${category.color}`);
         colors.push(category.color);
       } else {
-        // Fallback color if category not found
+        console.log(`❌ Category ${categoryName} not found, using fallback #9ca3af`);
         colors.push('#9ca3af');
       }
     });
+    
+    console.log('🎨 Final colors array:', colors);
+    
+    // Check for duplicates
+    const duplicateColors = colors.filter((color, index) => colors.indexOf(color) !== index);
+    if (duplicateColors.length > 0) {
+      console.error('❌ DUPLICATE COLORS DETECTED IN CHART:', duplicateColors);
+    } else {
+      console.log('✅ All chart colors are unique');
+    }
     
     return colors;
   }

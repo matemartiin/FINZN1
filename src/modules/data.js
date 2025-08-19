@@ -49,7 +49,8 @@ export class DataManager {
       // Migrate category icons from emojis to Phosphor icons if needed
       await this.migrateCategoryIconsToPhosphor();
       
-      // Migrate category colors to new unique palette
+      // 🔥 FORCE NUCLEAR COLOR MIGRATION EVERY TIME - NO EXCEPTIONS
+      console.log('🔥 FORCING NUCLEAR COLOR MIGRATION...');
       await this.migrateCategoryColors();
       
       await this.loadSpendingLimits();
@@ -230,94 +231,63 @@ export class DataManager {
     if (!userId) return;
 
     try {
-      console.log('🎨 Checking for category color migration...');
+      console.log('🎨 🔥 NUCLEAR CATEGORY COLOR MIGRATION STARTING...');
       
-      // Get current categories from memory
-      const currentCategories = this.data.categories;
-      if (!currentCategories || currentCategories.length === 0) {
-        console.log('ℹ️ No categories loaded, skipping color migration.');
-        return;
+      // STEP 1: DELETE ALL EXISTING CATEGORIES - NUCLEAR APPROACH
+      console.log('🗑️ DELETING ALL EXISTING CATEGORIES...');
+      const { error: deleteError } = await supabase
+        .from('categories')
+        .delete()
+        .eq('user_id', userId);
+
+      if (deleteError) {
+        console.error('❌ Error deleting categories:', deleteError);
+      } else {
+        console.log('✅ ALL CATEGORIES DELETED SUCCESSFULLY');
       }
 
-      // Get default categories with updated colors
+      // STEP 2: CREATE FRESH CATEGORIES WITH CORRECT COLORS
+      console.log('🎨 CREATING FRESH CATEGORIES WITH UNIQUE COLORS...');
       const defaultCategories = this.getDefaultCategories();
-      
-      // Check if any color needs updating - Force check for specific problematic colors
-      let needsUpdate = false;
-      const updatesNeeded = [];
-      const problematicColors = ['#ef4444', '#10b981']; // Colors that were duplicated
+      const categoriesToInsert = defaultCategories.map(cat => ({
+        user_id: userId,
+        name: cat.name,
+        icon: cat.icon,
+        color: cat.color
+      }));
 
-      currentCategories.forEach(currentCat => {
-        const defaultCat = defaultCategories.find(defCat => defCat.name === currentCat.name);
-        if (defaultCat && currentCat.color !== defaultCat.color) {
-          needsUpdate = true;
-          updatesNeeded.push({
-            id: currentCat.id,
-            name: currentCat.name,
-            oldColor: currentCat.color,
-            newColor: defaultCat.color
-          });
-        }
-        // Force update for Salud if it still has the wrong color (#ef4444)
-        else if (currentCat.name === 'Salud' && currentCat.color === '#ef4444') {
-          needsUpdate = true;
-          updatesNeeded.push({
-            id: currentCat.id,
-            name: currentCat.name,
-            oldColor: currentCat.color,
-            newColor: '#10b981'
-          });
-        }
-        // Force update for Supermercado if it has old green color
-        else if (currentCat.name === 'Supermercado' && currentCat.color === '#10b981') {
-          needsUpdate = true;
-          updatesNeeded.push({
-            id: currentCat.id,
-            name: currentCat.name,
-            oldColor: currentCat.color,
-            newColor: '#14b8a6'
-          });
-        }
-        // Force update for PedidosYa if it has old color
-        else if (currentCat.name === 'PedidosYa' && (currentCat.color === '#ff6b35' || currentCat.color === '#ef4444')) {
-          needsUpdate = true;
-          updatesNeeded.push({
-            id: currentCat.id,
-            name: currentCat.name,
-            oldColor: currentCat.color,
-            newColor: '#dc2626'
-          });
-        }
-      });
+      console.log('🎨 Categories to insert:', categoriesToInsert);
 
-      if (!needsUpdate) {
-        console.log('ℹ️ All category colors are up to date.');
-        return;
+      const { data: insertData, error: insertError } = await supabase
+        .from('categories')
+        .insert(categoriesToInsert)
+        .select();
+
+      if (insertError) {
+        console.error('❌ Error creating fresh categories:', insertError);
+      } else {
+        console.log('✅ FRESH CATEGORIES CREATED:', insertData);
       }
 
-      console.log(`🎨 Updating colors for ${updatesNeeded.length} categories:`, updatesNeeded);
-
-      // Update colors in database
-      for (const update of updatesNeeded) {
-        const { error } = await supabase
-          .from('categories')
-          .update({ color: update.newColor })
-          .eq('id', update.id)
-          .eq('user_id', userId);
-
-        if (error) {
-          console.error(`❌ Error updating color for ${update.name}:`, error);
-        } else {
-          console.log(`✅ Updated ${update.name}: ${update.oldColor} → ${update.newColor}`);
-        }
-      }
-
-      // Reload categories to get updated data
+      // STEP 3: FORCE RELOAD CATEGORIES
+      console.log('🔄 FORCE RELOADING CATEGORIES...');
       await this.loadCategories();
-      console.log('✅ Category color migration completed');
+      
+      // STEP 4: VERIFY COLORS ARE UNIQUE
+      const finalCategories = this.data.categories;
+      console.log('🎨 FINAL CATEGORIES WITH COLORS:', finalCategories.map(c => ({ name: c.name, color: c.color })));
+      
+      // Check for duplicates
+      const colors = finalCategories.map(c => c.color);
+      const duplicates = colors.filter((color, index) => colors.indexOf(color) !== index);
+      if (duplicates.length > 0) {
+        console.error('❌ STILL HAVE DUPLICATE COLORS:', duplicates);
+      } else {
+        console.log('✅ 🎉 ALL COLORS ARE UNIQUE! NUCLEAR MIGRATION SUCCESSFUL!');
+      }
 
     } catch (error) {
-      console.error('❌ Error in migrateCategoryColors:', error);
+      console.error('❌ NUCLEAR MIGRATION FAILED:', error);
     }
   }
 

@@ -871,16 +871,25 @@ export class UIManager {
   }
 
   getCategoryInfo(categoryName) {
+    console.log('🔍 getCategoryInfo called for:', categoryName);
+    
     if (window.app && window.app.data) {
       const categories = window.app.data.getCategories();
+      console.log('📊 Available categories:', categories.map(c => ({ name: c.name, color: c.color })));
+      
       const category = categories.find(cat => cat.name === categoryName);
       if (category) {
+        console.log('✅ Found category:', { name: category.name, color: category.color });
         return {
           name: category.name,
           icon: category.icon,
           color: category.color
         };
+      } else {
+        console.log('❌ Category not found in database categories');
       }
+    } else {
+      console.log('❌ No app.data available');
     }
     
     const defaultCategories = {
