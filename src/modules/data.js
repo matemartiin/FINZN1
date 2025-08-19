@@ -254,43 +254,71 @@ export class DataManager {
         return;
       }
 
-      console.log('🎨 🔥 MIGRATION NEEDED - Problematic categories found:', problematicCategories.map(c => ({ name: c.name, color: c.color })));
+      console.log('🎨 🔧 SELECTIVE MIGRATION NEEDED - Problematic categories found:', problematicCategories.map(c => ({ name: c.name, color: c.color })));
       
-      // STEP 2: NUCLEAR APPROACH - DELETE AND RECREATE (only if needed)
-      console.log('🗑️ DELETING ALL EXISTING CATEGORIES...');
-      const { error: deleteError } = await supabase
-        .from('categories')
-        .delete()
-        .eq('user_id', userId);
-
-      if (deleteError) {
-        console.error('❌ Error deleting categories:', deleteError);
-        return;
+      // STEP 2: SELECTIVE APPROACH - Only fix problematic default categories
+      console.log('🔧 UPDATING ONLY PROBLEMATIC DEFAULT CATEGORIES...');
+      
+      // Get default category names to preserve user-created categories
+      const defaultCategoryNames = this.getDefaultCategories().map(cat => cat.name);
+      
+      // Separate user-created categories from default categories
+      const userCustomCategories = currentCategories.filter(cat => 
+        !defaultCategoryNames.includes(cat.name)
+      );
+      
+      console.log('👤 User custom categories to preserve:', userCustomCategories.map(c => c.name));
+      
+      // Delete only DEFAULT categories that need fixing
+      if (problematicCategories.length > 0) {
+        for (const cat of problematicCategories) {
+          const { error: deleteError } = await supabase
+            .from('categories')
+            .delete()
+            .eq('user_id', userId)
+            .eq('name', cat.name);
+            
+          if (deleteError) {
+            console.error(`❌ Error deleting category ${cat.name}:`, deleteError);
+          } else {
+            console.log(`🗑️ Deleted problematic category: ${cat.name}`);
+          }
+        }
       }
 
-      console.log('✅ ALL CATEGORIES DELETED SUCCESSFULLY');
-
-      // STEP 3: CREATE FRESH CATEGORIES WITH CORRECT COLORS
-      console.log('🎨 CREATING FRESH CATEGORIES WITH UNIQUE COLORS...');
+      // STEP 3: CREATE FRESH DEFAULT CATEGORIES WITH CORRECT COLORS
+      console.log('🎨 CREATING FRESH DEFAULT CATEGORIES WITH UNIQUE COLORS...');
       const defaultCategories = this.getDefaultCategories();
-      const categoriesToInsert = defaultCategories.map(cat => ({
-        user_id: userId,
-        name: cat.name,
-        icon: cat.icon,
-        color: cat.color
-      }));
+      
+      // Only insert default categories that don't exist or were deleted
+      const existingCategoryNames = currentCategories
+        .filter(cat => !problematicCategories.some(prob => prob.id === cat.id))
+        .map(cat => cat.name);
+      
+      const categoriesToInsert = defaultCategories
+        .filter(cat => !existingCategoryNames.includes(cat.name))
+        .map(cat => ({
+          user_id: userId,
+          name: cat.name,
+          icon: cat.icon,
+          color: cat.color
+        }));
 
-      const { data: insertData, error: insertError } = await supabase
-        .from('categories')
-        .insert(categoriesToInsert)
-        .select();
+      if (categoriesToInsert.length > 0) {
+        const { data: insertData, error: insertError } = await supabase
+          .from('categories')
+          .insert(categoriesToInsert)
+          .select();
 
-      if (insertError) {
-        console.error('❌ Error creating fresh categories:', insertError);
-        return;
+        if (insertError) {
+          console.error('❌ Error creating fresh categories:', insertError);
+          return;
+        }
+
+        console.log('✅ FRESH DEFAULT CATEGORIES CREATED:', categoriesToInsert.map(c => c.name));
+      } else {
+        console.log('ℹ️ No default categories needed to be created');
       }
-
-      console.log('✅ FRESH CATEGORIES CREATED');
 
       // STEP 4: RELOAD AND VERIFY
       await this.loadCategories();
