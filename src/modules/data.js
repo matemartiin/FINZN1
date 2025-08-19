@@ -49,8 +49,7 @@ export class DataManager {
       // Migrate category icons from emojis to Phosphor icons if needed
       await this.migrateCategoryIconsToPhosphor();
       
-      // 🔥 FORCE NUCLEAR COLOR MIGRATION EVERY TIME - NO EXCEPTIONS
-      console.log('🔥 FORCING NUCLEAR COLOR MIGRATION...');
+      // Migrate category colors to new unique palette if needed
       await this.migrateCategoryColors();
       
       await this.loadSpendingLimits();
@@ -231,9 +230,33 @@ export class DataManager {
     if (!userId) return;
 
     try {
-      console.log('🎨 🔥 NUCLEAR CATEGORY COLOR MIGRATION STARTING...');
+      console.log('🎨 Checking for category color migration...');
       
-      // STEP 1: DELETE ALL EXISTING CATEGORIES - NUCLEAR APPROACH
+      // STEP 1: Check if migration is needed
+      const currentCategories = this.data.categories;
+      if (!currentCategories || currentCategories.length === 0) {
+        console.log('ℹ️ No categories loaded, skipping color migration.');
+        return;
+      }
+
+      // Check if colors are already unique
+      const colors = currentCategories.map(c => c.color);
+      const duplicates = colors.filter((color, index) => colors.indexOf(color) !== index);
+      
+      const problematicCategories = [
+        currentCategories.find(c => c.name === 'Salud' && c.color === '#ef4444'),
+        currentCategories.find(c => c.name === 'Supermercado' && c.color === '#10b981'),
+        currentCategories.find(c => c.name === 'PedidosYa' && (c.color === '#ff6b35' || c.color === '#ef4444'))
+      ].filter(Boolean);
+
+      if (duplicates.length === 0 && problematicCategories.length === 0) {
+        console.log('✅ All category colors are already unique and correct!');
+        return;
+      }
+
+      console.log('🎨 🔥 MIGRATION NEEDED - Problematic categories found:', problematicCategories.map(c => ({ name: c.name, color: c.color })));
+      
+      // STEP 2: NUCLEAR APPROACH - DELETE AND RECREATE (only if needed)
       console.log('🗑️ DELETING ALL EXISTING CATEGORIES...');
       const { error: deleteError } = await supabase
         .from('categories')
@@ -242,11 +265,12 @@ export class DataManager {
 
       if (deleteError) {
         console.error('❌ Error deleting categories:', deleteError);
-      } else {
-        console.log('✅ ALL CATEGORIES DELETED SUCCESSFULLY');
+        return;
       }
 
-      // STEP 2: CREATE FRESH CATEGORIES WITH CORRECT COLORS
+      console.log('✅ ALL CATEGORIES DELETED SUCCESSFULLY');
+
+      // STEP 3: CREATE FRESH CATEGORIES WITH CORRECT COLORS
       console.log('🎨 CREATING FRESH CATEGORIES WITH UNIQUE COLORS...');
       const defaultCategories = this.getDefaultCategories();
       const categoriesToInsert = defaultCategories.map(cat => ({
@@ -256,8 +280,6 @@ export class DataManager {
         color: cat.color
       }));
 
-      console.log('🎨 Categories to insert:', categoriesToInsert);
-
       const { data: insertData, error: insertError } = await supabase
         .from('categories')
         .insert(categoriesToInsert)
@@ -265,29 +287,24 @@ export class DataManager {
 
       if (insertError) {
         console.error('❌ Error creating fresh categories:', insertError);
-      } else {
-        console.log('✅ FRESH CATEGORIES CREATED:', insertData);
+        return;
       }
 
-      // STEP 3: FORCE RELOAD CATEGORIES
-      console.log('🔄 FORCE RELOADING CATEGORIES...');
+      console.log('✅ FRESH CATEGORIES CREATED');
+
+      // STEP 4: RELOAD AND VERIFY
       await this.loadCategories();
+      const finalColors = this.data.categories.map(c => c.color);
+      const finalDuplicates = finalColors.filter((color, index) => finalColors.indexOf(color) !== index);
       
-      // STEP 4: VERIFY COLORS ARE UNIQUE
-      const finalCategories = this.data.categories;
-      console.log('🎨 FINAL CATEGORIES WITH COLORS:', finalCategories.map(c => ({ name: c.name, color: c.color })));
-      
-      // Check for duplicates
-      const colors = finalCategories.map(c => c.color);
-      const duplicates = colors.filter((color, index) => colors.indexOf(color) !== index);
-      if (duplicates.length > 0) {
-        console.error('❌ STILL HAVE DUPLICATE COLORS:', duplicates);
+      if (finalDuplicates.length === 0) {
+        console.log('✅ 🎉 MIGRATION SUCCESSFUL! All colors are now unique and will remain stable.');
       } else {
-        console.log('✅ 🎉 ALL COLORS ARE UNIQUE! NUCLEAR MIGRATION SUCCESSFUL!');
+        console.error('❌ Migration failed - still have duplicates:', finalDuplicates);
       }
 
     } catch (error) {
-      console.error('❌ NUCLEAR MIGRATION FAILED:', error);
+      console.error('❌ Color migration failed:', error);
     }
   }
 
