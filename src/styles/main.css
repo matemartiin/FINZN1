@@ -395,7 +395,7 @@ body {
 
 .theme-toggle:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .logout-btn {
@@ -2935,13 +2935,13 @@ table,
 }
 
 .chat-toggle:hover {
-  transform: scale(1.02) translateY(-1px);
+  transform: scale(1.01) translateY(-0.5px);
   box-shadow: 0 12px 48px rgba(139, 92, 246, 0.5);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
 .chat-toggle:active {
-  transform: scale(1.05) translateY(0px);
+  transform: scale(1.01) translateY(0px);
   box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
 }
 
@@ -7561,6 +7561,14 @@ body[data-skin="pro"] .chart-container-new{
   
   .modal .modal-content {
     animation-duration: 0.3s;
+  }
+  
+  /* Chat toggle - sin movimiento hacia arriba en mobile */
+  .chat-toggle:hover,
+  .chat-toggle:active {
+    transform: none !important;
+    /* Solo cambio de opacidad para feedback visual */
+    opacity: 0.8;
   }
 }
 

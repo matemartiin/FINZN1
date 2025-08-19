@@ -109,14 +109,14 @@
 }
 
 .new-balance-icon:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
   box-shadow: 
     0 6px 18px rgba(200, 182, 255, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .new-balance-icon:hover i {
-  transform: scale(1.05);
+  transform: scale(1.02);
   filter: drop-shadow(0 0 4px rgba(200, 182, 255, 0.2));
 }
 
