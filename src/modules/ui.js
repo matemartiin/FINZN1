@@ -370,12 +370,12 @@ export class UIManager {
     });
     
     // Add fixed income
-    if (income && income.amount > 0) {
+    if (income && income.fixed > 0) {
       allTransactions.push({
         type: 'income',
         id: 'fixed-income',
-        description: income.description || 'Salario fijo',
-        amount: income.amount,
+        description: 'Salario fijo',
+        amount: income.fixed,
         date: new Date(),
         category: 'income'
       });

@@ -382,12 +382,24 @@ export class InputValidator {
     const errors = [];
     const sanitizedData = {};
 
-    // Validate description
-    const descResult = this.validateDescription(formData.description);
-    if (!descResult.isValid) {
-      errors.push(descResult.error);
+    // Validate type first
+    if (!formData.type || !['fixed', 'extra'].includes(formData.type)) {
+      errors.push('Tipo de ingreso inválido');
     } else {
-      sanitizedData.description = descResult.value;
+      sanitizedData.type = formData.type;
+    }
+
+    // Validate description only for extra income
+    if (formData.type === 'extra') {
+      const descResult = this.validateDescription(formData.description);
+      if (!descResult.isValid) {
+        errors.push(descResult.error);
+      } else {
+        sanitizedData.description = descResult.value;
+      }
+    } else if (formData.type === 'fixed') {
+      // For fixed income, description is optional/not needed
+      sanitizedData.description = 'Ingreso Fijo';
     }
 
     // Validate amount
@@ -396,13 +408,6 @@ export class InputValidator {
       errors.push(amountResult.error);
     } else {
       sanitizedData.amount = amountResult.value;
-    }
-
-    // Validate type
-    if (!formData.type || !['fixed', 'extra'].includes(formData.type)) {
-      errors.push('Tipo de ingreso inválido');
-    } else {
-      sanitizedData.type = formData.type;
     }
 
     // Validate date if present
