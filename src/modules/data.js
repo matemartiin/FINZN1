@@ -49,6 +49,9 @@ export class DataManager {
       // Migrate category icons from emojis to Phosphor icons if needed
       await this.migrateCategoryIconsToPhosphor();
       
+      // Migrate category colors to new unique palette
+      await this.migrateCategoryColors();
+      
       await this.loadSpendingLimits();
       await this.loadGoals();
       await this.loadAchievements();
@@ -219,6 +222,71 @@ export class DataManager {
 
     } catch (error) {
       console.error('Error in migrateCategoryIconsToPhosphor:', error);
+    }
+  }
+
+  async migrateCategoryColors() {
+    const userId = this.getCurrentUserId();
+    if (!userId) return;
+
+    try {
+      console.log('🎨 Checking for category color migration...');
+      
+      // Get current categories from memory
+      const currentCategories = this.data.categories;
+      if (!currentCategories || currentCategories.length === 0) {
+        console.log('ℹ️ No categories loaded, skipping color migration.');
+        return;
+      }
+
+      // Get default categories with updated colors
+      const defaultCategories = this.getDefaultCategories();
+      
+      // Check if any color needs updating
+      let needsUpdate = false;
+      const updatesNeeded = [];
+
+      currentCategories.forEach(currentCat => {
+        const defaultCat = defaultCategories.find(defCat => defCat.name === currentCat.name);
+        if (defaultCat && currentCat.color !== defaultCat.color) {
+          needsUpdate = true;
+          updatesNeeded.push({
+            id: currentCat.id,
+            name: currentCat.name,
+            oldColor: currentCat.color,
+            newColor: defaultCat.color
+          });
+        }
+      });
+
+      if (!needsUpdate) {
+        console.log('ℹ️ All category colors are up to date.');
+        return;
+      }
+
+      console.log(`🎨 Updating colors for ${updatesNeeded.length} categories:`, updatesNeeded);
+
+      // Update colors in database
+      for (const update of updatesNeeded) {
+        const { error } = await supabase
+          .from('categories')
+          .update({ color: update.newColor })
+          .eq('id', update.id)
+          .eq('user_id', userId);
+
+        if (error) {
+          console.error(`❌ Error updating color for ${update.name}:`, error);
+        } else {
+          console.log(`✅ Updated ${update.name}: ${update.oldColor} → ${update.newColor}`);
+        }
+      }
+
+      // Reload categories to get updated data
+      await this.loadCategories();
+      console.log('✅ Category color migration completed');
+
+    } catch (error) {
+      console.error('❌ Error in migrateCategoryColors:', error);
     }
   }
 
