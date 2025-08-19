@@ -1,0 +1,267 @@
+/* ============================================================================
+   UNIFIED SMOOTH ANIMATION SYSTEM - FINZN
+   ============================================================================
+   
+   This file creates a unified, smooth animation system that overrides
+   all existing hover animations and creates consistent, gentle interactions.
+*/
+
+/* ============================================================================
+   BASE ANIMATION VARIABLES
+   ============================================================================ */
+:root {
+  /* Smooth Animation Timing */
+  --smooth-fast: 200ms;
+  --smooth-normal: 350ms;
+  --smooth-slow: 500ms;
+  
+  /* Gentle Easing Curves */
+  --ease-gentle: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-natural: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  /* Subtle Transform Values */
+  --lift-subtle: translateY(-1px);
+  --lift-gentle: translateY(-2px);
+  --lift-normal: translateY(-3px);
+  --scale-subtle: scale(1.005);
+  --scale-gentle: scale(1.01);
+  --scale-normal: scale(1.015);
+  
+  /* Smooth Shadow Levels */
+  --shadow-rest: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-active: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================================================
+   UNIFIED CARD HOVER SYSTEM
+   ============================================================================ */
+
+/* Reset all existing aggressive hovers */
+.card:hover,
+.dashboard-card:hover,
+.metric-card:hover,
+.summary-card:hover,
+.report-card:hover,
+.settings-card:hover,
+.ai-insight-card:hover,
+.ml-prediction-card:hover,
+.pattern-card:hover,
+.chart-card:hover,
+.chart-card-new:hover,
+.expense-card:hover,
+.goal-card:hover,
+.budget-card:hover,
+.new-unified-card:hover {
+  /* Override existing aggressive transforms */
+  transform: var(--lift-gentle) var(--scale-subtle) !important;
+  box-shadow: var(--shadow-hover) !important;
+  
+  /* Smooth, consistent transition */
+  transition: 
+    transform var(--smooth-normal) var(--ease-gentle),
+    box-shadow var(--smooth-normal) var(--ease-gentle),
+    filter var(--smooth-normal) var(--ease-gentle),
+    border-color var(--smooth-normal) var(--ease-gentle) !important;
+    
+  /* Subtle brightness boost */
+  filter: brightness(1.02);
+}
+
+/* Special handling for unified card */
+.new-unified-card:hover {
+  transform: var(--lift-subtle) var(--scale-subtle) !important;
+}
+
+/* ============================================================================
+   BUTTON HOVER SMOOTHNESS
+   ============================================================================ */
+
+/* Smooth button interactions */
+.btn:hover,
+button:hover,
+.btn-primary:hover,
+.btn-secondary:hover,
+.tab-btn:hover {
+  transform: var(--lift-subtle) !important;
+  transition: 
+    transform var(--smooth-fast) var(--ease-smooth),
+    box-shadow var(--smooth-fast) var(--ease-smooth),
+    background-color var(--smooth-fast) var(--ease-smooth) !important;
+}
+
+/* Navigation items */
+.nav-item:hover,
+.sidebar-item:hover {
+  transform: var(--lift-subtle) !important;
+  transition: 
+    transform var(--smooth-normal) var(--ease-gentle),
+    background-color var(--smooth-normal) var(--ease-gentle) !important;
+}
+
+/* ============================================================================
+   INPUT FOCUS SMOOTHNESS
+   ============================================================================ */
+
+input:focus,
+select:focus,
+textarea:focus {
+  transform: var(--scale-gentle) !important;
+  box-shadow: 
+    0 0 0 3px rgba(200, 182, 255, 0.2),
+    var(--shadow-hover) !important;
+  transition: 
+    transform var(--smooth-normal) var(--ease-gentle),
+    box-shadow var(--smooth-normal) var(--ease-gentle),
+    border-color var(--smooth-normal) var(--ease-gentle) !important;
+}
+
+/* ============================================================================
+   TRANSACTION ITEMS SMOOTHNESS
+   ============================================================================ */
+
+.transaction-item:hover,
+.expense-item:hover,
+.income-item:hover,
+.recent-transaction-item:hover,
+.goal-item:hover,
+.budget-item:hover {
+  transform: var(--lift-subtle) var(--scale-subtle) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  transition: 
+    transform var(--smooth-normal) var(--ease-gentle),
+    background-color var(--smooth-normal) var(--ease-gentle) !important;
+}
+
+/* ============================================================================
+   MODAL AND OVERLAY SMOOTHNESS
+   ============================================================================ */
+
+.modal:hover {
+  transform: none !important; /* Modals shouldn't have hover effects */
+}
+
+.modal-content:hover {
+  transform: none !important;
+}
+
+/* ============================================================================
+   CHART AND DATA VISUALIZATION SMOOTHNESS
+   ============================================================================ */
+
+.chart-container:hover {
+  transform: var(--scale-subtle) !important;
+  transition: 
+    transform var(--smooth-slow) var(--ease-natural) !important;
+}
+
+/* ============================================================================
+   ACCESSIBILITY AND REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all transforms for accessibility */
+  .card:hover,
+  .dashboard-card:hover,
+  .metric-card:hover,
+  .summary-card:hover,
+  .report-card:hover,
+  .settings-card:hover,
+  .ai-insight-card:hover,
+  .ml-prediction-card:hover,
+  .pattern-card:hover,
+  .chart-card:hover,
+  .chart-card-new:hover,
+  .expense-card:hover,
+  .goal-card:hover,
+  .budget-card:hover,
+  .new-unified-card:hover,
+  .btn:hover,
+  button:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .tab-btn:hover,
+  .nav-item:hover,
+  .sidebar-item:hover,
+  input:focus,
+  select:focus,
+  textarea:focus,
+  .transaction-item:hover,
+  .expense-item:hover,
+  .income-item:hover,
+  .recent-transaction-item:hover,
+  .goal-item:hover,
+  .budget-item:hover,
+  .chart-container:hover {
+    transform: none !important;
+    transition: 
+      box-shadow var(--smooth-fast) var(--ease-smooth),
+      background-color var(--smooth-fast) var(--ease-smooth),
+      border-color var(--smooth-fast) var(--ease-smooth) !important;
+  }
+}
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================================ */
+
+/* Prepare elements for smooth animations */
+.card,
+.dashboard-card,
+.metric-card,
+.summary-card,
+.report-card,
+.settings-card,
+.ai-insight-card,
+.ml-prediction-card,
+.pattern-card,
+.chart-card,
+.chart-card-new,
+.expense-card,
+.goal-card,
+.budget-card,
+.new-unified-card,
+.btn,
+button,
+.nav-item,
+.sidebar-item,
+.transaction-item,
+.expense-item,
+.income-item,
+.recent-transaction-item,
+.goal-item,
+.budget-item {
+  /* Optimize for animations */
+  backface-visibility: hidden;
+  perspective: 1000px;
+  
+  /* Default smooth transitions */
+  transition: 
+    transform var(--smooth-normal) var(--ease-gentle),
+    box-shadow var(--smooth-normal) var(--ease-gentle),
+    filter var(--smooth-normal) var(--ease-gentle),
+    background-color var(--smooth-normal) var(--ease-gentle),
+    border-color var(--smooth-normal) var(--ease-gentle);
+}
+
+/* Clean default state */
+.card,
+.dashboard-card,
+.metric-card,
+.summary-card,
+.report-card,
+.settings-card,
+.ai-insight-card,
+.ml-prediction-card,
+.pattern-card,
+.chart-card,
+.chart-card-new,
+.expense-card,
+.goal-card,
+.budget-card,
+.new-unified-card {
+  transform: translateY(0) scale(1);
+  box-shadow: var(--shadow-rest);
+  filter: brightness(1);
+}

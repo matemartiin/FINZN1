@@ -97,44 +97,39 @@ export class AnimationManager {
     this.animateNumbers();
   }
 
-  // Enhanced dashboard cards animation with smooth entrance
+  // Simplified smooth dashboard cards animation
   animateDashboardCards() {
     const cards = document.querySelectorAll('.card, .dashboard-card, .metric-card, .summary-card, .new-unified-card');
     
     cards.forEach((card, index) => {
       if (this.animatedElements.has(card)) return;
       
-      // Enhanced card entrance animation
-      card.style.willChange = 'transform, opacity, filter';
+      // Gentle card entrance
+      card.style.willChange = 'transform, opacity';
       card.style.opacity = '0';
-      card.style.transform = 'translateY(40px) scale(0.9) rotateX(10deg)';
-      card.style.filter = 'blur(8px)';
-      card.style.transformOrigin = 'center bottom';
+      card.style.transform = 'translateY(20px)';
       
-      const delay = index * 120; // Staggered timing
+      const delay = index * 80; // Faster, smoother stagger
       
       setTimeout(() => {
         card.style.transition = `
-          opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-          transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-          filter 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+          opacity 500ms cubic-bezier(0.25, 0.1, 0.25, 1),
+          transform 500ms cubic-bezier(0.25, 0.1, 0.25, 1)
         `.replace(/\s+/g, ' ').trim();
         
         card.style.opacity = '1';
-        card.style.transform = 'translateY(0) scale(1) rotateX(0deg)';
-        card.style.filter = 'blur(0px)';
+        card.style.transform = 'translateY(0)';
         
         // Clean up after animation
         card.addEventListener('transitionend', () => {
           card.style.willChange = 'auto';
-          card.style.transformOrigin = '';
         }, { once: true });
       }, delay);
       
       card.classList.add('animated');
       this.animatedElements.add(card);
       
-      // Add enhanced hover animations
+      // Add performance optimizations only
       this.addHoverEffects(card);
     });
   }
@@ -249,48 +244,23 @@ export class AnimationManager {
     this.animatedElements.add(element);
   }
 
-  // Add smooth hover effects to elements
+  // Simplified hover effects (CSS handles the animation)
   addHoverEffects(element) {
     if (this.prefersReducedMotion) return;
     
-    // Enhanced transition for smooth hover
-    element.style.transition = 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 300ms ease-out';
-    element.style.willChange = 'transform';
+    // Just ensure the element is optimized for animations
+    element.style.backfaceVisibility = 'hidden';
+    element.style.perspective = '1000px';
     
-    element.addEventListener('mouseenter', () => {
-      element.style.transform = 'translateY(-3px) scale(1.01)';
-      element.style.filter = 'brightness(1.05)';
-    });
-
-    element.addEventListener('mouseleave', () => {
-      element.style.transform = 'translateY(0) scale(1)';
-      element.style.filter = 'brightness(1)';
-    });
-    
-    // Clean up will-change after animation
-    element.addEventListener('transitionend', () => {
-      element.style.willChange = 'auto';
-    }, { once: false });
+    // CSS will handle the actual hover animations
   }
 
-  // Add smooth input focus animations
+  // Simplified input animations (CSS handles focus states)
   addInputAnimations(input) {
-    // Smooth transitions for input states
-    input.style.transition = `
-      transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 250ms cubic-bezier(0.4, 0, 0.2, 1)
-    `.replace(/\s+/g, ' ').trim();
+    // Just ensure the input is optimized for animations
+    input.style.backfaceVisibility = 'hidden';
     
-    input.addEventListener('focus', () => {
-      input.style.transform = 'scale(1.015)';
-      input.style.boxShadow = '0 0 0 3px rgba(200, 182, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1)';
-    });
-
-    input.addEventListener('blur', () => {
-      input.style.transform = 'scale(1)';
-      input.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-    });
+    // CSS will handle the actual focus animations
   }
 
   // Count up animation for numbers with enhanced formatting
@@ -603,46 +573,21 @@ export class AnimationManager {
     });
   }
 
-  // Enhanced card hover animations with smooth transitions
+  // Unified smooth hover system (works with CSS)
   enhanceCardHovers() {
+    // Let CSS handle hover animations for consistency
+    // JavaScript only adds performance optimizations
     const cards = document.querySelectorAll('.expense-card, .goal-card, .budget-card, .card, .dashboard-card, .new-unified-card');
     
     cards.forEach(card => {
       if (this.activeAnimations.has(card)) return;
       
-      // Smooth, professional hover transitions
-      card.style.transition = `
-        transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        box-shadow 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        filter 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
-      `.replace(/\s+/g, ' ').trim();
+      // Ensure cards are optimized for smooth animations
+      card.style.backfaceVisibility = 'hidden';
+      card.style.perspective = '1000px';
       
-      // Initial state optimization
-      card.style.willChange = 'transform, box-shadow, filter';
-      
-      const handleMouseEnter = () => {
-        if (!this.prefersReducedMotion) {
-          card.style.transform = 'translateY(-4px) scale(1.02)';
-          card.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)';
-          card.style.filter = 'brightness(1.05)';
-        }
-      };
-      
-      const handleMouseLeave = () => {
-        card.style.transform = 'translateY(0) scale(1)';
-        card.style.boxShadow = 'var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.1))';
-        card.style.filter = 'brightness(1)';
-      };
-      
-      card.addEventListener('mouseenter', handleMouseEnter);
-      card.addEventListener('mouseleave', handleMouseLeave);
-      
-      // Clean up will-change after animation
-      card.addEventListener('transitionend', () => {
-        card.style.willChange = 'auto';
-      }, { once: false });
-      
-      this.activeAnimations.set(card, { handleMouseEnter, handleMouseLeave });
+      // Mark as processed
+      this.activeAnimations.set(card, { processed: true });
     });
   }
 
@@ -711,7 +656,7 @@ export class AnimationManager {
     return Promise.all(animations);
   }
 
-  // Enhanced data entry animation with smooth transitions
+  // Simplified smooth data entry animation
   animateDataEntry(element, newValue, options = {}) {
     return new Promise(resolve => {
       if (!element || this.prefersReducedMotion) {
@@ -724,32 +669,29 @@ export class AnimationManager {
 
       const { type = 'default', duration = 1000, delay = 0 } = options;
       
-      // Enhanced entrance animation with performance optimization
+      // Gentle entrance animation
       element.style.willChange = 'transform, opacity';
       element.style.opacity = '0';
-      element.style.transform = 'translateY(30px) scale(0.95)';
-      element.style.filter = 'blur(4px)';
+      element.style.transform = 'translateY(15px)';
       element.style.transition = `
-        opacity 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        transform 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        filter 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+        opacity 400ms cubic-bezier(0.25, 0.1, 0.25, 1),
+        transform 400ms cubic-bezier(0.25, 0.1, 0.25, 1)
       `.replace(/\s+/g, ' ').trim();
       
       setTimeout(() => {
         element.style.opacity = '1';
-        element.style.transform = 'translateY(0) scale(1)';
-        element.style.filter = 'blur(0px)';
+        element.style.transform = 'translateY(0)';
         
-        // Clean up will-change after initial animation
+        // Clean up will-change after animation
         element.addEventListener('transitionend', () => {
           element.style.willChange = 'auto';
         }, { once: true });
         
-        // Start count-up animation with slight overlap for smoothness
+        // Start count-up with gentle timing
         setTimeout(() => {
           this.animateCountUp(element, 0, newValue, duration, options);
           setTimeout(resolve, duration + 100);
-        }, 250); // Reduced delay for better flow
+        }, 200);
       }, delay);
     });
   }
@@ -921,7 +863,7 @@ export class AnimationManager {
     this.animateTransactionsInSection(activeSection);
   }
 
-  // Enhanced chart entrance animations
+  // Simplified smooth chart entrance
   animateChartsInSection(section) {
     if (!section || this.prefersReducedMotion) return;
 
@@ -929,41 +871,25 @@ export class AnimationManager {
     chartContainers.forEach((container, index) => {
       if (this.animatedElements.has(container)) return;
       
-      // Premium chart entrance animation
-      container.style.willChange = 'transform, opacity, filter';
+      // Gentle chart entrance
+      container.style.willChange = 'transform, opacity';
       container.style.opacity = '0';
-      container.style.transform = 'scale(0.8) translateY(60px)';
-      container.style.filter = 'blur(10px) brightness(0.8)';
-      container.style.transformOrigin = 'center center';
+      container.style.transform = 'scale(0.95) translateY(30px)';
       
-      const delay = index * 200 + 400; // Staggered after data animations
+      const delay = index * 150 + 300; // Smoother timing
       
       setTimeout(() => {
         container.style.transition = `
-          opacity 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-          transform 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-          filter 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+          opacity 600ms cubic-bezier(0.25, 0.1, 0.25, 1),
+          transform 600ms cubic-bezier(0.25, 0.1, 0.25, 1)
         `.replace(/\s+/g, ' ').trim();
         
         container.style.opacity = '1';
         container.style.transform = 'scale(1) translateY(0)';
-        container.style.filter = 'blur(0px) brightness(1)';
         
-        // Add subtle bounce effect on completion
+        // Clean up
         container.addEventListener('transitionend', () => {
           container.style.willChange = 'auto';
-          container.style.transformOrigin = '';
-          
-          // Subtle completion bounce
-          container.style.transition = 'transform 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-          container.style.transform = 'scale(1.02)';
-          
-          setTimeout(() => {
-            container.style.transform = 'scale(1)';
-            setTimeout(() => {
-              container.style.transition = '';
-            }, 300);
-          }, 150);
         }, { once: true });
       }, delay);
       
@@ -971,7 +897,7 @@ export class AnimationManager {
     });
   }
 
-  // Enhanced transaction list animations
+  // Simplified smooth transaction animations
   animateTransactionsInSection(section) {
     if (!section || this.prefersReducedMotion) return;
 
@@ -982,26 +908,23 @@ export class AnimationManager {
       transactions.forEach((transaction, index) => {
         if (this.animatedElements.has(transaction)) return;
         
-        // Smooth slide-in animation from left
+        // Gentle slide-in from left
         transaction.style.willChange = 'transform, opacity';
         transaction.style.opacity = '0';
-        transaction.style.transform = 'translateX(-50px) scale(0.95)';
-        transaction.style.filter = 'blur(2px)';
+        transaction.style.transform = 'translateX(-20px)';
         
-        const delay = index * 100 + 600; // After charts start appearing
+        const delay = index * 60 + 500; // Smooth, faster timing
         
         setTimeout(() => {
           transaction.style.transition = `
-            opacity 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-            transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-            filter 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+            opacity 400ms cubic-bezier(0.25, 0.1, 0.25, 1),
+            transform 400ms cubic-bezier(0.25, 0.1, 0.25, 1)
           `.replace(/\s+/g, ' ').trim();
           
           transaction.style.opacity = '1';
-          transaction.style.transform = 'translateX(0) scale(1)';
-          transaction.style.filter = 'blur(0px)';
+          transaction.style.transform = 'translateX(0)';
           
-          // Clean up after animation
+          // Clean up
           transaction.addEventListener('transitionend', () => {
             transaction.style.willChange = 'auto';
           }, { once: true });
