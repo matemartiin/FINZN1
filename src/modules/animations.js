@@ -614,31 +614,56 @@ export class AnimationManager {
 
   // Re-animate elements (useful for dynamic content updates)
   refreshAnimations() {
-    if (this.prefersReducedMotion) return;
+    if (this.prefersReducedMotion || this.isTransitioning) return;
 
-    // Re-enhance card hovers for newly added elements
-    this.enhanceCardHovers();
-    
-    // Animate any new list items
-    const containers = document.querySelectorAll('.expenses-list, .goals-list, .budgets-list');
-    containers.forEach(container => {
-      const newItems = container.querySelectorAll('[data-new="true"]');
-      newItems.forEach(item => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(20px)';
-        item.style.transition = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
-        
-        requestAnimationFrame(() => {
-          item.style.opacity = '1';
-          item.style.transform = 'translateY(0)';
-          item.removeAttribute('data-new');
+    // Wait a bit to ensure section transitions are complete
+    setTimeout(() => {
+      if (this.isTransitioning) return; // Double check
+
+      // Re-enhance card hovers for newly added elements
+      this.enhanceCardHovers();
+      
+      // Animate any new list items ONLY in the active section
+      const activeSection = document.querySelector('.dashboard-section.active');
+      if (!activeSection) return;
+
+      const containers = activeSection.querySelectorAll('.expenses-list, .goals-list, .budgets-list');
+      containers.forEach(container => {
+        const newItems = container.querySelectorAll('[data-new="true"]');
+        newItems.forEach(item => {
+          // Only animate if parent section is active and visible
+          if (!item.closest('.dashboard-section.active')) return;
+          
+          item.style.opacity = '0';
+          item.style.transform = 'translateY(20px)';
+          item.style.transition = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+          
+          requestAnimationFrame(() => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+            item.removeAttribute('data-new');
+          });
         });
       });
+      
+      // Re-run initial animations ONLY for active section
+      this.animateActiveSection();
+    }, 350); // Wait for section transition to complete
+  }
+
+  // Animate only the currently active section
+  animateActiveSection() {
+    const activeSection = document.querySelector('.dashboard-section.active');
+    if (!activeSection) return;
+
+    // Clear and re-animate elements only in active section
+    const elementsInActiveSection = activeSection.querySelectorAll('.card, .dashboard-card, .metric-card, .summary-card');
+    elementsInActiveSection.forEach(element => {
+      this.animatedElements.delete(element); // Remove from set to re-animate
     });
-    
-    // Re-run initial animations for any missed elements
-    this.animatedElements.clear();
-    this.animateInitialElements();
+
+    // Re-run animations for active section only
+    this.animateDashboardCards();
   }
 
   // Cleanup method

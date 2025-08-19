@@ -26,11 +26,59 @@
   will-change: transform, opacity;
   transform: translateX(20px);
   
-  /* Smooth transitions */
+  /* Smooth transitions - ONLY for the section itself */
   transition: 
     opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
     transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
     visibility 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* CRITICAL: Prevent transition inheritance to child elements */
+.dashboard-section * {
+  transition: none !important;
+  will-change: auto !important;
+}
+
+/* IMPORTANT: Re-enable specific transitions for interactive elements */
+.dashboard-section .btn,
+.dashboard-section .card,
+.dashboard-section .nav-item,
+.dashboard-section input,
+.dashboard-section select,
+.dashboard-section textarea,
+.dashboard-section .metric-card,
+.dashboard-section .summary-card,
+.dashboard-section .chart-container,
+.dashboard-section .expense-card,
+.dashboard-section .goal-card,
+.dashboard-section .budget-card {
+  transition: all 0.2s ease !important;
+  will-change: auto !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Re-enable hover effects */
+.dashboard-section .btn:hover,
+.dashboard-section .card:hover {
+  transition: all 0.2s ease !important;
+}
+
+/* Ensure text and numbers are never animated during section transitions */
+.dashboard-section .new-balance-amount,
+.dashboard-section .new-item-amount,
+.dashboard-section .metric-number,
+.dashboard-section .balance-amount,
+.dashboard-section .total-amount,
+.dashboard-section h1,
+.dashboard-section h2,
+.dashboard-section h3,
+.dashboard-section p,
+.dashboard-section span {
+  transition: none !important;
+  will-change: auto !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* Active section state */
