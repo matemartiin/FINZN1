@@ -402,7 +402,7 @@ export class AnimationManager {
     });
   }
 
-  // Main page transition animation
+  // Main page transition animation - SIMPLIFIED to work with CSS
   async animatePageTransition(fromSection, toSection) {
     if (this.isTransitioning) {
       return;
@@ -417,102 +417,25 @@ export class AnimationManager {
         return;
       }
 
-      // Prepare sections for animation
-      this.prepareSectionForAnimation(fromSection, toSection);
+      // Simple transition - let CSS handle the animations
+      if (fromSection) {
+        fromSection.classList.remove('active');
+      }
       
-      // Animate out current section and in new section
-      await Promise.all([
-        this.animateOut(fromSection),
-        this.animateIn(toSection)
-      ]);
-
-      // Cleanup
-      this.cleanupSectionAnimation(fromSection, toSection);
+      if (toSection) {
+        toSection.classList.add('active');
+      }
+      
+      // Wait for CSS transition to complete
+      await new Promise(resolve => setTimeout(resolve, 300));
       
     } finally {
       this.isTransitioning = false;
     }
   }
 
-  prepareSectionForAnimation(fromSection, toSection) {
-    if (!fromSection || !toSection) return;
-
-    // Prepare outgoing section
-    fromSection.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      opacity: 1;
-      transform: translateX(0);
-      will-change: transform, opacity;
-      z-index: 1;
-    `;
-
-    // Prepare incoming section
-    toSection.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      opacity: 0;
-      transform: translateX(20px);
-      will-change: transform, opacity;
-      z-index: 2;
-    `;
-    
-    // Make incoming section active and visible
-    toSection.classList.add('active');
-  }
-
-  async animateOut(section) {
-    if (!section) return Promise.resolve();
-
-    return new Promise(resolve => {
-      const duration = this.prefersReducedMotion ? 0 : 200;
-      
-      section.style.transition = `all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-      section.style.opacity = '0';
-      section.style.transform = 'translateX(-20px)';
-      
-      setTimeout(() => {
-        section.classList.remove('active');
-        resolve();
-      }, duration);
-    });
-  }
-
-  async animateIn(section) {
-    if (!section) return Promise.resolve();
-
-    return new Promise(resolve => {
-      const duration = this.prefersReducedMotion ? 0 : 300;
-      
-      // Small delay to ensure smooth transition
-      requestAnimationFrame(() => {
-        section.style.transition = `all ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-        section.style.opacity = '1';
-        section.style.transform = 'translateX(0)';
-        
-        setTimeout(resolve, duration);
-      });
-    });
-  }
-
-  cleanupSectionAnimation(fromSection, toSection) {
-    // Reset styles for both sections
-    [fromSection, toSection].forEach(section => {
-      if (section) {
-        section.style.cssText = '';
-        section.style.position = '';
-        section.style.opacity = '';
-        section.style.transform = '';
-        section.style.transition = '';
-        section.style.willChange = '';
-        section.style.zIndex = '';
-      }
-    });
-  }
+  // Unused methods - removed for cleaner code
+  // All transition logic is now handled by CSS in transitions.css
 
   instantTransition(fromSection, toSection) {
     if (fromSection) {
