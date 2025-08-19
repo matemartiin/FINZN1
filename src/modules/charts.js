@@ -270,10 +270,10 @@ export class ChartManager {
 
   generateColors(count) {
     const colors = [
-      '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#84cc16', 
-      '#6366f1', '#ec4899', '#8b5cf6', '#06b6d4', '#22c55e',
-      '#f97316', '#ff6b35', '#9ca3af', '#14b8a6', '#f43f5e',
-      '#7c3aed', '#0ea5e9', '#eab308', '#16a34a', '#dc2626'
+      '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#14b8a6', 
+      '#6366f1', '#ec4899', '#8b5cf6', '#06b6d4', '#84cc16',
+      '#f97316', '#dc2626', '#9ca3af', '#f43f5e', '#7c3aed',
+      '#0ea5e9', '#eab308', '#16a34a', '#db2777', '#059669'
     ];
     
     const result = [];

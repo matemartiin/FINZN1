@@ -22,14 +22,14 @@ export class DataManager {
       { id: '2', name: 'Transporte', icon: '<i class="ph ph-car"></i>', color: '#3b82f6' },
       { id: '3', name: 'Salud', icon: '<i class="ph ph-heart-straight"></i>', color: '#10b981' },
       { id: '4', name: 'Ocio', icon: '<i class="ph ph-game-controller"></i>', color: '#f59e0b' },
-      { id: '5', name: 'Supermercado', icon: '<i class="ph ph-shopping-cart"></i>', color: '#84cc16' },
+      { id: '5', name: 'Supermercado', icon: '<i class="ph ph-shopping-cart"></i>', color: '#14b8a6' },
       { id: '6', name: 'Servicios', icon: '<i class="ph ph-house"></i>', color: '#6366f1' },
       { id: '7', name: 'Ropa', icon: '<i class="ph ph-t-shirt"></i>', color: '#ec4899' },
       { id: '8', name: 'Educación', icon: '<i class="ph ph-book"></i>', color: '#8b5cf6' },
       { id: '9', name: 'Tecnología', icon: '<i class="ph ph-laptop"></i>', color: '#06b6d4' },
-      { id: '10', name: 'Deportes', icon: '<i class="ph ph-soccer-ball"></i>', color: '#22c55e' },
+      { id: '10', name: 'Deportes', icon: '<i class="ph ph-soccer-ball"></i>', color: '#84cc16' },
       { id: '11', name: 'Viajes', icon: '<i class="ph ph-airplane"></i>', color: '#f97316' },
-      { id: '12', name: 'PedidosYa', icon: '<img src="/assets/svg/pedidosya-logo.svg" alt="PedidosYa" width="20" height="20" style="display: inline-block;">', color: '#ff6b35' },
+      { id: '12', name: 'PedidosYa', icon: '<img src="/assets/svg/pedidosya-logo.svg" alt="PedidosYa" width="20" height="20" style="display: inline-block;">', color: '#dc2626' },
       { id: '13', name: 'Otros', icon: '<i class="ph ph-dots-three"></i>', color: '#9ca3af' }
     ];
   }
