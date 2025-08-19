@@ -1,0 +1,457 @@
+/* ============================================================================
+   PROFESSIONAL ANIMATIONS SYSTEM - FINZN
+   ============================================================================
+   
+   🎯 OBJETIVO: Crear una experiencia de usuario profesional y suave
+   📋 PRINCIPIOS: Subtle, Consistent, Performant, Accessible
+   
+   Este archivo REEMPLAZA y UNIFICA todos los hover effects agresivos
+   encontrados en múltiples archivos CSS del proyecto.
+   
+   ============================================================================ */
+
+/* ============================================================================
+   VARIABLES DE SISTEMA PROFESIONAL
+   ============================================================================ */
+:root {
+  /* === TIMING PROFESIONAL === */
+  --pro-timing-instant: 120ms;
+  --pro-timing-fast: 200ms;
+  --pro-timing-normal: 300ms;
+  --pro-timing-slow: 400ms;
+  --pro-timing-ultra-slow: 600ms;
+  
+  /* === EASING CURVES PROFESIONALES === */
+  --pro-ease-subtle: cubic-bezier(0.25, 0.1, 0.25, 1);        /* Suave y natural */
+  --pro-ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);            /* Material Design */
+  --pro-ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);    /* Ultra suave */
+  --pro-ease-bounce-gentle: cubic-bezier(0.68, 0.55, 0.265, 1.25); /* Bounce sutil */
+  
+  /* === TRANSFORMS PROFESIONALES (SUTILES) === */
+  --pro-lift-micro: translateY(-0.5px);      /* Casi imperceptible */
+  --pro-lift-subtle: translateY(-1px);       /* Muy sutil */
+  --pro-lift-gentle: translateY(-1.5px);     /* Gentle standard */
+  --pro-lift-normal: translateY(-2px);       /* Máximo recomendado */
+  
+  --pro-scale-micro: scale(1.002);           /* Casi imperceptible */
+  --pro-scale-subtle: scale(1.008);          /* Muy sutil */
+  --pro-scale-gentle: scale(1.012);          /* Gentle standard */
+  --pro-scale-normal: scale(1.02);           /* Máximo recomendado */
+  
+  /* === SOMBRAS PROFESIONALES === */
+  --pro-shadow-rest: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --pro-shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --pro-shadow-gentle: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --pro-shadow-normal: 0 6px 16px rgba(0, 0, 0, 0.1);
+  --pro-shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* === COLORES Y OPACIDAD === */
+  --pro-overlay-subtle: rgba(255, 255, 255, 0.02);
+  --pro-overlay-gentle: rgba(255, 255, 255, 0.04);
+  --pro-brand-glow: rgba(200, 182, 255, 0.15);
+  --pro-success-glow: rgba(16, 185, 129, 0.1);
+  --pro-danger-glow: rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================================================
+   RESET COMPLETO DE HOVERS AGRESIVOS
+   ============================================================================ */
+
+/* CRÍTICO: Resetear TODOS los hovers agresivos existentes */
+.new-unified-card:hover,
+.summary-card:hover,
+.card:hover, 
+.dashboard-card:hover, 
+.metric-card:hover,
+.report-card:hover,
+.expense-item:hover,
+.income-item:hover,
+.goal-item:hover,
+.installment-item:hover,
+.category-limit-item:hover,
+.settings-card:hover,
+.ai-insight-card:hover,
+.pattern-card:hover,
+.chart-card:hover,
+.recent-transactions-card:hover,
+.interactive-element:hover,
+.clickable:hover,
+.new-balance-icon:hover,
+.new-income-action:hover,
+.new-expense-action:hover,
+.income-action:hover,
+.expense-action:hover,
+.chat-toggle:hover,
+.calendar-day:hover,
+.calendar-nav-btn:hover {
+  /* ANULAR todos los transforms agresivos */
+  transform: none !important;
+  /* Mantener transiciones suaves */
+  transition: all var(--pro-timing-normal) var(--pro-ease-gentle) !important;
+}
+
+/* ============================================================================
+   SISTEMA DE JERARQUÍA PROFESIONAL
+   ============================================================================ */
+
+/* === NIVEL 1: ELEMENTOS PRIMARIOS (Más prominentes) === */
+.btn-primary,
+.new-unified-card,
+.summary-card.primary,
+.chart-card {
+  transition: 
+    transform var(--pro-timing-normal) var(--pro-ease-gentle),
+    box-shadow var(--pro-timing-normal) var(--pro-ease-gentle),
+    opacity var(--pro-timing-fast) var(--pro-ease-gentle),
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.btn-primary:hover,
+.new-unified-card:hover,
+.summary-card.primary:hover,
+.chart-card:hover {
+  transform: var(--pro-lift-gentle) !important;
+  box-shadow: var(--pro-shadow-gentle) !important;
+  opacity: 0.95;
+}
+
+/* === NIVEL 2: ELEMENTOS SECUNDARIOS (Cards generales) === */
+.summary-card,
+.card,
+.dashboard-card,
+.metric-card,
+.report-card,
+.settings-card,
+.recent-transactions-card {
+  transition: 
+    transform var(--pro-timing-normal) var(--pro-ease-gentle),
+    box-shadow var(--pro-timing-normal) var(--pro-ease-gentle),
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.summary-card:hover,
+.card:hover,
+.dashboard-card:hover,
+.metric-card:hover,
+.report-card:hover,
+.settings-card:hover,
+.recent-transactions-card:hover {
+  transform: var(--pro-lift-subtle) !important;
+  box-shadow: var(--pro-shadow-subtle) !important;
+  background-color: var(--pro-overlay-subtle);
+}
+
+/* === NIVEL 3: ELEMENTOS DE LISTA (Más sutiles) === */
+.expense-item,
+.income-item,
+.goal-item,
+.installment-item,
+.category-limit-item,
+.transaction-item,
+.recent-transaction-item,
+.expense-card,
+.goal-card,
+.budget-card {
+  transition: 
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle),
+    opacity var(--pro-timing-fast) var(--pro-ease-gentle),
+    transform var(--pro-timing-normal) var(--pro-ease-gentle) !important;
+}
+
+.expense-item:hover,
+.income-item:hover,
+.goal-item:hover,
+.installment-item:hover,
+.category-limit-item:hover,
+.transaction-item:hover,
+.recent-transaction-item:hover,
+.expense-card:hover,
+.goal-card:hover,
+.budget-card:hover {
+  transform: var(--pro-lift-micro) !important;
+  background-color: var(--pro-overlay-gentle);
+  opacity: 0.9;
+}
+
+/* === NIVEL 4: BOTONES SECUNDARIOS === */
+.btn-secondary,
+.btn,
+button:not(.btn-primary) {
+  transition: 
+    transform var(--pro-timing-fast) var(--pro-ease-gentle),
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle),
+    opacity var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.btn-secondary:hover,
+.btn:hover,
+button:not(.btn-primary):hover {
+  transform: var(--pro-lift-micro) !important;
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   ELEMENTOS ESPECIALES CON COMPORTAMIENTO ÚNICO
+   ============================================================================ */
+
+/* === ICONOS Y ELEMENTOS MICRO === */
+.new-balance-icon,
+.new-item-icon,
+.nav-icon,
+.action-icon {
+  transition: transform var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.new-balance-icon:hover,
+.new-item-icon:hover,
+.nav-icon:hover,
+.action-icon:hover {
+  transform: var(--pro-scale-subtle) !important;
+}
+
+/* === BOTONES DE ACCIÓN IMPORTANTES === */
+.new-income-action,
+.new-expense-action,
+.income-action,
+.expense-action {
+  transition: 
+    transform var(--pro-timing-normal) var(--pro-ease-gentle),
+    box-shadow var(--pro-timing-normal) var(--pro-ease-gentle),
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.new-income-action:hover,
+.income-action:hover {
+  transform: var(--pro-lift-subtle) !important;
+  box-shadow: 0 4px 12px var(--pro-success-glow) !important;
+}
+
+.new-expense-action:hover,
+.expense-action:hover {
+  transform: var(--pro-lift-subtle) !important;
+  box-shadow: 0 4px 12px var(--pro-danger-glow) !important;
+}
+
+/* === NAVEGACIÓN === */
+.nav-item,
+.sidebar-item,
+.mobile-nav-item,
+.tab-btn {
+  transition: 
+    transform var(--pro-timing-normal) var(--pro-ease-gentle),
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.nav-item:hover,
+.sidebar-item:hover,
+.mobile-nav-item:hover,
+.tab-btn:hover {
+  transform: var(--pro-lift-micro) !important;
+  background-color: var(--pro-overlay-gentle);
+}
+
+/* ============================================================================
+   ELEMENTOS INTERACTIVOS ESPECIALES
+   ============================================================================ */
+
+/* === CHAT WIDGET === */
+.chat-toggle {
+  transition: 
+    transform var(--pro-timing-normal) var(--pro-ease-bounce-gentle),
+    box-shadow var(--pro-timing-normal) var(--pro-ease-gentle) !important;
+}
+
+.chat-toggle:hover {
+  transform: var(--pro-scale-gentle) var(--pro-lift-subtle) !important;
+  box-shadow: 0 8px 24px var(--pro-brand-glow) !important;
+}
+
+/* === CALENDARIO === */
+.calendar-day {
+  transition: 
+    transform var(--pro-timing-fast) var(--pro-ease-gentle),
+    background-color var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+}
+
+.calendar-day:hover {
+  transform: var(--pro-lift-micro) !important;
+  background-color: var(--pro-overlay-gentle);
+}
+
+/* ============================================================================
+   MEJORAS DE PERFORMANCE
+   ============================================================================ */
+
+/* Optimización GPU solo cuando necesario */
+.new-unified-card,
+.summary-card,
+.btn-primary,
+.chat-toggle {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Will-change solo durante hover para mejor performance */
+.new-unified-card:hover,
+.summary-card:hover,
+.btn-primary:hover,
+.chat-toggle:hover {
+  will-change: transform, box-shadow;
+}
+
+/* Cleanup automático después de hover */
+.new-unified-card,
+.summary-card,
+.btn-primary,
+.chat-toggle {
+  will-change: auto;
+}
+
+/* ============================================================================
+   ACCESIBILIDAD Y REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Eliminar TODOS los transforms para usuarios que prefieren menos movimiento */
+  *:hover {
+    transform: none !important;
+    transition: 
+      background-color var(--pro-timing-fast) var(--pro-ease-gentle),
+      opacity var(--pro-timing-fast) var(--pro-ease-gentle),
+      box-shadow var(--pro-timing-fast) var(--pro-ease-gentle) !important;
+  }
+  
+  /* Mantener feedback visual sutil solo con colores */
+  .btn:hover,
+  .card:hover,
+  .nav-item:hover {
+    background-color: var(--pro-overlay-gentle);
+    opacity: 0.9;
+  }
+}
+
+/* ============================================================================
+   TEMAS Y VARIACIONES
+   ============================================================================ */
+
+/* === TEMA OSCURO PROFESIONAL === */
+body[data-skin="pro"] .summary-card:hover,
+body[data-skin="pro"] .card:hover,
+body[data-skin="pro"] .dashboard-card:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--pro-shadow-gentle) !important;
+  transform: var(--pro-lift-subtle) !important;
+}
+
+body[data-skin="pro"] .btn:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  transform: var(--pro-lift-micro) !important;
+}
+
+/* ============================================================================
+   OVERRIDES DE ALTA ESPECIFICIDAD
+   ============================================================================ */
+
+/* CRÍTICO: Máxima especificidad para anular hovers problemáticos */
+body[data-layout="v2"][data-skin="pro"] .new-unified-card:hover,
+body[data-layout="v2"] .new-unified-card:hover,
+.dashboard-section.active .new-unified-card:hover {
+  transform: var(--pro-lift-gentle) !important;
+  box-shadow: var(--pro-shadow-gentle) !important;
+}
+
+/* Específicamente para new-dashboard.css overrides */
+.dashboard-grid .new-unified-card:hover {
+  transform: var(--pro-lift-gentle) !important;
+}
+
+/* Específicamente para main.css overrides */
+.main-dashboard .summary-card:hover,
+.main-dashboard .card:hover,
+.main-dashboard .dashboard-card:hover,
+.main-dashboard .metric-card:hover {
+  transform: var(--pro-lift-subtle) !important;
+  box-shadow: var(--pro-shadow-subtle) !important;
+}
+
+/* ============================================================================
+   ANIMACIONES DE ENTRADA Y SALIDA
+   ============================================================================ */
+
+/* Entrada suave para elementos dinámicos */
+@keyframes professionalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-professional {
+  animation: professionalFadeIn var(--pro-timing-slow) var(--pro-ease-gentle) forwards;
+}
+
+/* ============================================================================
+   STATES Y FEEDBACK VISUAL
+   ============================================================================ */
+
+/* Estados de loading con animación sutil */
+.loading-state {
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity var(--pro-timing-normal) var(--pro-ease-gentle);
+}
+
+/* Estados de éxito */
+.success-state:hover {
+  box-shadow: 0 4px 12px var(--pro-success-glow) !important;
+}
+
+/* Estados de error */
+.error-state:hover {
+  box-shadow: 0 4px 12px var(--pro-danger-glow) !important;
+}
+
+/* ============================================================================
+   DEBUG Y UTILITIES (Solo para desarrollo)
+   ============================================================================ */
+
+/* Clase helper para debuggear hovers */
+.debug-hover:hover::after {
+  content: "HOVER ACTIVE";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  z-index: 9999;
+}
+
+/* ============================================================================
+   NOTAS Y DOCUMENTACIÓN PARA DESARROLLADORES
+   ============================================================================
+   
+   🎯 VALORES RECOMENDADOS:
+   - translateY máximo: -2px
+   - scale máximo: 1.02
+   - Duración estándar: 300ms
+   - Easing recomendado: cubic-bezier(0.25, 0.1, 0.25, 1)
+   
+   ⚠️ EVITAR:
+   - translateY(-4px) o mayor
+   - scale(1.05) o mayor  
+   - Duraciones menores a 200ms
+   - Múltiples transforms simultáneos
+   
+   ✅ MEJORES PRÁCTICAS:
+   - Usar variables CSS para consistencia
+   - Respetar jerarquía visual
+   - Incluir always reduced motion support
+   - Optimizar performance con will-change
+   
+   ============================================================================ */
