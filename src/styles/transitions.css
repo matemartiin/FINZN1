@@ -10,23 +10,24 @@
 
 /* Dashboard sections optimized for smooth animations */
 .dashboard-section {
-  /* CRITICAL: Use opacity + visibility instead of display for smooth transitions */
+  /* CRITICAL: Completely hidden by default */
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   
-  /* Positioning for smooth transitions */
+  /* Positioned off-screen to prevent any visual interference */
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
+  z-index: 0;
   
   /* Performance optimizations */
   will-change: transform, opacity;
-  transform: translateX(20px);
+  transform: translateX(30px);
   
-  /* Smooth transitions - ONLY for the section itself */
+  /* Default transitions - overridden by specific states */
   transition: 
     opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
     transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -87,6 +88,51 @@
   visibility: visible;
   pointer-events: auto;
   position: relative;
+  transform: translateX(0);
+  z-index: 10; /* Ensure active section is always on top */
+}
+
+/* ============================================================================
+   SEQUENTIAL TRANSITION STATES - No overlap between sections
+   ============================================================================ */
+
+/* Section transitioning OUT - faster fade out */
+.dashboard-section.transitioning-out {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  transform: translateX(-15px) !important;
+  z-index: 1 !important;
+  
+  /* Faster transition for exit */
+  transition: 
+    opacity 150ms cubic-bezier(0.4, 0, 1, 1),
+    transform 150ms cubic-bezier(0.4, 0, 1, 1),
+    visibility 150ms cubic-bezier(0.4, 0, 1, 1) !important;
+}
+
+/* Section transitioning IN - slower, smooth entrance */
+.dashboard-section.transitioning-in {
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+  position: relative;
+  transform: translateX(25px);
+  z-index: 2;
+  
+  /* Smooth entrance transition */
+  transition: 
+    opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    visibility 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* When transitioning-in becomes active */
+.dashboard-section.transitioning-in.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateX(0);
 }
 

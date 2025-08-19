@@ -402,7 +402,7 @@ export class AnimationManager {
     });
   }
 
-  // Main page transition animation - SIMPLIFIED to work with CSS
+  // Main page transition animation - SEQUENTIAL to avoid overlap
   async animatePageTransition(fromSection, toSection) {
     if (this.isTransitioning) {
       return;
@@ -417,17 +417,22 @@ export class AnimationManager {
         return;
       }
 
-      // Simple transition - let CSS handle the animations
+      // STEP 1: Animate OUT the current section first
       if (fromSection) {
+        fromSection.classList.add('transitioning-out');
+        await new Promise(resolve => setTimeout(resolve, 120)); // Quick fade out
         fromSection.classList.remove('active');
+        fromSection.classList.remove('transitioning-out');
       }
       
+      // STEP 2: Then animate IN the new section
       if (toSection) {
+        toSection.classList.add('transitioning-in');
+        // No delay - start immediately after previous section is hidden
         toSection.classList.add('active');
+        await new Promise(resolve => setTimeout(resolve, 180)); // Wait for smooth fade in
+        toSection.classList.remove('transitioning-in');
       }
-      
-      // Wait for CSS transition to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
       
     } finally {
       this.isTransitioning = false;
