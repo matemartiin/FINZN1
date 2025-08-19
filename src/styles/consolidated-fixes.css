@@ -447,8 +447,8 @@ body[data-skin="pro"] .item-amount {
 
 /* Override modal timing para sincronización perfecta */
 :root {
-  --modal-duration-fast: 180ms;
-  --modal-ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+  --modal-duration-fast: 250ms;
+  --modal-ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Modal backdrop - animación instantánea */
@@ -472,7 +472,7 @@ body[data-skin="pro"] .item-amount {
 
 /* Modal content - aparece inmediatamente con el modal */
 .modal-content {
-  transform: translateY(12px) scale(0.95);
+  transform: translateY(8px) scale(0.97);
   opacity: 0;
   transition: 
     transform var(--modal-duration-fast) var(--modal-ease-smooth),
@@ -561,15 +561,15 @@ body[data-skin="pro"] .item-amount {
 
 /* Cierre del modal más rápido */
 .modal.closing {
-  transition: opacity 120ms ease-out;
+  transition: opacity 180ms ease-out;
 }
 
 .modal.closing .modal-content {
-  transform: translateY(8px) scale(0.96);
+  transform: translateY(6px) scale(0.98);
   opacity: 0;
   transition: 
-    transform 120ms ease-out,
-    opacity 120ms ease-out;
+    transform 180ms ease-out,
+    opacity 180ms ease-out;
 }
 
 /* ========= CALENDARIO COMPACTO Y OPTIMIZADO ========= */

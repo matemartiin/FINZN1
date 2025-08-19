@@ -455,3 +455,154 @@ body[data-layout="v2"] .new-unified-card:hover,
    - Optimizar performance con will-change
    
    ============================================================================ */
+
+/* ============================================================================
+   SISTEMA PROFESIONAL DE ANIMACIONES PARA MODALES
+   ============================================================================ */
+
+/* === VARIABLES ESPECÍFICAS PARA MODALES === */
+:root {
+  --pro-modal-timing-fast: 200ms;
+  --pro-modal-timing-normal: 300ms;
+  --pro-modal-timing-slow: 400ms;
+  --pro-modal-ease-entrance: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --pro-modal-ease-exit: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  --pro-modal-backdrop-blur: 8px;
+  --pro-modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* === ANIMACIONES DE ENTRADA === */
+@keyframes professionalModalEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+    backdrop-filter: blur(0px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    backdrop-filter: blur(var(--pro-modal-backdrop-blur));
+  }
+}
+
+@keyframes professionalModalBackdrop {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(var(--pro-modal-backdrop-blur));
+  }
+}
+
+@keyframes professionalModalContentSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* === ANIMACIONES DE SALIDA === */
+@keyframes professionalModalExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(15px);
+  }
+}
+
+/* === COMPLEMENTO AL SISTEMA EXISTENTE === */
+/* Mejora suave para modales con clase .professional-modal */
+.modal.professional-modal {
+  backdrop-filter: blur(var(--pro-modal-backdrop-blur));
+  background: rgba(0, 0, 0, 0.4);
+  animation: professionalModalBackdrop var(--pro-modal-timing-normal) var(--pro-modal-ease-entrance);
+}
+
+.modal.professional-modal.active {
+  animation: none; /* Permitir que consolidated-fixes.css maneje el estado active */
+}
+
+.modal.professional-modal .modal-content {
+  box-shadow: var(--pro-modal-shadow);
+  border-radius: 12px;
+  will-change: transform, opacity, box-shadow;
+  animation: professionalModalContentSlide var(--pro-modal-timing-normal) var(--pro-modal-ease-entrance);
+}
+
+/* Animación escalonada para elementos del modal */
+.modal.professional-modal.active .modal-header {
+  animation: professionalFormElementSlide var(--pro-modal-timing-fast) var(--pro-modal-ease-entrance) 0ms;
+}
+
+.modal.professional-modal.active .modal-body {
+  animation: professionalFormElementSlide var(--pro-modal-timing-fast) var(--pro-modal-ease-entrance) 50ms;
+}
+
+.modal.professional-modal.active .modal-actions {
+  animation: professionalFormElementSlide var(--pro-modal-timing-fast) var(--pro-modal-ease-entrance) 100ms;
+}
+
+@keyframes professionalFormElementSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === CIERRE SUAVE === */
+.modal.professional-modal.closing {
+  animation: professionalModalExit var(--pro-modal-timing-fast) var(--pro-modal-ease-exit);
+}
+
+.modal.professional-modal.closing .modal-content {
+  animation: professionalModalExit var(--pro-modal-timing-fast) var(--pro-modal-ease-exit);
+}
+
+/* === COMPATIBILIDAD CON REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  .modal.professional-modal,
+  .modal.professional-modal .modal-content,
+  .modal.professional-modal .modal-header,
+  .modal.professional-modal .modal-body,
+  .modal.professional-modal .modal-actions {
+    animation: none !important;
+    transition: opacity var(--pro-timing-fast) ease-out !important;
+  }
+  
+  .modal.professional-modal {
+    backdrop-filter: none;
+  }
+}
+
+/* === MOBILE OPTIMIZATION === */
+@media (max-width: 768px) {
+  .modal.professional-modal .modal-content {
+    animation-duration: var(--pro-modal-timing-fast);
+    border-radius: 8px;
+  }
+  
+  .modal.professional-modal {
+    backdrop-filter: blur(4px); /* Menos blur en mobile para performance */
+  }
+}
