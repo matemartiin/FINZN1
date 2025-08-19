@@ -886,11 +886,17 @@ export class UIManager {
     const defaultCategories = {
       'Comida': { icon: '<i class="ph ph-fork-knife"></i>', color: '#ef4444' },
       'Transporte': { icon: '<i class="ph ph-car"></i>', color: '#3b82f6' },
-      'Salud': { icon: '<i class="ph ph-pill"></i>', color: '#8b5cf6' },
-      'Ocio': { icon: '<i class="ph ph-party-popper"></i>', color: '#f59e0b' },
-      'Supermercado': { icon: '<i class="ph ph-shopping-cart"></i>', color: '#10b981' },
-      'Servicios': { icon: '<i class="ph ph-device-mobile"></i>', color: '#6b7280' },
-      'Otros': { icon: '<i class="ph ph-package"></i>', color: '#9ca3af' }
+      'Salud': { icon: '<i class="ph ph-heart-straight"></i>', color: '#10b981' },
+      'Ocio': { icon: '<i class="ph ph-game-controller"></i>', color: '#f59e0b' },
+      'Supermercado': { icon: '<i class="ph ph-shopping-cart"></i>', color: '#14b8a6' },
+      'Servicios': { icon: '<i class="ph ph-house"></i>', color: '#6366f1' },
+      'Ropa': { icon: '<i class="ph ph-t-shirt"></i>', color: '#ec4899' },
+      'Educación': { icon: '<i class="ph ph-book"></i>', color: '#8b5cf6' },
+      'Tecnología': { icon: '<i class="ph ph-laptop"></i>', color: '#06b6d4' },
+      'Deportes': { icon: '<i class="ph ph-soccer-ball"></i>', color: '#84cc16' },
+      'Viajes': { icon: '<i class="ph ph-airplane"></i>', color: '#f97316' },
+      'PedidosYa': { icon: '<img src="/assets/svg/pedidosya-logo.svg" alt="PedidosYa" width="20" height="20" style="display: inline-block;">', color: '#dc2626' },
+      'Otros': { icon: '<i class="ph ph-dots-three"></i>', color: '#9ca3af' }
     };
     
     return defaultCategories[categoryName] || { 
