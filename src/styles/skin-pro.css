@@ -1143,37 +1143,88 @@ body[data-skin="pro"] .col-span-4 { grid-column: span 4; }
 }
 
 /* ===== Bottom navigation (móvil) ===== */
+/* === NAVEGACIÓN MÓVIL OPTIMIZADA === */
 .mobile-nav{
   position: fixed;
   left: 0; right: 0; bottom: 0;
   display: flex;
-  gap: 8px;
-  padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(16,21,28,.85);
-  backdrop-filter: blur(8px) saturate(120%);
-  border-top: 1px solid rgba(255,255,255,.08);
-  z-index: 1100;                 /* por encima del contenido */
+  gap: 2px;
+  padding: 10px 6px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(16,21,28,.92);
+  backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid rgba(184,167,255,.15);
+  box-shadow: 0 -8px 32px rgba(0,0,0,.25);
+  z-index: 1100;
 }
+
 .mobile-nav-item{
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 0;
+  gap: 3px;
+  padding: 10px 4px 8px;
   text-decoration: none;
-  color: var(--pro-text-2, #9CA3AF);
-  border-radius: 10px;
+  color: rgba(229,231,235,.65);
+  border-radius: 12px;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  min-width: 0; /* Permite que flex funcione con 6 items */
 }
-.mobile-nav-item.active,
-.mobile-nav-item:focus-visible{
-  color: var(--pro-text, #E5E7EB);
-  background: rgba(255,255,255,.06);
-  outline: none;
+
+.mobile-nav-item:hover {
+  color: rgba(229,231,235,.85);
+  background: rgba(255,255,255,.04);
+  transform: translateY(-1px);
 }
-.mobile-nav-icon .ph{ font-size: 20px; }
-.mobile-nav-label{ font-size: 12px; font-weight: 600; }
+
+.mobile-nav-item.active {
+  color: var(--pro-primary, #B8A7FF);
+  background: rgba(184,167,255,.08);
+  box-shadow: 0 0 0 1px rgba(184,167,255,.2), 
+              0 2px 8px rgba(184,167,255,.15);
+}
+
+.mobile-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    rgba(184,167,255,.6) 0%, 
+    rgba(184,167,255,1) 50%, 
+    rgba(184,167,255,.6) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(184,167,255,.4);
+}
+
+.mobile-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-icon .ph{ 
+  font-size: 22px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.3));
+}
+
+.mobile-nav-label{ 
+  font-size: 11px; 
+  font-weight: 600; 
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 
 /* Ocultar en desktop */
 @media (min-width: 901px){
@@ -1358,38 +1409,66 @@ html, body {
     overflow-x: hidden !important;
   }
   
-  /* CARDS PRINCIPALES MÁS GRANDES EN MÓVIL */
+  /* === OPTIMIZACIÓN DE CARDS PARA MÓVIL === */
   .summary-cards {
     grid-template-columns: 1fr !important;
-    gap: 16px !important;
-    margin-bottom: 20px;
+    gap: 12px !important;
+    margin-bottom: 16px;
   }
 
   .summary-card,
   .new-unified-card {
-    min-height: 120px !important;
-    padding: 20px !important;
+    min-height: 110px !important;
+    padding: 16px !important;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
   }
 
   .chart-card,
   .chart-card-new {
-    min-height: 300px !important;
-    padding: 20px !important;
-    margin-bottom: 20px;
+    min-height: 280px !important;
+    padding: 18px !important;
+    margin-bottom: 12px;
+    border-radius: 18px;
   }
 
   .recent-transactions-card,
   .expenses-section-card {
-    min-height: 350px !important;
-    padding: 20px !important;
+    min-height: 320px !important;
+    padding: 18px !important;
+    border-radius: 18px;
   }
 
-  /* Asegurar scroll interno en cards que lo necesiten */
+  /* === SCROLL INTERNO OPTIMIZADO === */
   .transactions-list,
   .expense-list {
-    max-height: 280px;
+    max-height: 260px;
     overflow-y: auto;
     overflow-x: hidden;
+    padding-right: 4px; /* Espacio para scrollbar */
+  }
+
+  /* Scrollbar personalizada para móvil */
+  .transactions-list::-webkit-scrollbar,
+  .expense-list::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .transactions-list::-webkit-scrollbar-track,
+  .expense-list::-webkit-scrollbar-track {
+    background: rgba(255,255,255,.05);
+    border-radius: 2px;
+  }
+
+  .transactions-list::-webkit-scrollbar-thumb,
+  .expense-list::-webkit-scrollbar-thumb {
+    background: rgba(184,167,255,.3);
+    border-radius: 2px;
+  }
+
+  .transactions-list::-webkit-scrollbar-thumb:hover,
+  .expense-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(184,167,255,.5);
   }
 
   /* Enhanced section responsive design */
@@ -1413,6 +1492,175 @@ html, body {
   /* Asegurar que no haya márgenes problemáticos */
   .dashboard-grid > * {
     margin: 0 !important;
+  }
+
+  /* === TIPOGRAFÍA Y CONTRASTE MEJORADOS === */
+  .summary-card .card-amount {
+    font-size: clamp(1.5rem, 4vw, 2rem) !important;
+    font-weight: 700 !important;
+    color: var(--pro-text, #E5E7EB) !important;
+    letter-spacing: -0.02em;
+  }
+
+  .summary-card .card-title,
+  .chart-card .card-title {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--pro-text, #E5E7EB) !important;
+    margin-bottom: 8px;
+  }
+
+  .card-subtitle,
+  .chart-subtitle {
+    font-size: 12px !important;
+    color: rgba(229,231,235,.7) !important;
+    font-weight: 500;
+  }
+
+  /* Elementos de lista más legibles */
+  .transaction-item,
+  .expense-item {
+    padding: 12px !important;
+    margin-bottom: 2px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.02);
+  }
+
+  .transaction-item:hover,
+  .expense-item:hover {
+    background: rgba(255,255,255,.04);
+  }
+
+  .transaction-description,
+  .expense-description {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--pro-text, #E5E7EB) !important;
+  }
+
+  .transaction-amount,
+  .expense-amount {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+  }
+
+  .transaction-date,
+  .expense-date {
+    font-size: 11px !important;
+    color: rgba(229,231,235,.6) !important;
+    font-weight: 500;
+  }
+
+  /* === OPTIMIZACIONES DE PERFORMANCE === */
+  
+  /* Reducir animaciones en móvil para mejor performance */
+  .summary-card,
+  .chart-card,
+  .transaction-item,
+  .expense-item {
+    transition: background-color 0.2s ease, transform 0.15s ease !important;
+    will-change: auto; /* Solo activar will-change en hover */
+  }
+
+  .summary-card:hover,
+  .chart-card:hover {
+    will-change: transform, background-color;
+    transform: translateY(-1px) !important;
+    background-color: rgba(255,255,255,.03) !important;
+  }
+
+  /* Eliminar transforms costosos en elementos pequeños */
+  .transaction-item:hover,
+  .expense-item:hover {
+    transform: none !important;
+    background-color: rgba(255,255,255,.04) !important;
+  }
+
+  /* Optimizar backdrop-filter para móvil */
+  .mobile-nav {
+    backdrop-filter: blur(8px) !important; /* Reducir de 12px a 8px */
+  }
+
+  /* Reducir sombras costosas en móvil */
+  .summary-card,
+  .chart-card {
+    box-shadow: 0 1px 8px rgba(0,0,0,.12) !important;
+  }
+
+  .summary-card:hover,
+  .chart-card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,.15) !important;
+  }
+
+  /* === DETALLES FINALES Y CONSISTENCIA VISUAL === */
+  
+  /* Botones optimizados para móvil */
+  .btn {
+    min-height: 44px !important; /* Touch target mínimo */
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pro-primary), var(--pro-primary-2)) !important;
+    box-shadow: 0 2px 8px rgba(184,167,255,.25) !important;
+  }
+
+  .btn-secondary {
+    border: 1px solid rgba(255,255,255,.1) !important;
+    background: rgba(255,255,255,.05) !important;
+  }
+
+  /* Input fields mejorados */
+  input, select, textarea {
+    min-height: 44px !important;
+    font-size: 16px !important; /* Evita zoom en iOS */
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+  }
+
+  /* Modales optimizados para móvil */
+  .modal-content {
+    margin: 20px !important;
+    border-radius: 20px !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+  }
+
+  /* Chat widget posicionado correctamente */
+  #chat-widget {
+    bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    right: 16px !important;
+    z-index: 1050 !important;
+  }
+
+  /* Iconos de cards más prominentes */
+  .card-icon,
+  .icon-chip {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .card-icon i,
+  .icon-chip i {
+    font-size: 18px !important;
+  }
+
+  /* Header mejorado para móvil */
+  .header {
+    padding: 12px 16px !important;
+    backdrop-filter: blur(8px) !important;
+  }
+
+  .header h1 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
   }
   
   .section-content {
