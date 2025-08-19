@@ -41,7 +41,7 @@
 }
 
 .new-unified-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-1.5px);
   box-shadow: 
     0 15px 50px -8px rgba(200, 182, 255, 0.25),
     0 8px 25px -5px rgba(200, 182, 255, 0.15),
@@ -264,7 +264,7 @@
 }
 
 .new-income-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
   box-shadow: 
     0 4px 16px rgba(5, 150, 105, 0.3),
     0 0 12px rgba(5, 150, 105, 0.2);
@@ -278,7 +278,7 @@
 }
 
 .new-expense-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
   box-shadow: 
     0 4px 16px rgba(220, 38, 38, 0.3),
     0 0 12px rgba(220, 38, 38, 0.2);
@@ -360,7 +360,7 @@
 
 .new-income-action:hover {
   background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-1px) scale(1.01);
   box-shadow: 
     0 8px 20px rgba(16, 185, 129, 0.4),
     0 0 16px rgba(16, 185, 129, 0.3),
@@ -368,7 +368,7 @@
 }
 
 .new-income-action:hover i {
-  transform: scale(1.1);
+  transform: scale(1.02);
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
 }
 
@@ -383,7 +383,7 @@
 
 .new-expense-action:hover {
   background: linear-gradient(135deg, #DC2626, #B91C1C);
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-1px) scale(1.01);
   box-shadow: 
     0 8px 20px rgba(239, 68, 68, 0.4),
     0 0 16px rgba(239, 68, 68, 0.3),
@@ -391,7 +391,7 @@
 }
 
 .new-expense-action:hover i {
-  transform: scale(1.1);
+  transform: scale(1.02);
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
 }
 

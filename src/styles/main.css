@@ -912,7 +912,7 @@ table,
 }
 
 .summary-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-1.5px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1010,7 +1010,7 @@ table,
 }
 
 .incomes-indicator:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(181, 234, 234, 0.5);
   background: var(--azul-pastel);
 }
@@ -1160,7 +1160,7 @@ table,
 }
 
 .chart-mascot-img:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 .chart-mascot-tooltip {
@@ -2935,7 +2935,7 @@ table,
 }
 
 .chat-toggle:hover {
-  transform: scale(1.1) translateY(-2px);
+  transform: scale(1.02) translateY(-1px);
   box-shadow: 0 12px 48px rgba(139, 92, 246, 0.5);
   border-color: rgba(255, 255, 255, 0.4);
 }
@@ -3603,7 +3603,7 @@ table,
   color: white;
   background: rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  transform: translateY(-3px);
+  transform: translateY(-1px);
 }
 
 .mobile-nav-item.active::before {
@@ -7073,7 +7073,7 @@ body[data-skin="pro"] .chart-container-new{
 }
 
 .day-event-item:hover .day-event-type {
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 /* Loading Animation for Calendar */
@@ -7291,7 +7291,7 @@ body[data-skin="pro"] .chart-container-new{
 }
 
 .card:hover, .dashboard-card:hover, .metric-card:hover, .summary-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-1.5px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
@@ -7687,7 +7687,7 @@ body[data-skin="pro"] .chart-container-new{
     transform: scale(0);
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.02);
   }
   100% {
     opacity: 1;
