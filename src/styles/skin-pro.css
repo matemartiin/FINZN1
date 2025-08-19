@@ -1322,23 +1322,97 @@ html, body {
 @media (max-width: 900px){
   .mobile-nav{ display: flex; }
 
-  /* que scrollee la página, no contenedores internos */
-  html, body, #app, .main-dashboard, .dashboard-section, .section-content{
+  /* LAYOUT MÓVIL CORREGIDO: Eliminar scroll global */
+  html, body {
+    height: 100%;
+    overflow: hidden !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Aplicar 100dvh al contenedor principal */
+  #layout-root,
+  .dashboard-new {
+    height: 100dvh !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* El main-dashboard debe ocupar el espacio restante */
+  .main-dashboard {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 16px calc(76px + env(safe-area-inset-bottom)) 16px;
+    min-height: 0; /* Permite que flex funcione correctamente */
+  }
+
+  /* Asegurar que las secciones no generen scroll */
+  .dashboard-section, .section-content {
     transform: none !important;
     perspective: none !important;
     filter: none !important;
-    overflow-y: visible !important;
     overflow-x: hidden !important;
   }
-
-  /* reservar espacio inferior para la bottom nav */
-  body{
-    padding-bottom: calc(76px + env(safe-area-inset-bottom));
-  }
   
+  /* CARDS PRINCIPALES MÁS GRANDES EN MÓVIL */
+  .summary-cards {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    margin-bottom: 20px;
+  }
+
+  .summary-card,
+  .new-unified-card {
+    min-height: 120px !important;
+    padding: 20px !important;
+  }
+
+  .chart-card,
+  .chart-card-new {
+    min-height: 300px !important;
+    padding: 20px !important;
+    margin-bottom: 20px;
+  }
+
+  .recent-transactions-card,
+  .expenses-section-card {
+    min-height: 350px !important;
+    padding: 20px !important;
+  }
+
+  /* Asegurar scroll interno en cards que lo necesiten */
+  .transactions-list,
+  .expense-list {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   /* Enhanced section responsive design */
   .dashboard-section {
-    padding-inline: 12px;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Eliminar cualquier padding fantasma que cause scroll */
+  .dashboard-section.active {
+    padding-bottom: 0 !important;
+  }
+
+  /* Grid del dashboard optimizado para móvil */
+  .dashboard-grid {
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Asegurar que no haya márgenes problemáticos */
+  .dashboard-grid > * {
+    margin: 0 !important;
   }
   
   .section-content {
