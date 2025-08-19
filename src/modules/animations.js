@@ -97,17 +97,44 @@ export class AnimationManager {
     this.animateNumbers();
   }
 
+  // Enhanced dashboard cards animation with smooth entrance
   animateDashboardCards() {
-    const cards = document.querySelectorAll('.card, .dashboard-card, .metric-card, .summary-card');
+    const cards = document.querySelectorAll('.card, .dashboard-card, .metric-card, .summary-card, .new-unified-card');
     
     cards.forEach((card, index) => {
       if (this.animatedElements.has(card)) return;
       
-      card.style.setProperty('--card-delay', index);
+      // Enhanced card entrance animation
+      card.style.willChange = 'transform, opacity, filter';
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(40px) scale(0.9) rotateX(10deg)';
+      card.style.filter = 'blur(8px)';
+      card.style.transformOrigin = 'center bottom';
+      
+      const delay = index * 120; // Staggered timing
+      
+      setTimeout(() => {
+        card.style.transition = `
+          opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          filter 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+        `.replace(/\s+/g, ' ').trim();
+        
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0) scale(1) rotateX(0deg)';
+        card.style.filter = 'blur(0px)';
+        
+        // Clean up after animation
+        card.addEventListener('transitionend', () => {
+          card.style.willChange = 'auto';
+          card.style.transformOrigin = '';
+        }, { once: true });
+      }, delay);
+      
       card.classList.add('animated');
       this.animatedElements.add(card);
       
-      // Add hover animations
+      // Add enhanced hover animations
       this.addHoverEffects(card);
     });
   }
@@ -222,29 +249,47 @@ export class AnimationManager {
     this.animatedElements.add(element);
   }
 
-  // Add hover effects to elements
+  // Add smooth hover effects to elements
   addHoverEffects(element) {
     if (this.prefersReducedMotion) return;
     
+    // Enhanced transition for smooth hover
+    element.style.transition = 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 300ms ease-out';
+    element.style.willChange = 'transform';
+    
     element.addEventListener('mouseenter', () => {
-      element.style.transform = 'translateY(-3px)';
+      element.style.transform = 'translateY(-3px) scale(1.01)';
+      element.style.filter = 'brightness(1.05)';
     });
 
     element.addEventListener('mouseleave', () => {
-      element.style.transform = '';
+      element.style.transform = 'translateY(0) scale(1)';
+      element.style.filter = 'brightness(1)';
     });
+    
+    // Clean up will-change after animation
+    element.addEventListener('transitionend', () => {
+      element.style.willChange = 'auto';
+    }, { once: false });
   }
 
-  // Add input focus animations
+  // Add smooth input focus animations
   addInputAnimations(input) {
+    // Smooth transitions for input states
+    input.style.transition = `
+      transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 250ms cubic-bezier(0.4, 0, 0.2, 1)
+    `.replace(/\s+/g, ' ').trim();
+    
     input.addEventListener('focus', () => {
-      input.style.transform = 'scale(1.02)';
-      input.style.boxShadow = '0 0 0 3px rgba(200, 182, 255, 0.3)';
+      input.style.transform = 'scale(1.015)';
+      input.style.boxShadow = '0 0 0 3px rgba(200, 182, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1)';
     });
 
     input.addEventListener('blur', () => {
-      input.style.transform = '';
-      input.style.boxShadow = '';
+      input.style.transform = 'scale(1)';
+      input.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
     });
   }
 
@@ -463,7 +508,7 @@ export class AnimationManager {
       // STEP 1: Animate OUT the current section first
       if (fromSection) {
         fromSection.classList.add('transitioning-out');
-        await new Promise(resolve => setTimeout(resolve, 120)); // Quick fade out
+        await new Promise(resolve => setTimeout(resolve, 200)); // Smooth fade out
         fromSection.classList.remove('active');
         fromSection.classList.remove('transitioning-out');
       }
@@ -473,7 +518,7 @@ export class AnimationManager {
         toSection.classList.add('transitioning-in');
         // No delay - start immediately after previous section is hidden
         toSection.classList.add('active');
-        await new Promise(resolve => setTimeout(resolve, 180)); // Wait for smooth fade in
+        await new Promise(resolve => setTimeout(resolve, 350)); // Premium smooth fade in
         toSection.classList.remove('transitioning-in');
         
         // STEP 3: Start coordinated animations for the new section
@@ -558,86 +603,106 @@ export class AnimationManager {
     });
   }
 
-  // Enhanced card hover animations with data entry effects
+  // Enhanced card hover animations with smooth transitions
   enhanceCardHovers() {
     const cards = document.querySelectorAll('.expense-card, .goal-card, .budget-card, .card, .dashboard-card, .new-unified-card');
     
     cards.forEach(card => {
       if (this.activeAnimations.has(card)) return;
       
-      card.style.transition = 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1)';
+      // Smooth, professional hover transitions
+      card.style.transition = `
+        transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        filter 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      `.replace(/\s+/g, ' ').trim();
+      
+      // Initial state optimization
+      card.style.willChange = 'transform, box-shadow, filter';
       
       const handleMouseEnter = () => {
         if (!this.prefersReducedMotion) {
-          card.style.transform = 'translateY(-2px)';
-          card.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
+          card.style.transform = 'translateY(-4px) scale(1.02)';
+          card.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)';
+          card.style.filter = 'brightness(1.05)';
         }
       };
       
       const handleMouseLeave = () => {
-        card.style.transform = '';
-        card.style.boxShadow = '';
+        card.style.transform = 'translateY(0) scale(1)';
+        card.style.boxShadow = 'var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.1))';
+        card.style.filter = 'brightness(1)';
       };
       
       card.addEventListener('mouseenter', handleMouseEnter);
       card.addEventListener('mouseleave', handleMouseLeave);
       
+      // Clean up will-change after animation
+      card.addEventListener('transitionend', () => {
+        card.style.willChange = 'auto';
+      }, { once: false });
+      
       this.activeAnimations.set(card, { handleMouseEnter, handleMouseLeave });
     });
   }
 
-  // Animate financial data entry with slide-in effects
+  // Enhanced financial data entry with staggered smooth animations
   animateFinancialData(data = {}) {
-    if (this.prefersReducedMotion) return;
+    if (this.prefersReducedMotion) return Promise.resolve();
 
     const animations = [];
+    const baseDelay = 200; // Stagger delay between elements
 
-    // Animate balance amount
+    // Animate balance amount (first priority)
     if (data.balance !== undefined) {
       const balanceElement = document.getElementById('balance-amount-new');
       if (balanceElement) {
         animations.push(this.animateDataEntry(balanceElement, data.balance, {
           type: 'balance',
-          duration: 1500,
+          duration: 1800,
+          delay: 0,
           showCurrency: true,
           decimals: 0
         }));
       }
     }
 
-    // Animate income amount
+    // Animate income amount (second)
     if (data.income !== undefined) {
       const incomeElement = document.getElementById('income-summary');
       if (incomeElement) {
         animations.push(this.animateDataEntry(incomeElement, data.income, {
           type: 'income',
-          duration: 1200,
+          duration: 1500,
+          delay: baseDelay,
           showCurrency: true,
           decimals: 0
         }));
       }
     }
 
-    // Animate expenses amount
+    // Animate expenses amount (third)
     if (data.expenses !== undefined) {
       const expensesElement = document.getElementById('monthly-expenses-summary');
       if (expensesElement) {
         animations.push(this.animateDataEntry(expensesElement, data.expenses, {
           type: 'expenses',
-          duration: 1200,
+          duration: 1500,
+          delay: baseDelay * 2,
           showCurrency: true,
           decimals: 0
         }));
       }
     }
 
-    // Animate installments count
+    // Animate installments count (last, quick)
     if (data.installmentsCount !== undefined) {
       const installmentsElement = document.getElementById('installments-count');
       if (installmentsElement) {
         animations.push(this.animateDataEntry(installmentsElement, data.installmentsCount, {
           type: 'count',
-          duration: 800,
+          duration: 1000,
+          delay: baseDelay * 3,
           showCurrency: false
         }));
       }
@@ -646,7 +711,7 @@ export class AnimationManager {
     return Promise.all(animations);
   }
 
-  // Generic data entry animation
+  // Enhanced data entry animation with smooth transitions
   animateDataEntry(element, newValue, options = {}) {
     return new Promise(resolve => {
       if (!element || this.prefersReducedMotion) {
@@ -659,20 +724,32 @@ export class AnimationManager {
 
       const { type = 'default', duration = 1000, delay = 0 } = options;
       
-      // Add entrance animation class
+      // Enhanced entrance animation with performance optimization
+      element.style.willChange = 'transform, opacity';
       element.style.opacity = '0';
-      element.style.transform = 'translateY(20px)';
-      element.style.transition = `all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)`;
+      element.style.transform = 'translateY(30px) scale(0.95)';
+      element.style.filter = 'blur(4px)';
+      element.style.transition = `
+        opacity 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        filter 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      `.replace(/\s+/g, ' ').trim();
       
       setTimeout(() => {
         element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
+        element.style.transform = 'translateY(0) scale(1)';
+        element.style.filter = 'blur(0px)';
         
-        // Start count-up animation after slide-in
+        // Clean up will-change after initial animation
+        element.addEventListener('transitionend', () => {
+          element.style.willChange = 'auto';
+        }, { once: true });
+        
+        // Start count-up animation with slight overlap for smoothness
         setTimeout(() => {
           this.animateCountUp(element, 0, newValue, duration, options);
           setTimeout(resolve, duration + 100);
-        }, 300);
+        }, 250); // Reduced delay for better flow
       }, delay);
     });
   }
@@ -844,7 +921,7 @@ export class AnimationManager {
     this.animateTransactionsInSection(activeSection);
   }
 
-  // Animate charts with smooth entrance
+  // Enhanced chart entrance animations
   animateChartsInSection(section) {
     if (!section || this.prefersReducedMotion) return;
 
@@ -852,38 +929,83 @@ export class AnimationManager {
     chartContainers.forEach((container, index) => {
       if (this.animatedElements.has(container)) return;
       
+      // Premium chart entrance animation
+      container.style.willChange = 'transform, opacity, filter';
       container.style.opacity = '0';
-      container.style.transform = 'scale(0.95)';
-      container.style.transition = 'all 400ms cubic-bezier(0.34, 1.56, 0.64, 1)';
+      container.style.transform = 'scale(0.8) translateY(60px)';
+      container.style.filter = 'blur(10px) brightness(0.8)';
+      container.style.transformOrigin = 'center center';
+      
+      const delay = index * 200 + 400; // Staggered after data animations
       
       setTimeout(() => {
+        container.style.transition = `
+          opacity 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          transform 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          filter 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+        `.replace(/\s+/g, ' ').trim();
+        
         container.style.opacity = '1';
-        container.style.transform = 'scale(1)';
-      }, index * 150 + 300);
+        container.style.transform = 'scale(1) translateY(0)';
+        container.style.filter = 'blur(0px) brightness(1)';
+        
+        // Add subtle bounce effect on completion
+        container.addEventListener('transitionend', () => {
+          container.style.willChange = 'auto';
+          container.style.transformOrigin = '';
+          
+          // Subtle completion bounce
+          container.style.transition = 'transform 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+          container.style.transform = 'scale(1.02)';
+          
+          setTimeout(() => {
+            container.style.transform = 'scale(1)';
+            setTimeout(() => {
+              container.style.transition = '';
+            }, 300);
+          }, 150);
+        }, { once: true });
+      }, delay);
       
       this.animatedElements.add(container);
     });
   }
 
-  // Animate transaction lists with stagger effect
+  // Enhanced transaction list animations
   animateTransactionsInSection(section) {
     if (!section || this.prefersReducedMotion) return;
 
     const transactionLists = section.querySelectorAll('.recent-transactions-list, .expenses-list, .income-list');
     transactionLists.forEach(list => {
-      const transactions = list.querySelectorAll('.transaction-item, .expense-item, .income-item');
+      const transactions = list.querySelectorAll('.transaction-item, .expense-item, .income-item, .recent-transaction-item');
       
       transactions.forEach((transaction, index) => {
         if (this.animatedElements.has(transaction)) return;
         
+        // Smooth slide-in animation from left
+        transaction.style.willChange = 'transform, opacity';
         transaction.style.opacity = '0';
-        transaction.style.transform = 'translateX(-30px)';
-        transaction.style.transition = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+        transaction.style.transform = 'translateX(-50px) scale(0.95)';
+        transaction.style.filter = 'blur(2px)';
+        
+        const delay = index * 100 + 600; // After charts start appearing
         
         setTimeout(() => {
+          transaction.style.transition = `
+            opacity 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+            transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+            filter 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)
+          `.replace(/\s+/g, ' ').trim();
+          
           transaction.style.opacity = '1';
-          transaction.style.transform = 'translateX(0)';
-        }, index * 80 + 400);
+          transaction.style.transform = 'translateX(0) scale(1)';
+          transaction.style.filter = 'blur(0px)';
+          
+          // Clean up after animation
+          transaction.addEventListener('transitionend', () => {
+            transaction.style.willChange = 'auto';
+          }, { once: true });
+        }, delay);
         
         this.animatedElements.add(transaction);
       });

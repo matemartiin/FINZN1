@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 
-/* Dashboard sections optimized for smooth animations */
+/* Dashboard sections optimized for premium smooth animations */
 .dashboard-section {
   /* CRITICAL: Completely hidden by default */
   opacity: 0;
@@ -23,15 +23,17 @@
   width: 100%;
   z-index: 0;
   
-  /* Performance optimizations */
-  will-change: transform, opacity;
-  transform: translateX(30px);
+  /* Enhanced performance optimizations */
+  will-change: transform, opacity, filter;
+  transform: translateX(40px) scale(0.98);
+  filter: blur(4px) brightness(0.9);
   
-  /* Default transitions - overridden by specific states */
+  /* Premium smooth transitions */
   transition: 
-    opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    visibility 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    visibility 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* CRITICAL: Prevent transition inheritance to child elements */
@@ -82,13 +84,14 @@
   transform: none !important;
 }
 
-/* Active section state */
+/* Active section state with enhanced entrance */
 .dashboard-section.active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   position: relative;
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
+  filter: blur(0px) brightness(1);
   z-index: 10; /* Ensure active section is always on top */
 }
 
@@ -96,44 +99,49 @@
    SEQUENTIAL TRANSITION STATES - No overlap between sections
    ============================================================================ */
 
-/* Section transitioning OUT - faster fade out */
+/* Section transitioning OUT - premium fade out */
 .dashboard-section.transitioning-out {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
   position: absolute !important;
-  transform: translateX(-15px) !important;
+  transform: translateX(-30px) scale(0.95) !important;
+  filter: blur(6px) brightness(0.7) !important;
   z-index: 1 !important;
   
-  /* Faster transition for exit */
+  /* Smooth but quick transition for exit */
   transition: 
-    opacity 150ms cubic-bezier(0.4, 0, 1, 1),
-    transform 150ms cubic-bezier(0.4, 0, 1, 1),
-    visibility 150ms cubic-bezier(0.4, 0, 1, 1) !important;
+    opacity 200ms cubic-bezier(0.4, 0, 1, 1),
+    transform 200ms cubic-bezier(0.4, 0, 1, 1),
+    filter 200ms cubic-bezier(0.4, 0, 1, 1),
+    visibility 200ms cubic-bezier(0.4, 0, 1, 1) !important;
 }
 
-/* Section transitioning IN - slower, smooth entrance */
+/* Section transitioning IN - premium smooth entrance */
 .dashboard-section.transitioning-in {
   opacity: 0;
   visibility: visible;
   pointer-events: none;
   position: relative;
-  transform: translateX(25px);
+  transform: translateX(50px) scale(0.96);
+  filter: blur(8px) brightness(0.8);
   z-index: 2;
   
-  /* Smooth entrance transition */
+  /* Premium smooth entrance transition */
   transition: 
-    opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    visibility 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    visibility 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* When transitioning-in becomes active */
+/* When transitioning-in becomes active - enhanced completion */
 .dashboard-section.transitioning-in.active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
+  filter: blur(0px) brightness(1);
 }
 
 /* Accessibility: Respect reduced motion preference */
