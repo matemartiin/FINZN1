@@ -30,8 +30,8 @@
   /* === TRANSFORMS PROFESIONALES (SUTILES) === */
   --pro-lift-micro: translateY(-0.5px);      /* Casi imperceptible */
   --pro-lift-subtle: translateY(-1px);       /* Muy sutil */
-  --pro-lift-gentle: translateY(-1.5px);     /* Gentle standard */
-  --pro-lift-normal: translateY(-2px);       /* Máximo recomendado */
+  --pro-lift-gentle: translateY(-1px);       /* Gentle standard */
+  --pro-lift-normal: translateY(-1.5px);     /* Máximo recomendado */
   
   --pro-scale-micro: scale(1.002);           /* Casi imperceptible */
   --pro-scale-subtle: scale(1.008);          /* Muy sutil */

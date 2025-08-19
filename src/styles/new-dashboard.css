@@ -41,7 +41,7 @@
 }
 
 .new-unified-card:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-1px);
   box-shadow: 
     0 15px 50px -8px rgba(200, 182, 255, 0.25),
     0 8px 25px -5px rgba(200, 182, 255, 0.15),

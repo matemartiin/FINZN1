@@ -912,7 +912,7 @@ table,
 }
 
 .summary-card:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -7291,7 +7291,7 @@ body[data-skin="pro"] .chart-container-new{
 }
 
 .card:hover, .dashboard-card:hover, .metric-card:hover, .summary-card:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-1px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
