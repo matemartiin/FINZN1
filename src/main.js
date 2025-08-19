@@ -731,17 +731,21 @@ setupDashboardEvents() {
       console.log('💰 Balance calculated:', balance);
       
       // Calculate totals for animations
-      const totalIncome = income + (extraIncomes?.reduce((sum, inc) => sum + (inc.amount || 0), 0) || 0);
+      const fixedIncome = (income && typeof income.fixed === 'number') ? income.fixed : 0;
+      const extraIncomesTotal = extraIncomes?.reduce((sum, inc) => sum + (inc.amount || 0), 0) || 0;
+      const totalIncome = fixedIncome + extraIncomesTotal;
       const totalExpenses = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
       const installmentsCount = expenses.filter(exp => exp.total_installments > 1).length;
       
       // Prepare animation data
       const animationData = {
-        balance: balance,
+        balance: balance?.available || 0,
         income: totalIncome,
         expenses: totalExpenses,
         installmentsCount: installmentsCount
       };
+      
+      console.log('🎬 Animation data prepared:', animationData);
       
       // Animate financial data entry with staggered timing
       this.animations.animateFinancialData(animationData);

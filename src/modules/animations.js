@@ -250,16 +250,22 @@ export class AnimationManager {
 
   // Count up animation for numbers with enhanced formatting
   animateCountUp(element, start, end, duration = 1200, options = {}) {
+    // Validate inputs
+    if (!element) return;
+    
+    const safeStart = (start === null || start === undefined || isNaN(start)) ? 0 : parseFloat(start);
+    const safeEnd = (end === null || end === undefined || isNaN(end)) ? 0 : parseFloat(end);
+    
     if (this.prefersReducedMotion) {
-      element.textContent = this.formatCurrency(end, options);
+      element.textContent = this.formatCurrency(safeEnd, options);
       return;
     }
 
     const startTime = performance.now();
     const originalText = element.textContent;
-    const isNegative = end < 0;
-    const absoluteEnd = Math.abs(end);
-    const absoluteStart = Math.abs(start);
+    const isNegative = safeEnd < 0;
+    const absoluteEnd = Math.abs(safeEnd);
+    const absoluteStart = Math.abs(safeStart);
     
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
@@ -279,7 +285,7 @@ export class AnimationManager {
         requestAnimationFrame(animate);
       } else {
         // Final value with proper formatting
-        element.textContent = this.formatCurrency(end, options);
+        element.textContent = this.formatCurrency(safeEnd, options);
       }
     };
 
@@ -294,13 +300,20 @@ export class AnimationManager {
       showCurrency = true
     } = options;
     
-    const formattedNumber = Math.abs(value).toLocaleString('es-AR', {
+    // Handle invalid values
+    if (value === null || value === undefined || isNaN(value)) {
+      value = 0;
+    }
+    
+    const numericValue = typeof value === 'number' ? value : parseFloat(value) || 0;
+    
+    const formattedNumber = Math.abs(numericValue).toLocaleString('es-AR', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
     
     const prefix = showCurrency ? currency : '';
-    const sign = value < 0 ? '-' : '';
+    const sign = numericValue < 0 ? '-' : '';
     
     return `${sign}${prefix}${formattedNumber}`;
   }
