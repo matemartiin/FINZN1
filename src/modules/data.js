@@ -1181,12 +1181,15 @@ async updateSpendingLimit(limitId, updates) {
   // Categories Management
   async addCategory(categoryData) {
     const userId = this.getCurrentUserId();
-    if (!userId) return false;
+    console.log('🏷️ addCategory called with:', { categoryData, userId });
+    
+    if (!userId) {
+      console.error('❌ No userId found');
+      return false;
+    }
 
     try {
-      if (import.meta.env.DEV) {
-        console.log('🏷️ Adding category:', categoryData);
-      }
+      console.log('🏷️ Preparing category data...');
       
       const category = {
         user_id: userId,
@@ -1194,22 +1197,35 @@ async updateSpendingLimit(limitId, updates) {
         icon: categoryData.icon,
         color: categoryData.color
       };
+      
+      console.log('🏷️ Category to insert:', category);
 
+      console.log('🏷️ Inserting into Supabase...');
       const { data, error } = await supabase
         .from('categories')
         .insert([category])
         .select();
 
+      console.log('🏷️ Supabase response:', { data, error });
+
       if (error) {
-        console.error('Error adding category:', error);
+        console.error('❌ Supabase error adding category:', error);
         return false;
       }
 
+      if (!data || data.length === 0) {
+        console.error('❌ No data returned from Supabase');
+        return false;
+      }
+
+      console.log('🏷️ Adding to local categories array...');
       this.data.categories.push(data[0]);
-      console.log('✅ Category added successfully');
+      console.log('✅ Category added successfully:', data[0]);
+      console.log('📊 Total categories now:', this.data.categories.length);
+      
       return true;
     } catch (error) {
-      console.error('Error in addCategory:', error);
+      console.error('❌ Exception in addCategory:', error);
       return false;
     }
   }

@@ -1525,11 +1525,13 @@ async handleAddIncome(e) {
   
   async handleAddCategory(e) {
     e.preventDefault();
-    console.log('🏷️ Adding category...');
+    console.log('🏷️ handleAddCategory started...');
     
     const formData = this.ui.getFormData('add-category-form');
+    console.log('🏷️ Form data received:', formData);
     
     if (!formData.name || !formData.icon) {
+      console.error('❌ Missing required fields:', { name: formData.name, icon: formData.icon });
       this.ui.showAlert('Por favor completa todos los campos', 'error');
       return;
     }
@@ -1545,20 +1547,27 @@ async handleAddIncome(e) {
         color: formData.color || randomColor
       };
       
-      await this.data.addCategory(categoryData);
+      console.log('🏷️ Final category data to save:', categoryData);
       
-      // Update categories list in modal
-      const categories = this.data.getCategories();
-      this.ui.updateCategoriesManagementList(categories);
+      const success = await this.data.addCategory(categoryData);
+      console.log('🏷️ addCategory result:', success);
       
-      // Update all category selects
-      this.ui.updateCategoriesSelect(categories, 'expense-category');
-      this.ui.updateCategoriesSelect(categories, 'limit-category');
-      
-      // Clear form
-      this.ui.clearForm('add-category-form');
-      
-      this.ui.showAlert('Categoría agregada exitosamente', 'success');
+      if (success) {
+        // Update categories list in modal
+        const categories = this.data.getCategories();
+        this.ui.updateCategoriesManagementList(categories);
+        
+        // Update all category selects
+        this.ui.updateCategoriesSelect(categories, 'expense-category');
+        this.ui.updateCategoriesSelect(categories, 'limit-category');
+        
+        // Clear form
+        this.ui.clearForm('add-category-form');
+        
+        this.ui.showAlert('Categoría agregada exitosamente', 'success');
+      } else {
+        this.ui.showAlert('Error al guardar la categoría en la base de datos', 'error');
+      }
       
     } catch (error) {
       console.error('Error adding category:', error);
