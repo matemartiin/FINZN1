@@ -28,7 +28,7 @@ export class VisibilityToggle {
     // Setup event listeners
     this.setupEventListeners();
     
-    // Apply initial state
+    // Apply initial state (including eye state)
     this.applyVisibilityState();
   }
 
@@ -36,9 +36,15 @@ export class VisibilityToggle {
     const toggleBtn = document.getElementById('toggle-visibility-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        // Start eye animation sequence
+        // Animate eye based on current state
         if (this.animatedEye) {
-          this.animatedEye.animateSequence();
+          if (this.isVisible) {
+            // Currently visible, will hide -> animate closing
+            this.animatedEye.animateClosing();
+          } else {
+            // Currently hidden, will show -> animate opening
+            this.animatedEye.animateOpening();
+          }
         }
         
         // Toggle visibility (original functionality)
@@ -79,6 +85,9 @@ export class VisibilityToggle {
     // Update toggle button icon
     this.updateToggleIcon();
     
+    // Set eye state without animation (for initial load)
+    this.setEyeStateInstant();
+    
     // Update each element
     this.elements.forEach(element => {
       const el = document.getElementById(element.id);
@@ -101,6 +110,19 @@ export class VisibilityToggle {
         el.setAttribute('data-visible', 'false');
       }
     });
+  }
+
+  // Set eye state instantly without animation (for initial load)
+  setEyeStateInstant() {
+    if (!this.animatedEye) return;
+    
+    if (this.isVisible) {
+      // Values visible -> eye open
+      this.animatedEye.setState('open');
+    } else {
+      // Values hidden -> eye closed
+      this.animatedEye.setState('closed');
+    }
   }
 
   updateToggleIcon() {

@@ -9,9 +9,9 @@ export class AnimatedEye {
     this.updateState();
   }
   
-  // Animate through all states with delays
-  animateSequence() {
-    if (this.isAnimating) return; // Prevent multiple animations
+  // Animate closing sequence (open -> closed)
+  animateClosing() {
+    if (this.isAnimating) return;
     
     this.isAnimating = true;
     
@@ -33,8 +33,32 @@ export class AnimatedEye {
         }
       }, delay * (index + 1));
     });
+  }
+  
+  // Animate opening sequence (closed -> open)
+  animateOpening() {
+    if (this.isAnimating) return;
     
-    return this.getCurrentState();
+    this.isAnimating = true;
+    
+    // Start from closed state
+    this.currentStateIndex = 3; // closed
+    this.updateState();
+    
+    // Animate backwards through states (closed -> open)
+    const delays = [300, 300, 300]; // Delays between states in ms
+    
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        this.currentStateIndex = 3 - (index + 1); // Go backwards
+        this.updateState();
+        
+        // If we've reached the first state, allow new animations
+        if (index === delays.length - 1) {
+          this.isAnimating = false;
+        }
+      }, delay * (index + 1));
+    });
   }
   
   // Get current state name
