@@ -6,6 +6,7 @@
   top: 20px;
   left: 20px;
   z-index: 1000;
+  display: none; /* Initially hidden until app shows */
 }
 
 /* Botón circular del perfil */
@@ -44,7 +45,7 @@
 
 /* Ajustar el main content para dar espacio al botón */
 .dashboard-new {
-  padding-top: 90px !important; /* Espacio para el botón de perfil */
+  padding-top: 30px !important; /* Espacio reducido, más compacto */
 }
 
 /* Modal del perfil de usuario */
@@ -333,7 +334,7 @@
   }
   
   .dashboard-new {
-    padding-top: 80px !important;
+    padding-top: 25px !important;
   }
   
   .user-profile-modal-content {

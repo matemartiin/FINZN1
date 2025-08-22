@@ -17,7 +17,13 @@ export class UserProfileButton {
     this.themeManager = themeManager;
     
     this.setupEventListeners();
-    await this.updateUserInitials();
+    
+    // Update initials immediately and then again after a delay
+    this.updateUserInitials();
+    setTimeout(() => {
+      this.updateUserInitials();
+    }, 2000);
+    
     this.isInitialized = true;
     
     console.log('👤 User Profile Button initialized');
@@ -27,8 +33,15 @@ export class UserProfileButton {
   setupEventListeners() {
     // Profile button click
     const profileBtn = document.getElementById('user-profile-btn');
+    console.log('👤 Profile button found:', profileBtn);
     if (profileBtn) {
-      profileBtn.addEventListener('click', () => this.openModal());
+      profileBtn.addEventListener('click', () => {
+        console.log('👤 Profile button clicked');
+        this.openModal();
+      });
+      console.log('👤 Profile button event listener attached');
+    } else {
+      console.error('❌ Profile button not found!');
     }
 
     // Modal close
@@ -199,10 +212,12 @@ export class UserProfileButton {
 
   // Open the profile modal
   openModal() {
+    console.log('👤 Opening profile modal...');
     this.modal = document.getElementById('user-profile-modal');
+    console.log('👤 Modal element found:', this.modal);
     if (this.modal) {
       this.updateModalContent();
-      this.modal.classList.add('show');
+      this.modal.classList.add('active');
       this.switchSection('profile'); // Always start with profile section
       
       // Focus management for accessibility
@@ -212,13 +227,16 @@ export class UserProfileButton {
       }
       
       document.body.style.overflow = 'hidden';
+      console.log('👤 Modal opened successfully');
+    } else {
+      console.error('❌ Modal element not found!');
     }
   }
 
   // Close the profile modal
   closeModal() {
     if (this.modal) {
-      this.modal.classList.remove('show');
+      this.modal.classList.remove('active');
       document.body.style.overflow = '';
       this.modal = null;
     }
@@ -226,7 +244,7 @@ export class UserProfileButton {
 
   // Check if modal is open
   isModalOpen() {
-    return this.modal && this.modal.classList.contains('show');
+    return this.modal && this.modal.classList.contains('active');
   }
 
   // Switch between modal sections
@@ -248,15 +266,21 @@ export class UserProfileButton {
   }
 
   // Update user initials in button and modal
-  async updateUserInitials() {
+  updateUserInitials() {
     try {
-      if (!this.userProfile) return;
+      console.log('👤 Updating user initials...');
+      if (!this.userProfile) {
+        console.log('👤 No userProfile available');
+        return;
+      }
 
-      const profile = await this.userProfile.getCurrentProfile();
+      const profile = this.userProfile.getCurrentProfile();
+      console.log('👤 Current profile:', profile);
       let initials = 'U';
       
       if (profile && profile.first_name && profile.last_name) {
         initials = `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`.toUpperCase();
+        console.log('👤 Using first_name + last_name:', initials);
       } else if (profile && profile.display_name) {
         const names = profile.display_name.split(' ');
         if (names.length >= 2) {
@@ -264,12 +288,28 @@ export class UserProfileButton {
         } else {
           initials = profile.display_name.charAt(0).toUpperCase();
         }
+        console.log('👤 Using display_name:', initials);
+      } else if (profile && profile.email) {
+        // Fallback to email
+        initials = profile.email.charAt(0).toUpperCase();
+        console.log('👤 Using email fallback:', initials);
+      } else {
+        // Try to get user email from auth
+        const currentUser = this.auth ? this.auth.getCurrentUser() : null;
+        if (currentUser && currentUser.email) {
+          initials = currentUser.email.charAt(0).toUpperCase();
+          console.log('👤 Using auth email:', initials);
+        } else {
+          console.log('👤 No profile data available, using default');
+        }
       }
 
       // Update button initials
       const buttonInitials = document.getElementById('user-initials');
+      console.log('👤 Button initials element:', buttonInitials);
       if (buttonInitials) {
         buttonInitials.textContent = initials;
+        console.log('👤 Button initials updated to:', initials);
       }
 
       // Update modal initials
@@ -280,7 +320,7 @@ export class UserProfileButton {
 
       console.log('👤 User initials updated:', initials);
     } catch (error) {
-      console.error('Error updating user initials:', error);
+      console.error('❌ Error updating user initials:', error);
     }
   }
 
@@ -334,8 +374,8 @@ export class UserProfileButton {
   }
 
   // Public method to refresh user data
-  async refresh() {
-    await this.updateUserInitials();
+  refresh() {
+    this.updateUserInitials();
     if (this.isModalOpen()) {
       this.updateModalContent();
     }

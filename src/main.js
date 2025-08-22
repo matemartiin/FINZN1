@@ -76,9 +76,6 @@ this.setupModalEvents();
       // Initialize user profile
       this.userProfile.init();
       
-      // Initialize user profile button
-      await this.userProfileButton.init(this.userProfile, this.auth, this.theme);
-      
       // Setup month selector
       this.setupMonthSelector();
       
@@ -90,6 +87,9 @@ this.setupModalEvents();
       if (currentUser) {
         this.showApp();
         await this.loadUserData();
+        
+        // Initialize user profile button AFTER authentication
+        await this.userProfileButton.init(this.userProfile, this.auth, this.theme);
         
         // Check if user needs to complete profile
         await this.checkProfileCompletion();
@@ -678,12 +678,25 @@ setupDashboardEvents() {
     document.getElementById('login-container').classList.add('hidden');
     document.getElementById('register-container').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
+    
+    // Show user profile button
+    const profileButtonContainer = document.querySelector('.user-profile-button-container');
+    if (profileButtonContainer) {
+      profileButtonContainer.style.display = 'block';
+    }
   }
 
   showLogin() {
     console.log('🔐 Showing login form');
     document.getElementById('register-container').classList.add('hidden');
     document.getElementById('login-container').classList.remove('hidden');
+    document.getElementById('app').classList.add('hidden');
+    
+    // Hide user profile button
+    const profileButtonContainer = document.querySelector('.user-profile-button-container');
+    if (profileButtonContainer) {
+      profileButtonContainer.style.display = 'none';
+    }
   }
 
   showRegister() {
@@ -711,7 +724,7 @@ setupDashboardEvents() {
       
       // Update user profile button
       if (this.userProfileButton) {
-        await this.userProfileButton.refresh();
+        this.userProfileButton.refresh();
       }
       
       console.log('✅ User data loaded successfully');
