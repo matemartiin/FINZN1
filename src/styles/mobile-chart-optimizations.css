@@ -272,13 +272,27 @@
 /* PERFORMANCE OPTIMIZATIONS */
 /* ========================================== */
 
-/* Ensure all chart canvases are transparent */
-canvas[id*="chart"] {
+/* Ensure all chart canvases are transparent - AGGRESSIVE */
+canvas[id*="chart"],
+canvas[id*="expenses"],
+canvas[id*="dashboard"],
+canvas[id*="trend"],
+#expenses-chart,
+#dashboard-expenses-chart,
+#trend-chart,
+#income-chart,
+#goals-chart,
+#budget-chart {
+  background-color: transparent !important;
+  background-image: none !important;
   background: transparent !important;
 }
 
 .chart-container canvas,
+.chart-card canvas,
 canvas {
+  background-color: transparent !important;
+  background-image: none !important;
   background: transparent !important;
 }
 

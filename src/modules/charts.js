@@ -1,8 +1,62 @@
+// Register Chart.js transparent background plugin
+const transparentBackgroundPlugin = {
+  id: 'transparentBackground',
+  beforeDraw: (chart) => {
+    const ctx = chart.canvas.getContext('2d');
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = 'transparent';
+    ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
+    ctx.restore();
+    
+    // Also force canvas styles
+    const canvas = chart.canvas;
+    canvas.style.backgroundColor = 'transparent';
+    canvas.style.background = 'transparent';
+  }
+};
+
+// Register the plugin globally if Chart is available
+if (typeof Chart !== 'undefined') {
+  Chart.register(transparentBackgroundPlugin);
+  
+  // Set Chart.js defaults for transparency
+  Chart.defaults.backgroundColor = 'transparent';
+  Chart.defaults.plugins.legend.labels.backgroundColor = 'transparent';
+  
+  // Override Chart.js canvas creation to force transparency
+  const originalGetCanvas = Chart.helpers?.getCanvas;
+  if (originalGetCanvas) {
+    Chart.helpers.getCanvas = function(canvasOpts) {
+      const canvas = originalGetCanvas.call(this, canvasOpts);
+      if (canvas && canvas.style) {
+        canvas.style.backgroundColor = 'transparent';
+        canvas.style.background = 'transparent';
+      }
+      return canvas;
+    };
+  }
+}
+
 export class ChartManager {
   constructor() {
     this.expensesChart = null;
     this.dashboardExpensesChart = null;
     this.trendChart = null;
+    
+    // Register plugin when Chart becomes available
+    this.ensurePluginRegistered();
+  }
+  
+  ensurePluginRegistered() {
+    if (typeof Chart !== 'undefined' && Chart.register) {
+      try {
+        Chart.register(transparentBackgroundPlugin);
+      } catch (error) {
+        // Plugin might already be registered
+        console.log('📊 Transparent background plugin registration:', error.message);
+      }
+    }
   }
 
   updateExpensesChart(data, categories) {
@@ -76,10 +130,6 @@ export class ChartManager {
     const colors = this.getCategoryColors(labels, categories);
 
     try {
-      // Clear canvas background to ensure transparency
-      const context = ctx.getContext('2d');
-      context.clearRect(0, 0, ctx.width, ctx.height);
-      
       // Detect dark mode
       const isDarkMode = document.body.classList.contains('darkmode') || 
                         document.documentElement.getAttribute('data-theme') === 'dark';
@@ -112,6 +162,9 @@ export class ChartManager {
             easing: 'easeOutCubic'
           },
           plugins: {
+            transparentBackground: {
+              enabled: true
+            },
             legend: {
               position: 'bottom',
               labels: {
@@ -160,6 +213,35 @@ export class ChartManager {
           }
         }
       });
+      
+      // Force transparent background after chart creation
+      const canvas = this[chartProperty].canvas;
+      const canvasStyle = canvas.style;
+      
+      // Method 1: CSS override with highest priority
+      canvasStyle.setProperty('background-color', 'transparent', 'important');
+      canvasStyle.setProperty('background', 'transparent', 'important');
+      
+      // Method 2: Canvas element direct assignment
+      canvas.style.backgroundColor = 'transparent';
+      canvas.style.background = 'transparent';
+      
+      // Method 3: Manual clear of canvas background
+      const context = canvas.getContext('2d');
+      const { width, height } = canvas;
+      
+      // Override the Chart.js render to ensure transparency
+      const originalRender = this[chartProperty].draw;
+      this[chartProperty].draw = function() {
+        // Clear with transparent before drawing
+        context.save();
+        context.globalCompositeOperation = 'source-over';
+        context.clearRect(0, 0, width, height);
+        context.restore();
+        
+        // Call original render
+        originalRender.call(this);
+      };
       
       console.log('✅ Chart created successfully:', chartProperty);
     } catch (error) {
@@ -227,6 +309,9 @@ export class ChartManager {
         maintainAspectRatio: false,
         devicePixelRatio: window.devicePixelRatio || 1,
         plugins: {
+          transparentBackground: {
+            enabled: true
+          },
           legend: {
             display: false
           },
@@ -260,6 +345,18 @@ export class ChartManager {
         }
       }
     });
+    
+    // Force transparent background after chart creation
+    if (this.trendChart && this.trendChart.canvas) {
+      const canvas = this.trendChart.canvas;
+      const canvasStyle = canvas.style;
+      
+      // Force transparent background
+      canvasStyle.setProperty('background-color', 'transparent', 'important');
+      canvasStyle.setProperty('background', 'transparent', 'important');
+      canvas.style.backgroundColor = 'transparent';
+      canvas.style.background = 'transparent';
+    }
   }
 
   getCategoryColors(labels, categories) {
