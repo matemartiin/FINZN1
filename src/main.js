@@ -13,6 +13,7 @@ import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
 import { UserProfileButton } from './modules/user-profile-button.js';
 import { AnimationManager } from './modules/animations.js';
+import { VisibilityToggle } from './modules/visibility-toggle.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
 import { loadingManager } from './modules/loading.js';
 import { inputValidator } from './modules/input-validation.js';
@@ -41,6 +42,7 @@ class FinznApp {
     this.userProfile = new UserProfileManager();
     this.userProfileButton = new UserProfileButton();
     this.animations = new AnimationManager();
+    this.visibilityToggle = new VisibilityToggle();
     
     this.currentMonth = this.getCurrentMonth();
     this.currentExpenseId = null;
@@ -76,6 +78,9 @@ this.setupModalEvents();
       
       // Initialize user profile
       this.userProfile.init();
+      
+      // Initialize visibility toggle
+      this.visibilityToggle.init();
       
       // Setup month selector
       this.setupMonthSelector();

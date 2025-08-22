@@ -272,7 +272,13 @@ export class AnimationManager {
     const safeEnd = (end === null || end === undefined || isNaN(end)) ? 0 : parseFloat(end);
     
     if (this.prefersReducedMotion) {
-      element.textContent = this.formatCurrency(safeEnd, options);
+      const formatted = this.formatCurrency(safeEnd, options);
+      element.textContent = formatted;
+      
+      // Notify visibility toggle of value update
+      if (window.app?.visibilityToggle && element.id) {
+        window.app.visibilityToggle.updateValue(element.id, formatted);
+      }
       return;
     }
 
@@ -300,7 +306,13 @@ export class AnimationManager {
         requestAnimationFrame(animate);
       } else {
         // Final value with proper formatting
-        element.textContent = this.formatCurrency(safeEnd, options);
+        const finalFormatted = this.formatCurrency(safeEnd, options);
+        element.textContent = finalFormatted;
+        
+        // Notify visibility toggle of value update
+        if (window.app?.visibilityToggle && element.id) {
+          window.app.visibilityToggle.updateValue(element.id, finalFormatted);
+        }
       }
     };
 
@@ -661,7 +673,13 @@ export class AnimationManager {
     return new Promise(resolve => {
       if (!element || this.prefersReducedMotion) {
         if (element) {
-          element.textContent = this.formatCurrency(newValue, options);
+          const formatted = this.formatCurrency(newValue, options);
+          element.textContent = formatted;
+          
+          // Notify visibility toggle of value update
+          if (window.app?.visibilityToggle && element.id) {
+            window.app.visibilityToggle.updateValue(element.id, formatted);
+          }
         }
         resolve();
         return;
