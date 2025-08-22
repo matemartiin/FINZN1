@@ -1,3 +1,5 @@
+import { AnimatedEye } from './animated-eye.js';
+
 export class VisibilityToggle {
   constructor() {
     this.isVisible = true;
@@ -8,10 +10,17 @@ export class VisibilityToggle {
     ];
     this.hiddenPlaceholder = '••••••';
     this.storageKey = 'finzn-values-visibility';
+    this.animatedEye = null;
   }
 
   init() {
     console.log('👁️ Initializing Visibility Toggle...');
+    
+    // Initialize animated eye
+    const eyeIcon = document.getElementById('animated-eye-icon');
+    if (eyeIcon) {
+      this.animatedEye = new AnimatedEye(eyeIcon);
+    }
     
     // Load saved state
     this.loadState();
@@ -26,7 +35,15 @@ export class VisibilityToggle {
   setupEventListeners() {
     const toggleBtn = document.getElementById('toggle-visibility-btn');
     if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => this.toggleVisibility());
+      toggleBtn.addEventListener('click', () => {
+        // Advance eye animation state
+        if (this.animatedEye) {
+          this.animatedEye.nextState();
+        }
+        
+        // Toggle visibility (original functionality)
+        this.toggleVisibility();
+      });
     }
   }
 
@@ -87,16 +104,18 @@ export class VisibilityToggle {
   }
 
   updateToggleIcon() {
-    const icon = document.getElementById('visibility-icon');
-    if (!icon) return;
-
-    if (this.isVisible) {
-      icon.className = 'ph ph-eye';
-      icon.parentElement.title = 'Ocultar valores';
-    } else {
-      icon.className = 'ph ph-eye-slash';
-      icon.parentElement.title = 'Mostrar valores';
+    // Update tooltip based on visibility state
+    const toggleBtn = document.getElementById('toggle-visibility-btn');
+    if (toggleBtn) {
+      if (this.isVisible) {
+        toggleBtn.title = 'Ocultar valores';
+      } else {
+        toggleBtn.title = 'Mostrar valores';
+      }
     }
+    
+    // The animated eye state is now controlled separately by the AnimatedEye class
+    // and cycles through its 4 states on each click
   }
 
   // Method to update values when they change (called by other modules)

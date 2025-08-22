@@ -1,0 +1,48 @@
+/* Animated Eye Icon Styles */
+
+.animated-eye-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+/* Smooth transitions between eye states */
+.animated-eye-icon g {
+  transition: opacity 0.3s ease;
+}
+
+/* Dark mode support */
+body[data-skin="pro"] .animated-eye-icon {
+  color: var(--pro-text-2);
+}
+
+/* Hover effect for the container button */
+.visibility-toggle-btn:hover .animated-eye-icon {
+  color: var(--text-primary);
+}
+
+body[data-skin="pro"] .visibility-toggle-btn:hover .animated-eye-icon {
+  color: var(--pro-text);
+}
+
+/* Animation states - controlled by JavaScript */
+.animated-eye-icon[data-state="open"] #eye-open { opacity: 1; }
+.animated-eye-icon[data-state="open"] #eye-half-open { opacity: 0; }
+.animated-eye-icon[data-state="open"] #eye-almost-closed { opacity: 0; }
+.animated-eye-icon[data-state="open"] #eye-closed { opacity: 0; }
+
+.animated-eye-icon[data-state="half-open"] #eye-open { opacity: 0; }
+.animated-eye-icon[data-state="half-open"] #eye-half-open { opacity: 1; }
+.animated-eye-icon[data-state="half-open"] #eye-almost-closed { opacity: 0; }
+.animated-eye-icon[data-state="half-open"] #eye-closed { opacity: 0; }
+
+.animated-eye-icon[data-state="almost-closed"] #eye-open { opacity: 0; }
+.animated-eye-icon[data-state="almost-closed"] #eye-half-open { opacity: 0; }
+.animated-eye-icon[data-state="almost-closed"] #eye-almost-closed { opacity: 1; }
+.animated-eye-icon[data-state="almost-closed"] #eye-closed { opacity: 0; }
+
+.animated-eye-icon[data-state="closed"] #eye-open { opacity: 0; }
+.animated-eye-icon[data-state="closed"] #eye-half-open { opacity: 0; }
+.animated-eye-icon[data-state="closed"] #eye-almost-closed { opacity: 0; }
+.animated-eye-icon[data-state="closed"] #eye-closed { opacity: 1; }
