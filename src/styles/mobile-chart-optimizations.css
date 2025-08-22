@@ -11,7 +11,7 @@
     height: 250px !important;
     margin: 16px 0;
     padding: 12px;
-    background: var(--bg-primary);
+    background: transparent !important;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
@@ -248,8 +248,24 @@
 
 [data-theme="dark"] .chart-container,
 .darkmode .chart-container {
-  background: var(--bg-dark, #1a202c);
+  background: transparent !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .chart-card,
+.darkmode .chart-card {
+  background: var(--bg-primary) !important;
+}
+
+/* Force all chart containers to be transparent in dark mode */
+.darkmode .chart-container,
+.darkmode .chart-card .chart-container,
+.darkmode #dashboard-expenses-chart-container,
+[data-theme="dark"] .chart-container,
+[data-theme="dark"] .chart-card .chart-container,
+[data-theme="dark"] #dashboard-expenses-chart-container {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 [data-theme="dark"] .chart-card,

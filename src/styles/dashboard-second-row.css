@@ -10,12 +10,12 @@
 
 /* Chart Card - Unified Style */
 .chart-card {
-  background: linear-gradient(135deg, rgba(156, 163, 175, 0.2) 0%, rgba(156, 163, 175, 0.12) 30%, rgba(229, 231, 235, 0.15) 100%);
+  background: var(--bg-primary);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(156, 163, 175, 0.2);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(156, 163, 175, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -54,10 +54,12 @@
   position: relative;
   height: 280px;
   width: 100%;
+  background: transparent !important;
 }
 
 .chart-container canvas {
   max-height: 100%;
+  background: transparent !important;
 }
 
 /* Recent Transactions Card - Unified Style */

@@ -279,6 +279,25 @@ export class ChartManager {
       forceTransparent();
       clearCanvas();
       
+      // DARK MODE FIX: Force container transparency
+      const isDarkMode = document.body.classList.contains('darkmode') || 
+                        document.documentElement.getAttribute('data-theme') === 'dark';
+      
+      if (isDarkMode) {
+        // Force all parent containers to be transparent
+        let container = canvas.parentElement;
+        while (container && container !== document.body) {
+          if (container.classList.contains('chart-container') || 
+              container.classList.contains('chart-card') ||
+              container.id.includes('chart')) {
+            container.style.setProperty('background', 'transparent', 'important');
+            container.style.setProperty('background-color', 'transparent', 'important');
+            console.log('🌙 Dark mode: Forced container transparent:', container.className);
+          }
+          container = container.parentElement;
+        }
+      }
+      
       // Method 3: Override Chart.js render completely
       const originalRender = this[chartProperty].draw;
       this[chartProperty].draw = function() {
