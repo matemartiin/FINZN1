@@ -81,6 +81,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-radius: 32px;
+  background: var(--bg-primary);
 }
 
 .user-profile-modal-header {
@@ -89,7 +91,8 @@
   justify-content: space-between;
   padding: 24px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
-  background: var(--card-bg, #ffffff);
+  background: var(--bg-primary);
+  border-radius: 32px 32px 0 0;
 }
 
 .profile-info {
@@ -101,7 +104,7 @@
 .profile-avatar {
   width: 60px;
   height: 60px;
-  border-radius: 50%;
+  border-radius: 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
@@ -140,7 +143,7 @@
 /* Navegación lateral del modal */
 .profile-navigation {
   width: 200px;
-  background: var(--sidebar-bg, #f7fafc);
+  background: var(--bg-secondary);
   border-right: 1px solid var(--border-color, #e2e8f0);
   padding: 16px 0;
   display: flex;
@@ -157,15 +160,17 @@
   background: none;
   text-align: left;
   cursor: pointer;
-  color: var(--text-secondary, #718096);
+  color: var(--text-secondary);
   transition: all 0.2s ease;
   font-size: 14px;
   width: 100%;
+  border-radius: 16px;
+  margin: 4px 8px;
 }
 
 .profile-nav-item:hover {
-  background: var(--hover-bg, #edf2f7);
-  color: var(--text-primary, #1a202c);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .profile-nav-item.active {
@@ -211,9 +216,9 @@
 
 /* Tarjeta de información del perfil */
 .profile-info-card {
-  background: var(--card-bg, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -232,13 +237,13 @@
 
 .info-item label {
   font-weight: 500;
-  color: var(--text-secondary, #718096);
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .info-item span {
   font-weight: 500;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary);
 }
 
 /* Opciones de configuración */
@@ -249,9 +254,9 @@
 }
 
 .setting-card {
-  background: var(--card-bg, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
   padding: 20px;
 }
 
@@ -259,12 +264,12 @@
   margin: 0 0 8px 0;
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary);
 }
 
 .setting-card p {
   margin: 0 0 16px 0;
-  color: var(--text-secondary, #718096);
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -282,9 +287,9 @@
 }
 
 .theme-option {
-  background: var(--card-bg, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
   padding: 20px;
 }
 
@@ -298,8 +303,8 @@
 .theme-slider {
   width: 50px;
   height: 24px;
-  background: var(--border-color, #e2e8f0);
-  border-radius: 12px;
+  background: var(--border-color);
+  border-radius: 20px;
   position: relative;
   transition: background 0.3s ease;
 }
@@ -336,13 +341,13 @@
 
 .theme-title {
   font-weight: 500;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .theme-description {
   font-size: 14px;
-  color: var(--text-secondary, #718096);
+  color: var(--text-secondary);
 }
 
 /* Responsive - MÓVIL OPTIMIZADO */
@@ -366,14 +371,14 @@
     height: 90vh;
     max-height: 90vh;
     margin: 5vh auto;
-    border-radius: 20px 20px 12px 12px;
+    border-radius: 32px 32px 24px 24px;
     overflow: hidden;
     position: relative;
   }
   
   .user-profile-modal-header {
     padding: 20px 16px 16px 16px;
-    border-radius: 20px 20px 0 0;
+    border-radius: 32px 32px 0 0;
     background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-dark, #5a67d8) 100%);
     color: white;
     border-bottom: none;
@@ -387,7 +392,7 @@
   .user-profile-modal-header .modal-close {
     color: white;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
+    border-radius: 16px;
     width: 32px;
     height: 32px;
     display: flex;
@@ -423,7 +428,7 @@
     min-width: 100px;
     flex-shrink: 0;
     padding: 12px 16px;
-    border-radius: 20px;
+    border-radius: 24px;
     font-size: 13px;
     font-weight: 600;
     text-align: center;
@@ -467,7 +472,7 @@
   .theme-option {
     padding: 16px;
     margin-bottom: 16px;
-    border-radius: 12px;
+    border-radius: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   
@@ -568,34 +573,102 @@
 }
 
 /* Dark mode support */
+.darkmode .user-profile-btn,
 [data-theme="dark"] .user-profile-btn {
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
+.darkmode .user-profile-btn:hover,
 [data-theme="dark"] .user-profile-btn:hover {
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
 }
 
+.darkmode .user-profile-modal-content,
+[data-theme="dark"] .user-profile-modal-content {
+  background: var(--bg-primary);
+}
+
+.darkmode .user-profile-modal-header,
 [data-theme="dark"] .user-profile-modal-header {
-  background: var(--card-bg-dark, #2d3748);
-  border-bottom-color: var(--border-color-dark, #4a5568);
+  background: var(--bg-primary);
+  border-bottom-color: var(--border-color);
 }
 
+.darkmode .profile-navigation,
 [data-theme="dark"] .profile-navigation {
-  background: var(--sidebar-bg-dark, #2d3748);
-  border-right-color: var(--border-color-dark, #4a5568);
+  background: var(--bg-secondary);
+  border-right-color: var(--border-color);
 }
 
+.darkmode .profile-nav-item,
 [data-theme="dark"] .profile-nav-item {
-  color: var(--text-secondary-dark, #a0aec0);
+  color: var(--text-secondary);
 }
 
+.darkmode .profile-nav-item:hover,
 [data-theme="dark"] .profile-nav-item:hover {
-  background: var(--hover-bg-dark, #4a5568);
-  color: var(--text-primary-dark, #f7fafc);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
+.darkmode .profile-nav-item.active,
 [data-theme="dark"] .profile-nav-item.active {
   background: var(--primary-color, #667eea);
   color: white;
+}
+
+.darkmode .profile-info-card,
+.darkmode .setting-card,
+.darkmode .theme-option,
+[data-theme="dark"] .profile-info-card,
+[data-theme="dark"] .setting-card,
+[data-theme="dark"] .theme-option {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+.darkmode .profile-details h3,
+.darkmode .profile-details p,
+.darkmode .info-item label,
+.darkmode .info-item span,
+.darkmode .setting-card h5,
+.darkmode .setting-card p,
+.darkmode .theme-title,
+.darkmode .theme-description,
+.darkmode .profile-section h4,
+[data-theme="dark"] .profile-details h3,
+[data-theme="dark"] .profile-details p,
+[data-theme="dark"] .info-item label,
+[data-theme="dark"] .info-item span,
+[data-theme="dark"] .setting-card h5,
+[data-theme="dark"] .setting-card p,
+[data-theme="dark"] .theme-title,
+[data-theme="dark"] .theme-description,
+[data-theme="dark"] .profile-section h4 {
+  color: var(--text-primary);
+}
+
+.darkmode .info-item label,
+.darkmode .setting-card p,
+.darkmode .theme-description,
+[data-theme="dark"] .info-item label,
+[data-theme="dark"] .setting-card p,
+[data-theme="dark"] .theme-description {
+  color: var(--text-secondary);
+}
+
+/* Mobile dark mode header override */
+@media (max-width: 768px) {
+  .darkmode .user-profile-modal-header,
+  [data-theme="dark"] .user-profile-modal-header {
+    background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-dark, #5a67d8) 100%);
+    color: white;
+  }
+  
+  .darkmode .user-profile-modal-header .profile-details h3,
+  .darkmode .user-profile-modal-header .profile-details p,
+  [data-theme="dark"] .user-profile-modal-header .profile-details h3,
+  [data-theme="dark"] .user-profile-modal-header .profile-details p {
+    color: white !important;
+  }
 }

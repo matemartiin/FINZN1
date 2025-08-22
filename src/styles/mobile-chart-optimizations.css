@@ -29,9 +29,12 @@
   #expenses-chart,
   #income-chart,
   #goals-chart,
-  #budget-chart {
+  #budget-chart,
+  #dashboard-expenses-chart,
+  #trend-chart {
     max-height: 200px !important;
     width: 100% !important;
+    background: transparent !important;
   }
 
   /* Chart wrapper for better mobile layout */
@@ -269,10 +272,21 @@
 /* PERFORMANCE OPTIMIZATIONS */
 /* ========================================== */
 
+/* Ensure all chart canvases are transparent */
+canvas[id*="chart"] {
+  background: transparent !important;
+}
+
+.chart-container canvas,
+canvas {
+  background: transparent !important;
+}
+
 @media (max-width: 768px) {
   /* Reduce animations for better performance */
   .chart-container canvas {
     will-change: auto;
+    background: transparent !important;
   }
 
   /* Optimize chart rendering */

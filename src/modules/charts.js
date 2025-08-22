@@ -76,9 +76,14 @@ export class ChartManager {
     const colors = this.getCategoryColors(labels, categories);
 
     try {
+      // Clear canvas background to ensure transparency
+      const context = ctx.getContext('2d');
+      context.clearRect(0, 0, ctx.width, ctx.height);
+      
       // Detect dark mode
-      const isDarkMode = document.body.classList.contains('darkmode');
-      const legendColor = isDarkMode ? '#e5e7eb' : '#374151';
+      const isDarkMode = document.body.classList.contains('darkmode') || 
+                        document.documentElement.getAttribute('data-theme') === 'dark';
+      const legendColor = isDarkMode ? '#e5e7eb' : '#1a202c';
       const borderColor = isDarkMode ? 'rgba(55, 65, 81, 0.3)' : 'rgba(255, 255, 255, 0.8)';
 
       this[chartProperty] = new Chart(ctx, {
@@ -100,7 +105,6 @@ export class ChartManager {
           responsive: true,
           maintainAspectRatio: false,
           devicePixelRatio: window.devicePixelRatio || 1,
-          backgroundColor: 'transparent',
           animation: {
             animateRotate: true,
             animateScale: true,
