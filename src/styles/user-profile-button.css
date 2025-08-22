@@ -48,7 +48,17 @@
   padding-top: 30px !important; /* Espacio reducido, más compacto */
 }
 
+/* Ajustar la barra de navegación lateral para alinearse con el contenido */
+.sidebar-nav {
+  top: 30px !important; /* Alinear con el nuevo espaciado del dashboard */
+  margin-top: 0 !important;
+}
+
 /* Modal del perfil de usuario */
+#user-profile-modal.modal.active {
+  display: flex !important; /* Override .hidden class when active */
+}
+
 .user-profile-modal-content {
   max-width: 800px;
   width: 90%;

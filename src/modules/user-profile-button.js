@@ -217,6 +217,7 @@ export class UserProfileButton {
     console.log('👤 Modal element found:', this.modal);
     if (this.modal) {
       this.updateModalContent();
+      this.modal.classList.remove('hidden');
       this.modal.classList.add('active');
       this.switchSection('profile'); // Always start with profile section
       
@@ -237,6 +238,7 @@ export class UserProfileButton {
   closeModal() {
     if (this.modal) {
       this.modal.classList.remove('active');
+      this.modal.classList.add('hidden');
       document.body.style.overflow = '';
       this.modal = null;
     }
