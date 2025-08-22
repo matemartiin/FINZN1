@@ -16,6 +16,7 @@ import { AnimationManager } from './modules/animations.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
 import { loadingManager } from './modules/loading.js';
 import { inputValidator } from './modules/input-validation.js';
+import { MobileTesting } from './utils/mobile-testing.js';
 
 
 console.log('FINZN App - Starting initialization');
@@ -112,6 +113,15 @@ this.setupModalEvents();
       
       this.setupEventListeners();
       console.log('✅ FINZN App initialized successfully');
+      
+      // Auto-run mobile tests in development
+      if ((import.meta.env?.DEV || window.location.hostname === 'localhost') && 
+          window.location.search.includes('test=mobile')) {
+        setTimeout(async () => {
+          const testing = new MobileTesting();
+          await testing.runAllTests();
+        }, 3000);
+      }
     } catch (error) {
       console.error('❌ Error initializing app:', error);
       this.showAuth();

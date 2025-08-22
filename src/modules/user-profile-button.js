@@ -26,21 +26,31 @@ export class UserProfileButton {
     
     this.isInitialized = true;
     
-    console.log('👤 User Profile Button initialized');
-    console.log('👤 ModalManager available:', !!(window.app && window.app.modals));
+    if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+      console.log('👤 User Profile Button initialized');
+      console.log('👤 ModalManager available:', !!(window.app && window.app.modals));
+    }
   }
 
   // Set up event listeners
   setupEventListeners() {
     // Profile button click
     const profileBtn = document.getElementById('user-profile-btn');
-    console.log('👤 Profile button found:', profileBtn);
+    if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+      console.log('👤 Profile button found:', profileBtn);
+    }
+    
     if (profileBtn) {
       profileBtn.addEventListener('click', () => {
-        console.log('👤 Profile button clicked');
+        if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+          console.log('👤 Profile button clicked');
+        }
         this.openModal();
       });
-      console.log('👤 Profile button event listener attached');
+      
+      if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+        console.log('👤 Profile button event listener attached');
+      }
     } else {
       console.error('❌ Profile button not found!');
     }
@@ -213,38 +223,60 @@ export class UserProfileButton {
 
   // Open the profile modal
   openModal() {
-    console.log('👤 Opening profile modal...');
+    const isDev = import.meta.env?.DEV || window.location.hostname === 'localhost';
+    if (isDev) console.log('👤 Opening profile modal...');
     
-    // Use the existing modal manager
-    if (window.app && window.app.modals) {
-      this.updateModalContent();
-      this.switchSection('profile'); // Always start with profile section
-      window.app.modals.show('user-profile-modal');
-      console.log('👤 Modal opened via ModalManager');
-    } else {
-      // Fallback to manual modal management
-      this.modal = document.getElementById('user-profile-modal');
-      console.log('👤 Modal element found:', this.modal);
-      if (this.modal) {
-        console.log('👤 Modal classes before:', this.modal.className);
+    // Wait a bit if window.app is not ready yet
+    const tryOpenModal = (retries = 3) => {
+      if (window.app && window.app.modals) {
         this.updateModalContent();
-        
-        // Force remove all problematic classes
-        this.modal.classList.remove('hidden');
-        this.modal.classList.remove('closing');
-        this.modal.style.display = 'flex';
-        this.modal.style.visibility = 'visible';
-        this.modal.style.opacity = '1';
-        this.modal.classList.add('active');
-        
-        console.log('👤 Modal classes after:', this.modal.className);
         this.switchSection('profile'); // Always start with profile section
-        
-        document.body.style.overflow = 'hidden';
-        console.log('👤 Modal opened manually');
+        window.app.modals.show('user-profile-modal');
+        if (isDev) console.log('👤 Modal opened via ModalManager');
+        return true;
+      } else if (retries > 0) {
+        if (isDev) console.log('👤 ModalManager not ready, retrying...', retries);
+        setTimeout(() => tryOpenModal(retries - 1), 100);
+        return false;
       } else {
-        console.error('❌ Modal element not found!');
+        // Fallback to manual modal management
+        return this.openModalManually();
       }
+    };
+
+    return tryOpenModal();
+  }
+
+  // Fallback manual modal opening
+  openModalManually() {
+    const isDev = import.meta.env?.DEV || window.location.hostname === 'localhost';
+    
+    this.modal = document.getElementById('user-profile-modal');
+    if (isDev) console.log('👤 Modal element found:', this.modal);
+    
+    if (this.modal) {
+      if (isDev) console.log('👤 Modal classes before:', this.modal.className);
+      
+      this.updateModalContent();
+      
+      // Force remove all problematic classes
+      this.modal.classList.remove('hidden');
+      this.modal.classList.remove('closing');
+      this.modal.style.display = 'flex';
+      this.modal.style.visibility = 'visible';
+      this.modal.style.opacity = '1';
+      this.modal.classList.add('active');
+      
+      if (isDev) console.log('👤 Modal classes after:', this.modal.className);
+      
+      this.switchSection('profile'); // Always start with profile section
+      document.body.style.overflow = 'hidden';
+      
+      if (isDev) console.log('👤 Modal opened manually');
+      return true;
+    } else {
+      console.error('❌ Modal element not found!');
+      return false;
     }
   }
 
