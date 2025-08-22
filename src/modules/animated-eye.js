@@ -3,15 +3,37 @@ export class AnimatedEye {
     this.svgElement = svgElement;
     this.states = ['open', 'half-open', 'almost-closed', 'closed'];
     this.currentStateIndex = 0;
+    this.isAnimating = false;
     
     // Initialize with first state
     this.updateState();
   }
   
-  // Cycle to next state
-  nextState() {
-    this.currentStateIndex = (this.currentStateIndex + 1) % this.states.length;
+  // Animate through all states with delays
+  animateSequence() {
+    if (this.isAnimating) return; // Prevent multiple animations
+    
+    this.isAnimating = true;
+    
+    // Start from open state
+    this.currentStateIndex = 0;
     this.updateState();
+    
+    // Animate through each state with delays
+    const delays = [300, 300, 300]; // Delays between states in ms
+    
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        this.currentStateIndex = index + 1;
+        this.updateState();
+        
+        // If we've reached the last state, allow new animations
+        if (index === delays.length - 1) {
+          this.isAnimating = false;
+        }
+      }, delay * (index + 1));
+    });
+    
     return this.getCurrentState();
   }
   
@@ -28,6 +50,8 @@ export class AnimatedEye {
   
   // Set specific state by name
   setState(stateName) {
+    if (this.isAnimating) return; // Don't allow manual state changes during animation
+    
     const stateIndex = this.states.indexOf(stateName);
     if (stateIndex !== -1) {
       this.currentStateIndex = stateIndex;
@@ -37,7 +61,14 @@ export class AnimatedEye {
   
   // Reset to first state
   reset() {
+    if (this.isAnimating) return;
+    
     this.currentStateIndex = 0;
     this.updateState();
+  }
+  
+  // Check if currently animating
+  getIsAnimating() {
+    return this.isAnimating;
   }
 }

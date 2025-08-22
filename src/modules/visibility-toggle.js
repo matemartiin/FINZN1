@@ -36,9 +36,9 @@ export class VisibilityToggle {
     const toggleBtn = document.getElementById('toggle-visibility-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        // Advance eye animation state
+        // Start eye animation sequence
         if (this.animatedEye) {
-          this.animatedEye.nextState();
+          this.animatedEye.animateSequence();
         }
         
         // Toggle visibility (original functionality)
