@@ -272,7 +272,7 @@
 /* PERFORMANCE OPTIMIZATIONS */
 /* ========================================== */
 
-/* Ensure all chart canvases are transparent - AGGRESSIVE */
+/* Ensure all chart canvases are transparent - MAXIMUM AGGRESSIVE */
 canvas[id*="chart"],
 canvas[id*="expenses"],
 canvas[id*="dashboard"],
@@ -282,17 +282,53 @@ canvas[id*="trend"],
 #trend-chart,
 #income-chart,
 #goals-chart,
-#budget-chart {
+#budget-chart,
+canvas[data-transparent="true"],
+.chart-container > canvas,
+.chart-card > canvas,
+div > canvas,
+body canvas {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Override any inherited backgrounds */
+.chart-container canvas,
+.chart-card canvas,
+.dashboard-second-row canvas,
+.chart-content canvas,
+canvas {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Specific canvas element override - nuclear option */
+canvas,
+canvas:before,
+canvas:after {
   background-color: transparent !important;
   background-image: none !important;
   background: transparent !important;
 }
 
-.chart-container canvas,
-.chart-card canvas,
-canvas {
+/* Chart.js specific overrides */
+.chartjs-render-monitor {
+  background: transparent !important;
   background-color: transparent !important;
-  background-image: none !important;
+}
+
+/* Dark mode specific canvas fixes */
+.darkmode canvas,
+[data-theme="dark"] canvas,
+body.darkmode canvas {
+  background-color: transparent !important;
   background: transparent !important;
 }
 

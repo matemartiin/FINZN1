@@ -3,13 +3,41 @@ const transparentBackgroundPlugin = {
   id: 'transparentBackground',
   beforeDraw: (chart) => {
     const ctx = chart.canvas.getContext('2d');
+    const canvas = chart.canvas;
+    
+    // Method 1: Clear the entire canvas
     ctx.save();
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillStyle = 'transparent';
-    ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
     
-    // Also force canvas styles
+    // Method 2: Force canvas style properties with maximum priority
+    const styleProps = [
+      'background-color',
+      'background-image', 
+      'background',
+      'backgroundColor'
+    ];
+    
+    styleProps.forEach(prop => {
+      try {
+        canvas.style.setProperty(prop, 'transparent', 'important');
+        canvas.style.removeProperty(prop);
+        canvas.style[prop] = 'transparent';
+      } catch (e) {
+        console.log('Style override attempt:', prop, e.message);
+      }
+    });
+    
+    // Method 3: Remove any CSS classes that might add background
+    canvas.classList.remove('chart-bg', 'chart-background', 'bg-white', 'bg-dark');
+    
+    // Method 4: Set data attribute for CSS targeting
+    canvas.setAttribute('data-transparent', 'true');
+  },
+  
+  afterDraw: (chart) => {
+    // Double-check after drawing
     const canvas = chart.canvas;
     canvas.style.backgroundColor = 'transparent';
     canvas.style.background = 'transparent';
@@ -214,34 +242,76 @@ export class ChartManager {
         }
       });
       
-      // Force transparent background after chart creation
+      // ULTRA AGGRESSIVE: Force transparent background after chart creation
       const canvas = this[chartProperty].canvas;
       const canvasStyle = canvas.style;
-      
-      // Method 1: CSS override with highest priority
-      canvasStyle.setProperty('background-color', 'transparent', 'important');
-      canvasStyle.setProperty('background', 'transparent', 'important');
-      
-      // Method 2: Canvas element direct assignment
-      canvas.style.backgroundColor = 'transparent';
-      canvas.style.background = 'transparent';
-      
-      // Method 3: Manual clear of canvas background
       const context = canvas.getContext('2d');
       const { width, height } = canvas;
       
-      // Override the Chart.js render to ensure transparency
+      // Debug: Log current state
+      console.log('🐛 Canvas DEBUG:', {
+        id: canvas.id,
+        currentBg: getComputedStyle(canvas).backgroundColor,
+        styleBg: canvas.style.backgroundColor,
+        width: canvas.width,
+        height: canvas.height
+      });
+      
+      // Method 1: Nuclear CSS override
+      const forceTransparent = () => {
+        ['background-color', 'background-image', 'background', 'backgroundColor'].forEach(prop => {
+          canvasStyle.setProperty(prop, 'transparent', 'important');
+          canvasStyle[prop] = 'transparent';
+        });
+        canvas.setAttribute('data-transparent-forced', 'true');
+      };
+      
+      // Method 2: Canvas context manipulation
+      const clearCanvas = () => {
+        context.save();
+        context.globalCompositeOperation = 'copy';
+        context.fillStyle = 'rgba(0,0,0,0)';
+        context.fillRect(0, 0, width, height);
+        context.restore();
+      };
+      
+      // Apply immediately
+      forceTransparent();
+      clearCanvas();
+      
+      // Method 3: Override Chart.js render completely
       const originalRender = this[chartProperty].draw;
       this[chartProperty].draw = function() {
-        // Clear with transparent before drawing
+        // Force clear before every render
         context.save();
-        context.globalCompositeOperation = 'source-over';
+        context.globalCompositeOperation = 'copy';
+        context.fillStyle = 'transparent';
         context.clearRect(0, 0, width, height);
         context.restore();
         
+        // Force style again
+        forceTransparent();
+        
         // Call original render
         originalRender.call(this);
+        
+        // Force style after render
+        setTimeout(() => forceTransparent(), 0);
       };
+      
+      // Method 4: Continuous monitoring
+      const monitor = setInterval(() => {
+        const computed = getComputedStyle(canvas);
+        if (computed.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
+            computed.backgroundColor !== 'transparent') {
+          console.log('🐛 Background detected, forcing transparent:', computed.backgroundColor);
+          forceTransparent();
+          clearCanvas();
+        }
+      }, 100);
+      
+      // Stop monitoring after 5 seconds
+      setTimeout(() => clearInterval(monitor), 5000);
       
       console.log('✅ Chart created successfully:', chartProperty);
     } catch (error) {
