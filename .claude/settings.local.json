@@ -21,6 +21,9 @@
       "Bash(echo $VITE_GOOGLE_CLIENT_ID)",
       "Bash(curl:*)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "C:\\c\\Users\\mateo\\OneDrive\\Documentos\\GitHub"
+    ]
   }
 }

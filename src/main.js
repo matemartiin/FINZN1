@@ -11,6 +11,7 @@ import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
 import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
+import { UserProfileButton } from './modules/user-profile-button.js';
 import { AnimationManager } from './modules/animations.js';
 import { DOMHelpers } from './utils/dom-helpers.js';
 import { loadingManager } from './modules/loading.js';
@@ -37,6 +38,7 @@ class FinznApp {
     this.budget = new BudgetManager();
     this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
+    this.userProfileButton = new UserProfileButton();
     this.animations = new AnimationManager();
     
     this.currentMonth = this.getCurrentMonth();
@@ -73,6 +75,9 @@ this.setupModalEvents();
       
       // Initialize user profile
       this.userProfile.init();
+      
+      // Initialize user profile button
+      await this.userProfileButton.init(this.userProfile, this.auth, this.theme);
       
       // Setup month selector
       this.setupMonthSelector();
@@ -703,6 +708,11 @@ setupDashboardEvents() {
       const categories = this.data.getCategories();
       this.ui.updateCategoriesSelect(categories, 'expense-category');
       this.ui.updateCategoriesSelect(categories, 'limit-category');
+      
+      // Update user profile button
+      if (this.userProfileButton) {
+        await this.userProfileButton.refresh();
+      }
       
       console.log('✅ User data loaded successfully');
     } catch (error) {

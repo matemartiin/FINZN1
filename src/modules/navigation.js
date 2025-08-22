@@ -102,11 +102,7 @@ export class NavigationManager {
     if (e.key === 'Escape') close();
   });
 
-  // Ir a Configuración
-  settingsBtn?.addEventListener('click', () => {
-    this.showSection('settings');
-    close();
-  });
+  // Settings now handled by user profile modal - remove this handler
 
   // Logout (usa el mismo handler que ya tenés)
   logoutBtn?.addEventListener('click', () => {
@@ -240,7 +236,6 @@ export class NavigationManager {
       'transactions': 'Transacciones',
       'goals': 'Objetivos de Ahorro',
       'reports': 'Reportes y Análisis',
-      'settings': 'Configuración',
       'calendar': 'Calendario Financiero',
       'budgets': 'Gestión de Presupuestos'
     };

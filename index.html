@@ -31,6 +31,8 @@
   <link rel="stylesheet" href="./src/styles/animation-compatibility.css">
   <!-- Color override must be last to take precedence -->
   <link rel="stylesheet" href="./src/styles/dashboard-numbers-color.css">
+  <!-- User Profile Button Styles -->
+  <link rel="stylesheet" href="./src/styles/user-profile-button.css">
 </head>
 <body data-layout="v2" data-skin="pro">
   <!-- Alert System -->
@@ -117,73 +119,12 @@
   
   <!-- Main Application -->
   <div id="app" class="app hidden">
-    <!-- Header -->
-    <header class="header">
-  <div class="header-content">
-    <!-- IZQUIERDA: logo -->
-    <div class="header-left">
-      <div class="logo-container">
-        <div class="finzn-logo-header">
-          <img src="/isotipo.png" alt="FINZN Logo" class="logo-icon" />
-        </div>
-        <h1 class="logo">FINZN</h1>
-      </div>
-    </div>
-
-    <!-- DERECHA: usuario + tema + salir (desktop) -->
-    <div class="header-right">
-      <div class="user-info">
-        <span id="user-name"></span>
-      </div>
-
-      <!-- Botón tema (desktop) -->
-      <button id="theme-toggle" class="btn btn-icon theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
-  <i class="ph ph-moon-stars" aria-hidden="true"></i>
-</button>
-
-
-      <!-- Salir (desktop) -->
-      <button id="logout-btn" class="btn btn-secondary logout-btn" title="Cerrar sesión">
-  <i class="ph ph-sign-out" aria-hidden="true"></i>
-  <span class="logout-text">Salir</span>
-</button>
-
-      <!-- Hamburguesa (solo mobile) -->
-      <button id="header-menu-toggle" class="hamburger" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
+    <!-- User Profile Button -->
+    <div class="user-profile-button-container">
+      <button id="user-profile-btn" class="user-profile-btn" title="Abrir perfil">
+        <span id="user-initials" class="user-initials">U</span>
       </button>
-
-      <!-- Menú móvil -->
-      <div id="header-menu" class="header-menu">
-        <div class="header-menu-header">
-          <div class="menu-user">
-            <div class="menu-user-avatar"><i class="ph ph-user"></i></div>
-            <div class="menu-user-name" id="menu-user-name">Usuario</div>
-          </div>
-          <button id="header-menu-close" class="menu-close" aria-label="Cerrar">
-            <i class="ph ph-x" aria-hidden="true"></i>
-          </button>
-        </div>
-
-        <nav class="header-menu-items">
-          <button class="menu-item" id="header-menu-settings">
-            <i class="ph ph-gear-six" aria-hidden="true"></i> Configuración
-          </button>
-
-          <label class="menu-item switch">
-            <input type="checkbox" id="header-theme-switch" />
-            <span class="slider"></span>
-            <span class="switch-label">Modo oscuro</span>
-          </label>
-
-          <button class="menu-item danger" id="header-menu-logout">
-            <i class="ph ph-sign-out" aria-hidden="true"></i> Salir
-          </button>
-        </nav>
-      </div>
     </div>
-  </div>
-</header>
 
 
     <!-- Dashboard with New Layout -->
@@ -225,10 +166,6 @@
             <div class="nav-item" data-section="reports">
   <div class="nav-icon icon"><i class="ph ph-chart-line-up"></i></div>
   <span class="nav-label">Reportes</span>
-</div>
-            <div class="nav-item" data-section="settings">
-  <div class="nav-icon icon"><i class="ph ph-gear-six"></i></div>
-  <span class="nav-label">Configuración</span>
 </div>
           </div>
           
@@ -459,83 +396,6 @@
           </div>
         </section>
 
-        <!-- Settings Section -->
-        <section id="settings-section" class="dashboard-section">
-          
-          <div class="section-content">
-            <div class="section-header">
-              <h1>Configuración</h1>
-            </div>
-            
-            <!-- Settings Categories -->
-            <div class="settings-categories">
-              <div class="settings-category">
-                <h3><i class="ph ph-user" aria-hidden="true"></i> Cuenta y Perfil</h3>
-                <div class="settings-grid">
-                  <div class="settings-card">
-                    <h4>Información Personal</h4>
-                    <p>Actualiza tu información de perfil</p>
-                    <button id="edit-profile-btn" class="btn btn-secondary btn-sm">Editar Perfil</button>
-                  </div>
-                  
-                  <div class="settings-card">
-                    <h4>Seguridad</h4>
-                    <p>Cambiar contraseña y configuración de seguridad</p>
-                    <button class="btn btn-secondary btn-sm">Configurar</button>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="settings-category">
-                <h3><i class="ph ph-tag" aria-hidden="true"></i> Personalización</h3>
-                <div class="settings-grid">
-                  <div class="settings-card">
-                    <h4>Categorías</h4>
-                    <p>Gestiona tus categorías de gastos</p>
-                    <button id="manage-categories-btn" class="btn btn-secondary btn-sm">
-  <i class="ph ph-tag" aria-hidden="true"></i> Gestionar
-</button>
-                  </div>
-                  
-                  <div class="settings-card">
-                    <h4>Tema y Apariencia</h4>
-                    <p>Personaliza la apariencia de la aplicación</p>
-                    <button class="btn btn-secondary btn-sm">Personalizar</button>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="settings-category">
-                <h3><i class="ph ph-database" aria-hidden="true"></i> Datos y Respaldo</h3>
-                <div class="settings-grid">
-                  <div class="settings-card">
-                    <h4>Exportar Datos</h4>
-                    <p>Descarga tus datos financieros</p>
-                    <button id="export-data-btn" class="btn btn-secondary btn-sm">
-  <i class="ph ph-download-simple" aria-hidden="true"></i> Exportar
-</button>
-                  </div>
-                  
-                  <div class="settings-card">
-                    <h4>Importar Datos</h4>
-                    <p>Carga tus datos desde archivo CSV</p>
-                    <button id="import-data-btn" class="btn btn-secondary btn-sm">
-  <i class="ph ph-upload-simple" aria-hidden="true"></i> Importar
-</button>
-                  </div>
-                  
-                  <div class="settings-card">
-                    <h4>Respaldo de Datos</h4>
-                    <p>Respalda y restaura tu información</p>
-                    <button id="backup-data-btn" class="btn btn-secondary btn-sm">
-  <i class="ph ph-cloud-arrow-up" aria-hidden="true"></i> Respaldar
-</button>
-                  </div>
-              </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         <!-- Budgets Section -->
         <section id="budgets-section" class="dashboard-section">
@@ -1613,6 +1473,119 @@
           <i class="ph ph-sparkle" aria-hidden="true"></i>
           Aplicar Recomendaciones
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div id="user-profile-modal" class="modal">
+    <div class="modal-content user-profile-modal-content">
+      <div class="user-profile-modal-header">
+        <div class="profile-info">
+          <div class="profile-avatar">
+            <span id="profile-modal-initials" class="profile-modal-initials">U</span>
+          </div>
+          <div class="profile-details">
+            <h3 id="profile-modal-name">Usuario</h3>
+            <p id="profile-modal-email">email@ejemplo.com</p>
+          </div>
+        </div>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+      </div>
+      
+      <div class="user-profile-modal-body">
+        <nav class="profile-navigation">
+          <button class="profile-nav-item active" data-section="profile">
+            <i class="ph ph-user" aria-hidden="true"></i>
+            <span>Perfil</span>
+          </button>
+          <button class="profile-nav-item" data-section="settings">
+            <i class="ph ph-gear-six" aria-hidden="true"></i>
+            <span>Configuración</span>
+          </button>
+          <button class="profile-nav-item" data-section="theme">
+            <i class="ph ph-palette" aria-hidden="true"></i>
+            <span>Tema</span>
+          </button>
+          <button class="profile-nav-item danger" id="profile-logout-btn">
+            <i class="ph ph-sign-out" aria-hidden="true"></i>
+            <span>Cerrar Sesión</span>
+          </button>
+        </nav>
+        
+        <div class="profile-content">
+          <!-- Profile Section -->
+          <div id="profile-content-section" class="profile-section active">
+            <h4>Información Personal</h4>
+            <div class="profile-info-card">
+              <div class="info-item">
+                <label>Nombre</label>
+                <span id="profile-display-first-name">-</span>
+              </div>
+              <div class="info-item">
+                <label>Apellido</label>
+                <span id="profile-display-last-name">-</span>
+              </div>
+              <div class="info-item">
+                <label>Email</label>
+                <span id="profile-display-email">-</span>
+              </div>
+            </div>
+            <button id="edit-profile-from-modal" class="btn btn-primary">
+              <i class="ph ph-pencil" aria-hidden="true"></i>
+              Editar Perfil
+            </button>
+          </div>
+          
+          <!-- Settings Section -->
+          <div id="settings-content-section" class="profile-section">
+            <h4>Configuración</h4>
+            <div class="settings-options">
+              <div class="setting-card">
+                <h5>Categorías</h5>
+                <p>Gestiona tus categorías de gastos</p>
+                <button id="manage-categories-from-modal" class="btn btn-secondary btn-sm">
+                  <i class="ph ph-tag" aria-hidden="true"></i> Gestionar
+                </button>
+              </div>
+              
+              <div class="setting-card">
+                <h5>Datos y Respaldo</h5>
+                <p>Exporta, importa y respalda tus datos</p>
+                <div class="setting-actions">
+                  <button id="export-data-from-modal" class="btn btn-secondary btn-sm">
+                    <i class="ph ph-download-simple" aria-hidden="true"></i> Exportar
+                  </button>
+                  <button id="import-data-from-modal" class="btn btn-secondary btn-sm">
+                    <i class="ph ph-upload-simple" aria-hidden="true"></i> Importar
+                  </button>
+                  <button id="backup-data-from-modal" class="btn btn-secondary btn-sm">
+                    <i class="ph ph-cloud-arrow-up" aria-hidden="true"></i> Respaldar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Theme Section -->
+          <div id="theme-content-section" class="profile-section">
+            <h4>Personalización</h4>
+            <div class="theme-options">
+              <div class="theme-option">
+                <label class="theme-switch">
+                  <input type="checkbox" id="profile-theme-toggle" />
+                  <span class="theme-slider"></span>
+                  <div class="theme-info">
+                    <span class="theme-title">Modo Oscuro</span>
+                    <span class="theme-description">Activa el tema oscuro para mejor visualización nocturna</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
