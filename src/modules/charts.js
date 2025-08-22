@@ -280,9 +280,6 @@ export class ChartManager {
       clearCanvas();
       
       // DARK MODE FIX: Force container transparency
-      const isDarkMode = document.body.classList.contains('darkmode') || 
-                        document.documentElement.getAttribute('data-theme') === 'dark';
-      
       if (isDarkMode) {
         // Force all parent containers to be transparent
         let container = canvas.parentElement;
