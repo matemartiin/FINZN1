@@ -338,24 +338,24 @@
   }
 }
 
-/* Dark theme adjustments */
-[data-theme="dark"] .chart-card,
-[data-theme="dark"] .recent-transactions-card {
-  background: linear-gradient(135deg, rgba(55, 65, 81, 0.3) 0%, rgba(55, 65, 81, 0.15) 30%, rgba(75, 85, 99, 0.2) 100%);
-  border-color: rgba(75, 85, 99, 0.3);
+/* Pro Skin (Dark Mode) adjustments */
+body[data-skin="pro"] .chart-card,
+body[data-skin="pro"] .recent-transactions-card {
+  background: var(--pro-surface);
+  border-color: var(--pro-border);
 }
 
-[data-theme="dark"] .recent-transaction-item {
-  background: rgba(31, 41, 55, 0.5);
-  border-color: rgba(75, 85, 99, 0.2);
+body[data-skin="pro"] .recent-transaction-item {
+  background: var(--pro-elev);
+  border-color: var(--pro-border);
 }
 
-[data-theme="dark"] .recent-transaction-item:hover {
-  background: rgba(31, 41, 55, 0.7);
-  border-color: rgba(75, 85, 99, 0.3);
+body[data-skin="pro"] .recent-transaction-item:hover {
+  background: var(--pro-surface);
+  border-color: var(--pro-border);
 }
 
-[data-theme="dark"] .transaction-icon {
-  background: rgba(31, 41, 55, 0.8);
-  border-color: rgba(75, 85, 99, 0.2);
+body[data-skin="pro"] .transaction-icon {
+  background: var(--pro-bg);
+  border-color: var(--pro-border);
 }

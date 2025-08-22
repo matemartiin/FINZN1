@@ -1,46 +1,20 @@
-// Register Chart.js transparent background plugin
+// Clean Chart.js transparent background plugin
 const transparentBackgroundPlugin = {
   id: 'transparentBackground',
   beforeDraw: (chart) => {
-    const ctx = chart.canvas.getContext('2d');
     const canvas = chart.canvas;
     
-    // Method 1: Clear the entire canvas
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-    
-    // Method 2: Force canvas style properties with maximum priority
-    const styleProps = [
-      'background-color',
-      'background-image', 
-      'background',
-      'backgroundColor'
-    ];
-    
-    styleProps.forEach(prop => {
-      try {
-        canvas.style.setProperty(prop, 'transparent', 'important');
-        canvas.style.removeProperty(prop);
-        canvas.style[prop] = 'transparent';
-      } catch (e) {
-        console.log('Style override attempt:', prop, e.message);
-      }
-    });
-    
-    // Method 3: Remove any CSS classes that might add background
-    canvas.classList.remove('chart-bg', 'chart-background', 'bg-white', 'bg-dark');
-    
-    // Method 4: Set data attribute for CSS targeting
-    canvas.setAttribute('data-transparent', 'true');
-  },
-  
-  afterDraw: (chart) => {
-    // Double-check after drawing
-    const canvas = chart.canvas;
+    // Simple: Force canvas to be transparent
     canvas.style.backgroundColor = 'transparent';
     canvas.style.background = 'transparent';
+    
+    // Clear canvas background
+    const ctx = chart.canvas.getContext('2d');
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = 'transparent';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
   }
 };
 
@@ -143,9 +117,9 @@ export class ChartManager {
       try {
         const context = ctx.getContext('2d');
         context.clearRect(0, 0, ctx.width, ctx.height);
-        // Detect dark mode for empty state text
-        const isDarkMode = document.body.classList.contains('darkmode');
-        context.fillStyle = isDarkMode ? '#a0aec0' : '#666';
+        // Detect dark mode for empty state text CORRECTLY
+        const isDarkModeEmpty = document.body.getAttribute('data-skin') === 'pro';
+        context.fillStyle = isDarkModeEmpty ? '#9CA3AF' : '#666';
         context.font = '14px Arial';
         context.textAlign = 'center';
         context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
@@ -158,10 +132,9 @@ export class ChartManager {
     const colors = this.getCategoryColors(labels, categories);
 
     try {
-      // Detect dark mode
-      const isDarkMode = document.body.classList.contains('darkmode') || 
-                        document.documentElement.getAttribute('data-theme') === 'dark';
-      const legendColor = isDarkMode ? '#e5e7eb' : '#1a202c';
+      // Detect dark mode CORRECTLY for this app
+      const isDarkMode = document.body.getAttribute('data-skin') === 'pro';
+      const legendColor = isDarkMode ? '#E5E7EB' : '#1a202c';
       const borderColor = isDarkMode ? 'rgba(55, 65, 81, 0.3)' : 'rgba(255, 255, 255, 0.8)';
 
       this[chartProperty] = new Chart(ctx, {
@@ -242,92 +215,18 @@ export class ChartManager {
         }
       });
       
-      // ULTRA AGGRESSIVE: Force transparent background after chart creation
+      // Simple post-creation transparency fix
       const canvas = this[chartProperty].canvas;
-      const canvasStyle = canvas.style;
-      const context = canvas.getContext('2d');
-      const { width, height } = canvas;
       
-      // Debug: Log current state
-      console.log('🐛 Canvas DEBUG:', {
-        id: canvas.id,
-        currentBg: getComputedStyle(canvas).backgroundColor,
-        styleBg: canvas.style.backgroundColor,
-        width: canvas.width,
-        height: canvas.height
-      });
+      // Force canvas transparency
+      canvas.style.backgroundColor = 'transparent';
+      canvas.style.background = 'transparent';
       
-      // Method 1: Nuclear CSS override
-      const forceTransparent = () => {
-        ['background-color', 'background-image', 'background', 'backgroundColor'].forEach(prop => {
-          canvasStyle.setProperty(prop, 'transparent', 'important');
-          canvasStyle[prop] = 'transparent';
-        });
-        canvas.setAttribute('data-transparent-forced', 'true');
-      };
-      
-      // Method 2: Canvas context manipulation
-      const clearCanvas = () => {
-        context.save();
-        context.globalCompositeOperation = 'copy';
-        context.fillStyle = 'rgba(0,0,0,0)';
-        context.fillRect(0, 0, width, height);
-        context.restore();
-      };
-      
-      // Apply immediately
-      forceTransparent();
-      clearCanvas();
-      
-      // DARK MODE FIX: Force container transparency
-      if (isDarkMode) {
-        // Force all parent containers to be transparent
-        let container = canvas.parentElement;
-        while (container && container !== document.body) {
-          if (container.classList.contains('chart-container') || 
-              container.classList.contains('chart-card') ||
-              container.id.includes('chart')) {
-            container.style.setProperty('background', 'transparent', 'important');
-            container.style.setProperty('background-color', 'transparent', 'important');
-            console.log('🌙 Dark mode: Forced container transparent:', container.className);
-          }
-          container = container.parentElement;
-        }
+      // Force container transparency if needed
+      const container = canvas.parentElement;
+      if (container && container.classList.contains('chart-container')) {
+        container.style.background = 'transparent';
       }
-      
-      // Method 3: Override Chart.js render completely
-      const originalRender = this[chartProperty].draw;
-      this[chartProperty].draw = function() {
-        // Force clear before every render
-        context.save();
-        context.globalCompositeOperation = 'copy';
-        context.fillStyle = 'transparent';
-        context.clearRect(0, 0, width, height);
-        context.restore();
-        
-        // Force style again
-        forceTransparent();
-        
-        // Call original render
-        originalRender.call(this);
-        
-        // Force style after render
-        setTimeout(() => forceTransparent(), 0);
-      };
-      
-      // Method 4: Continuous monitoring
-      const monitor = setInterval(() => {
-        const computed = getComputedStyle(canvas);
-        if (computed.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
-            computed.backgroundColor !== 'transparent') {
-          console.log('🐛 Background detected, forcing transparent:', computed.backgroundColor);
-          forceTransparent();
-          clearCanvas();
-        }
-      }, 100);
-      
-      // Stop monitoring after 5 seconds
-      setTimeout(() => clearInterval(monitor), 5000);
       
       console.log('✅ Chart created successfully:', chartProperty);
     } catch (error) {
@@ -359,9 +258,9 @@ export class ChartManager {
       try {
         const context = ctx.getContext('2d');
         context.clearRect(0, 0, ctx.width, ctx.height);
-        // Detect dark mode for empty state text
-        const isDarkMode = document.body.classList.contains('darkmode');
-        context.fillStyle = isDarkMode ? '#a0aec0' : '#666';
+        // Detect dark mode for empty state text CORRECTLY
+        const isDarkModeEmpty = document.body.getAttribute('data-skin') === 'pro';
+        context.fillStyle = isDarkModeEmpty ? '#9CA3AF' : '#666';
         context.font = '14px Arial';
         context.textAlign = 'center';
         context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);

@@ -246,42 +246,32 @@
 /* DARK MODE CHART OPTIMIZATIONS */
 /* ========================================== */
 
-[data-theme="dark"] .chart-container,
-.darkmode .chart-container {
+/* PRO SKIN (Dark Mode) Chart Optimizations */
+body[data-skin="pro"] .chart-container {
   background: transparent !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .chart-card,
-.darkmode .chart-card {
-  background: var(--bg-primary) !important;
+body[data-skin="pro"] .chart-card {
+  background: var(--pro-surface) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Force all chart containers to be transparent in dark mode */
-.darkmode .chart-container,
-.darkmode .chart-card .chart-container,
-.darkmode #dashboard-expenses-chart-container,
-[data-theme="dark"] .chart-container,
-[data-theme="dark"] .chart-card .chart-container,
-[data-theme="dark"] #dashboard-expenses-chart-container {
+/* Force all chart containers to be transparent in PRO SKIN */
+body[data-skin="pro"] .chart-container,
+body[data-skin="pro"] .chart-card .chart-container,
+body[data-skin="pro"] #dashboard-expenses-chart-container {
   background: transparent !important;
   background-color: transparent !important;
 }
 
-[data-theme="dark"] .chart-card,
-.darkmode .chart-card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+body[data-skin="pro"] .chart-legend-item {
+  background: var(--pro-elev);
+  color: var(--pro-text-2);
 }
 
-[data-theme="dark"] .chart-legend-item,
-.darkmode .chart-legend-item {
-  background: var(--bg-secondary-dark, #2d3748);
-  color: var(--text-secondary-dark, #a0aec0);
-}
-
-[data-theme="dark"] .chart-empty-state,
-.darkmode .chart-empty-state {
-  color: var(--text-muted-dark, #718096);
+body[data-skin="pro"] .chart-empty-state {
+  color: var(--pro-text-2);
 }
 
 /* ========================================== */
@@ -340,10 +330,8 @@ canvas:after {
   background-color: transparent !important;
 }
 
-/* Dark mode specific canvas fixes */
-.darkmode canvas,
-[data-theme="dark"] canvas,
-body.darkmode canvas {
+/* Pro skin specific canvas fixes */
+body[data-skin="pro"] canvas {
   background-color: transparent !important;
   background: transparent !important;
 }
