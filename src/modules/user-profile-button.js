@@ -27,6 +27,7 @@ export class UserProfileButton {
     this.isInitialized = true;
     
     console.log('👤 User Profile Button initialized');
+    console.log('👤 ModalManager available:', !!(window.app && window.app.modals));
   }
 
   // Set up event listeners
@@ -213,40 +214,58 @@ export class UserProfileButton {
   // Open the profile modal
   openModal() {
     console.log('👤 Opening profile modal...');
-    this.modal = document.getElementById('user-profile-modal');
-    console.log('👤 Modal element found:', this.modal);
-    if (this.modal) {
+    
+    // Use the existing modal manager
+    if (window.app && window.app.modals) {
       this.updateModalContent();
-      this.modal.classList.remove('hidden');
-      this.modal.classList.add('active');
       this.switchSection('profile'); // Always start with profile section
-      
-      // Focus management for accessibility
-      const firstFocusable = this.modal.querySelector('.profile-nav-item');
-      if (firstFocusable) {
-        firstFocusable.focus();
-      }
-      
-      document.body.style.overflow = 'hidden';
-      console.log('👤 Modal opened successfully');
+      window.app.modals.show('user-profile-modal');
+      console.log('👤 Modal opened via ModalManager');
     } else {
-      console.error('❌ Modal element not found!');
+      // Fallback to manual modal management
+      this.modal = document.getElementById('user-profile-modal');
+      console.log('👤 Modal element found:', this.modal);
+      if (this.modal) {
+        console.log('👤 Modal classes before:', this.modal.className);
+        this.updateModalContent();
+        
+        // Force remove all problematic classes
+        this.modal.classList.remove('hidden');
+        this.modal.classList.remove('closing');
+        this.modal.style.display = 'flex';
+        this.modal.style.visibility = 'visible';
+        this.modal.style.opacity = '1';
+        this.modal.classList.add('active');
+        
+        console.log('👤 Modal classes after:', this.modal.className);
+        this.switchSection('profile'); // Always start with profile section
+        
+        document.body.style.overflow = 'hidden';
+        console.log('👤 Modal opened manually');
+      } else {
+        console.error('❌ Modal element not found!');
+      }
     }
   }
 
   // Close the profile modal
   closeModal() {
-    if (this.modal) {
+    if (window.app && window.app.modals) {
+      window.app.modals.hide('user-profile-modal');
+      console.log('👤 Modal closed via ModalManager');
+    } else if (this.modal) {
       this.modal.classList.remove('active');
       this.modal.classList.add('hidden');
       document.body.style.overflow = '';
       this.modal = null;
+      console.log('👤 Modal closed manually');
     }
   }
 
   // Check if modal is open
   isModalOpen() {
-    return this.modal && this.modal.classList.contains('active');
+    const modal = document.getElementById('user-profile-modal');
+    return modal && modal.classList.contains('active');
   }
 
   // Switch between modal sections

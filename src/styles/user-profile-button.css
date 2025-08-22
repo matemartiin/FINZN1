@@ -57,6 +57,21 @@
 /* Modal del perfil de usuario */
 #user-profile-modal.modal.active {
   display: flex !important; /* Override .hidden class when active */
+  z-index: 10001 !important; /* Ensure it's above other elements */
+  position: fixed !important;
+  inset: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(12px) saturate(150%) !important;
+}
+
+#user-profile-modal.modal {
+  /* Ensure modal starts hidden */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .user-profile-modal-content {
