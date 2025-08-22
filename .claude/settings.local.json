@@ -19,7 +19,12 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(echo $VITE_GOOGLE_CLIENT_ID)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(start http://localhost:5173/?test=charts)",
+      "Bash(timeout 10 curl -s \"http://localhost:5173/?test=charts\")",
+      "Bash(start http://localhost:5173/test-charts.html)",
+      "Bash(start http://localhost:5173/)",
+      "Bash(timeout:*)"
     ],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [

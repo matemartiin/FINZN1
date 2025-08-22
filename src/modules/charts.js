@@ -254,52 +254,249 @@ export class ChartManager {
   }
 
   getCategoryColors(labels, categories) {
-    console.log('🎨 getCategoryColors called with:', { labels, categories: categories?.map(c => ({ name: c.name, color: c.color })) });
+    if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+      console.log('🎨 getCategoryColors called with:', { labels, categories: categories?.map(c => ({ name: c.name, color: c.color })) });
+    }
     
     if (!categories) {
-      console.log('⚠️ No categories provided, using fallback colors');
-      return this.generateColors(labels.length);
+      if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+        console.log('⚠️ No categories provided, using fallback colors');
+      }
+      return this.generateUniqueColors(labels.length);
     }
     
     const colors = [];
+    const usedColors = new Set();
+    const fallbackColors = this.generateUniqueColors(labels.length);
+    let fallbackIndex = 0;
+    
     labels.forEach(categoryName => {
       const category = categories.find(cat => cat.name === categoryName);
-      if (category) {
-        console.log(`✅ Color for ${categoryName}: ${category.color}`);
-        colors.push(category.color);
+      let colorToUse;
+      
+      if (category && category.color) {
+        // Check if this color is already used
+        if (!usedColors.has(category.color)) {
+          colorToUse = category.color;
+          if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+            console.log(`✅ Color for ${categoryName}: ${category.color}`);
+          }
+        } else {
+          // Category has a color but it's already used, get unique fallback
+          colorToUse = this.getNextUniqueColor(usedColors, fallbackColors, fallbackIndex++);
+          if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+            console.log(`⚠️ Color ${category.color} already used for ${categoryName}, using ${colorToUse}`);
+          }
+        }
       } else {
-        console.log(`❌ Category ${categoryName} not found, using fallback #9ca3af`);
-        colors.push('#9ca3af');
+        // Category not found or has no color, use unique fallback
+        colorToUse = this.getNextUniqueColor(usedColors, fallbackColors, fallbackIndex++);
+        if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+          console.log(`❌ Category ${categoryName} not found, using fallback ${colorToUse}`);
+        }
       }
+      
+      colors.push(colorToUse);
+      usedColors.add(colorToUse);
     });
     
-    console.log('🎨 Final colors array:', colors);
-    
-    // Check for duplicates
-    const duplicateColors = colors.filter((color, index) => colors.indexOf(color) !== index);
-    if (duplicateColors.length > 0) {
-      console.error('❌ DUPLICATE COLORS DETECTED IN CHART:', duplicateColors);
-    } else {
+    if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
+      console.log('🎨 Final colors array:', colors);
       console.log('✅ All chart colors are unique');
     }
     
     return colors;
   }
 
-  generateColors(count) {
-    const colors = [
-      '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#14b8a6', 
-      '#6366f1', '#ec4899', '#8b5cf6', '#06b6d4', '#84cc16',
-      '#f97316', '#dc2626', '#9ca3af', '#f43f5e', '#7c3aed',
-      '#0ea5e9', '#eab308', '#16a34a', '#db2777', '#059669'
+  // Get next unique color that hasn't been used
+  getNextUniqueColor(usedColors, fallbackColors, index) {
+    let color = fallbackColors[index % fallbackColors.length];
+    let attempts = 0;
+    
+    // Keep trying until we find a unique color
+    while (usedColors.has(color) && attempts < fallbackColors.length * 2) {
+      index++;
+      color = fallbackColors[index % fallbackColors.length];
+      attempts++;
+    }
+    
+    // If still not unique after many attempts, generate a random one
+    if (usedColors.has(color)) {
+      color = this.generateRandomColor();
+    }
+    
+    return color;
+  }
+
+  // Generate a random color
+  generateRandomColor() {
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = 60 + Math.floor(Math.random() * 30); // 60-90%
+    const lightness = 45 + Math.floor(Math.random() * 20); // 45-65%
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  }
+
+  generateUniqueColors(count) {
+    // Mobile-optimized color palette with high contrast and accessibility
+    // These colors work well on both light and dark backgrounds
+    const mobileOptimizedColors = [
+      // Primary vibrant colors - high contrast
+      '#dc2626', // Red - expenses, alerts
+      '#2563eb', // Blue - income, primary actions  
+      '#16a34a', // Green - savings, success
+      '#ea580c', // Orange - categories, warnings
+      '#7c3aed', // Purple - goals, premium
+      '#0891b2', // Cyan - utilities, tech
+      '#be185d', // Pink - lifestyle, personal
+      '#65a30d', // Lime - health, food
+      '#0d9488', // Teal - transport, travel
+      '#7c2d12', // Brown - education, work
+      
+      // Secondary colors - good mobile visibility
+      '#1d4ed8', // Dark blue
+      '#be123c', // Dark red
+      '#166534', // Dark green
+      '#9333ea', // Bright purple
+      '#c2410c', // Dark orange
+      '#0c4a6e', // Steel blue
+      '#831843', // Deep pink
+      '#365314', // Dark lime
+      '#134e4a', // Dark teal
+      '#451a03', // Deep brown
+      
+      // Tertiary colors - extended palette
+      '#991b1b', // Darker red
+      '#1e3a8a', // Darker blue
+      '#14532d', // Darker green
+      '#92400e', // Darker orange
+      '#581c87', // Darker purple
+      '#164e63', // Darker cyan
+      '#9d174d', // Darker pink
+      '#4d7c0f', // Darker lime
+      '#115e59', // Darker teal
+      '#78350f'  // Medium brown
     ];
     
+    // Detect if we're in dark mode for better color selection
+    const isDarkMode = document.body.classList.contains('darkmode') || 
+                      document.documentElement.getAttribute('data-theme') === 'dark';
+    
     const result = [];
+    const usedColors = new Set();
+    
     for (let i = 0; i < count; i++) {
-      result.push(colors[i % colors.length]);
+      let color;
+      
+      if (i < mobileOptimizedColors.length) {
+        color = mobileOptimizedColors[i];
+        
+        // If we've already used this color, generate a variation
+        if (usedColors.has(color)) {
+          color = this.generateMobileOptimizedVariation(color, i, isDarkMode);
+        }
+      } else {
+        // Generate additional colors if needed
+        color = this.generateMobileOptimizedVariation(
+          mobileOptimizedColors[i % mobileOptimizedColors.length], 
+          i, 
+          isDarkMode
+        );
+      }
+      
+      // Ensure uniqueness
+      let attempts = 0;
+      while (usedColors.has(color) && attempts < 10) {
+        color = this.generateMobileOptimizedVariation(color, i + attempts, isDarkMode);
+        attempts++;
+      }
+      
+      result.push(color);
+      usedColors.add(color);
     }
     
     return result;
+  }
+
+  // Generate mobile-optimized color variations
+  generateMobileOptimizedVariation(baseColor, index, isDarkMode = false) {
+    const hsl = this.hexToHsl(baseColor);
+    if (!hsl) return this.generateRandomColor();
+    
+    // For mobile, we want:
+    // - High saturation (60-85%) for visibility
+    // - Appropriate lightness for the theme
+    // - Distinct hue variations
+    
+    const hueShift = (index * 30 + Math.floor(index / 10) * 15) % 360;
+    const newHue = (hsl.h + hueShift) % 360;
+    
+    // Adjust saturation and lightness for mobile visibility
+    const saturation = Math.max(60, Math.min(85, hsl.s + (index % 3) * 10));
+    
+    let lightness;
+    if (isDarkMode) {
+      // For dark mode, use lighter colors (55-75%)
+      lightness = Math.max(55, Math.min(75, hsl.l + 20));
+    } else {
+      // For light mode, use darker colors (35-55%)
+      lightness = Math.max(35, Math.min(55, hsl.l - 10));
+    }
+    
+    return `hsl(${newHue}, ${saturation}%, ${lightness}%)`;
+  }
+
+  // Generate a variation of a base color
+  generateColorVariation(baseColor, index) {
+    // Convert hex to HSL and modify
+    const hsl = this.hexToHsl(baseColor);
+    if (hsl) {
+      // Modify hue by small amounts
+      const hueShift = (index * 25) % 360;
+      const newHue = (hsl.h + hueShift) % 360;
+      return `hsl(${newHue}, ${Math.max(50, hsl.s)}%, ${Math.max(40, Math.min(60, hsl.l))}%)`;
+    }
+    
+    // Fallback to random if conversion fails
+    return this.generateRandomColor();
+  }
+
+  // Convert hex to HSL
+  hexToHsl(hex) {
+    try {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100)
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Legacy method for backward compatibility
+  generateColors(count) {
+    return this.generateUniqueColors(count);
   }
 
   destroy() {
