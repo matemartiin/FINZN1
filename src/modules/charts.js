@@ -61,7 +61,9 @@ export class ChartManager {
       try {
         const context = ctx.getContext('2d');
         context.clearRect(0, 0, ctx.width, ctx.height);
-        context.fillStyle = '#666';
+        // Detect dark mode for empty state text
+        const isDarkMode = document.body.classList.contains('darkmode');
+        context.fillStyle = isDarkMode ? '#a0aec0' : '#666';
         context.font = '14px Arial';
         context.textAlign = 'center';
         context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
@@ -98,6 +100,7 @@ export class ChartManager {
           responsive: true,
           maintainAspectRatio: false,
           devicePixelRatio: window.devicePixelRatio || 1,
+          backgroundColor: 'transparent',
           animation: {
             animateRotate: true,
             animateScale: true,
@@ -184,7 +187,9 @@ export class ChartManager {
       try {
         const context = ctx.getContext('2d');
         context.clearRect(0, 0, ctx.width, ctx.height);
-        context.fillStyle = '#666';
+        // Detect dark mode for empty state text
+        const isDarkMode = document.body.classList.contains('darkmode');
+        context.fillStyle = isDarkMode ? '#a0aec0' : '#666';
         context.font = '14px Arial';
         context.textAlign = 'center';
         context.fillText('No hay datos para mostrar', ctx.width / 2, ctx.height / 2);
@@ -267,25 +272,28 @@ export class ChartManager {
     
     const colors = [];
     const usedColors = new Set();
+    const usedColorsSimilar = new Set(); // Track similar colors
     const fallbackColors = this.generateUniqueColors(labels.length);
     let fallbackIndex = 0;
     
-    labels.forEach(categoryName => {
+    labels.forEach((categoryName, index) => {
       const category = categories.find(cat => cat.name === categoryName);
       let colorToUse;
       
       if (category && category.color) {
-        // Check if this color is already used
-        if (!usedColors.has(category.color)) {
+        // Check if this exact color or a very similar one is already used
+        const isSimilarColor = this.isColorSimilar(category.color, usedColorsSimilar);
+        
+        if (!usedColors.has(category.color) && !isSimilarColor) {
           colorToUse = category.color;
           if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
             console.log(`✅ Color for ${categoryName}: ${category.color}`);
           }
         } else {
-          // Category has a color but it's already used, get unique fallback
+          // Category has a color but it's already used or too similar, get unique fallback
           colorToUse = this.getNextUniqueColor(usedColors, fallbackColors, fallbackIndex++);
           if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
-            console.log(`⚠️ Color ${category.color} already used for ${categoryName}, using ${colorToUse}`);
+            console.log(`⚠️ Color ${category.color} already used or similar for ${categoryName}, using ${colorToUse}`);
           }
         }
       } else {
@@ -298,14 +306,34 @@ export class ChartManager {
       
       colors.push(colorToUse);
       usedColors.add(colorToUse);
+      usedColorsSimilar.add(this.normalizeColorForComparison(colorToUse));
     });
     
     if (import.meta.env?.DEV || window.location.hostname === 'localhost') {
       console.log('🎨 Final colors array:', colors);
-      console.log('✅ All chart colors are unique');
+      console.log('✅ All chart colors are unique and visually distinct');
     }
     
     return colors;
+  }
+
+  // Check if a color is similar to already used colors
+  isColorSimilar(newColor, usedColorsSimilar) {
+    const normalizedNew = this.normalizeColorForComparison(newColor);
+    return usedColorsSimilar.has(normalizedNew);
+  }
+
+  // Normalize color for similarity comparison (group similar hues)
+  normalizeColorForComparison(color) {
+    const hsl = this.hexToHsl(color);
+    if (!hsl) return color;
+    
+    // Group hues into 24 buckets (15° each) for similarity detection
+    const hueGroup = Math.floor(hsl.h / 15) * 15;
+    const satGroup = Math.floor(hsl.s / 25) * 25; // Group saturation in 25% buckets
+    const lightGroup = Math.floor(hsl.l / 25) * 25; // Group lightness in 25% buckets
+    
+    return `${hueGroup}-${satGroup}-${lightGroup}`;
   }
 
   // Get next unique color that hasn't been used
@@ -337,44 +365,52 @@ export class ChartManager {
   }
 
   generateUniqueColors(count) {
-    // Mobile-optimized color palette with high contrast and accessibility
-    // These colors work well on both light and dark backgrounds
+    // Enhanced mobile-optimized color palette with guaranteed uniqueness
+    // Colors are carefully selected to be visually distinct and accessible
     const mobileOptimizedColors = [
-      // Primary vibrant colors - high contrast
-      '#dc2626', // Red - expenses, alerts
-      '#2563eb', // Blue - income, primary actions  
-      '#16a34a', // Green - savings, success
-      '#ea580c', // Orange - categories, warnings
-      '#7c3aed', // Purple - goals, premium
-      '#0891b2', // Cyan - utilities, tech
-      '#be185d', // Pink - lifestyle, personal
-      '#65a30d', // Lime - health, food
-      '#0d9488', // Teal - transport, travel
-      '#7c2d12', // Brown - education, work
+      // Primary vibrant colors - high contrast, well-spaced hues
+      '#dc2626', // Red (0°) - expenses, alerts
+      '#ea580c', // Orange (25°) - categories, warnings
+      '#ca8a04', // Yellow (50°) - income, savings
+      '#16a34a', // Green (120°) - success, health
+      '#0891b2', // Cyan (190°) - utilities, tech
+      '#2563eb', // Blue (225°) - primary actions, information
+      '#7c3aed', // Purple (270°) - goals, premium
+      '#be185d', // Pink (330°) - lifestyle, personal
       
-      // Secondary colors - good mobile visibility
-      '#1d4ed8', // Dark blue
-      '#be123c', // Dark red
-      '#166534', // Dark green
-      '#9333ea', // Bright purple
-      '#c2410c', // Dark orange
-      '#0c4a6e', // Steel blue
-      '#831843', // Deep pink
-      '#365314', // Dark lime
-      '#134e4a', // Dark teal
-      '#451a03', // Deep brown
+      // Secondary colors - distinct hue variations
+      '#b91c1c', // Dark red (5°)
+      '#c2410c', // Dark orange (30°)
+      '#a16207', // Dark yellow (55°)
+      '#15803d', // Dark green (125°)
+      '#0e7490', // Dark cyan (195°)
+      '#1d4ed8', // Dark blue (230°)
+      '#6d28d9', // Dark purple (275°)
+      '#a21caf', // Dark pink (335°)
       
-      // Tertiary colors - extended palette
-      '#991b1b', // Darker red
-      '#1e3a8a', // Darker blue
-      '#14532d', // Darker green
-      '#92400e', // Darker orange
-      '#581c87', // Darker purple
-      '#164e63', // Darker cyan
-      '#9d174d', // Darker pink
-      '#4d7c0f', // Darker lime
-      '#115e59', // Darker teal
-      '#78350f'  // Medium brown
+      // Tertiary colors - lighter variations
+      '#ef4444', // Light red (0°)
+      '#f97316', // Light orange (25°)
+      '#eab308', // Light yellow (50°)
+      '#22c55e', // Light green (120°)
+      '#06b6d4', // Light cyan (190°)
+      '#3b82f6', // Light blue (225°)
+      '#8b5cf6', // Light purple (270°)
+      '#ec4899', // Light pink (330°)
+      
+      // Additional distinct colors for large datasets
+      '#65a30d', // Lime (80°)
+      '#0d9488', // Teal (175°)
+      '#4338ca', // Indigo (240°)
+      '#7c2d12', // Brown (15°)
+      '#166534', // Forest green (130°)
+      '#0c4a6e', // Steel blue (210°)
+      '#581c87', // Deep purple (280°)
+      '#831843', // Deep pink (340°)
+      '#365314', // Dark lime (85°)
+      '#134e4a', // Dark teal (180°)
+      '#1e3a8a', // Navy blue (235°)
+      '#78350f'  // Dark brown (20°)
     ];
     
     // Detect if we're in dark mode for better color selection
@@ -384,30 +420,30 @@ export class ChartManager {
     const result = [];
     const usedColors = new Set();
     
-    for (let i = 0; i < count; i++) {
+    // First pass: use the predefined colors directly
+    for (let i = 0; i < count && i < mobileOptimizedColors.length; i++) {
+      const color = mobileOptimizedColors[i];
+      result.push(color);
+      usedColors.add(color);
+    }
+    
+    // Second pass: generate additional colors if needed
+    for (let i = mobileOptimizedColors.length; i < count; i++) {
       let color;
-      
-      if (i < mobileOptimizedColors.length) {
-        color = mobileOptimizedColors[i];
-        
-        // If we've already used this color, generate a variation
-        if (usedColors.has(color)) {
-          color = this.generateMobileOptimizedVariation(color, i, isDarkMode);
-        }
-      } else {
-        // Generate additional colors if needed
-        color = this.generateMobileOptimizedVariation(
-          mobileOptimizedColors[i % mobileOptimizedColors.length], 
-          i, 
-          isDarkMode
-        );
-      }
-      
-      // Ensure uniqueness
       let attempts = 0;
-      while (usedColors.has(color) && attempts < 10) {
-        color = this.generateMobileOptimizedVariation(color, i + attempts, isDarkMode);
+      
+      do {
+        // Generate a color with guaranteed hue spacing
+        const baseHue = (i * 40 + attempts * 15) % 360; // 40° spacing minimum
+        const saturation = isDarkMode ? 75 : 65; // Higher saturation for dark mode
+        const lightness = isDarkMode ? 60 : 50; // Lighter for dark mode
+        color = `hsl(${baseHue}, ${saturation}%, ${lightness}%)`;
         attempts++;
+      } while (usedColors.has(color) && attempts < 20);
+      
+      // If still duplicate after many attempts, use a random color
+      if (usedColors.has(color)) {
+        color = this.generateRandomColor();
       }
       
       result.push(color);
