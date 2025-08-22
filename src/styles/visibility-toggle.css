@@ -4,31 +4,17 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 12px;
-  display: flex;
+  padding: 0;
+  margin: 0;
+  margin-left: 8px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  margin-left: 8px;
-  opacity: 0.7;
   color: var(--text-secondary);
-}
-
-.visibility-toggle-btn:hover {
-  opacity: 1;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  transform: scale(1.1);
-}
-
-.visibility-toggle-btn:active {
-  transform: scale(0.95);
 }
 
 .visibility-toggle-btn i {
   font-size: 18px;
-  transition: all 0.2s ease;
 }
 
 /* New Balance Header Layout */
@@ -48,12 +34,6 @@
   font-family: 'Courier New', monospace;
   letter-spacing: 2px;
   color: var(--text-muted);
-}
-
-/* Animation for state changes */
-.new-balance-amount,
-.new-item-amount {
-  transition: all 0.3s ease;
 }
 
 /* Dark mode / Pro skin support */
