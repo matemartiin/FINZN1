@@ -7997,3 +7997,28 @@ html {
     border-top: 2px solid transparent;
   }
 }
+
+/* ========= LIGHT MODE FIX FOR TRANSACTION TABS ========= */
+/* Fix tab button active state text color in light mode */
+
+.lightmode .transaction-tabs .tab-btn.active,
+[data-theme="light"] .transaction-tabs .tab-btn.active,
+:root:not(.darkmode) .transaction-tabs .tab-btn.active {
+  color: var(--text-primary, #2D3748) !important;
+}
+
+/* Also fix other elements that use var(--text-1, #fff) pattern */
+.lightmode .card-title,
+.lightmode .card-header-simple,
+[data-theme="light"] .card-title,
+[data-theme="light"] .card-header-simple,
+:root:not(.darkmode) .card-title,
+:root:not(.darkmode) .card-header-simple {
+  color: var(--text-primary, #2D3748);
+}
+
+.lightmode .installments-button:hover,
+[data-theme="light"] .installments-button:hover,
+:root:not(.darkmode) .installments-button:hover {
+  color: var(--text-primary, #2D3748);
+}

@@ -1905,3 +1905,9 @@ body[data-skin="pro"].lightmode .summary-card .card-header-simple,
 body[data-skin="pro"][data-theme="light"] .summary-card .card-header-simple { 
   border-bottom: 1px solid var(--pro-border);
 }
+
+/* Light mode transaction tabs fix for PRO skin */
+body[data-skin="pro"].lightmode .transaction-tabs .tab-btn.active,
+body[data-skin="pro"][data-theme="light"] .transaction-tabs .tab-btn.active {
+  color: var(--pro-text, #2d3748) !important;
+}
