@@ -1762,7 +1762,146 @@ html, body {
 /* 4) Imágenes/canvas nunca más anchos que el viewport */
 img, canvas, svg, video { max-width: 100%; height: auto; }
 
-/* 5) Nada con width:100vw en mobile (evita “empujar” el ancho por la barra de scroll) */
+/* 5) Nada con width:100vw en mobile (evita "empujar" el ancho por la barra de scroll) */
 @media (max-width: 900px){
   [style*="100vw"]{ width: 100% !important; max-width: 100% !important; }
+}
+
+/* ========= LIGHT MODE OVERRIDES FOR PRO SKIN ========= */
+/* Override pro skin colors when in light mode */
+
+body[data-skin="pro"].lightmode,
+body[data-skin="pro"][data-theme="light"],
+body[data-skin="pro"]:root:not(.darkmode) {
+  --pro-bg:        var(--blanco-hueso, #FAFAFA);
+  --pro-surface:   #ffffff;
+  --pro-elev:      #f8f9fa;
+  --pro-border:    #e2e8f0;
+  --pro-text:      #2d3748;
+  --pro-text-2:    #718096;
+
+  --pro-primary:   var(--lavanda, #C8B6FF);
+  --pro-primary-2: #B5A3FF;
+
+  --pro-success:   #22C55E;
+  --pro-warning:   #F59E0B;
+  --pro-error:     #EF4444;
+
+  --pro-shadow-sm: 0 1px 3px rgba(0,0,0,.1);
+  --pro-shadow-md: 0 4px 6px rgba(0,0,0,.1);
+
+  --text-muted: rgba(45,55,72,.72);
+}
+
+/* Light mode header and containers */
+body[data-skin="pro"].lightmode .header,
+body[data-skin="pro"][data-theme="light"] .header {
+  background: var(--pro-surface);
+  box-shadow: var(--pro-shadow-sm);
+  color: var(--pro-text);
+}
+
+body[data-skin="pro"].lightmode .main-dashboard,
+body[data-skin="pro"].lightmode .dashboard-section.active,
+body[data-skin="pro"][data-theme="light"] .main-dashboard,
+body[data-skin="pro"][data-theme="light"] .dashboard-section.active {
+  background: transparent;
+  color: var(--pro-text);
+}
+
+/* Light mode sidebar */
+body[data-skin="pro"].lightmode .sidebar-nav,
+body[data-skin="pro"][data-theme="light"] .sidebar-nav {
+  background: var(--pro-surface);
+  border-right: 1px solid var(--pro-border);
+}
+
+body[data-skin="pro"].lightmode .nav-item.active,
+body[data-skin="pro"][data-theme="light"] .nav-item.active {
+  background: var(--pro-elev);
+  border: 1px solid var(--pro-border);
+  box-shadow: var(--pro-shadow-sm);
+  color: var(--pro-text);
+}
+
+/* Light mode cards */
+body[data-skin="pro"].lightmode .summary-card,
+body[data-skin="pro"].lightmode .chart-card-new,
+body[data-skin="pro"].lightmode .expenses-section-card,
+body[data-skin="pro"].lightmode .income-section-card,
+body[data-skin="pro"].lightmode .spending-limits-main-card,
+body[data-skin="pro"].lightmode .settings-card,
+body[data-skin="pro"].lightmode .report-card,
+body[data-skin="pro"].lightmode .budgets-container,
+body[data-skin="pro"][data-theme="light"] .summary-card,
+body[data-skin="pro"][data-theme="light"] .chart-card-new,
+body[data-skin="pro"][data-theme="light"] .expenses-section-card,
+body[data-skin="pro"][data-theme="light"] .income-section-card,
+body[data-skin="pro"][data-theme="light"] .spending-limits-main-card,
+body[data-skin="pro"][data-theme="light"] .settings-card,
+body[data-skin="pro"][data-theme="light"] .report-card,
+body[data-skin="pro"][data-theme="light"] .budgets-container {
+  background: var(--pro-surface);
+  border: 1px solid var(--pro-border);
+  box-shadow: var(--pro-shadow-sm);
+  color: var(--pro-text);
+}
+
+/* Light mode typography */
+body[data-skin="pro"].lightmode .section-header h1,
+body[data-skin="pro"][data-theme="light"] .section-header h1 { 
+  color: var(--pro-text); 
+}
+
+body[data-skin="pro"].lightmode .card-amount,
+body[data-skin="pro"][data-theme="light"] .card-amount {
+  color: var(--pro-text);
+}
+
+body[data-skin="pro"].lightmode .card-title,
+body[data-skin="pro"].lightmode .nav-label,
+body[data-skin="pro"][data-theme="light"] .card-title,
+body[data-skin="pro"][data-theme="light"] .nav-label {
+  color: var(--pro-text-2);
+}
+
+/* Light mode buttons */
+body[data-skin="pro"].lightmode .btn-primary,
+body[data-skin="pro"][data-theme="light"] .btn-primary {
+  background: linear-gradient(135deg, var(--pro-primary), var(--pro-primary-2));
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(200,182,255,.2);
+}
+
+body[data-skin="pro"].lightmode .btn-secondary,
+body[data-skin="pro"][data-theme="light"] .btn-secondary {
+  background: var(--pro-elev);
+  color: var(--pro-text);
+  border: 1px solid var(--pro-border);
+}
+
+/* Light mode hover effects */
+body[data-skin="pro"].lightmode .summary-card:hover,
+body[data-skin="pro"][data-theme="light"] .summary-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(0,0,0,.12);
+}
+
+/* Light mode focus styles */
+body[data-skin="pro"].lightmode a:focus-visible,
+body[data-skin="pro"].lightmode button:focus-visible,
+body[data-skin="pro"].lightmode .nav-item:focus-visible,
+body[data-skin="pro"].lightmode .btn:focus-visible,
+body[data-skin="pro"][data-theme="light"] a:focus-visible,
+body[data-skin="pro"][data-theme="light"] button:focus-visible,
+body[data-skin="pro"][data-theme="light"] .nav-item:focus-visible,
+body[data-skin="pro"][data-theme="light"] .btn:focus-visible {
+  outline: 3px solid rgba(200,182,255,.4);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+body[data-skin="pro"].lightmode .summary-card .card-header-simple,
+body[data-skin="pro"][data-theme="light"] .summary-card .card-header-simple { 
+  border-bottom: 1px solid var(--pro-border);
 }

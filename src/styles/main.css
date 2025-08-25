@@ -64,6 +64,18 @@
   --transition-slow: 0.5s ease;
 }
 
+/* Tema claro - valores por defecto explícitos */
+.lightmode,
+:root:not(.darkmode) {
+  --text-primary: #2D3748;
+  --text-secondary: #718096;
+  --text-muted: #A0AEC0;
+  --bg-primary: var(--blanco-hueso);
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: var(--gris-piedra);
+  --border-color: #E2E8F0;
+}
+
 /* Tema oscuro */
 .darkmode {
   --text-primary: #F7FAFC;

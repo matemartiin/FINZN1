@@ -382,3 +382,61 @@ html body #monthly-expenses-summary.item-amount {
   pointer-events: auto !important;
   user-select: text !important;
 }
+
+/* ========= LIGHT MODE SUPPORT FOR UNIFIED DASHBOARD ========= */
+/* Override hardcoded colors when in light mode */
+
+.lightmode .balance-icon i,
+[data-theme="light"] .balance-icon i,
+:root:not(.darkmode) .balance-icon i {
+  color: var(--text-secondary, #718096);
+}
+
+.lightmode .balance-amount,
+[data-theme="light"] .balance-amount,
+:root:not(.darkmode) .balance-amount {
+  color: var(--text-primary, #2D3748);
+}
+
+.lightmode .item-amount,
+[data-theme="light"] .item-amount,
+:root:not(.darkmode) .item-amount {
+  color: var(--text-primary, #2D3748);
+}
+
+.lightmode .income-icon,
+[data-theme="light"] .income-icon,
+:root:not(.darkmode) .income-icon {
+  color: #059669; /* Keep green for income */
+}
+
+.lightmode .expense-icon,
+[data-theme="light"] .expense-icon,
+:root:not(.darkmode) .expense-icon {
+  color: #dc2626; /* Keep red for expense */
+}
+
+/* Override !important rules for light mode */
+.lightmode .income-expenses-section #income-summary,
+.lightmode .income-expenses-section #monthly-expenses-summary,
+[data-theme="light"] .income-expenses-section #income-summary,
+[data-theme="light"] .income-expenses-section #monthly-expenses-summary,
+:root:not(.darkmode) .income-expenses-section #income-summary,
+:root:not(.darkmode) .income-expenses-section #monthly-expenses-summary {
+  color: var(--text-primary, #2D3748) !important;
+}
+
+.lightmode html body .unified-balance-card span#income-summary,
+.lightmode html body .unified-balance-card span#monthly-expenses-summary,
+.lightmode html body #income-summary.item-amount,
+.lightmode html body #monthly-expenses-summary.item-amount,
+[data-theme="light"] html body .unified-balance-card span#income-summary,
+[data-theme="light"] html body .unified-balance-card span#monthly-expenses-summary,
+[data-theme="light"] html body #income-summary.item-amount,
+[data-theme="light"] html body #monthly-expenses-summary.item-amount,
+:root:not(.darkmode) html body .unified-balance-card span#income-summary,
+:root:not(.darkmode) html body .unified-balance-card span#monthly-expenses-summary,
+:root:not(.darkmode) html body #income-summary.item-amount,
+:root:not(.darkmode) html body #monthly-expenses-summary.item-amount {
+  color: var(--text-primary, #2D3748) !important;
+}

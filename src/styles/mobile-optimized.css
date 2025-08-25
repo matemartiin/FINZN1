@@ -885,4 +885,38 @@
     background: var(--bg-dark, #1a202c);
     border-color: var(--border-color-dark, #4a5568);
   }
+
+  /* Light mode mobile specific styles */
+  .lightmode .sidebar-nav,
+  .lightmode .mobile-nav,
+  [data-theme="light"] .sidebar-nav,
+  [data-theme="light"] .mobile-nav,
+  :root:not(.darkmode) .sidebar-nav,
+  :root:not(.darkmode) .mobile-nav {
+    background: var(--bg-primary, #FAFAFA);
+    border-color: var(--border-color, #E2E8F0);
+  }
+
+  .lightmode .nav-item.active,
+  .lightmode .mobile-nav-item.active,
+  [data-theme="light"] .nav-item.active,
+  [data-theme="light"] .mobile-nav-item.active,
+  :root:not(.darkmode) .nav-item.active,
+  :root:not(.darkmode) .mobile-nav-item.active {
+    background: var(--primary-color, #C8B6FF);
+    color: white;
+  }
+
+  .lightmode .new-unified-card,
+  .lightmode .chart-card,
+  .lightmode .recent-transactions-card,
+  [data-theme="light"] .new-unified-card,
+  [data-theme="light"] .chart-card,
+  [data-theme="light"] .recent-transactions-card,
+  :root:not(.darkmode) .new-unified-card,
+  :root:not(.darkmode) .chart-card,
+  :root:not(.darkmode) .recent-transactions-card {
+    background: var(--bg-primary, #FAFAFA);
+    border-color: var(--border-color, #E2E8F0);
+  }
 }

@@ -672,3 +672,55 @@
     color: white !important;
   }
 }
+
+/* Light mode specific styles - Force proper colors for light theme */
+.lightmode .user-profile-btn,
+[data-theme="light"] .user-profile-btn,
+:root:not(.darkmode) .user-profile-btn {
+  color: white; /* Keep white for gradient background */
+}
+
+.lightmode .user-initials,
+[data-theme="light"] .user-initials,
+:root:not(.darkmode) .user-initials {
+  color: white; /* Keep white for gradient background */
+}
+
+.lightmode .profile-modal-initials,
+[data-theme="light"] .profile-modal-initials,
+:root:not(.darkmode) .profile-modal-initials {
+  color: white; /* Keep white for gradient background */
+}
+
+/* Light mode - Nav item active should use appropriate text color */
+.lightmode .profile-nav-item.active,
+[data-theme="light"] .profile-nav-item.active,
+:root:not(.darkmode) .profile-nav-item.active {
+  background: var(--primary-color, #667eea);
+  color: white; /* Keep white on colored background */
+}
+
+/* Light mode mobile header - different from dark mode */
+@media (max-width: 768px) {
+  .lightmode .user-profile-modal-header,
+  [data-theme="light"] .user-profile-modal-header,
+  :root:not(.darkmode) .user-profile-modal-header {
+    background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--primary-dark, #5a67d8) 100%);
+    color: white;
+  }
+  
+  .lightmode .user-profile-modal-header .profile-details h3,
+  .lightmode .user-profile-modal-header .profile-details p,
+  [data-theme="light"] .user-profile-modal-header .profile-details h3,
+  [data-theme="light"] .user-profile-modal-header .profile-details p,
+  :root:not(.darkmode) .user-profile-modal-header .profile-details h3,
+  :root:not(.darkmode) .user-profile-modal-header .profile-details p {
+    color: white !important;
+  }
+  
+  .lightmode .user-profile-modal-header .modal-close,
+  [data-theme="light"] .user-profile-modal-header .modal-close,
+  :root:not(.darkmode) .user-profile-modal-header .modal-close {
+    color: white;
+  }
+}

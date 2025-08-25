@@ -209,3 +209,34 @@
   background: var(--error-color);
   color: white;
 }
+
+/* Light theme adjustments - Explicit overrides for light mode */
+.lightmode .edit-income-btn,
+[data-theme="light"] .edit-income-btn,
+:root:not(.darkmode) .edit-income-btn {
+  background: var(--bg-tertiary, #E2E2E2);
+  border-color: var(--border-color, #E2E8F0);
+  color: var(--text-primary, #2D3748);
+}
+
+.lightmode .edit-income-btn:hover,
+[data-theme="light"] .edit-income-btn:hover,
+:root:not(.darkmode) .edit-income-btn:hover {
+  background: var(--primary-color, #C8B6FF);
+  color: white;
+}
+
+.lightmode .delete-income-btn,
+[data-theme="light"] .delete-income-btn,
+:root:not(.darkmode) .delete-income-btn {
+  background: #fee;
+  border-color: #fcc;
+  color: var(--error-color, #F44336);
+}
+
+.lightmode .delete-income-btn:hover,
+[data-theme="light"] .delete-income-btn:hover,
+:root:not(.darkmode) .delete-income-btn:hover {
+  background: var(--error-color, #F44336);
+  color: white;
+}

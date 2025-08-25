@@ -126,3 +126,43 @@ html body div#balance-amount-new {
 [class*="item-amount"] {
   color: #C8B6FF !important;
 }
+
+/* ========= LIGHT MODE CONSISTENCY FOR NUMBERS COLOR ========= */
+/* Ensure brand color consistency across light/dark modes */
+
+.lightmode html body div .new-balance-amount,
+.lightmode html body span.new-item-amount,
+.lightmode html body span#income-summary,
+.lightmode html body span#monthly-expenses-summary,
+.lightmode html body div#balance-amount-new,
+[data-theme="light"] html body div .new-balance-amount,
+[data-theme="light"] html body span.new-item-amount,
+[data-theme="light"] html body span#income-summary,
+[data-theme="light"] html body span#monthly-expenses-summary,
+[data-theme="light"] html body div#balance-amount-new,
+:root:not(.darkmode) html body div .new-balance-amount,
+:root:not(.darkmode) html body span.new-item-amount,
+:root:not(.darkmode) html body span#income-summary,
+:root:not(.darkmode) html body span#monthly-expenses-summary,
+:root:not(.darkmode) html body div#balance-amount-new {
+  color: var(--primary-color, #C8B6FF) !important;
+}
+
+/* Light mode specific overrides for brand consistency */
+.lightmode [id="balance-amount-new"],
+.lightmode [id="income-summary"], 
+.lightmode [id="monthly-expenses-summary"],
+.lightmode [class*="balance-amount"],
+.lightmode [class*="item-amount"],
+[data-theme="light"] [id="balance-amount-new"],
+[data-theme="light"] [id="income-summary"], 
+[data-theme="light"] [id="monthly-expenses-summary"],
+[data-theme="light"] [class*="balance-amount"],
+[data-theme="light"] [class*="item-amount"],
+:root:not(.darkmode) [id="balance-amount-new"],
+:root:not(.darkmode) [id="income-summary"], 
+:root:not(.darkmode) [id="monthly-expenses-summary"],
+:root:not(.darkmode) [class*="balance-amount"],
+:root:not(.darkmode) [class*="item-amount"] {
+  color: var(--primary-color, #C8B6FF) !important;
+}
