@@ -25,11 +25,26 @@ export class UIManager {
   }
 
   // Utility function to format dates safely without timezone issues
-  formatDateSafe(dateStr, options = {}) {
-    if (!dateStr) return 'Sin fecha';
+  formatDateSafe(dateInput, options = {}) {
+    if (!dateInput) return 'Sin fecha';
+    
+    // If it's already a Date object, use it directly
+    if (dateInput instanceof Date) {
+      if (isNaN(dateInput.getTime())) return 'Sin fecha';
+      
+      const defaultOptions = {
+        day: 'numeric', 
+        month: 'short' 
+      };
+      
+      const formatOptions = { ...defaultOptions, ...options };
+      return dateInput.toLocaleDateString('es-ES', formatOptions);
+    }
+    
+    const dateStr = String(dateInput);
     
     // If it's already in YYYY-MM-DD format, parse it manually to avoid timezone issues
-    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       const [year, month, day] = dateStr.split('-');
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       
@@ -44,7 +59,12 @@ export class UIManager {
     
     // Fallback to Date constructor with timezone fix
     try {
-      const date = new Date(dateStr + 'T12:00:00'); // Add time to avoid timezone issues
+      const date = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T12:00:00'); // Add time to avoid timezone issues
+      
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
       const defaultOptions = {
         day: 'numeric', 
         month: 'short' 
@@ -58,18 +78,26 @@ export class UIManager {
     }
   }
 
-  parseDateSafe(dateStr) {
-    if (!dateStr) return new Date();
+  parseDateSafe(dateInput) {
+    if (!dateInput) return new Date();
+    
+    // If it's already a Date object, return it (or current date if invalid)
+    if (dateInput instanceof Date) {
+      return isNaN(dateInput.getTime()) ? new Date() : dateInput;
+    }
+    
+    const dateStr = String(dateInput);
     
     // If it's already in YYYY-MM-DD format, parse it manually to avoid timezone issues
-    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       const [year, month, day] = dateStr.split('-');
       return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
     
     // Fallback to Date constructor with timezone fix
     try {
-      return new Date(dateStr + 'T12:00:00'); // Add time to avoid timezone issues
+      const date = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T12:00:00'); // Add time to avoid timezone issues
+      return isNaN(date.getTime()) ? new Date() : date;
     } catch (e) {
       console.warn('Could not parse date:', dateStr, e);
       return new Date();
@@ -371,12 +399,16 @@ export class UIManager {
     
     // Add fixed income
     if (income && income.fixed > 0) {
+      // Use the first day of current month for fixed income date
+      const fixedIncomeDate = new Date();
+      fixedIncomeDate.setDate(1);
+      
       allTransactions.push({
         type: 'income',
         id: 'fixed-income',
         description: 'Salario fijo',
         amount: income.fixed,
-        date: new Date(),
+        date: fixedIncomeDate,
         category: 'income'
       });
     }
@@ -388,7 +420,7 @@ export class UIManager {
         id: extraIncome.id,
         description: extraIncome.description,
         amount: extraIncome.amount,
-        date: new Date(extraIncome.date),
+        date: this.parseDateSafe(extraIncome.created_at || extraIncome.date),
         category: 'income'
       });
     });
@@ -417,7 +449,7 @@ export class UIManager {
         ? { icon: '<i class="ph ph-arrow-up"></i>', name: 'Ingreso', color: '#22c55e' }
         : this.getCategoryInfo(transaction.category);
       
-      const formattedDate = transaction.date.toLocaleDateString('es-ES', { 
+      const formattedDate = this.formatDateSafe(transaction.date, { 
         day: 'numeric', 
         month: 'short' 
       });
@@ -2215,8 +2247,102 @@ bindBudgetForm() {
     }
   }
 
-  showEditExtraIncomeModal(incomeId) {
-    // For now, we'll show an alert - this could be enhanced with a proper edit modal
-    this.showAlert('Función de edición de ingresos en desarrollo. Por ahora puedes eliminar y crear uno nuevo.', 'info');
+  async showEditExtraIncomeModal(incomeId) {
+    console.log('✏️ Show edit extra income modal for:', incomeId);
+    
+    if (!window.app || !window.app.data) {
+      this.showAlert('Error: No se pudo acceder a los datos', 'error');
+      return;
+    }
+    
+    try {
+      // Buscar el ingreso extra por ID
+      const extraIncomes = await window.app.data.getExtraIncomes(window.app.currentMonth);
+      const income = extraIncomes.find(i => i.id === incomeId);
+      
+      if (!income) {
+        this.showAlert('Ingreso no encontrado', 'error');
+        return;
+      }
+      
+      // Poblar el formulario con los datos actuales
+      const descriptionInput = document.getElementById('edit-income-description');
+      const amountInput = document.getElementById('edit-income-amount');
+      const categorySelect = document.getElementById('edit-income-category');
+      const modal = document.getElementById('edit-extra-income-modal');
+      
+      if (descriptionInput) descriptionInput.value = income.description || '';
+      if (amountInput) amountInput.value = income.amount || '';
+      if (categorySelect) categorySelect.value = income.category || 'other';
+      if (modal) modal.dataset.incomeId = incomeId;
+      
+      // Mostrar el modal
+      if (window.app && window.app.modals) {
+        window.app.modals.show('edit-extra-income-modal');
+      }
+      
+      // Configurar el event listener para el formulario si no existe
+      this.setupEditExtraIncomeForm();
+      
+    } catch (error) {
+      console.error('Error loading income for edit:', error);
+      this.showAlert('Error al cargar los datos del ingreso', 'error');
+    }
+  }
+  
+  setupEditExtraIncomeForm() {
+    const form = document.getElementById('edit-extra-income-form');
+    if (!form || form.dataset.listenerAdded) return;
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const modal = document.getElementById('edit-extra-income-modal');
+      const incomeId = modal?.dataset.incomeId;
+      
+      if (!incomeId) {
+        this.showAlert('Error: ID de ingreso no encontrado', 'error');
+        return;
+      }
+      
+      const formData = new FormData(form);
+      const updates = {
+        description: formData.get('description')?.trim(),
+        amount: parseFloat(formData.get('amount')),
+        category: formData.get('category')
+      };
+      
+      // Validaciones
+      if (!updates.description || updates.amount <= 0) {
+        this.showAlert('Por favor completa todos los campos correctamente', 'error');
+        return;
+      }
+      
+      try {
+        const success = await window.app.data.updateExtraIncome(incomeId, updates);
+        
+        if (success) {
+          this.showAlert('Ingreso actualizado correctamente', 'success');
+          
+          // Cerrar modal
+          if (window.app && window.app.modals) {
+            window.app.modals.hide('edit-extra-income-modal');
+          }
+          
+          // Refrescar dashboard
+          if (window.app.updateDashboard) {
+            window.app.updateDashboard();
+          }
+        } else {
+          this.showAlert('Error al actualizar el ingreso', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating income:', error);
+        this.showAlert('Error al actualizar el ingreso: ' + error.message, 'error');
+      }
+    });
+    
+    // Marcar que el listener ya fue agregado
+    form.dataset.listenerAdded = 'true';
   }
 }

@@ -799,6 +799,41 @@
     </div>
   </div>
 
+  <!-- Edit Extra Income Modal -->
+  <div id="edit-extra-income-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Ingreso Extra</h2>
+        <button class="modal-close">
+          <i class="ph ph-x" aria-hidden="true"></i>
+        </button>
+      </div>
+      <form id="edit-extra-income-form" class="modal-form">
+        <div class="form-group">
+          <label for="edit-income-description">Descripción</label>
+          <input type="text" id="edit-income-description" name="description" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-income-amount">Monto</label>
+          <input type="number" id="edit-income-amount" name="amount" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-income-category">Categoría</label>
+          <select id="edit-income-category" name="category">
+            <option value="freelance">Freelance</option>
+            <option value="bonus">Bonus</option>
+            <option value="investment">Inversión</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Add Goal Modal -->
   <div id="add-goal-modal" class="modal">
     <div class="modal-content">
