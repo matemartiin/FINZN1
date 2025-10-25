@@ -3,13 +3,11 @@ import { DataManager } from './modules/data.js';
 import { UIManager } from './modules/ui.js';
 import { ChartManager } from './modules/charts.js';
 import { ModalManager } from './modules/modals.js';
-import { ChatManager } from './modules/chat.js';
 import { ReportManager } from './modules/reports.js';
 import { ThemeManager } from './modules/theme.js';
 import { NavigationManager } from './modules/navigation.js';
 import { CalendarManager } from './modules/calendar.js';
 import { BudgetManager } from './modules/budget.js';
-import { AIBudgetManager } from './modules/ai-budget.js';
 import { UserProfileManager } from './modules/user-profile.js';
 import { UserProfileButton } from './modules/user-profile-button.js';
 import { AnimationManager } from './modules/animations.js';
@@ -32,13 +30,11 @@ class FinznApp {
     this.ui = new UIManager();
     this.charts = new ChartManager();
     this.modals = new ModalManager();
-    this.chat = new ChatManager();
     this.reports = new ReportManager();
     this.theme = new ThemeManager();
     this.navigation = new NavigationManager();
     this.calendar = new CalendarManager();
     this.budget = new BudgetManager();
-    this.aiBudget = new AIBudgetManager();
     this.userProfile = new UserProfileManager();
     this.userProfileButton = new UserProfileButton();
     this.animations = new AnimationManager();
@@ -72,10 +68,7 @@ this.setupModalEvents();
       
       // Initialize animations (before other UI elements)
       this.animations.init();
-      
-      // Initialize chat
-      this.chat.init();
-      
+
       // Initialize user profile
       this.userProfile.init();
       
@@ -248,9 +241,6 @@ if (goReports) {
             case 'delete-budget':
               if (budgetId && budgetName) this.deleteBudget(budgetId, budgetName);
               break;
-            case 'analyze-budget':
-              if (budgetId) this.generateBudgetInsights(budgetId);
-              break;
             default:
               console.warn('Unknown budget action:', action);
           }
@@ -358,20 +348,11 @@ setupDashboardEvents() {
   const importDataBtn = document.getElementById('import-data-btn');
   if (importDataBtn) importDataBtn.addEventListener('click', () => this.showImportDataModal());
 
-  const generateAiReportBtn = document.getElementById('generate-ai-report-btn');
-  if (generateAiReportBtn) generateAiReportBtn.addEventListener('click', () => this.showGenerateAiReportModal());
-
-  const generateReportBtnSection = document.getElementById('generate-report-btn-section');
-  if (generateReportBtnSection) generateReportBtnSection.addEventListener('click', () => this.showGenerateAiReportModal());
-
   const backupDataBtn = document.getElementById('backup-data-btn');
   if (backupDataBtn) backupDataBtn.addEventListener('click', () => this.handleBackupData());
 
   const addBudgetBtn = document.getElementById('add-budget-btn');
   if (addBudgetBtn) addBudgetBtn.addEventListener('click', () => this.showAddBudgetModal());
-
-  const generateBudgetInsightsBtn = document.getElementById('generate-budget-insights-btn');
-  if (generateBudgetInsightsBtn) generateBudgetInsightsBtn.addEventListener('click', () => this.generateAllBudgetInsights());
 
   // ---- Formularios (una sola vez) ----
   const addExpenseForm = document.getElementById('add-expense-form');
@@ -397,9 +378,6 @@ setupDashboardEvents() {
 
   const processImportBtn = document.getElementById('process-import-btn');
   if (processImportBtn) processImportBtn.addEventListener('click', () => this.handleImportData());
-
-  const generateReportBtn = document.getElementById('generate-report-btn');
-  if (generateReportBtn) generateReportBtn.addEventListener('click', () => this.handleGenerateAiReport());
 
   // ---- Delegación en lista de gastos ----
   const expensesList = document.getElementById('expenses-list');
@@ -430,9 +408,6 @@ setupDashboardEvents() {
 
   const qaImport = document.getElementById('qa-import');
   if (qaImport) qaImport.addEventListener('click', () => this.showImportDataModal());
-
-  const qaAiReport = document.getElementById('qa-ai-report');
-  if (qaAiReport) qaAiReport.addEventListener('click', () => this.showGenerateAiReportModal());
 
   const qaAddBudget = document.getElementById('qa-add-budget');
   if (qaAddBudget) qaAddBudget.addEventListener('click', () => this.showAddBudgetModal());
@@ -1107,11 +1082,6 @@ async handleEditLimitSubmit(e) {
     this.modals.show('import-data-modal');
   }
   
-  showGenerateAiReportModal() {
-    console.log('🤖 Show generate AI report modal');
-    this.modals.show('generate-ai-report-modal');
-  }
-  
   showViewIncomesModal() {
     console.log('👁️ Show view incomes modal');
     
@@ -1286,10 +1256,6 @@ async handleAddBudget(e) {
       this.modals.hide('add-budget-modal');
       this.ui.showAlert('Presupuesto creado exitosamente', 'success');
       this.updateDashboard();
-
-      if (budgetData.ai_recommended) {
-        this.generateBudgetInsights(budgetData.category);
-      }
     } else {
       this.ui.showAlert('Error al crear el presupuesto', 'error');
     }
@@ -1374,121 +1340,6 @@ async handleEditBudget(e) {
         this.ui.showAlert('Error al eliminar el presupuesto', 'error');
       }
     }
-  }
-
-  async generateBudgetInsights(budgetId = null) {
-    console.log('🤖 Generating budget insights for:', budgetId || 'all budgets');
-    
-    try {
-      this.ui.showAlert('Generando análisis inteligente con IA...', 'info');
-      
-      // Generar análisis completo con IA
-      const recommendations = await this.aiBudget.generateAllRecommendations();
-      
-      // Verificar si hay datos suficientes
-      if (recommendations.error === 'insufficient_data') {
-        this.ui.showInsufficientDataMessage(recommendations);
-        return null;
-      }
-      
-      // Mostrar recomendaciones en la UI
-      this.ui.displayAIBudgetInsights(recommendations.aiRecommendations);
-      
-      // Mostrar predicciones ML
-      this.ui.displayMLPredictions(recommendations.mlPredictions);
-      
-      // Mostrar patrones detectados
-      this.ui.displaySpendingPatterns(recommendations.patterns);
-      
-      this.ui.showAlert('¡Análisis IA completado! Revisa las recomendaciones.', 'success');
-      
-      return recommendations;
-    } catch (error) {
-      console.error('Error generating AI insights:', error);
-      this.ui.showAlert('Error al generar análisis IA. Intenta nuevamente.', 'error');
-      return null;
-    }
-  }
-
-  // Aplicar recomendación de IA
-  async applyAIRecommendation(recommendationId) {
-    try {
-      console.log('✅ Applying AI recommendation:', recommendationId);
-      
-      // Buscar la recomendación
-      const recommendations = document.querySelectorAll('.ai-insight-card');
-      let targetRecommendation = null;
-      
-      recommendations.forEach(card => {
-        if (card.dataset.recommendationId === recommendationId) {
-          const recommendation = {
-            id: recommendationId,
-            category: card.dataset.category,
-            suggestedBudget: parseFloat(card.dataset.suggestedBudget),
-            action: card.dataset.action
-          };
-          targetRecommendation = recommendation;
-        }
-      });
-      
-      if (!targetRecommendation) {
-        this.ui.showAlert('Recomendación no encontrada', 'error');
-        return;
-      }
-      
-      // Aplicar la recomendación
-      const success = await this.aiBudget.applyRecommendation(targetRecommendation);
-      
-      if (success) {
-        this.ui.showAlert('¡Recomendación aplicada exitosamente!', 'success');
-        
-        // Actualizar la UI
-        const card = document.querySelector(`[data-recommendation-id="${recommendationId}"]`);
-        if (card) {
-          card.classList.add('applied');
-          const applyBtn = card.querySelector('.apply-recommendation-btn');
-          if (applyBtn) {
-            applyBtn.textContent = '✅ Aplicada';
-            applyBtn.disabled = true;
-          }
-        }
-        
-        // Actualizar dashboard
-        this.updateDashboard();
-      } else {
-        this.ui.showAlert('Error al aplicar la recomendación', 'error');
-      }
-    } catch (error) {
-      console.error('Error applying AI recommendation:', error);
-      this.ui.showAlert('Error al aplicar la recomendación', 'error');
-    }
-  }
-
-  // Descartar recomendación
-  dismissAIRecommendation(recommendationId) {
-    const card = document.querySelector(`[data-recommendation-id="${recommendationId}"]`);
-    if (card) {
-      card.style.opacity = '0.5';
-      card.classList.add('dismissed');
-      
-      const dismissBtn = card.querySelector('.dismiss-recommendation-btn');
-      if (dismissBtn) {
-        dismissBtn.textContent = '❌ Descartada';
-        dismissBtn.disabled = true;
-      }
-      
-      const applyBtn = card.querySelector('.apply-recommendation-btn');
-      if (applyBtn) {
-        applyBtn.disabled = true;
-      }
-    }
-    
-    this.ui.showAlert('Recomendación descartada', 'info');
-  }
-
-  async generateAllBudgetInsights() {
-    console.log('🤖 Generating insights for all budgets');
-    await this.generateBudgetInsights();
   }
 
 async handleAddIncome(e) {
@@ -1715,78 +1566,6 @@ async handleAddIncome(e) {
   handleBackupData() {
     console.log('☁️ Backup data...');
     this.ui.showAlert('Función de respaldo próximamente', 'info');
-  }
-  
-  async handleGenerateAiReport() {
-    console.log('🤖 Generating AI report...');
-    
-    const period = DOMHelpers.safeGetValue('report-period', 'current');
-    const focus = DOMHelpers.safeGetValue('report-focus', 'general');
-    const questions = DOMHelpers.safeGetValue('report-questions');
-    
-    const resultDiv = DOMHelpers.safeGetElement('ai-report-result');
-    const contentDiv = DOMHelpers.safeGetElement('ai-report-content');
-    const generateBtn = DOMHelpers.safeGetElement('generate-report-btn');
-    const downloadBtn = DOMHelpers.safeGetElement('download-report-btn');
-    
-    // Show loading state
-    if (generateBtn) {
-      generateBtn.disabled = true;
-      generateBtn.innerHTML = '<div class="loading-spinner"></div> Generando...';
-    }
-    
-    try {
-      // Prepare data for AI analysis
-      const reportData = await this.prepareReportData(period);
-      
-      // Generate report with AI using ReportManager
-      const report = await this.reports.generateAIReport(reportData, focus, questions);
-      
-      // Show result
-      contentDiv.innerHTML = report;
-      resultDiv.classList.remove('hidden');
-      
-      // Store report data for PDF generation
-      this.currentReportData = reportData;
-      this.currentReportContent = report;
-      
-      // Enable download button
-      if (downloadBtn) {
-        downloadBtn.disabled = false;
-        downloadBtn.onclick = () => this.handleDownloadReport();
-      }
-      
-      this.ui.showAlert('Informe generado exitosamente', 'success');
-      
-    } catch (error) {
-      console.error('Error generating AI report:', error);
-      this.ui.showAlert('Error al generar el informe', 'error');
-    } finally {
-      generateBtn.disabled = false;
-      generateBtn.innerHTML = '<i class="ph ph-robot"></i> Generar Informe';
-    }
-  }
-  
-  async handleDownloadReport() {
-    console.log('📄 Downloading report as PDF...');
-    
-    if (!this.currentReportContent || !this.currentReportData) {
-      this.ui.showAlert('No hay informe para descargar', 'error');
-      return;
-    }
-    
-    try {
-      const success = await this.reports.generatePDF(this.currentReportContent, this.currentReportData);
-      
-      if (success) {
-        this.ui.showAlert('PDF generado exitosamente', 'success');
-      } else {
-        this.ui.showAlert('PDF generado como archivo HTML', 'info');
-      }
-    } catch (error) {
-      console.error('Error downloading report:', error);
-      this.ui.showAlert('Error al generar el PDF', 'error');
-    }
   }
   
   async prepareReportData(period) {
@@ -2087,23 +1866,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 console.log('✅ MAIN.JS LOADED SUCCESSFULLY');
-
-(() => {
-  const widget = document.getElementById('chat-widget');
-  const btn = document.getElementById('chat-toggle');
-  const win = document.getElementById('chat-window');
-  if (!widget || !btn || !win) return;
-
-  // Garantizar que el widget cuelgue directo de <body> y no herede ocultamientos
-  document.body.appendChild(widget);
-
-  // Mostrar/ocultar SOLO la ventana, nunca el botón
-  btn.addEventListener('click', () => {
-    win.classList.toggle('hidden');
-  });
-
-  // Cerrar con la X
-  const close = document.getElementById('chat-close');
-  close?.addEventListener('click', () => win.classList.add('hidden'));
-})();
 

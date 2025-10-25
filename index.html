@@ -396,11 +396,6 @@
           <div class="section-content">
             <div class="section-header">
               <h1>Reportes y Análisis</h1>
-              <div class="section-actions">
-                <button id="generate-report-btn-section" class="btn btn-primary">
-  <i class="ph ph-robot" aria-hidden="true"></i> Generar Reporte IA
-</button>
-              </div>
             </div>
             
             <div class="reports-grid">
@@ -422,11 +417,6 @@
                 <button class="btn btn-secondary">Ver Progreso</button>
               </div>
               
-              <div class="report-card">
-                <h3><i class="ph ph-robot" aria-hidden="true"></i> Reporte IA</h3>
-                <p>Análisis inteligente personalizado de tus finanzas</p>
-                <button id="reports-generate-ai-card-btn" class="btn btn-secondary">Generar</button>
-              </div>
             </div>
           </div>
         </section>
@@ -442,27 +432,9 @@
                 <button id="add-budget-btn" class="btn btn-primary">
   <i class="ph ph-plus" aria-hidden="true"></i> Nuevo Presupuesto
 </button>
-                <button id="generate-budget-insights-btn" class="btn btn-secondary">
-  <i class="ph ph-robot" aria-hidden="true"></i> Análisis IA
-</button>
               </div>
             </div>
-            
-            <!-- Budget AI Insights Section -->
-            <div id="budget-ai-insights" class="budget-ai-insights">
-              <!-- AI insights will be loaded here -->
-            </div>
-            
-            <!-- ML Predictions Section -->
-            <div id="ml-predictions-container" class="ml-predictions-container hidden">
-              <!-- ML predictions will be loaded here -->
-            </div>
-            
-            <!-- Spending Patterns Section -->
-            <div id="spending-patterns-container" class="spending-patterns-container hidden">
-              <!-- Spending patterns will be loaded here -->
-            </div>
-            
+
             <!-- Budgets List -->
             <div class="budgets-container">
               <div class="budgets-header">
@@ -1092,105 +1064,6 @@
     </div>
   </div>
 
-  <!-- Generate AI Report Modal -->
-  <div id="generate-ai-report-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2><i class="ph ph-robot" aria-hidden="true"></i> Generar Informe Financiero con IA</h2>
-        <button class="modal-close">
-          <i class="ph ph-x" aria-hidden="true"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="ai-report-options">
-          <div class="form-group">
-            <label for="report-period">Período del Informe</label>
-            <select id="report-period" name="period">
-              <option value="current">Mes Actual</option>
-              <option value="last3">Últimos 3 Meses</option>
-              <option value="last6">Últimos 6 Meses</option>
-              <option value="year">Año Completo</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="report-focus">Enfoque del Informe</label>
-            <select id="report-focus" name="focus">
-              <option value="general">Análisis General</option>
-              <option value="savings">Enfoque en Ahorros</option>
-              <option value="expenses">Análisis de Gastos</option>
-              <option value="budget">Optimización de Presupuesto</option>
-              <option value="goals">Progreso hacia Objetivos</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="report-questions">Preguntas Específicas (Opcional)</label>
-            <textarea id="report-questions" name="questions" rows="3" placeholder="¿Hay algo específico que te gustaría saber sobre tus finanzas?"></textarea>
-          </div>
-        </div>
-        
-        <div id="ai-report-result" class="ai-report-result hidden">
-          <h3><i class="ph ph-chart-line" aria-hidden="true"></i> Tu Informe Financiero Personalizado</h3>
-          <div id="ai-report-content" class="ai-report-content">
-            <!-- El informe generado aparecerá aquí -->
-          </div>
-          <div class="ai-report-actions">
-            <button id="download-report-btn" class="btn btn-secondary">
-              <i class="ph ph-file-text" aria-hidden="true"></i>
-              Descargar
-            </button>
-            <button id="share-report-btn" class="btn btn-secondary">
-              <i class="ph ph-export" aria-hidden="true"></i>
-              Compartir
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-        <button type="button" id="generate-report-btn" class="btn btn-primary">
-          <i class="ph ph-robot" aria-hidden="true"></i>
-          Generar Informe
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Chat Widget -->
-  <div id="chat-widget" class="chat-widget">
-    <button id="chat-toggle" class="chat-toggle" title="Chat con asistente financiero">
-      <img src="/robot-chat.png" alt="Chat" class="chat-toggle-icon" />
-    </button>
-    
-    <div id="chat-window" class="chat-window hidden">
-      <div class="chat-header">
-        <div class="chat-header-info">
-          <img src="/robot-chat.png" alt="Asistente" class="chat-header-avatar" />
-          <div class="chat-header-text">
-            <h3>Asistente FINZN</h3>
-            <p>Tu consejero financiero</p>
-          </div>
-        </div>
-        <button id="chat-close" class="chat-close">
-          <i class="ph ph-x" aria-hidden="true"></i>
-        </button>
-      </div>
-      
-      <div id="chat-messages" class="chat-messages">
-        <!-- Messages will be added here -->
-      </div>
-      
-      <form id="chat-form" class="chat-form">
-        <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" />
-        <button type="submit" class="chat-send" aria-label="Enviar">
-  <i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>
-</button>
-      </form>
-    </div>
-  </div>
-
-  
 <!-- Modal: Agregar Evento -->
 <div id="add-event-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="add-event-title">
   <div class="modal-content">
@@ -1462,12 +1335,6 @@
           <label for="budget-end-date">Fecha de Finalización</label>
           <input type="date" id="budget-end-date" name="end_date" required />
         </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="budget-ai-recommendations" name="ai_recommended" />
-            Permitir recomendaciones de IA para este presupuesto
-          </label>
-        </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Crear Presupuesto</button>
@@ -1508,12 +1375,6 @@
           <label for="edit-budget-end-date">Fecha de Finalización</label>
           <input type="date" id="edit-budget-end-date" name="end_date" required />
         </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="edit-budget-ai-recommendations" name="ai_recommended" />
-            Permitir recomendaciones de IA para este presupuesto
-          </label>
-        </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary">Guardar Cambios</button>
@@ -1523,31 +1384,7 @@
     </div>
   </div>
 
-  <!-- Budget AI Insights Modal -->
-  <div id="budget-ai-insights-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2><i class="ph ph-robot"></i> Análisis IA de Presupuestos</h2>
-        <button class="modal-close">
-          <i class="ph ph-x" aria-hidden="true"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div id="budget-ai-analysis-content" class="budget-ai-analysis-content">
-          <!-- AI analysis will be loaded here -->
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary modal-cancel">Cerrar</button>
-        <button type="button" id="apply-ai-recommendations-btn" class="btn btn-primary">
-          <i class="ph ph-sparkle" aria-hidden="true"></i>
-          Aplicar Recomendaciones
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- User Profile Modal -->
+<!-- User Profile Modal -->
   <div id="user-profile-modal" class="modal">
     <div class="modal-content user-profile-modal-content">
       <div class="user-profile-modal-header">
