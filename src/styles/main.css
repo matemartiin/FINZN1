@@ -713,7 +713,7 @@ small:not(.btn-content small) {
   cursor: pointer;
   font-weight: 700;
   color: var(--text-secondary);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
   position: relative;
   overflow: visible;
 }
@@ -727,14 +727,13 @@ small:not(.btn-content small) {
   height: 3px;
   background: var(--primary-color);
   transform: translateX(-50%);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
   border-radius: 2px 2px 0 0;
 }
 
 .tab-btn:hover {
   color: var(--text-primary);
   background: rgba(200, 182, 255, 0.08);
-  transform: translateY(-1px);
 }
 
 .tab-btn:hover::after {
@@ -753,9 +752,9 @@ small:not(.btn-content small) {
 .tab-content {
   display: none;
   opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(8px);
+  transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .tab-content.active {
@@ -882,13 +881,11 @@ small:not(.btn-content small) {
   min-height: calc(100vh - 80px);
   box-sizing: border-box;
 
-  /* 🎨 Premium Performance optimizations */
-  will-change: transform, opacity;
-  transform: translateX(30px) scale(0.98);
+  /* 🎨 Premium Performance optimizations - removed aggressive transforms */
+  will-change: opacity;
   transition:
-    opacity 400ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 400ms cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 800ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    visibility 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -899,8 +896,7 @@ small:not(.btn-content small) {
   visibility: visible;
   pointer-events: auto;
   position: relative;
-  transform: translateX(0) scale(1);
-  transition-duration: 500ms;
+  transition-duration: 800ms;
 }
 
 /* 🔧 FALLBACK: For browsers that don't support smooth transitions */
@@ -3614,13 +3610,11 @@ table,
   min-height: calc(100vh - 80px);
   box-sizing: border-box;
 
-  /* 🎨 Premium Performance optimizations */
-  will-change: transform, opacity;
-  transform: translateX(30px) scale(0.98);
+  /* 🎨 Premium Performance optimizations - removed aggressive transforms */
+  will-change: opacity;
   transition:
-    opacity 400ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 400ms cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 800ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    visibility 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -3631,8 +3625,7 @@ table,
   visibility: visible;
   pointer-events: auto;
   position: relative;
-  transform: translateX(0) scale(1);
-  transition-duration: 500ms;
+  transition-duration: 800ms;
 }
 
 /* 🔧 FALLBACK: For browsers that don't support smooth transitions */
@@ -6492,7 +6485,7 @@ textarea:focus-visible{
   cursor: pointer;
 }
 
-.transaction-tabs .tab-btn:hover{ opacity: 1; transform: translateY(-1px); }
+.transaction-tabs .tab-btn:hover{ opacity: 1; }
 
 .transaction-tabs .tab-btn.active{
   color: var(--text-1,#fff);
@@ -7242,24 +7235,24 @@ body[data-skin="pro"] .chart-container-new{
 /* ========== SECTION ANIMATIONS ========== */
 .dashboard-section {
   opacity: 0;
-  animation: fadeIn 0.6s ease-out forwards;
-  animation-delay: 0.1s;
+  animation: fadeIn 0.8s ease-out forwards;
+  animation-delay: 0.15s;
 }
 
 .dashboard-section.active {
-  animation: slideUpFade 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 .section-header, .section-title {
   opacity: 0;
-  animation: slideInFromLeft 0.5s ease-out forwards;
-  animation-delay: 0.2s;
+  animation: fadeIn 0.7s ease-out forwards;
+  animation-delay: 0.3s;
 }
 
 .section-content {
   opacity: 0;
-  animation: slideUpFade 0.6s ease-out forwards;
-  animation-delay: 0.3s;
+  animation: fadeIn 0.8s ease-out forwards;
+  animation-delay: 0.4s;
 }
 
 /* ========== FORM ANIMATIONS ========== */
@@ -7476,17 +7469,15 @@ body[data-skin="pro"] .chart-container-new{
 
 /* Dashboard sections */
 .dashboard-section {
-  transform: translateX(100px);
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .dashboard-section.active {
-  transform: translateX(0);
   opacity: 1;
 }
 
-/* Cards grid animation */
+/* Cards grid animation - smoother and less aggressive */
 .dashboard-grid, .cards-grid {
   display: grid;
   gap: var(--spacing-lg);
@@ -7494,8 +7485,8 @@ body[data-skin="pro"] .chart-container-new{
 
 .dashboard-grid > *, .cards-grid > * {
   opacity: 0;
-  animation: slideUpFade 0.6s ease-out forwards;
-  animation-delay: calc(var(--grid-item-delay, 0) * 0.1s);
+  animation: fadeIn 0.8s ease-out forwards;
+  animation-delay: calc(var(--grid-item-delay, 0) * 0.15s);
 }
 
 /* Sidebar animation */
@@ -7926,7 +7917,8 @@ html {
 }
 
 .tab-btn:active {
-  transform: translateY(0) scale(0.98);
+  /* Removed aggressive scale effect for smoother interaction */
+  opacity: 0.9;
 }
 
 /* Prevent content jump during transitions */
@@ -7934,26 +7926,26 @@ html {
   min-height: 200px;
 }
 
-/* Smooth card animations within tabs */
+/* Smooth card animations within tabs - more subtle and premium */
 .tab-content.active > * {
-  animation: tabFadeInSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 0.1s;
+  animation: tabFadeInSlide 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  animation-delay: 0.2s;
   opacity: 0;
   animation-fill-mode: forwards;
 }
 
 .tab-content.active > *:nth-child(2) {
-  animation-delay: 0.15s;
+  animation-delay: 0.3s;
 }
 
 .tab-content.active > *:nth-child(3) {
-  animation-delay: 0.2s;
+  animation-delay: 0.4s;
 }
 
-/* Premium button press feedback */
+/* Premium button press feedback - removed aggressive scale */
 .btn:active:not(:disabled) {
-  transform: scale(0.98);
-  transition-duration: 0.1s;
+  opacity: 0.9;
+  transition-duration: 0.2s;
 }
 
 /* Smooth focus indicators */
@@ -7963,14 +7955,13 @@ html {
   border-radius: 8px;
 }
 
-/* Enhanced section transitions with subtle blur */
+/* Enhanced section transitions - removed aggressive blur */
 .dashboard-section:not(.active) {
-  filter: blur(2px);
-  transition: filter 0.3s ease;
+  /* Blur removed for smoother, less aggressive transitions */
 }
 
 .dashboard-section.active {
-  filter: blur(0);
+  /* Premium smooth transition without blur */
 }
 
 /* Reduce motion for accessibility */
