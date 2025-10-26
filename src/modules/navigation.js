@@ -2,6 +2,8 @@ export class NavigationManager {
   constructor() {
     this.currentSection = 'dashboard';
     this.mobileMenuOpen = false;
+    this.isTransitioning = false;
+    this.pendingTab = null;
   }
 
   init() {
@@ -60,12 +62,18 @@ export class NavigationManager {
   
   setupTabNavigation() {
     const tabButtons = document.querySelectorAll('.tab-btn');
-    
+
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         const tabName = button.getAttribute('data-tab');
-        this.switchTab(tabName);
-        this.setActiveTab(button);
+
+        // If already transitioning, queue this tab change
+        if (this.isTransitioning) {
+          this.pendingTab = { name: tabName, button: button };
+          return;
+        }
+
+        this.switchTab(tabName, button);
       });
     });
   }
@@ -154,27 +162,75 @@ export class NavigationManager {
     }
   }
   
-  switchTab(tabName) {
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
-      content.classList.remove('active');
-    });
-    
-    // Show selected tab content
-    const selectedTab = document.getElementById(`${tabName}-tab`);
-    if (selectedTab) {
-      selectedTab.classList.add('active');
+  async switchTab(tabName, activeButton) {
+    // Prevent multiple transitions at once
+    if (this.isTransitioning) return;
+
+    this.isTransitioning = true;
+
+    // Get current and target tab contents
+    const currentTab = document.querySelector('.tab-content.active');
+    const targetTab = document.getElementById(`${tabName}-tab`);
+
+    if (!targetTab || currentTab === targetTab) {
+      this.isTransitioning = false;
+      return;
+    }
+
+    // Update button states immediately for visual feedback
+    this.setActiveTab(activeButton);
+
+    // Phase 1: Fade out current tab
+    if (currentTab) {
+      currentTab.style.opacity = '0';
+      currentTab.style.transform = 'translateX(-20px)';
+
+      // Wait for fade out animation
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      currentTab.classList.remove('active');
+      currentTab.style.transform = '';
+    }
+
+    // Phase 2: Prepare and fade in new tab
+    targetTab.style.opacity = '0';
+    targetTab.style.transform = 'translateX(20px)';
+    targetTab.classList.add('active');
+
+    // Force reflow
+    targetTab.offsetHeight;
+
+    // Fade in
+    await new Promise(resolve => setTimeout(resolve, 50));
+    targetTab.style.opacity = '1';
+    targetTab.style.transform = 'translateX(0)';
+
+    // Wait for fade in animation
+    await new Promise(resolve => setTimeout(resolve, 250));
+
+    // Clear inline styles
+    targetTab.style.opacity = '';
+    targetTab.style.transform = '';
+
+    this.isTransitioning = false;
+
+    // Process pending tab change if any
+    if (this.pendingTab) {
+      const pending = this.pendingTab;
+      this.pendingTab = null;
+      this.switchTab(pending.name, pending.button);
     }
   }
-  
+
   setActiveTab(activeButton) {
-    // Remove active class from all tab buttons
+    if (!activeButton) return;
+
+    // Remove active class from all tab buttons with smooth transition
     const tabButtons = document.querySelectorAll('.tab-btn');
     tabButtons.forEach(button => {
       button.classList.remove('active');
     });
-    
+
     // Add active class to clicked button
     activeButton.classList.add('active');
   }
