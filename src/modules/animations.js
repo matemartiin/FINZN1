@@ -97,38 +97,18 @@ export class AnimationManager {
     this.animateNumbers();
   }
 
-  // Simplified smooth dashboard cards animation
+  // Simplified smooth dashboard cards animation - Let CSS handle most of it
   animateDashboardCards() {
     const cards = document.querySelectorAll('.card, .dashboard-card, .metric-card, .summary-card, .new-unified-card');
-    
+
     cards.forEach((card, index) => {
       if (this.animatedElements.has(card)) return;
-      
-      // Gentle card entrance
-      card.style.willChange = 'transform, opacity';
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(20px)';
-      
-      const delay = index * 80; // Faster, smoother stagger
-      
-      setTimeout(() => {
-        card.style.transition = `
-          opacity 500ms cubic-bezier(0.25, 0.1, 0.25, 1),
-          transform 500ms cubic-bezier(0.25, 0.1, 0.25, 1)
-        `.replace(/\s+/g, ' ').trim();
-        
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-        
-        // Clean up after animation
-        card.addEventListener('transitionend', () => {
-          card.style.willChange = 'auto';
-        }, { once: true });
-      }, delay);
-      
+
+      // Just add the animated class and let CSS do the work
+      card.style.setProperty('--card-delay', index);
       card.classList.add('animated');
       this.animatedElements.add(card);
-      
+
       // Add performance optimizations only
       this.addHoverEffects(card);
     });
@@ -472,14 +452,14 @@ export class AnimationManager {
     });
   }
 
-  // Main page transition animation - SEQUENTIAL to avoid overlap
+  // Main page transition animation - Let CSS handle the transitions
   async animatePageTransition(fromSection, toSection) {
     if (this.isTransitioning) {
       return;
     }
 
     this.isTransitioning = true;
-    
+
     try {
       if (this.prefersReducedMotion) {
         // Instant transition for reduced motion
@@ -487,31 +467,29 @@ export class AnimationManager {
         return;
       }
 
-      // STEP 1: Animate OUT the current section first
+      // STEP 1: Remove active class from old section (CSS handles fade out)
       if (fromSection) {
-        fromSection.classList.add('transitioning-out');
-        await new Promise(resolve => setTimeout(resolve, 200)); // Smooth fade out
         fromSection.classList.remove('active');
-        fromSection.classList.remove('transitioning-out');
+        // Wait for CSS transition to complete (600ms as defined in CSS)
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
-      
-      // STEP 2: Then animate IN the new section
+
+      // STEP 2: Add active class to new section (CSS handles fade in)
       if (toSection) {
-        toSection.classList.add('transitioning-in');
-        // No delay - start immediately after previous section is hidden
         toSection.classList.add('active');
-        await new Promise(resolve => setTimeout(resolve, 350)); // Premium smooth fade in
-        toSection.classList.remove('transitioning-in');
-        
-        // STEP 3: Start coordinated animations for the new section
-        if (toSection.id === 'dashboard-section') {
-          this.orchestrateDashboardAnimations();
-        } else {
-          // For other sections, just animate content
-          this.animateActiveSection();
-        }
+        // Wait for CSS transition to complete (600ms as defined in CSS)
+        await new Promise(resolve => setTimeout(resolve, 650));
+
+        // STEP 3: Animate content inside the new section
+        setTimeout(() => {
+          if (toSection.id === 'dashboard-section') {
+            this.orchestrateDashboardAnimations();
+          } else {
+            this.animateActiveSection();
+          }
+        }, 100);
       }
-      
+
     } finally {
       this.isTransitioning = false;
     }
@@ -839,25 +817,8 @@ export class AnimationManager {
   orchestrateDashboardAnimations() {
     if (this.prefersReducedMotion) return;
 
-    // Phase 1: Section transition (already handled by existing system)
-    // Phase 2: Main cards entrance (300ms after section is active)
-    setTimeout(() => {
-      this.animateDashboardCards();
-    }, 300);
-    
-    // Phase 3: Financial data count-up (600ms after cards)
-    // This is handled by animateFinancialData() in main.js
-    
-    // Phase 4: Charts entrance (after financial data animations)
-    // This is handled by the enhanced chart timing in main.js
-    
-    // Phase 5: Transaction lists (final phase)
-    setTimeout(() => {
-      const activeSection = document.querySelector('.dashboard-section.active');
-      if (activeSection) {
-        this.animateTransactionsInSection(activeSection);
-      }
-    }, 2000);
+    // Just trigger the animations - CSS handles the timing and transitions
+    this.animateDashboardCards();
   }
 
   // Animate only the currently active section
@@ -869,16 +830,11 @@ export class AnimationManager {
     const elementsInActiveSection = activeSection.querySelectorAll('.card, .dashboard-card, .metric-card, .summary-card');
     elementsInActiveSection.forEach(element => {
       this.animatedElements.delete(element); // Remove from set to re-animate
+      element.classList.remove('animated'); // Remove the class to retrigger CSS animation
     });
 
-    // Re-run animations for active section only
+    // Re-run animations for active section only - let CSS handle it
     this.animateDashboardCards();
-    
-    // Animate charts if present
-    this.animateChartsInSection(activeSection);
-    
-    // Animate transaction lists
-    this.animateTransactionsInSection(activeSection);
   }
 
   // Simplified smooth chart entrance
