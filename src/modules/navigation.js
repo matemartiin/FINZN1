@@ -183,10 +183,10 @@ export class NavigationManager {
     // Phase 1: Fade out current tab
     if (currentTab) {
       currentTab.style.opacity = '0';
-      currentTab.style.transform = 'translateX(-20px)';
+      currentTab.style.transform = 'translateX(-10px)';
 
       // Wait for fade out animation
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       currentTab.classList.remove('active');
       currentTab.style.transform = '';
@@ -194,7 +194,7 @@ export class NavigationManager {
 
     // Phase 2: Prepare and fade in new tab
     targetTab.style.opacity = '0';
-    targetTab.style.transform = 'translateX(20px)';
+    targetTab.style.transform = 'translateX(10px)';
     targetTab.classList.add('active');
 
     // Force reflow
@@ -206,7 +206,7 @@ export class NavigationManager {
     targetTab.style.transform = 'translateX(0)';
 
     // Wait for fade in animation
-    await new Promise(resolve => setTimeout(resolve, 250));
+    await new Promise(resolve => setTimeout(resolve, 400));
 
     // Clear inline styles
     targetTab.style.opacity = '';

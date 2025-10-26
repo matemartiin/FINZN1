@@ -752,9 +752,9 @@ small:not(.btn-content small) {
 .tab-content {
   display: none;
   opacity: 0;
-  transform: translateX(8px);
-  transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
-              transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform: translateX(10px);
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .tab-content.active {
@@ -881,11 +881,13 @@ small:not(.btn-content small) {
   min-height: calc(100vh - 80px);
   box-sizing: border-box;
 
-  /* 🎨 Premium Performance optimizations - removed aggressive transforms */
-  will-change: opacity;
+  /* 🎨 Premium Performance optimizations with subtle movement */
+  will-change: opacity, transform;
+  transform: translateY(15px);
   transition:
-    opacity 800ms cubic-bezier(0.25, 0.1, 0.25, 1),
-    visibility 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    opacity 600ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 600ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    visibility 600ms cubic-bezier(0.25, 0.1, 0.25, 1);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -896,7 +898,8 @@ small:not(.btn-content small) {
   visibility: visible;
   pointer-events: auto;
   position: relative;
-  transition-duration: 800ms;
+  transform: translateY(0);
+  transition-duration: 600ms;
 }
 
 /* 🔧 FALLBACK: For browsers that don't support smooth transitions */
@@ -3610,11 +3613,13 @@ table,
   min-height: calc(100vh - 80px);
   box-sizing: border-box;
 
-  /* 🎨 Premium Performance optimizations - removed aggressive transforms */
-  will-change: opacity;
+  /* 🎨 Premium Performance optimizations with subtle movement */
+  will-change: opacity, transform;
+  transform: translateY(15px);
   transition:
-    opacity 800ms cubic-bezier(0.25, 0.1, 0.25, 1),
-    visibility 800ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    opacity 600ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 600ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    visibility 600ms cubic-bezier(0.25, 0.1, 0.25, 1);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -3625,7 +3630,8 @@ table,
   visibility: visible;
   pointer-events: auto;
   position: relative;
-  transition-duration: 800ms;
+  transform: translateY(0);
+  transition-duration: 600ms;
 }
 
 /* 🔧 FALLBACK: For browsers that don't support smooth transitions */
@@ -7174,13 +7180,13 @@ body[data-skin="pro"] .chart-container-new{
 /* ========== DASHBOARD CARDS ANIMATIONS ========== */
 .card, .dashboard-card, .metric-card, .summary-card {
   opacity: 0;
-  animation: slideUpFade 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  animation-delay: calc(var(--card-delay, 0) * 0.1s);
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation: fadeInUp 0.5s ease-out forwards;
+  animation-delay: calc(var(--card-delay, 0) * 0.08s);
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .card:hover, .dashboard-card:hover, .metric-card:hover, .summary-card:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
@@ -7235,24 +7241,24 @@ body[data-skin="pro"] .chart-container-new{
 /* ========== SECTION ANIMATIONS ========== */
 .dashboard-section {
   opacity: 0;
-  animation: fadeIn 0.8s ease-out forwards;
-  animation-delay: 0.15s;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: 0.1s;
 }
 
 .dashboard-section.active {
-  animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  animation: fadeIn 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 .section-header, .section-title {
   opacity: 0;
-  animation: fadeIn 0.7s ease-out forwards;
-  animation-delay: 0.3s;
+  animation: slideInFromLeft 0.5s ease-out forwards;
+  animation-delay: 0.2s;
 }
 
 .section-content {
   opacity: 0;
-  animation: fadeIn 0.8s ease-out forwards;
-  animation-delay: 0.4s;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: 0.3s;
 }
 
 /* ========== FORM ANIMATIONS ========== */
@@ -7470,14 +7476,17 @@ body[data-skin="pro"] .chart-container-new{
 /* Dashboard sections */
 .dashboard-section {
   opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform: translateY(15px);
+  transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .dashboard-section.active {
   opacity: 1;
+  transform: translateY(0);
 }
 
-/* Cards grid animation - smoother and less aggressive */
+/* Cards grid animation - smooth and fluid */
 .dashboard-grid, .cards-grid {
   display: grid;
   gap: var(--spacing-lg);
@@ -7485,8 +7494,8 @@ body[data-skin="pro"] .chart-container-new{
 
 .dashboard-grid > *, .cards-grid > * {
   opacity: 0;
-  animation: fadeIn 0.8s ease-out forwards;
-  animation-delay: calc(var(--grid-item-delay, 0) * 0.15s);
+  animation: fadeInUp 0.5s ease-out forwards;
+  animation-delay: calc(var(--grid-item-delay, 0) * 0.1s);
 }
 
 /* Sidebar animation */
@@ -7902,11 +7911,11 @@ html {
 @keyframes tabFadeInSlide {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -7926,20 +7935,28 @@ html {
   min-height: 200px;
 }
 
-/* Smooth card animations within tabs - more subtle and premium */
+/* Smooth card animations within tabs - visible but not aggressive */
 .tab-content.active > * {
-  animation: tabFadeInSlide 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-  animation-delay: 0.2s;
+  animation: tabFadeInSlide 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  animation-delay: 0.15s;
   opacity: 0;
   animation-fill-mode: forwards;
 }
 
 .tab-content.active > *:nth-child(2) {
-  animation-delay: 0.3s;
+  animation-delay: 0.25s;
 }
 
 .tab-content.active > *:nth-child(3) {
-  animation-delay: 0.4s;
+  animation-delay: 0.35s;
+}
+
+.tab-content.active > *:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.tab-content.active > *:nth-child(5) {
+  animation-delay: 0.55s;
 }
 
 /* Premium button press feedback - removed aggressive scale */
